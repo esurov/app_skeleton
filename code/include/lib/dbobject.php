@@ -105,6 +105,14 @@ class DbObject {
         return date("Y-m-d", $ts);
     }
 
+    function mysql_now_datetime() {
+        return DbObject::mysql_datetime(time());
+    }
+
+    function mysql_datetime($ts) {
+        return date("Y-m-d H:i:s", $ts);
+    }
+
     function get_app_double_value($double_value, $decimals = 2) {
         return format_double_value($double_value);
     }
@@ -662,7 +670,10 @@ class DbObject {
                 case 'varchar':
                 case 'text':
                 case 'mediumtext':
+                case 'longtext':
                 case 'blob':
+                case 'mediumblob':
+                case 'longblob':
                 case 'enum':
                     $str .= qw($value);
                     break;
@@ -745,7 +756,10 @@ class DbObject {
             case 'varchar':
             case 'text':
             case 'mediumtext':
+            case 'longtext':
             case 'blob':
+            case 'mediumblob':
+            case 'longblob':
             case 'enum':
                 $str .= qw($value);
                 break;
@@ -1235,7 +1249,11 @@ class DbObject {
             $type  = $f['type'];
             $value = $this->$name;  // !!!
 
-            if ($type == 'blob') {  // do not try to write blobs...
+            if (
+                $type == 'blob' ||
+                $type == 'mediumblob' ||
+                $type == 'longblob'
+            ) {  // do not try to write blobs...
                 continue;
             }
 

@@ -218,6 +218,8 @@ class CustomDbObject extends DbObject {
                     "name=\"{$pname}\" value=\"{$value}\">";
                 break;
             case "text":
+            case "mediumtext":
+            case "longtext":
                 $h[$pname . "_input"] =
                     "<textarea name=\"{$pname}\" cols=\"60\" rows=\"9\">" .
                     $value . "</textarea>";
