@@ -12,9 +12,11 @@ page_title_pg_static_contact_form = Contacts
 page_title_pg_static_sample_page1 = SamplePage1
 page_title_pg_static_sample_page2 = SamplePage2
 page_title_pg_news = News
+page_title_view_article_info = View article
 
 recent_news = Recent news
 view_all_news = View all news
+view_article = View article
 
 pager_pages_title = Pages:
 

@@ -1,0 +1,18 @@
+setup_area_head_title = !!AppSkeleton setup area
+setup_auth_realm = !!AppSkeleton setup area
+tables_created = Tables have been created!
+tables_deleted = Tables have been deleted!
+tables_updated = Tables have been updated!
+test_data_inserted = Test data have been inserted!
+initial_data_inserted = Initial data have been inserted!
+
+admin_area_head_title = !!AppSkeleton area di amministrazione
+admin_auth_realm = !!AppSkeleton area di amministrazione
+
+page_title_view_articles = Visualizza articoli
+page_title_edit_article_info = Modifica articolo
+page_title_add_article_info = Aggiungi articolo
+page_title_view_article_info = Visualizza articolo
+article_added = Aggiunto nuovo articolo
+article_updated = L'articolo &egrave; stato modificato
+article_deleted = L'articolo &egrave; stato eliminato

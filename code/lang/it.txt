@@ -12,6 +12,7 @@ page_title_pg_static_contact_form = Contatti
 page_title_pg_static_sample_page1 = !!SamplePage1
 page_title_pg_static_sample_page2 = !!SamplePage2
 page_title_pg_news = News
+page_title_view_article_info = View article
 
 recent_news = Ultime novit&agrave;
 view_all_news = Tutte le News
@@ -59,25 +60,7 @@ label_address = Indirizzo:
 label_phone = Telefono:
 label_fax = Fax:
 
-contact_form_processed = !!Your contact info was processed. Thank you.
+contact_form_processed = I suoi dati sono stati registrati. Grazie.
 
 sure_delete = Sei sicuro di voler cancellare l\'informazione?
 cannot_delete_record_because_it_has_links = Impossibile eliminare {%main_obj_name%} perch&eacute; in relazione con {%dep_objs_data%}
-
-setup_area_head_title = !!AppSkeleton setup area
-setup_auth_realm = !!AppSkeleton setup area
-admin_area_head_title = !!AppSkeleton admin area
-admin_auth_realm = !!AppSkeleton admin area
-tables_created = Tables have been created!
-tables_deleted = Tables have been deleted!
-tables_updated = Tables have been updated!
-test_data_inserted = Test data have been inserted!
-
-page_title_view_articles = Visualizza articoli
-page_title_edit_article_info = Modifica articolo
-page_title_add_article_info = Aggiungi articolo
-page_title_view_article_info = Visualizza articolo
-article_added = Aggiunto nuovo articolo
-article_updated = L'articolo &egrave; stato modificato
-article_deleted = L'articolo &egrave; stato eliminato
-

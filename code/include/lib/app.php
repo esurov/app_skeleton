@@ -16,13 +16,7 @@ class App {
         // Read configuration file:
         $this->config = new Config();
         $this->config->read("{$config_dir}/app.cfg");
-    /*
-        // Read special (debug) configuration file:
-        $special_config_file = "{$config_dir}/debug.cfg";
-        if(file_exists( $special_config_file) ) {
-            $this->config->read($special_config_file);
-        }
-    */
+
         // Initialise logging:
         $debug_level = $this->config->value('debug_level');
         $this->log = new Logger("$log_dir/app.log", $debug_level);

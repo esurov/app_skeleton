@@ -6,6 +6,7 @@ class Config {
     // name = value
 
     var $params;
+    var $ignore_comments = true;
 
 
     function Config() {
@@ -56,17 +57,19 @@ class Config {
 
         while ($line = fgets($f, 1024)) {
             $line = chop($line);
-            $line = preg_replace('/^#.*$/', '', $line);
-            $line = preg_replace('/([^\\\\])#.*$/', "$1", $line);
-            $line = preg_replace('/\/\/.*$/', '', $line);
-            $line = preg_replace('/\\\\#/', '#', $line);
-            $line = trim($line);
 
-            if($line == '') {
+            if ($this->ignore_comments) {
+                $line = preg_replace('/^#.*$/', '', $line);
+                $line = preg_replace('/([^\\\\])#.*$/', "$1", $line);
+                $line = preg_replace('/\/\/.*$/', '', $line);
+                $line = preg_replace('/\\\\#/', '#', $line);
+                $line = trim($line);
+            }
+            if ($line == '') {
                 continue;
             }
 
-            list($name, $value) = preg_split('/\s*=\s?/', $line, 2);
+            list ($name, $value) = preg_split('/\s*=\s?/', $line, 2);
 
             $this->params[$name] = $value;
         }

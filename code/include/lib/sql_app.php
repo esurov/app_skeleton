@@ -12,17 +12,11 @@ class SqlApp extends App {
     ) {
         // Constructor.
 
-        $this->App($app_name, $config_dir, $log_dir);
+        parent::App($app_name, $config_dir, $log_dir);
 
         // Read SQL configuration:
         $sql_config = new Config();
         $sql_config->read("$config_dir/$sql_config_file.cfg");
-
-        // Read special (debug) configuration file:
-        $special_config_file = "{$config_dir}/debug.cfg";
-        if (file_exists($special_config_file)) {
-            $sql_config->read($special_config_file);
-        }
 
         // Create SQL object:
         $this->sql = new SQL(
