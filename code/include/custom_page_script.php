@@ -96,6 +96,9 @@ class CustomPageScript extends PageScript {
                     "caption" => $this->get_message(
                         "{$this->script_name}_menu_item_{$menu_action}"
                     ),
+                    "url" => $this->config->value(
+                        "{$this->script_name}_menu_action_{$menu_action}"
+                    ),
                 ));
                 if (
                     $menu_action == $this->action ||
@@ -103,11 +106,6 @@ class CustomPageScript extends PageScript {
                 ) {
                     $this->page->parse_file("_main_menu_item_current.html", "menu_items");
                 } else {
-                    $this->page->assign(array(
-                        "url" => $this->config->value(
-                            "{$this->script_name}_menu_action_{$menu_action}"
-                        ),
-                    ));
                     $this->page->parse_file("_main_menu_item.html", "menu_items");
                 }
                 if ($i != count($menu_items)) {
