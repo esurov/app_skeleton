@@ -20,6 +20,8 @@ operation_delete = Delete
 operation_select = Select
 operation_back = Back
 operation_save = Save
+operation_filter = Filter
+operation_send = Send
 actions = Actions
 
 article = article

@@ -5,3 +5,11 @@
 .ok {
     color: green;
 }
+
+.wide input {
+    width: 400px;
+}
+
+.mid-wide input {
+    width: 250px;
+}

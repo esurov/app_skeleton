@@ -20,13 +20,15 @@ operation_delete = Cancella
 operation_select = Seleziona
 operation_back = Indietro
 operation_save = Salva
+operation_filter = Filtra
+operation_send = Invia
 actions = Azioni
 
 article = articolo
 articles = articoli
 
 news_list = News
-recent_news_list = !!Recent news
+recent_news_list = Ultime novit&agrave;
 
 filter_by = Filtra per:
 article_text = Testo
@@ -34,7 +36,7 @@ article_text = Testo
 en = Inglese
 it = Italiano
 
-view_all_news = !!View all news
+view_all_news = Tutte le News
 
 label_date_created = Data:
 label_article_title = Titolo:
@@ -51,24 +53,24 @@ label_country = Nazione:
 label_address = Indirizzo:
 label_phone = Telefono:
 label_fax = Fax:
-label_send_btn = Invia
 
 contact_form_processed = !!Your contact info was processed. Thank you.
 
 setup_auth_realm = Area di setup
-setup_auth_access_denied_page = Accesso non autorizzato!
 admin_auth_realm = Area di amministrazione
 admin_auth_access_denied_page = Accesso non autorizzato!
 
-tables_created = Le tabelle sono state create!
-tables_deleted = Le tabelle sono state eliminate!
-tables_updated = Tutte le tabelle sono state aggiornate!
+tables_created = Tables have been created
+tables_deleted = Tables have been deleted
+tables_updated = All tables have been updated
 test_data_inserted = Test data inserted
 
-title_view_articles = View articles
-title_edit_article_info = Edit article info
-title_add_article_info = Add article info
-title_view_article_info = View article info
-article_added = New article was added
-article_updated = Article was updated
-article_deleted = Article was deleted
+title_view_articles = Visualizza articoli
+title_edit_article_info = Modifica articolo
+title_add_article_info = Aggiungi articolo
+title_view_article_info = Visualizza articolo
+article_added = Aggiunto nuovo articolo
+article_updated = L'articolo &egrave; stato modificato
+article_deleted = L'articolo &egrave; stato eliminato
+sure_delete_article = Si &egrave; sicuri di voler eliminare questo articolo?
+

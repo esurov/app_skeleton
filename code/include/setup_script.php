@@ -29,7 +29,7 @@ class SetupScript extends CustomPageScript {
             $this->config->value("admin_login"),
             $this->config->value("admin_password"),
             $this->get_message("setup_auth_realm"),
-            $this->get_message("setup_auth_access_denied_page")
+            $this->get_message("admin_auth_access_denied_page")
         );
     }
 
