@@ -1059,10 +1059,15 @@ class DbObject {
         $havings = array();
 
         foreach($this->where_conditions as $name => $field_conditions) {
-            $type   = $this->fields[$name]['type'];
-            $select = $this->fields[$name]['select'];
 
             foreach($field_conditions as $relation => $cond) {
+                $type = (isset($cond["type"])) ?
+                    $cond["type"] :
+                    $this->fields[$name]["type"];
+                $select = (isset($cond["select"])) ?
+                    $cond["select"] :
+                    $this->fields[$name]["select"];
+                
                 $nonset_value =
                     (isset($cond["input"]["nonset_id"])) ? $cond["input"]["nonset_id"] : "";
 
@@ -1508,9 +1513,13 @@ class DbObject {
                 $h["{$pname}_hidden"] =
                     "<input type=\"hidden\" name=\"$pname\" value=\"$value\">";
 
+                $field_type = (isset($cond["type"])) ?
+                    $cond["type"] :
+                    $this->fields[$name]["type"];
+
                 switch ($input['type']) {
                 case 'select':
-                    if ($this->fields[$name]['type'] == 'enum') {
+                    if ($field_type == 'enum') {
                         $items = $this->fields[$name]['values'];
 
                     } else if (isset($input['values'])) {
@@ -1543,7 +1552,7 @@ class DbObject {
 
                     $value = isset($cond['value']) ? $cond['value'] : array();
 
-                    if ($this->fields[$name]['type'] == 'enum') {
+                    if ($field_type == 'enum') {
                         $items = $this->fields[$name]['values'];
 
                     } else if (isset($input['values'])) {

@@ -112,6 +112,10 @@ function make_sub_url($params) {
     return $sub_url;
 }
 
+function convert_url_to_redirect_url($url) {
+    return str_replace("&amp;", "&", $url);
+}
+
 
 function if_null($variable, $value) {
     return is_null($variable) ? $value : $variable;

@@ -277,7 +277,7 @@ class SelectQuery {
     function expand($q) {
         // Add more statements to the clauses using given array.
 
-        $this->select .= isset($q['select'  ]) ? " ,   $q[select]  " : '';
+        $this->select .= isset($q['select'  ]) ? ",    $q[select]  " : '';
         $this->from   .= isset($q['from'    ]) ? "     $q[from]    " : '';
         $this->where  .= isset($q['where'   ]) ? " and $q[where]   " : '';
         $this->limit  .= isset($q['limit'   ]) ? "     $q[limit]  "  : '';

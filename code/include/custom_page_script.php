@@ -344,6 +344,17 @@ class CustomPageScript extends PageScript {
         echo $content;
         exit();
     }
+
+    function fetch_db_objects_list($obj_name, $query_ex) {
+        $obj = new $this->app->tables[$obj_name]();
+        $res = $obj->get_expanded_result($query_ex);
+        $objs_list = array();
+        while ($row = $res->fetch()) {
+            $obj->fetch_row($row);
+            $objs_list[] = $obj;
+        }
+        return $objs_list;
+    }
 }
 
 ?>
