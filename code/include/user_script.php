@@ -1,8 +1,6 @@
 <?php
 
 class UserScript extends CustomPageScript {
-    var $user = null;
-
     function UserScript() {
         parent::CustomPageScript("user");
 
