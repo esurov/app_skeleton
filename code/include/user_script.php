@@ -29,6 +29,9 @@ class UserScript extends CustomPageScript {
     }
 
     function pg_index() {
+        $title_resource = "page_title_pg_index";
+        $this->print_title($title_resource);
+        $this->print_title_resource($title_resource);
         $this->print_recent_news();
         $this->page->parse_file("index.html", "body");
     }
@@ -66,7 +69,6 @@ class UserScript extends CustomPageScript {
     }
 
     function pg_contact_form() {
-        $this->print_title("page_title_contact_form");
         $this->page->parse_file("contact_form.html", "body");
     }
 

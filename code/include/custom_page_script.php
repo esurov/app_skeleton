@@ -19,19 +19,26 @@ class CustomPageScript extends PageScript {
         $this->init_lang_dependent_data();
         $this->init_email_message();
 
+        $action = param("action");
+        $page_name = param("page");
         $this->page->assign(array(
-            'logo'  => $this->get_message('app_title'),
-            'logo2' => $this->get_message('logo2'),
-            "action" => param("action"),
-            "page" => param("page"),
+            "action" => $action,
+            "page" => $page_name,
         ));
+        if (is_null($page_name) || trim($page_name) == "") {
+            $title_resource = "page_title_{$action}";
+        } else {
+            $title_resource = "page_title_{$action}_{$page_name}";
+        }
+        $this->print_title($title_resource);
+        $this->print_title_resource($title_resource);
+        $this->print_title("app_head_title", "head_title");
+
         $this->app->page =& $this->page;
     }
 
     function run() {
-        $this->print_title("app_head_title", "head_title");
         $this->print_lang_menu();
-
 
         $this->popup = intval(param("popup"));
         $this->report = intval(param("report"));
@@ -155,36 +162,31 @@ class CustomPageScript extends PageScript {
         return "&amp;popup={$this->popup}";
     }
 
-    function print_title($title, $varName = "title") {
-        $this->page->assign(array($varName => ''));
-        $this->print_message($title, $varName);
+    function print_title($resource, $var_name = "title") {
+        $text = $this->get_message($resource);
+        $this->page->assign(array(
+            $var_name => $text,
+        ));
     }
 
     function create_view_object_page_title($obj) {
         $resource = $obj->singular_resource_name();
-        $resource = "title_view_{$resource}_info";
-        $this->page->assign(array(
-            'title' => $this->get_message($resource),
-        ));
+        $resource = "page_title_view_{$resource}_info";
+        $this->print_title($resource);
     }
 
     function create_view_several_objects_page_title($obj) {
         $resource = $obj->plural_resource_name();
-        $this->page->assign(array(
-            'title' => $this->get_message("title_view_{$resource}"),
-        ));
+        $this->print_title("page_title_view_{$resource}");
     }
 
     function create_edit_object_page_title($obj) {
         $resource = $obj->singular_resource_name();
         $resource =
             ($obj->is_definite()) ?
-            "title_edit_{$resource}_info" :
-            "title_add_{$resource}_info";
-
-        $this->page->assign(array(
-            'title' => $this->get_message($resource),
-        ));
+            "page_title_edit_{$resource}_info" :
+            "page_title_add_{$resource}_info";
+        $this->print_title($resource);
     }
 
     /**
@@ -308,11 +310,22 @@ class CustomPageScript extends PageScript {
         if ($this->page->is_template_exist($localized_page_path)) {
             $page_path = $localized_page_path;
         }
-        $this->page->assign(array(
-            "title_img_url" => $this->get_message("page_title_img_url_{$page_name}")
-        ));
-        $this->print_title("page_title_{$page_name}");
+        $this->print_image_title($page_name);
+        $this->print_title("page_title_pg_static_{$page_name}");
         $this->page->parse_file($page_path, "body");
+    }
+
+    function print_title_resource($resource) {
+        $this->page->assign(array(
+            "title_resource" => $resource,
+        ));
+    }
+
+    function print_image_title($page_name) {
+        $this->page->assign(array(
+            "title_img_url" =>
+                $this->get_message("page_title_img_url_pg_static_{$page_name}"),
+        ));
     }
 }
 
