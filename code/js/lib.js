@@ -348,6 +348,12 @@ function openPopup(url, width, height, use_scroll) {
     }
 }
 
+function reloadParentWindow() {
+    if (window.opener != null) {
+        window.opener.location.reload();
+    }
+}
+
 function ifConfirmed(message) {
     result = confirm(message);
     event.returnValue = result;
