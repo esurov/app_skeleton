@@ -332,11 +332,16 @@ function openIT(theURL)
     subwin = window.open(theURL, "",windowprops);
 }
 
-function openPopup(url, width, height, scroll) {
+function openPopup(url, width, height, use_scroll) {
+    var corner_x = (screen.width - width) / 2;
+    var corner_y = (screen.height - height) / 2 - 32;
+
     w = window.open(
         url,
         'popup',
-        'width=' + width + ',height=' + height + ',scrollbars=' + scroll + ',resizable'
+        'width=' + width + ',height=' + height +
+        ',left=' + corner_x + ',top=' + corner_y +
+        ',scrollbars=' + use_scroll + ',resizable'
     );
     if (w != null) {
         w.focus();
