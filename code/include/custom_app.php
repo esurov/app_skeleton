@@ -13,6 +13,7 @@ class CustomApp extends SqlApp {
         $this->lang = $this->get_current_lang();
 
         $this->messages = new Config();
+        $this->messages->ignore_comments = false;
         $this->messages->read("lang/default.txt");
         $this->messages->read("lang/{$this->lang}.txt");
     }

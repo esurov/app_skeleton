@@ -6,6 +6,8 @@ class Config {
     // name = value
 
     var $params;
+    var $ignore_comments = true;
+
 
     function Config() {
         // Constructor.
