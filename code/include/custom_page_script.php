@@ -317,13 +317,14 @@ class CustomPageScript extends PageScript {
     }
 
     function image() {
+        send_no_cache_headers();
         $image = $this->app->read_id_fetch_object("image", "", "1");
         if ($image->is_definite()) {
             $content = $image->content;
             $filename = $image->filename;
             $filesize = $image->filesize;
             $type = $image->type;
-            $modified = timestamp2unix($image->updated);
+            $modified = mysql_datetime_to_unix($image->updated);
         } else {
             $filename = 'no_image.gif';
             $content = file_get_contents("images/{$filename}");

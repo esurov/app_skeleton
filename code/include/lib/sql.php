@@ -300,4 +300,12 @@ function qw($str) {
     return "'" . mysql_escape_string($str) . "'" ;
 }
 
+// Quote and escape string for MySql LIKE expression.
+function lqw($str, $prefix_str = "", $suffix_str = "") {
+    $str = mysql_escape_string($str);
+    $str = str_replace('%', '\%', $str);
+    $str = str_replace('_', '\_', $str);
+    return "'{$prefix_str}{$str}{$suffix_str}'";
+}
+
 ?>

@@ -2,18 +2,18 @@
 
 // Standard library functions.
 
-function header_no_cache() {
+function send_no_cache_headers() {
     // This function sent raw HTTP header for no cache HTML page.
     // For more detail realization - see PHP manual, HTTP function.
 
     header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
     header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 
-    $server_protocol = $_SERVER['SERVER_PROTOCOL'];
+    $server_protocol = $_SERVER["SERVER_PROTOCOL"];
     if ($server_protocol == 'HTTP/1.1') {
-        header("Cache-Control: no-store, no-cache, must-revalidate");  // HTTP/1.1
+        header("Cache-Control: no-store, no-cache, must-revalidate"); // HTTP/1.1
     } else {
-        header("Pragma: no-cache");                          // HTTP/1.0
+        header("Pragma: no-cache"); // HTTP/1.0
     }
 
     header("Cache-Control: post-check=0, pre-check=0", false);
@@ -197,6 +197,10 @@ function str_to_unix_time($str) {
 
 function unix_to_mysql_time($time) {
     return date('Y-m-d H:i:s', $time);
+}
+
+function mysql_datetime_to_unix($datetime) {
+    return strtotime($datetime);
 }
 
 function timestamp2unix($stamp)
