@@ -46,8 +46,8 @@ class Article extends CustomDbObject {
         ));
 
         $this->table_indexes =
-            "primary key(id), " .
-            "index(created)";
+            "index(created), " .
+            "primary key(id)";
     }
 
     function write($fields = null) {

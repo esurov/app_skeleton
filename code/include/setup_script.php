@@ -18,6 +18,7 @@ class SetupScript extends CustomPageScript {
             "delete_tables"    => $a,
             "update_tables"    => $a,
             "insert_test_data" => $a,
+//            "insert_initial_data" => $a,
         );
     }
 
@@ -68,12 +69,12 @@ class SetupScript extends CustomPageScript {
     }
 
     function insert_test_data() {
-        $this->insert_articles();
+        $this->insert_test_articles();
         $this->print_status_message(new OA_OkStatusMsg("test_data_inserted"));
         $this->pg_index();
     }
 
-    function insert_articles() {
+    function insert_test_articles() {
         $article = new Article();
         $article->created = "2004-06-20";
         $article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";
@@ -167,6 +168,12 @@ class SetupScript extends CustomPageScript {
             "Morbi eros. Quisque luctus neque et justo. Nullam facilisis velit. " .
             "Curabitur at odio. Sed vel justo. Aenean suscipit.";
         $article->store();
+    }
+
+    function insert_initial_data() {
+//        $this->insert_initial_rent_();
+//        $this->print_status_message(new OA_OkStatusMsg("initial_data_inserted"));
+//        $this->pg_index();
     }
 }
 

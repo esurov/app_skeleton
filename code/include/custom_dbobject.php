@@ -349,6 +349,86 @@ class CustomDbObject extends DbObject {
 
         return $messages;
     }
+
+    function write_image($image_id = null, $var_name = "_image") {
+        $image_template_text = "";
+        $filename = "{$this->class_name}/{$var_name}.html";
+        if ($this->page->is_template_exist($filename)) {
+            $image = $this->get_image($image_id);
+            if (!is_null($image)) {
+                $this->page->assign($image->write());
+                $image_template_text = $this->page->parse_file($filename);
+            }
+        }
+        return array("{$this->class_name}{$var_name}" => $image_template_text);
+    }
+
+    function get_image($image_id = null) {
+        if (is_null($image_id)) {
+            $image_id = $this->image_id;
+        }
+        if ($image_id != 0) {
+            $image = new Image();
+            $image->fetch("image.id = {$image_id}");
+            return $image;
+        } else {
+            return null;
+        }
+    }
+
+    function del_image($image_id = null) {
+        if (is_null($image_id)) {
+            $image_id = $this->image_id;    
+        }
+        if ($image_id != 0) {
+            $image = new Image();
+            $image->del_where("id = {$image_id}");
+        }
+    }
+
+    function process_image_upload(
+        $image_id_name = "image_id", $input_name = "image_file"
+    ) {
+        if (Image::was_uploaded($input_name)) {
+            $image_id = $this->{$image_id_name};
+            $image = $this->get_image($image_id);
+            if (is_null($image)) {
+                $image = new Image();
+            }
+            $image->read_uploaded_content($input_name);
+            
+            if ($image->is_definite()) {
+                $image->update();
+            } else {
+                $image->store();
+                $this->{$image_id_name} = $image->id;
+            }
+        }
+    }
+
+    function verify_image_upload($input_name = "image_file") {
+        if (!Image::was_uploaded($input_name)) {
+            return "";
+        }
+
+        switch ($_FILES[$input_name]["error"]) {
+            case UPLOAD_ERR_OK:
+                $err = "";
+                break;
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                $err = $this->status_message("too_big_filesize");
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $err = $this->status_message("file_was_not_uploaded_completely");
+                break;
+            default:
+                $err = "";
+                break;
+        }
+
+        return $err;
+    }
 }
 
 ?>

@@ -259,15 +259,6 @@ function is_email($value) {
     return preg_match('/.+@.+\..+/', $value);
 }
 
-function is_in_table($table, $where_str, $sql) {
-    $query = new SelectQuery(array(
-        "from"  => $table,
-        "where" => $where_str,
-    ));
-    $n = $sql->get_query_num_rows($query);
-    return ($n == 1);
-}
-
 function format_double_value(
     $double_value, $decimals = 2, $dec_point = ",", $thousands_sep = "."
 ) {
@@ -353,4 +344,51 @@ function write_options_ex($items, $select = null, $items_begin = null, $items_en
     return write_options($items, $select);
 }
 
+function print_html_input($type, $name, $value, $attrs = "") {
+    if ($attrs != "") {
+        $attrs = " " . $attrs;
+    }
+    $value_safe = htmlspecialchars($value);
+    return "<input type=\"{$type}\" name=\"{$name}\" " .
+        "value=\"{$value_safe}\"{$attrs}>";
+}
+
+function print_html_radio_group($name, $values, $value, $default_value) {
+    if (count($values) == 0) {
+        return "";
+    }
+
+    $value_ids = array_keys($values);
+    if (in_array($value, $value_ids)) {
+        $checked_value = $value;
+    } else if (in_array($default_value, $value_ids)) {
+        $checked_value = $default_value;
+    } else {
+        $checked_value = $value_ids[0];
+    }
+    
+    $output = "";
+    foreach ($values as $current_value_id => $current_value) {
+        $output .= print_html_input(
+            "radio",
+            $name,
+            $current_value_id,
+            ($current_value == $checked_value) ? "checked" : ""
+        );
+
+        $output .= "&nbsp;" . htmlspecialchars($current_value) . "<br>\n";
+    }
+    return $output;
+}
+
+function print_html_checkbox($name, $value) {
+    $checked = (intval($value) == 1) ? "checked" : "";
+
+    return print_html_input(
+        "checkbox",
+        $name,
+        "1",
+        $checked
+    );
+}
 ?>

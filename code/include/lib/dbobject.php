@@ -1741,6 +1741,58 @@ class DbObject {
         return $main_to_dep_rows;
     }
 
+    function is_unique($field_names, $old_obj) {
+        if (!is_array($field_names)) {
+            $field_names = array($field_names);
+        }
+
+        $res = false;
+        foreach ($field_names as $field_name) {
+            $res = $res || $this->{$field_name} == $old_obj->{$field_name};
+        }
+
+        return $res || !$this->field_values_exist($field_names);
+    }
+
+    function field_values_exist($field_names) {
+        $field_sqls = array();
+        foreach ($field_names as $field_name) {
+            $field_sqls[] = "{$field_name} = " . qw($this->{$field_name});
+        }
+        $query = new SelectQuery(array(
+            "from"  => get_table_name($this->class_name),
+            "where" => join(" and ", $field_sqls),
+        ));
+
+        $n = $this->sql->get_query_num_rows($query);
+
+        return ($n != 0);
+    }
+
+    function fetch_linked_object($obj_name, $id) {
+        $obj = $this->app->create_object($obj_name);
+        if ($id != 0) {
+            $obj->fetch("{$obj_name}.id = {$id}");
+        }
+        return $obj;
+    }
+
+    function save($refetch_after_save = true) {
+        $is_definite = $this->is_definite();
+
+        if ($is_definite) {
+            $this->update();
+        } else {
+            $this->store();
+        }
+        
+        if ($refetch_after_save) {
+            $this->fetch();
+        }
+
+        return $is_definite;
+    }
+
 }  // class DbObject
 
 

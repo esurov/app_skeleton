@@ -269,15 +269,16 @@ class CustomPageScript extends PageScript {
 
     function pg_static() {
         $page_name = trim(if_null(param("page"), ""));
-        $this->print_title("page_title_pg_static_{$page_name}");
-        $this->print_static_page($page_name);
-    }
-
-    function print_static_page($page_name) {
         $avail_pages = explode(",", $this->config->value("static_pages"));
         if (!in_array($page_name, $avail_pages)) {
             $this->pg_access_denied();
+        } else {
+            $this->print_title("page_title_pg_static_{$page_name}");
+            $this->print_static_page($page_name);
         }
+    }
+
+    function print_static_page($page_name) {
         $page_path = "static/{$page_name}.html";
         $localized_page_path = "static/{$page_name}_{$this->app->lang}.html";
         if ($this->page->is_template_exist($localized_page_path)) {
@@ -303,6 +304,34 @@ class CustomPageScript extends PageScript {
         $this->page->assign(array(
             "head_title" => $resource_text,
         ));
+    }
+
+    function image() {
+        $image = $this->app->read_id_fetch_object("image", "", "1");
+        if ($image->is_definite()) {
+            $content = $image->content;
+            $filename = $image->filename;
+            $filesize = $image->filesize;
+            $type = $image->type;
+            $modified = timestamp2unix($image->updated);
+        } else {
+            $filename = 'no_image.gif';
+            $content = file_get_contents("images/{$filename}");
+            $filesize = filesize("images/{$filename}");
+            $type = 'image/gif';
+            $modified = filectime("images/{$filename}");
+        }
+
+        header("Content-type: {$type}");
+        header("Content-Disposition: attachment; filename={$filename}");
+        header("Accept-Ranges: bytes");
+        header("Content-Length: {$filesize}");
+
+        $gm_modified = gmdate("D, d M Y H:i:s", $modified);
+        header("Last-Modified: {$gm_modified} GMT");
+
+        echo $content;
+        exit();
     }
 }
 
