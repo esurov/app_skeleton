@@ -50,47 +50,6 @@ class Article extends CustomDbObject {
             "index(created)";
     }
 
-    function singular_name() {
-        return $this->get_message("article");
-    }
-
-    function plural_name() {
-        return $this->get_message("articles");
-    }
-
-//    function verify()
-//    {
-//        $err = "";
-//
-//        if( !preg_match("/\w+/", $this->title) ) {
-//            $err .= "<p>Please input article title. It should be correct string.</p>\n";
-//        }
-//
-//        if( !preg_match("/\w+/", $this->body) ) {
-//            $err .= "<p>Please input article text.</p>\n";
-//        }
-//
-//        if ( preg_match( "/\d{2,4}-\d{1,2}-\d{1,2}/", $this->created ) ) {
-//            list( $year, $month, $day ) = explode( "-", $this->created );
-//
-//            if( checkdate( $month, $day, $year ) ) {
-//                $now = date("Y-m-d");
-//                if( $this->created > $now ) {
-//                    $err .= "<p>Article date cannot be in future.</p>";
-//                } else if( $year <= 1900 ) {
-//                    $err .= "<p>Article is too old.</p>";
-//                }
-//            } else {
-//                $err .= "<p>Please input correct date.</p>";
-//            }
-//
-//        } else {
-//            $err .= "<p>Article date should be in format mm/dd/yyyy.</p>";
-//        }
-//
-//        return $err;
-//    }
-
     function write($fields = null) {
         $h = parent::write($fields);
         
