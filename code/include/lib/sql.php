@@ -76,7 +76,8 @@ class SQL {
         // Run query:
         $result = mysql_query($query_str, $this->connection);
         if (!$result) {
-            $this->log->write('SQL', "MySQL error: " . mysql_error(), 0);
+            $this->log->write('SQL', "MySQL error: #" . mysql_errno($this->connection) . ": " .
+                mysql_error($this->connection), 0);
             die();
         }
 
