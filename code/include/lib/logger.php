@@ -2,7 +2,7 @@
 
 class Logger {
 
-    // Log file with 'debug level' suppurt.
+    // Log file with 'debug level' support.
 
     var $filename;
     var $level;
@@ -13,8 +13,13 @@ class Logger {
 
         $this->filename = $filename;
         $this->level    = $level;
+
+        $this->max_file_size = 1048576;
     }
 
+    function set_max_file_size($max_file_size) {
+        $this->max_file_size = $max_file_size;
+    }
 
     function write($class_name, $message, $level = 1) {
         // Write $class_name and $message to log file,
@@ -27,11 +32,15 @@ class Logger {
 
         $f = @fopen($this->filename, "a");
         if (!$f) {
-            // Max: if no log file -- just return.
-            //die("Cannot open log file [$filename].");
             return;
         }
         flock($f, LOCK_EX);  // lock
+
+        $file_stats = fstat($f);
+        $file_size = $file_stats["size"];
+        if ($file_size > $this->max_file_size) {
+            ftruncate($f, 0);
+        }
 
         $time_str = strftime('%Y.%m.%d %H:%M:%S', time());
         $s = "$time_str - [$class_name] $message\n";
