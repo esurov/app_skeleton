@@ -303,7 +303,7 @@ class CustomPageScript extends PageScript {
             $page_path = $localized_page_path;
         }
         $this->print_title("page_title_{$page_name}");
-        $this->page->parse_file("static/{$page_name}.html", "body");
+        $this->page->parse_file($page_path, "body");
     }
 }
 
