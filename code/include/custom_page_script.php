@@ -283,7 +283,7 @@ class CustomPageScript extends PageScript {
         if ($this->page->is_template_exist($localized_page_path)) {
             $page_path = $localized_page_path;
         }
-        return $this->page->parse_file("static/{$page_name}.html", "body");
+        return $this->page->parse_file($page_path, "body");
     }
 
     function print_title($resource) {
