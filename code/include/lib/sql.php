@@ -195,6 +195,9 @@ class SQLResult {
         if (is_array($row)) {
             $field_value_pairs = array();
             foreach ($row as $field => $value) {
+                if (strlen($value) > 400) {
+                    $value = substr($value, 0, 400) . "...";
+                }
                 $field_value_pairs[] = "{$field}='{$value}'";
             }
             $log_str = join(", ", $field_value_pairs);
