@@ -85,35 +85,39 @@ class CustomPageScript extends PageScript {
         }
     }
 
-    function print_main_menu() {
-        $menu_actions = $this->config->value("{$this->script_name}_menu_actions");
+    function print_main_menu($menu_prefix = "", $menu_var = "main_menu") {
+        $menu_actions = $this->config->value("{$this->script_name}_menu_{$menu_prefix}actions");
         if (!is_null($menu_actions)) {
             $menu_items = explode(",", $menu_actions);
             $i = 0;
+            $this->page->assign(array(
+                "menu_items" => "",
+            ));
             foreach ($menu_items as $menu_action) {
                 $i++;
                 $this->page->assign(array(
                     "caption" => $this->get_message(
-                        "{$this->script_name}_menu_item_{$menu_action}"
+                        "{$this->script_name}_menu_{$menu_prefix}item_{$menu_action}"
                     ),
                     "url" => $this->config->value(
-                        "{$this->script_name}_menu_action_{$menu_action}"
+                        "{$this->script_name}_menu_{$menu_prefix}action_{$menu_action}"
                     ),
+                    "marker" => $menu_action,
                 ));
                 if (
                     $menu_action == $this->action ||
                     $menu_action == $this->action . "_" . param("page")
                 ) {
-                    $this->page->parse_file("_main_menu_item_current.html", "menu_items");
+                    $this->page->parse_file("_main_menu_{$menu_prefix}item_current.html", "menu_items");
                 } else {
-                    $this->page->parse_file("_main_menu_item.html", "menu_items");
+                    $this->page->parse_file("_main_menu_{$menu_prefix}item.html", "menu_items");
                 }
                 if ($i != count($menu_items)) {
-                    $this->page->parse_file("_main_menu_item_delimiter.html", "menu_items");
+                    $this->page->parse_file("_main_menu_{$menu_prefix}item_delimiter.html", "menu_items");
                 }
             }
         }
-        $this->page->parse_file("_main_menu.html", "main_menu");
+        $this->page->parse_file("_{$menu_var}.html", $menu_var);
     }
 
     // Should be redefined in child class
@@ -304,6 +308,9 @@ class CustomPageScript extends PageScript {
         if ($this->page->is_template_exist($localized_page_path)) {
             $page_path = $localized_page_path;
         }
+        $this->page->assign(array(
+            "title_img_url" => $this->get_message("page_title_img_url_{$page_name}")
+        ));
         $this->print_title("page_title_{$page_name}");
         $this->page->parse_file($page_path, "body");
     }
