@@ -1,3 +1,10 @@
 php_flag session.use_trans_sid 0
 php_flag magic_quotes_gpc      off
 php_flag magic_quotes_runtime  off
+
+Options -Indexes
+
+<Files ~ "(CVS|Entries|Repository|Root)$">
+    Order allow,deny
+    Deny from all
+</Files>

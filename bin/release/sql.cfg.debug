@@ -1,0 +1,9 @@
+# SQL configuration file for 'release' version of project
+# Real hosting mysql connection info should be placed here
+
+host     = localhost
+database = !!CHANGE_ME!!
+username = !!CHANGE_ME!!
+password = !!CHANGE_ME!!
+
+table_prefix = apsk_
