@@ -292,7 +292,7 @@ function create_dependency_js(
     return
         "<script language=\"JavaScript\">
 
-        depends[depends.length] = new Dependency(
+        dependencies[dependencies.length] = new Dependency(
             '{$formName}',
             '{$name}',
             '{$depSelectName}',
