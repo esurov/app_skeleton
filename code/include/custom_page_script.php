@@ -22,6 +22,8 @@ class CustomPageScript extends PageScript {
         $this->page->assign(array(
             'logo'  => $this->get_message('app_title'),
             'logo2' => $this->get_message('logo2'),
+            "action" => param("action"),
+            "page" => param("page"),
         ));
         $this->app->page =& $this->page;
     }
@@ -288,7 +290,9 @@ class CustomPageScript extends PageScript {
 
     function change_lang() {
         $this->app->set_current_lang(param("new_lang"));
-        self_redirect("?action=pg_index");
+        $cur_action = param("cur_action");
+        $cur_page = param("cur_page");
+        self_redirect("?action={$cur_action}&page={$cur_page}");
     }
 
     function pg_static() {
