@@ -306,7 +306,9 @@ function fail(message, formName, field)
  */
 function focus(element)
 {
-    element.focus();
+    if (element != null) {
+        element.focus();
+    }
 }
 
 /**
@@ -336,7 +338,9 @@ function openPopup(url, width, height, scroll) {
         'popup',
         'width=' + width + ',height=' + height + ',scrollbars=' + scroll + ',resizable'
     );
-    w.focus();
+    if (w != null) {
+        w.focus();
+    }
 }
 
 function ifConfirmed(message) {
