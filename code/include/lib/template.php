@@ -10,10 +10,15 @@ class Template {
 
     var $fillings;  // hash with template data
 
+    var $print_template_name; // debug
+
+    var $TEMPLATE_NAME_PATTERN;
 
 
-function Template($templates_dir = 'templates')
-{
+function Template(
+    $templates_dir = "templates",
+    $print_template_name = false
+) {
     // Constructor.
     // Store path to templates in the internal variable.
 
@@ -22,7 +27,13 @@ function Template($templates_dir = 'templates')
     $this->parsed_files = array();
 
     $this->fillings = array();
-    
+
+    $this->print_template_name = $print_template_name;
+
+    $this->TEMPLATE_NAME_PATTERN =
+        "\n<!-- TEMPLATE BEGIN '%s' -->\n" .
+        "%s" .
+        "\n<!-- TEMPLATE END '%s' -->\n";
 }
 
 
@@ -84,6 +95,15 @@ function parse_file($template_name, $append_to = NULL)
     // Return filled template.
 
     $raw_text = $this->get_raw_text($template_name);
+
+    if ($this->print_template_name) {
+        $raw_text = sprintf(
+            $this->TEMPLATE_NAME_PATTERN,
+            $template_name,
+            $raw_text,
+            $template_name
+        );
+    }
 
     $parsed_text = $this->parse_text($raw_text, $append_to);
 

@@ -42,11 +42,12 @@ class PageScript
         // Create template for HTML pages:
         $t_dir = $templates_dir;
         $template_type = $this->config->value('template_type');
+        $print_template_name = $this->config->value('print_template_name');
         if($template_type != '') {
             $t_dir .= "/$template_type";
         }
         $t_dir .= "/{$this->script_name}";
-        $this->page = new Template($t_dir);
+        $this->page = new Template($t_dir, $print_template_name);
 
         // Assign predefined variables to page template.
         $this->page->assign(array(
