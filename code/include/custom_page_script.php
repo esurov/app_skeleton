@@ -299,6 +299,11 @@ class CustomPageScript extends PageScript {
         if (!in_array($page_name, $avail_pages)) {
             $this->pg_access_denied();
         }
+        $page_path = "static/{$page_name}.html";
+        $localized_page_path = "static/{$page_name}_{$this->app->lang}.html";
+        if ($this->page->is_template_exist($localized_page_path)) {
+            $page_path = $localized_page_path;
+        }
         $this->print_title("page_title_{$page_name}");
         $this->page->parse_file("static/{$page_name}.html", "body");
     }

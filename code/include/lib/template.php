@@ -127,6 +127,10 @@ function append($name, $text)
     }
 }
 
+function is_template_exist($template_name) {
+    $filename = "{$this->templates_dir}/{$template_name}";
+    return file_exists($filename);
+}
 
 }  // class Template
 
