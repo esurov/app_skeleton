@@ -329,3 +329,144 @@ function openIT(theURL)
 
     subwin = window.open(theURL, "",windowprops);
 }
+
+function openPopup(url, width, height, scroll) {
+    w = window.open(
+        url,
+        'popup',
+        'width=' + width + ',height=' + height + ',scrollbars=' + scroll + ',resizable'
+    );
+    w.focus();
+}
+
+function ifConfirmed(message) {
+    result = confirm(message);
+    event.returnValue = result;
+    return result;
+}
+
+function acceptChoice(formName, input1, value1, input2, value2) {
+    var input = eval("window.opener.document." + formName + "." + input1);
+    input.value = value1;
+    input.onchange(); // onchange is not fired automatically ;(
+
+    if (input2 != null && value2 != null) {
+        var input = eval("window.opener.document." + formName + "." + input2);
+        input.value = value2;
+    }
+    window.opener.focus();
+    window.close();
+}
+
+function Dependency(formName, mainSelect, dependentSelect, dependencyArray) {
+    this.formName = formName;
+    this.mainSelectName = mainSelect;
+    this.dependentSelectName = dependentSelect;
+    this.dependencyArray = dependencyArray;
+
+    this.dependentSelectValues = new Array();
+    this.dependentSelectCaptions = new Array();
+
+    this.read = read;
+    this.update = update;
+    this.init = init;
+    this.getCaptionByValue = getCaptionByValue;
+}
+
+function init() {
+    this.form = eval('document.' + this.formName);
+
+    this.mainSelect = eval('this.form.' + this.mainSelectName);
+    this.dependentSelect = eval('this.form.' + this.dependentSelectName);
+
+    var oldDependentSelectValue = getSelectValue(this.dependentSelect);
+
+    this.read();
+    this.update();
+    
+    setSelectValue(this.dependentSelect, oldDependentSelectValue);
+}
+
+function getSelectValue(obj) {
+    return obj.value;
+}
+
+function setSelectValue(obj, newValue) {
+    if (isValueInSelectOptions(obj, newValue)) {
+        obj.value = newValue;
+    } else {
+        obj.value = 0; // value 0 must be present in dependency
+    }
+}
+
+function isValueInSelectOptions(obj, value) {
+    var options = obj.options;
+    for (var i = 0; i < options.length; i++) {
+        if (options[i].value == value) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function read() {
+    var options = this.dependentSelect.options;
+    for (var i = 0; i < options.length; i++) {
+        this.dependentSelectValues[i] = options[i].value;
+        this.dependentSelectCaptions[i] = options[i].text;
+    }
+}
+
+function update() {
+    var caption, value;
+    var values = this.dependencyArray[this.mainSelect.selectedIndex];
+    this.dependentSelect.options.length = 0;
+    for (var i = 0; i < values.length; i++) {
+        value = values[i];
+        caption = this.getCaptionByValue(value);
+        if (caption != null) {
+            this.dependentSelect.options[i] = new Option(caption, value);
+        }
+    }
+}
+
+function getCaptionByValue(value) {
+    for (var i = 0; i < this.dependentSelectValues.length; i++) {
+        if (this.dependentSelectValues[i] == value) {
+            return this.dependentSelectCaptions[i];
+        }
+    }
+    return null;
+}
+
+function updateDependentSelect(mainObj, dependentName) {
+    var formName = mainObj.form.name;
+    var mainName = mainObj.name;
+    dependency = getDependency(formName, mainName, dependentName);
+    if (dependency != null) {
+        dependency.update();
+    }
+}
+
+function getDependency(formName, mainName, dependentName) {
+    for (var i = 0; i < depends.length; i++) {
+        if (
+            depends[i].formName == formName && 
+            depends[i].mainSelectName == mainName && 
+            depends[i].dependentSelectName == dependentName 
+        ) {
+            return depends[i];
+        }
+    }
+    return null;
+}
+
+function initDependencies() {
+    for (var i = 0; i < depends.length; i++) {
+        depends[i].init();
+    }
+}
+
+var depends = new Array();
+
+window.onload = initDependencies;

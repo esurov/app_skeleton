@@ -1710,22 +1710,28 @@ class DbObject {
     }
 
     function get_dependency_array(
-        $main_objs, $dep_obj_name, $dep_key_name,
-        $dep_field_name = "name", $dep_order_by_field_name = "name",
-        $where_str = "1"
+        $main_objs,
+        $dep_obj_name,
+        $dep_key_name,
+        $dep_data_field_name = "name",
+        $query_clauses = array()
     ) {
         $main_obj_ids = get_ids_from_items($main_objs);
         $main_to_dep_rows = array(array(0));
 
+        if (!isset($query_clauses["where"])) {
+            $query_clauses["where"] = "1";
+        }
         foreach ($main_obj_ids as $main_obj_id) {
-            $dep_obj_ids = get_ids_from_items(get_table_field_values(
+            $q = $query_clauses;
+            $q["where"] .= " and {$dep_key_name} = {$main_obj_id}";
+
+            $dep_obj_ids = get_names_from_items(get_table_field_values(
                 $dep_obj_name,
-                $dep_field_name,
-                array(
-                    "order_by" => $dep_order_by_field_name,
-                    "where" => "{$where_str} and {$dep_key_name} = {$main_obj_id}"
-                )
+                $dep_data_field_name,
+                $q
             ));
+
             array_unshift($dep_obj_ids, 0);
             $main_to_dep_rows[] = $dep_obj_ids;
         }

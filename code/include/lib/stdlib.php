@@ -318,6 +318,14 @@ function get_ids_from_items($items) {
     return $ids;
 }
 
+function get_names_from_items($items) {
+    $names = array();
+    foreach ($items as $item) {
+        $names[] = $item["name"];    
+    }    
+    return $names;
+}
+
 function write_options_ex($items, $select = null, $items_begin = null, $items_end = null) {
     if (!is_null($items_begin)) {
         $items = array_merge(array($items_begin), $items);

@@ -491,16 +491,19 @@ class PageScript {
             $this->page->parse_file("{$prefix}total.html", "text_{$name}_total");
         }
 
-        // Make sub-URL with all necessary parameters stored -- for pager:
-        $self_action = $this->get_self_action();
+        // Make sub-URLs with all necessary parameters stored:
         $where_sub_url = make_sub_url($where_params);
         $order_by_sub_url = make_sub_url($order_by_params);
-        $sub_url = "{$self_action}{$where_sub_url}{$order_by_sub_url}" .
-            $this->get_pager_custom_url_params();
+        $where_order_by_suburl = "{$where_sub_url}{$order_by_sub_url}";
+
+        $action_suburl = "?action={$this->action}";
+        $action_where_suburl = "{$action_suburl}{$where_sub_url}";
+        $action_where_order_by_suburl = "{$action_suburl}{$where_order_by_suburl}";
 
         $this->page->assign(array(
-            'self_action' => "{$self_action}{$where_sub_url}",
-            'pager_suburl' => "{$where_sub_url}{$order_by_sub_url}",
+            "action_suburl" => $action_suburl,
+            "action_where_suburl" => $action_where_suburl,
+            "action_where_order_by_suburl" => $action_where_order_by_suburl,
         ));
 
         if ($show_search_form) {
@@ -536,9 +539,12 @@ class PageScript {
                 $i++;
             }
 
+            $pager_suburl =
+                $action_where_order_by_suburl .
+                $this->get_pager_custom_url_params();
             $this->page->assign(array(
-                'nav_str'        => $this->pager->get_pages_navig($sub_url),
-                'simple_nav_str' => $this->pager->get_simple_navig($sub_url),
+                'nav_str'        => $this->pager->get_pages_navig($pager_suburl),
+                'simple_nav_str' => $this->pager->get_simple_navig($pager_suburl),
             ));
         }
 
