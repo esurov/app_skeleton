@@ -4,7 +4,7 @@ user_menu_item_pg_static_contact_form = Contatti
 user_menu_item_pg_static_sample_page1 = !!SamplePage1
 user_menu_item_pg_static_sample_page2 = !!SamplePage2
 
-app_head_title = !!WebAppSkeleton
+app_head_title = !!AppSkeleton
 page_title_access_denied = Accesso non autorizzato!
 head_page_title_pg_index = Home
 page_title_pg_index =
@@ -64,10 +64,10 @@ contact_form_processed = !!Your contact info was processed. Thank you.
 sure_delete = Sei sicuro di voler cancellare l\'informazione?
 cannot_delete_record_because_it_has_links = Impossibile eliminare {%main_obj_name%} perch&eacute; in relazione con {%dep_objs_data%}
 
-setup_area_head_title = !!WebAppSkeleton area di setup
-setup_auth_realm = !!WebAppSkeleton area di setup
-admin_area_head_title = !!WebAppSkeleton area di amministrazione
-admin_auth_realm = !!WebAppSkeleton area di amministrazione
+setup_area_head_title = !!AppSkeleton setup area
+setup_auth_realm = !!AppSkeleton setup area
+admin_area_head_title = !!AppSkeleton admin area
+admin_auth_realm = !!AppSkeleton admin area
 tables_created = Tables have been created!
 tables_deleted = Tables have been deleted!
 tables_updated = Tables have been updated!

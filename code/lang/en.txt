@@ -4,7 +4,7 @@ user_menu_item_pg_static_contact_form = Contacts
 user_menu_item_pg_static_sample_page1 = SamplePage1
 user_menu_item_pg_static_sample_page2 = SamplePage2
 
-app_head_title = !!WebAppSkeleton
+app_head_title = !!AppSkeleton
 page_title_access_denied = Accesso non autorizzato!
 head_page_title_pg_index = Home
 page_title_pg_index =
