@@ -1,0 +1,51 @@
+user_menu_item_pg_index = Home
+user_menu_item_pg_news = News
+user_menu_item_pg_contact_form = Contacts
+user_menu_item_pg_static_sample_page1 = SamplePage1
+user_menu_item_pg_static_sample_page2 = SamplePage2
+
+access_denied = Access denied!
+
+app_head_title = (((((WebAppSkeleton)))))
+page_title_contact_form = Contact form
+page_title_sample_page1 = SamplePage1
+page_title_sample_page2 = SamplePage2
+
+pager_pages_title = Pages:
+
+operation_view = View
+operation_edit = Edit
+operation_add = Add
+operation_delete = Delete
+operation_select = Select
+info = info
+actions = Actions
+
+article = article
+articles = articles
+
+news_list = News
+recent_news_list = Recent news
+
+filter_by = Filter by
+article_text = Text
+
+en = English
+it = Italian
+
+view_all_news = View all news
+
+label_first_name = First Name:
+label_last_name = Last Name:
+label_company = Company:
+label_position = Position:
+label_email = E-mail:
+label_zip = ZIP Code:
+label_city = City:
+label_country = Country:
+label_address = Address:
+label_phone = Phone:
+label_fax = Fax:
+label_send_btn = Send
+
+contact_form_processed = Your contact info was processed. Thank you.

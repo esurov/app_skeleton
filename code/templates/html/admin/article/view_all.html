@@ -1,0 +1,15 @@
+{%text_article_search_form%}
+
+<table border="1">
+<tr>
+<th><a href="?action=pg_view_article&amp;order_by=id">ID</a></th>
+<th><a href="?action=pg_view_article&amp;order_by=created+desc">Data</a></th>
+<th><a href="?action=pg_view_article&amp;order_by=title">Titolo</a></th>
+<th><a href="?action=pg_view_article&amp;order_by=title">{%str_actions%}</a></th>
+</tr>
+
+{%text_article_items%}
+
+</table>
+
+<p>{%total%}</p>

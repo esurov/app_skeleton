@@ -1,0 +1,27 @@
+<form action="?" method="post">
+<input type="hidden" name="action" value="update_article">
+<input type="hidden" name="article_id" value="{%article_id%}">
+<table>
+
+<tr>
+<th>{%str_label_date_created%}</th>
+<td>{%article_created_input%}</td>
+</tr>
+
+<tr>
+<th>{%str_label_article_title%}</th>
+<td>{%article_title_input%}</td>
+</tr>
+
+<tr>
+<th>{%str_label_article_body%}</th>
+<td>{%article_body_input%}</td>
+</tr>
+
+<tr>
+<td></td>
+<td><input type="submit" value="!!Save"></td>
+</tr>
+
+</table>
+</form>

@@ -1,0 +1,69 @@
+user_menu_item_pg_index = !!Home
+user_menu_item_pg_news = !!News
+user_menu_item_pg_contact_form = Contatti
+user_menu_item_pg_static_sample_page1 = !!SamplePage1
+user_menu_item_pg_static_sample_page2 = !!SamplePage2
+
+access_denied = !!Access denied!
+
+app_head_title = (((((WebAppSkeleton)))))
+page_title_contact_form = !!Contact form
+page_title_sample_page1 = !!SamplePage1
+page_title_sample_page2 = !!SamplePage2
+
+pager_pages_title = Pagine:
+
+operation_view = !!View
+operation_edit = !!Edit
+operation_add = !!Add
+operation_delete = !!Delete
+operation_select = !!Select
+info = !!info
+actions = !!Actions
+
+article = !!article
+articles = !!articles
+
+news_list = !!News
+recent_news_list = !!Recent news
+
+filter_by = !!Filter by
+article_text = Testo
+
+en = Inglese
+it = Italiano
+
+view_all_news = !!View all news
+
+label_date_created = Data:
+label_article_title = Titolo:
+label_article_body = !!Body:
+
+label_first_name = Nome:
+label_last_name = Cognome:
+label_company = Azienda:
+label_position = Ruolo aziendale:
+label_email = E-mail:
+label_zip = CAP:
+label_city = Citt&agrave;:
+label_country = Nazione:
+label_address = Indirizzo:
+label_phone = Telefono:
+label_fax = Fax:
+label_send_btn = Invia
+
+contact_form_processed = !!Your contact info was processed. Thank you.
+
+setup_auth_realm = Setup area
+setup_auth_access_denied_page = Access denied!
+admin_auth_realm = !!Admin area
+admin_auth_access_denied_page = !!Access denied!
+
+tables_created = Tables have been created
+tables_deleted = Tables have been deleted
+tables_updated = All tables have been updated
+test_data_inserted = Test data inserted
+
+article_added = New article was added
+article_updated = Article was updated
+article_deleted = Article was deleted

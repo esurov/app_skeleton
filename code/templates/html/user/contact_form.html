@@ -1,0 +1,58 @@
+<table>
+<form action="?" method="post" name="contact" onsubmit="if (validate(this.name)) {this.send_btn.disabled=true;return true;} else {return false;}">
+<input type="hidden" name="action" value="process_contact_form">
+<tr>
+    <td>{%str_label_first_name%}</td>
+    <td><input name="first_name" type="text"></td>
+
+    <td>{%str_label_last_name%}</td>
+    <td><input name="last_name" type="text"></td>
+</tr>
+
+<tr>
+    <td>{%str_label_company%}</td>
+    <td><input name="company" type="text"></td>
+
+    <td>{%str_label_position%}</td>
+    <td><input name="position" type="text"></td>
+</tr>
+
+<tr>
+    <td>{%str_label_email%}</td>
+    <td><input name="email" type="text"></td>
+
+    <td>{%str_label_zip%}</td>
+    <td><input name="zip" type="text"></td>
+</tr>
+
+<tr>
+    <td>{%str_label_city%}</td>
+    <td><input name="city" type="text"></td>
+
+    <td>{%str_label_country%}</td>
+    <td><input name="country" type="text" value=""></td>
+</tr>
+
+<tr>
+    <td>{%str_label_address%}</td>
+    <td colspan="3"><input name="address" type="text" style="width:280px"></td>
+</tr>
+
+<tr>
+    <td>{%str_label_phone%}</td>
+    <td><input name="phone" type="text"></td>
+
+    <td>{%str_label_fax%}</td>
+    <td><input name="fax" type="text"></td>
+</tr>
+
+<tr>
+    <td colspan="4">
+        <center><input name="send_btn" type="submit" value="{%str_label_send_btn%}"></center>
+    </td>
+</tr>
+
+</form>
+</table>
+
+<script language="JavaScript">focusElement('contact', 'first_name');</script>
