@@ -4,4 +4,4 @@
 
 echo Pass: $HOST_PASSWORD
 
-ssh -1 "$HOST_USER@$HOST_NAME"
+scp $1 "$HOST_USER@$HOST_NAME:$HOST_HOME_DIR"

@@ -2,6 +2,8 @@
 
 . _vars.sh
 
+. export_full.sh
+
 echo Pass: $HOST_PASSWORD
 
-ssh -1 "$HOST_USER@$HOST_NAME"
+. _install.sh
