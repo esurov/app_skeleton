@@ -124,7 +124,10 @@ class CustomPageScript extends PageScript {
                 }
             }
         }
-        $this->page->parse_file("_{$menu_var}.html", $menu_var);
+        $menu_template_name = "_{$menu_var}.html";
+        if ($this->page->is_template_exist($menu_template_name)) {
+            $this->page->parse_file($menu_template_name, $menu_var);
+        }
     }
 
     // Should be redefined in child class
