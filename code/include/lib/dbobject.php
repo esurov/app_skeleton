@@ -98,9 +98,12 @@ class DbObject {
     }
 
     function mysql_now_date() {
-        return date("Y-m-d");
+        return DbObject::mysql_date(time());
     }
 
+    function mysql_date($ts) {
+        return date("Y-m-d", $ts);
+    }
 
     function get_app_double_value($double_value, $decimals = 2) {
         return format_double_value($double_value);
