@@ -2,27 +2,25 @@
 
 // Standard library functions.
 
-function header_no_cache()
-{
+function header_no_cache() {
     // This function sent raw HTTP header for no cache HTML page.
     // For more detail realization - see PHP manual, HTTP function.
 
-    header ("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-    header ("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+    header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+    header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 
     $server_protocol = $_SERVER['SERVER_PROTOCOL'];
-    if($server_protocol == 'HTTP/1.1'){
-        header ("Cache-Control: no-store, no-cache, must-revalidate");  // HTTP/1.1
+    if ($server_protocol == 'HTTP/1.1') {
+        header("Cache-Control: no-store, no-cache, must-revalidate");  // HTTP/1.1
     } else {
-        header ("Pragma: no-cache");                          // HTTP/1.0
+        header("Pragma: no-cache");                          // HTTP/1.0
     }
 
     header("Cache-Control: post-check=0, pre-check=0", false);
 }
 
 
-function self_redirect($sub_url = '')
-{
+function self_redirect($sub_url = '') {
     // Perform HTTP redirect to the same script.
 
     global $app;
@@ -37,8 +35,7 @@ function self_redirect($sub_url = '')
 }
 
 
-function write_options($items, $select = NULL)
-{
+function write_options($items, $select = NULL) {
     // OBSOLETE!
     // Compatibility wrapper for make_options() function.
 
@@ -46,14 +43,13 @@ function write_options($items, $select = NULL)
 }
 
 
-function make_options($items, $select = NULL)
-{
+function make_options($items, $select = NULL) {
     // Return a string with a <option> tags created from given array.
 
     $s = "\n";
 
     foreach($items as $i => $item) {
-        if(is_array( $item) ) {
+        if (is_array( $item) ) {
             $id   = $item['id'];
             $name = $item['name'];
 
@@ -62,7 +58,7 @@ function make_options($items, $select = NULL)
             $id   = $i;
             $name = $item;
         }
-        if(is_array( $select) ) {
+        if (is_array( $select) ) {
             $sel = in_array($id, $select) ? ' selected' : '';
         } else {
             $sel = (isset($select) && $id == $select) ? ' selected' : '';
@@ -98,14 +94,13 @@ function params() {
     return array_merge($_POST, $_GET);
 }
 
-function make_sub_url($params)
-{
+function make_sub_url($params) {
     // Generate partial URL from given hash of parameters.
 
     $sub_url = '';
 
     foreach($params as $name => $value) {
-        if(is_array( $value) ) {
+        if (is_array($value)) {
             foreach($value as $val) {
                 $sub_url .= "&amp;{$name}[]=" . urlencode($val);
             }
@@ -125,8 +120,7 @@ function if_null($variable, $value) {
 
 // Some less standard functions:
 
-function get_years()
-{
+function get_years() {
     // Return array of valid years.
 
     $y = array();
@@ -137,13 +131,14 @@ function get_years()
     $y[2003] = '2003';
     $y[2004] = '2004';
     $y[2005] = '2005';
+    $y[2006] = '2006';
+    $y[2007] = '2007';
 
     return $y;
 }
 
 
-function get_months()
-{
+function get_months() {
     // Return array of valid months.
 
     $m = array(
@@ -160,16 +155,16 @@ function get_months()
         'October',
         'November',
         'December'
-   );
+    );
+    
     return $m;
 }
 
-function mysql_to_unix_time($str)
-{
+function mysql_to_unix_time($str) {
     $date_regexp = '/^(\d+)-(\d+)-(\d+) (\d+):(\d+):(\d+)$/';
     $date_values = array();
     $result = 0;
-    if(preg_match( $date_regexp, $str, $date_values) ) {
+    if (preg_match($date_regexp, $str, $date_values)) {
         $year   = $date_values[1];
         $month  = $date_values[2];
         $day    = $date_values[3];
@@ -182,13 +177,12 @@ function mysql_to_unix_time($str)
 }
 
 
-function str_to_unix_time($str)
-{
+function str_to_unix_time($str) {
     $date_regexp = '/^(\d+)-(\d+)-(\d+)(\s+(\d+))?(:(\d+))?(:(\d+))?$/';
     $date_values = array();
     $result = 0;
-    if(preg_match( $date_regexp, $str, $matches) ) {
-        $matches = array_merge($matches, array( 0, 0, 0) );
+    if (preg_match($date_regexp, $str, $matches)) {
+        $matches = array_merge($matches, array(0, 0, 0));
         $year   = $matches[1];
         $month  = $matches[2];
         $day    = $matches[3];
@@ -201,20 +195,18 @@ function str_to_unix_time($str)
 }
 
 
-function unix_to_mysql_time($time)
-{
+function unix_to_mysql_time($time) {
     return date('Y-m-d H:i:s', $time);
 }
 
-function pipe_sendmail($msg, $queue = true)
-{
+function pipe_sendmail($msg, $queue = true) {
     // Send email message using local sendmail program.
 
     // $sendmail_path = '/usr/lib/sendmail';
     // $sendmail_keys = '-oi -t' . ($queue ? ' -odq' : '');
 
     $sendmail_command = ini_get('sendmail_path');
-    if($queue) {
+    if ($queue) {
         $sendmail_command .= ' -odq';
     }
 
@@ -233,7 +225,7 @@ function pipe_sendmail($msg, $queue = true)
         "$text";
 
     $sm = popen("$sendmail_command", 'w');
-    if(!$sm) {
+    if (!$sm) {
         die("Can't fork for sendmail!<br>\n");
     }
 

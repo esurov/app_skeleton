@@ -1,158 +1,131 @@
 <?php
 
+// HTML templates parser and manager.
+
 class Template {
 
-    // HTML templates.
-
     var $templates_dir;
-
     var $parsed_files;  // already parsed files cache
-
     var $fillings;  // hash with template data
-
-    var $print_template_name; // debug
-
+    var $print_template_name; // for debug purposes
     var $TEMPLATE_NAME_PATTERN;
 
 
-function Template(
-    $templates_dir = "templates",
-    $print_template_name = false
-) {
-    // Constructor.
-    // Store path to templates in the internal variable.
+    function Template(
+        $templates_dir = "templates",
+        $print_template_name = false
+    ) {
+        // Constructor.
+        // Store path to templates in the internal variable.
 
-    $this->templates_dir = $templates_dir;
+        $this->templates_dir = $templates_dir;
+        $this->parsed_files = array();
+        $this->fillings = array();
+        $this->print_template_name = $print_template_name;
 
-    $this->parsed_files = array();
-
-    $this->fillings = array();
-
-    $this->print_template_name = $print_template_name;
-
-    $this->TEMPLATE_NAME_PATTERN =
-        "\n<!-- TEMPLATE BEGIN '%s' -->\n" .
-        "%s" .
-        "\n<!-- TEMPLATE END '%s' -->\n";
-}
-
-
-function get_value( $var_name )
-{
-    // Return current value of given template variable.
-
-    return $this->fillings[$var_name];
-}
-
-
-function set_value($var_name, $value)
-{
-    $this->fillings[$var_name] = $value;
-}
-
-
-function assign($more_fillings)
-{
-    // Add given hash to internal page fillings.
-
-    foreach($more_fillings as $name => $value) {
-        $this->set_value($name, $value);
+        $this->TEMPLATE_NAME_PATTERN =
+            "\n<!-- TEMPLATE BEGIN '%s' -->\n" .
+            "%s" .
+            "\n<!-- TEMPLATE END '%s' -->\n";
     }
-}
 
-function parse($raw_text)
-{
+    function get_value($var_name) {
+        return $this->fillings[$var_name];
+    }
+
+    function set_value($var_name, $value) {
+        $this->fillings[$var_name] = $value;
+    }
+
+    function assign($more_fillings) {
+        foreach ($more_fillings as $name => $value) {
+            $this->set_value($name, $value);
+        }
+    }
+
     // Parse given text, return it with variables filled.
+    function parse($raw_text) {
 
-    $parsed_text = preg_replace(
-        "/{%(.*?)%}/e",
-        " isset(\$this->fillings['$1']) ? \$this->fillings['$1'] : '' ",
-        $raw_text
-   );
+        $parsed_text = preg_replace(
+            "/{%(.*?)%}/e",
+            " isset(\$this->fillings['$1']) ? \$this->fillings['$1'] : '' ",
+            $raw_text
+        );
 
-    return $parsed_text;
-}
+        return $parsed_text;
+    }
 
-
-function parse_text($raw_text, $append_to = NULL)
-{
     // Parse given text, return it with variables filled.
     // Also append result to given variable in fillings.
+    function parse_text($raw_text, $append_to = NULL) {
+        
+        $parsed_text = $this->parse($raw_text);
+        if (!is_null(($append_to))) {
+            $this->append($append_to, $parsed_text);
+        }
 
-    $parsed_text = $this->parse($raw_text);
-
-    if(isset( $append_to) ) {
-        $this->append($append_to, $parsed_text);
+        return $parsed_text;
     }
 
-    return $parsed_text;
-}
-
-
-function parse_file($template_name, $append_to = NULL)
-{
     // Parse given template using values from internal hash.
     // Return filled template.
+    function parse_file($template_name, $append_to = NULL) {
 
-    $raw_text = $this->get_raw_text($template_name);
+        $raw_text = $this->get_raw_text($template_name);
 
-    if ($this->print_template_name) {
-        $raw_text = sprintf(
-            $this->TEMPLATE_NAME_PATTERN,
-            $template_name,
-            $raw_text,
-            $template_name
-        );
+        if ($this->print_template_name) {
+            $raw_text = sprintf(
+                $this->TEMPLATE_NAME_PATTERN,
+                $template_name,
+                $raw_text,
+                $template_name
+            );
+        }
+
+        $parsed_text = $this->parse_text($raw_text, $append_to);
+
+        return $parsed_text;
     }
 
-    $parsed_text = $this->parse_text($raw_text, $append_to);
-
-    return $parsed_text;
-}
-
-function parse_file_new($template_name, $variable = NULL) {
-    if (!is_null($variable)) {
-        $this->set_value($variable, "");
+    // Parse given template using values from internal hash.
+    // Return filled template and empty the variable.
+    function parse_file_new($template_name, $variable = NULL) {
+        if (!is_null($variable)) {
+            $this->set_value($variable, "");
+        }
+        return $this->parse_file($template_name, $variable);
     }
-    return $this->parse_file($template_name, $variable);
-}
 
-
-function get_raw_text($template_name)
-{
     // Return non-parsed template text.
     // Read from file if necessary.
+    function get_raw_text($template_name) {
 
-    if(isset( $this->parsed_files[$template_name]) ) {
-        $text = $this->parsed_files[$template_name];
+        if (isset($this->parsed_files[$template_name])) {
+            $text = $this->parsed_files[$template_name];
+        } else {
+            $filename = "{$this->templates_dir}/{$template_name}";
+            $text = join('', file($filename));
+            $this->parsed_files[$template_name] = $text;
+        }
 
-    } else {
+        return $text;
+    }
+
+    function append($name, $text) {
+        // Append given text to the current filling value.
+
+        if (isset($this->fillings[$name])) {
+            $this->set_value($name, $this->fillings[$name] . $text);
+        } else {
+            $this->set_value($name, $text);
+        }
+    }
+
+    function is_template_exist($template_name) {
         $filename = "{$this->templates_dir}/{$template_name}";
-        $text = join('', file( $filename) );
-        $this->parsed_files[$template_name] = $text;
+        return file_exists($filename);
     }
-
-    return $text;
-}
-
-
-function append($name, $text)
-{
-    // Append given text to the current filling value.
-
-    if( isset( $this->fillings[$name] ) ) {
-        $this->set_value($name, $this->fillings[$name] . $text );
-    } else {
-        $this->set_value($name, $text);
-    }
-}
-
-function is_template_exist($template_name) {
-    $filename = "{$this->templates_dir}/{$template_name}";
-    return file_exists($filename);
-}
 
 }  // class Template
-
 
 ?>

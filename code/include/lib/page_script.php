@@ -1,7 +1,6 @@
 <?php
 
-class PageScript
-{
+class PageScript {
     // Script that generates pages -- base class.
     // Also provides user validation and action selection.
 
@@ -21,15 +20,14 @@ class PageScript
     var $log;
     var $sql;
 
-    function PageScript($script_name, $templates_dir = 'templates')
-    {
+    function PageScript($script_name, $templates_dir = 'templates') {
         // Constructor.
 
         global $app;
 
         $this->script_name = $script_name;
 
-        if(!isset( $app) ) {
+        if (!isset($app)) {
             die('App object is not found!');
         }
 
@@ -43,7 +41,7 @@ class PageScript
         $t_dir = $templates_dir;
         $template_type = $this->config->value('template_type');
         $print_template_name = $this->config->value('print_template_name');
-        if($template_type != '') {
+        if ($template_type != '') {
             $t_dir .= "/$template_type";
         }
         $t_dir .= "/{$this->script_name}";
@@ -58,14 +56,14 @@ class PageScript
         $this->messages = new Config();
         $this->messages->read("{$templates_dir}/messages.txt");
         $custom_messages_file = "$t_dir/debug.cfg";
-        if(file_exists( $custom_messages_file) ) {
+        if (file_exists($custom_messages_file)) {
             $this->messages->read($custom_messages_file);
         }
 
         // Read pager defaults from config:
         $default_rows = $this->config->value("{$this->script_name}_default_rows");
         $max_rows     = $this->config->value("{$this->script_name}_max_rows");
-        if(isset( $default_rows) && isset( $max_rows ) ) {
+        if (isset($default_rows) && isset($max_rows)) {
             $this->pager = new Pager($this, $default_rows, $max_rows);
         }
 
@@ -73,8 +71,8 @@ class PageScript
         $actions = array(
             'pg_index' => array(
                 'valid_users' => array(),
-           ),
-       );
+            ),
+        );
     }
 
     function run() {
@@ -134,8 +132,7 @@ class PageScript
         return "$_SERVER[PHP_SELF]?action={$this->action}";
     }
 
-    function get_message($name)
-    {
+    function get_message($name) {
         // Return text of predefined message.
         return $this->messages->value($name);
     }
@@ -155,8 +152,7 @@ class PageScript
 
     // Common actions:
 
-    function pg_index()
-    {
+    function pg_index() {
         // Print index page.
 
         $this->page->assign(array(
@@ -165,8 +161,7 @@ class PageScript
     }
 
 
-    function pg_access_denied()
-    {
+    function pg_access_denied() {
         // Print "access denied" page.
 
         $this->page->assign(array(
@@ -205,14 +200,15 @@ class PageScript
         ));
     }
 
-    function pg_view_object($name, $aspect, $where_str,
-        $default_order_by = NULL, $show_search_form = false)
-    {
+    function pg_view_object(
+        $name, $aspect, $where_str,
+        $default_order_by = NULL, $show_search_form = false
+    ) {
         // Print page to view info about object(s).
 
         $obj = $this->app->read_id_fetch_object($name, $aspect, $where_str);
 
-        if($obj->is_definite()) {
+        if ($obj->is_definite()) {
             // Print one object:
             $this->print_view_object_page($obj, $aspect);
         } else {
@@ -222,8 +218,7 @@ class PageScript
         }
     }
 
-    function print_view_object_page($obj, $aspect)
-    {
+    function print_view_object_page($obj, $aspect) {
         // Print page for viewing object info.
 
         $name   = $obj->class_name;
@@ -239,8 +234,7 @@ class PageScript
     }
 
 
-    function pg_edit_object($name, $aspect, $where_str)
-    {
+    function pg_edit_object($name, $aspect, $where_str) {
         // Print page for editing (modifying) object.
 
         // Read existing object:
@@ -324,7 +318,7 @@ class PageScript
 
         $this->print_message("{$prefix}added", 'ok');
 
-        if(is_null( param( 'continue_editing')  ) ) {
+        if (is_null(param('continue_editing'))) {
             $this->print_view_object_page($obj, $aspect);
 
         } else {
@@ -343,7 +337,7 @@ class PageScript
 
         $this->print_message("{$prefix}updated", 'ok');
 
-        if(is_null( param( 'continue_editing')  ) ) {
+        if (is_null(param('continue_editing'))) {
             $this->print_view_object_page($obj, $aspect);
 
         } else {
@@ -352,8 +346,7 @@ class PageScript
     }
 
 
-    function pg_delete_object($name, $aspect, $where_str)
-    {
+    function pg_delete_object($name, $aspect, $where_str) {
         // Print page for deleting object.
 
         // Read existing object:
@@ -372,7 +365,7 @@ class PageScript
 
         // Read existing object
         $obj = $this->app->read_id_fetch_object($name, $aspect, $where_str);
-        if(!$obj->is_definite()) {
+        if (!$obj->is_definite()) {
             // FIXME: add "object not found" page here.
             self_redirect("?action=pg_view_{$name}");  // UGLY
         }
@@ -396,7 +389,7 @@ class PageScript
         $pr_key_name  = $obj->primary_key_name();
         $pr_key_value = $obj->primary_key_value();
 
-        if(param( 'sure') != '1' ) {  // if not sure -- do nothing
+        if (param( 'sure') != '1' ) {  // if not sure -- do nothing
             self_redirect(
                 "?action=pg_view_{$name}&{$name}_{$pr_key_name}={$pr_key_value}");
         }
@@ -414,7 +407,7 @@ class PageScript
             $this->page->assign(array(
                 'n_items' => $obj->quantity_str($n),
             ));
-            if($n == 1) {
+            if ($n == 1) {
                 // Object becomes indefinite.
                 $obj->set_indefinite();
             }
@@ -443,15 +436,16 @@ class PageScript
 
     // Even more generalized object functions:
 
-    function print_view_several_objects_page($obj, $aspect, $where_str,
-        $default_order_by = NULL, $show_search_form = false, $template_var = 'body')
-    {
+    function print_view_several_objects_page(
+        $obj, $aspect, $where_str,
+        $default_order_by = NULL, $show_search_form = false, $template_var = 'body'
+    ) {
         // Print table to view several objects.
 
         //$obj = $this->app->create_object($name);
 
         // COMPATIBILITY:
-        if (!is_object( $obj) ) {
+        if (!is_object($obj)) {
             $obj = $this->app->create_object($obj);
         }
 
@@ -566,8 +560,7 @@ class PageScript
     }
 
 
-    function print_edit_object_page($obj, $aspect)
-    {
+    function print_edit_object_page($obj, $aspect) {
         // Print page for adding/editing object.
 
         $name = $obj->class_name;
@@ -583,8 +576,7 @@ class PageScript
     }
 
 
-    function print_delete_object_page($obj, $aspect)
-    {
+    function print_delete_object_page($obj, $aspect) {
         // Print page for deleting object.
 
         $name = $obj->class_name;
@@ -607,8 +599,7 @@ class PageScript
 
     // Auxilary object functions:
 
-    function get_template_prefix($name, $aspect)
-    {
+    function get_template_prefix($name, $aspect) {
         // Return template prefix (directory for templates) for given object.
 
         $prefix = ($aspect == '') ? "$name/" : "$name/$aspect/";
@@ -664,6 +655,7 @@ class PageScript
         $this->page->parse_text($msg_text_raw, "text");
         return $this->page->parse_file("_status_message.html", "status_messages");
     }
+
 }  // class PageScript
 
 ?>
