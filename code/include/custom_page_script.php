@@ -267,25 +267,32 @@ class CustomPageScript extends PageScript {
         $this->app->set_current_lang(param("new_lang"));
         $cur_action = param("cur_action");
         $cur_page = param("cur_page");
-        self_redirect("?action={$cur_action}&page={$cur_page}");
+        $url = "";
+        if (!is_null($cur_action)) {
+            $url .= "?action={$cur_action}";
+        }
+        if (!is_null($cur_page)) {
+            $url .= "&page={$cur_page}";
+        }
+        self_redirect($url);
     }
 
     function pg_static() {
         $page_name = trim(if_null(param("page"), ""));
-        $avail_pages = explode(",", $this->config->value("static_pages"));
-        if (!in_array($page_name, $avail_pages)) {
-            $this->pg_access_denied();
-        } else {
-            $this->print_title("page_title_pg_static_{$page_name}");
-            $this->print_static_page($page_name);
-        }
+        $this->print_title("page_title_pg_static_{$page_name}");
+        $this->print_static_page($page_name);
     }
 
     function print_static_page($page_name) {
-        $page_path = "static/{$page_name}.html";
-        $localized_page_path = "static/{$page_name}_{$this->app->lang}.html";
-        if ($this->page->is_template_exist($localized_page_path)) {
-            $page_path = $localized_page_path;
+        $page_path = "static/{$page_name}_{$this->app->lang}.html";
+        if (!$this->page->is_template_exist($page_path)) {
+            $page_path = "static/{$page_name}.html";
+            if (!$this->page->is_template_exist($page_path)) {
+                $this->page->assign(array(
+                    "body" => "",
+                ));
+                return "";
+            }
         }
         return $this->page->parse_file($page_path, "body");
     }
