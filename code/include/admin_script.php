@@ -11,6 +11,7 @@ class AdminScript extends CustomPageScript {
 
         $this->actions = array(
             "pg_index" => $a,
+            
             "pg_view_article" => $a,
             "pg_edit_article" => $a,
             "update_article" => $a,

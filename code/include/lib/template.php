@@ -1,10 +1,5 @@
 <?php
 
-// template.php,v 1.3 2001/11/09 09:53:02 max Exp
-
-// class Template.
-
-
 class Template {
 
     // HTML templates.
@@ -15,7 +10,6 @@ class Template {
 
     var $fillings;  // hash with template data
 
-//    var $fillings_history; // история изменений fillings
 
 
 function Template($templates_dir = 'templates')
@@ -29,7 +23,6 @@ function Template($templates_dir = 'templates')
 
     $this->fillings = array();
     
-//    $this->fillings_history = array();
 }
 
 
@@ -43,24 +36,8 @@ function get_value( $var_name )
 
 function set_value($var_name, $value)
 {
-    // записываем в историю
-//    $this->fillings_history[$var_name][] = $value;
-    
     $this->fillings[$var_name] = $value;
 }
-
-
-//function get_value_history($var_name)
-//{
-    // возвращает историю изменений в виде массива
-//    if (isset($this->fillings_history[$var_name])) {
-//        $result = $this->fillings_history[$var_name];
-//    } else {
-//        $result = null;
-//    }
-//
-//    return $result;
-//}
 
 
 function assign($more_fillings)
@@ -71,18 +48,6 @@ function assign($more_fillings)
         $this->set_value($name, $value);
     }
 }
-
-//function assign_new($more_fillings, $filling_value = "") {
-//    if (is_array($more_fillings)) {
-//        foreach (array_keys($more_fillings) as $name => $value) {
-//            $this->set_value($name, $value);
-//        }
-//    } else {
-//        $name = $more_fillings;
-//        $this->set_value($name, $filling_value);
-//    }
-//}
-//
 
 function parse($raw_text)
 {

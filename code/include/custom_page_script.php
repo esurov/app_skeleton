@@ -45,7 +45,6 @@ class CustomPageScript extends PageScript {
 
         parent::run();
     }
-
     function drop_pager() {
         $this->pager = new Pager($this, 10000, 10000);
     }

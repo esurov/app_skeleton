@@ -61,6 +61,47 @@ function DbObject($class_name)
 
 // Core functions:
 
+function mysql2app_date($value) {
+    list($year, $month, $day) = explode("-", $value);
+    return "{$day}/{$month}/{$year}";
+}
+
+function mysql2app_time($value) {
+    list($hour, $minute, $second) = explode(":", $value);
+    return "{$hour}:{$minute}:{$second}";
+}
+
+function mysql2app_datetime($value) {
+    list($year, $month, $day, $hour, $minute, $second) = explode("-", $value);
+    return "{$day}/{$month}/{$year} {$hour}:{$minute}:{$second}";
+}
+
+function mysql2app_timestamp($value) {
+    $datetime_values = array();
+    $date_regexp = '/^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)$/';
+    preg_match($date_regexp, $value, $date_values);
+    $year   = $datetime_values[1];
+    $month  = $datetime_values[2];
+    $day    = $datetime_values[3];
+    $hour   = $datetime_values[4];
+    $minute = $datetime_values[5];
+    $second = $datetime_values[6];
+    return sprintf("%02d/%02d/%04d %02d:%02d:%02d", $day, $month, $year, $hour, $minute, $second);
+}
+
+function app2mysql_date($date) {
+    $parts = explode("/", $date);
+    if (count($parts) != 3) {
+        return "0000-00-00";
+    }
+    list($day, $month, $year) = $parts;
+    return sprintf("%04d-%02d-%02d", $year, $month, $day);
+}
+
+function mysql_now_date() {
+    return date("Y-m-d");
+}
+
 function get_date_format()
 {
     // Return PHP date format usable for strftime() function.
@@ -68,14 +109,12 @@ function get_date_format()
     return '%Y-%m-%d';
 }
 
-
 function get_time_format()
 {
     // Return PHP date format usable for strftime() function.
 
     return '%Y-%m-%d %H:%M';
 }
-
 
 function primary_key_name()
 {
@@ -1029,7 +1068,10 @@ function get_where_condition()
         $select = $this->fields[$name]['select'];
 
         foreach($field_conditions as $relation => $cond) {
-            if(!(isset( $cond['value']) && $cond['value'] != '') ) {
+            $nonset_value =
+                (isset($cond["input"]["nonset_id"])) ? $cond["input"]["nonset_id"] : "";
+
+            if (!isset($cond['value']) || $cond['value'] == $nonset_value) {
                 continue;
             }
             $value = $cond['value'];
@@ -1054,6 +1096,17 @@ function get_where_condition()
                     }
                 } else {
                     $value_str = double($value);
+                }
+                break;
+
+            case 'date':
+                if(is_array( $value) ) {
+                    $value_str = array();
+                    foreach($value as $val) {
+                        $value_str[] = qw($this->app2mysql_date($val));
+                    }
+                } else {
+                    $value_str = qw($this->app2mysql_date($value));
                 }
                 break;
 
@@ -1131,47 +1184,6 @@ function get_where_params()
     }
 
     return $params;
-}
-
-function mysql2app_date($value) {
-    list($year, $month, $day) = explode("-", $value);
-    return "{$day}/{$month}/{$year}";
-}
-
-function mysql2app_time($value) {
-    list($hour, $minute, $second) = explode(":", $value);
-    return "{$hour}:{$minute}:{$second}";
-}
-
-function mysql2app_datetime($value) {
-    list($year, $month, $day, $hour, $minute, $second) = explode("-", $value);
-    return "{$day}/{$month}/{$year} {$hour}:{$minute}:{$second}";
-}
-
-function mysql2app_timestamp($value) {
-    $datetime_values = array();
-    $date_regexp = '/^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)$/';
-    preg_match($date_regexp, $value, $date_values);
-    $year   = $datetime_values[1];
-    $month  = $datetime_values[2];
-    $day    = $datetime_values[3];
-    $hour   = $datetime_values[4];
-    $minute = $datetime_values[5];
-    $second = $datetime_values[6];
-    return sprintf("%02d/%02d/%04d %02d:%02d:%02d", $day, $month, $year, $hour, $minute, $second);
-}
-
-function app2mysql_date($date) {
-    $parts = explode("/", $date);
-    if (count($parts) != 3) {
-        return "0000-00-00";
-    }
-    list($day, $month, $year) = $parts;
-    return sprintf("%04d-%02d-%02d", $year, $month, $day);
-}
-
-function sql_now_date() {
-    return date("Y-m-d");
 }
 
 function read($fields_to_read = NULL)
@@ -1591,6 +1603,7 @@ function check_links()
 function plural_name()
 {
     // Return class name in plural.
+
     return "{$this->class_name}s";
 }
 

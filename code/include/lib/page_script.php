@@ -1,10 +1,5 @@
 <?php
 
-// page_script.php,v 1.20 2002/02/04 15:57:45 max Exp
-
-// class PageScript.
-
-
 class PageScript
 {
     // Script that generates pages -- base class.
@@ -14,7 +9,9 @@ class PageScript
     var $messages;
 
     var $script_name;
+    
     var $actions;
+    
     var $action;
     var $self_action;
 

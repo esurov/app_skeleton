@@ -1,9 +1,6 @@
 <?php
 
-// stdlib.php,v 1.16 2002/04/18 13:52:34 eugene Exp
-
 // Standard library functions.
-
 
 function header_no_cache()
 {
@@ -13,7 +10,7 @@ function header_no_cache()
     header ("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
     header ("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 
-    $server_protocol = $GLOBALS['SERVER_PROTOCOL'];
+    $server_protocol = $_SERVER['SERVER_PROTOCOL'];
     if($server_protocol == 'HTTP/1.1'){
         header ("Cache-Control: no-store, no-cache, must-revalidate");  // HTTP/1.1
     } else {
@@ -30,7 +27,7 @@ function self_redirect($sub_url = '')
 
     global $app;
 
-    $url = "http://$GLOBALS[HTTP_HOST]$GLOBALS[SCRIPT_NAME]$sub_url";
+    $url = "http://$_SERVER[HTTP_HOST]$_SERVER[SCRIPT_NAME]$sub_url";
 
     $app->log->write('Redirect', $url, 3);
 
@@ -219,11 +216,6 @@ function str_to_unix_time($str)
 function unix_to_mysql_time($time)
 {
     return date('Y-m-d H:i:s', $time);
-}
-
-function sql_now_date()
-{
-    return date('Y-m-d');
 }
 
 function pipe_sendmail($msg, $queue = true)

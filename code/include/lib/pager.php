@@ -1,10 +1,5 @@
 <?php
 
-// pager.php,v 1.12 2001/12/22 16:08:01 max Exp
-
-// class Pager.
-
-
 class Pager {
 
     // Simple class for page splitting.
@@ -23,6 +18,7 @@ class Pager {
     var $nav_str;
     var $simple_nav_str;
 
+    var $script;
 
 function Pager(&$script, $default_rows, $max_rows)
 {

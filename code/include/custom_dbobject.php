@@ -10,12 +10,10 @@ class CustomDbObject extends DbObject {
     /** current language (from App) */
     var $lang;
 
-    function CustomDbObject($class_name)
-    {
+    function CustomDbObject($class_name) {
         parent::DbObject($class_name);
 
         global $app;
-
         $this->messages =& $app->messages;
         $this->page =& $app->page;
         $this->lang =& $app->lang;
@@ -106,13 +104,13 @@ class CustomDbObject extends DbObject {
 
             if ($type == "date") {
                 $value = (isset($param_value) && $param_value != "") ?
-                    app2sql_date($param_value) : "";
+                    $this->app2mysql_date($param_value) : "";
                 $this->$name = $value;
             }
 
             if ($type == "time") {
                 $value = (isset($param_value) && $param_value != "") ?
-                    app2sql_time($param_value) : "";
+                    $this->app2mysql_time($param_value) : "";
                 $this->$name = $value;
             }
             $multi = $this->get_multilingual();
@@ -145,13 +143,13 @@ class CustomDbObject extends DbObject {
                 if ($value == "0000-00-00") {
                     $value = "";
                 } else {
-                    $value = sql2app_date($value);
+                    $value = $this->mysql2app_date($value);
                 }
 
                 $h[$pname] = $value;
                 break;
             case "time":
-                $value = sql2app_time($value);
+                $value = $this->mysql2app_time($value);
                 $h[$pname] = $value;
                 break;
             case "double":
@@ -198,7 +196,7 @@ class CustomDbObject extends DbObject {
                 if ($value == "0000-00-00" || $value == "") {
                     $value = "";
                 } else {
-                    $value = sql2app_date($value);
+                    $value = $this->mysql2app_date($value);
                 }
                 $h[$pname] = $value;
                 $h[$pname . "_input"] =
@@ -207,12 +205,11 @@ class CustomDbObject extends DbObject {
 
                 break;
             case "time":
-                $value = sql2app_time($value);
+                $value = $this->mysql2app_time($value);
                 $h[$pname] = $value;
                 $h[$pname . "_input"] =
                     "<input type=\"{$f['input']}\" " .
                     "name=\"{$pname}\" value=\"{$value}\">";
-
                 break;
             case "double":
                 $h[$pname] = format_currency($value);

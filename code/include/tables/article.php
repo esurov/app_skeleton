@@ -15,7 +15,7 @@ class Article extends CustomDbObject {
         $this->insert_field(array(
             "column" => "created",
             "type"   => "date",
-            "value"  => sql_now_date(),
+            "value"  => $this->mysql_now_date(),
         ));
 
         $this->insert_field(array(

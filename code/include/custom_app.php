@@ -6,7 +6,7 @@ class CustomApp extends SqlApp {
     var $avail_langs;
 
     function CustomApp($tables) {
-        parent::SqlApp("!!!", $tables);
+        parent::SqlApp("app_skeleton", $tables);
 
         $this->avail_langs = $this->get_avail_langs();
         $this->dlang = $this->config->value("default_language");

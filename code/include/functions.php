@@ -1,34 +1,5 @@
 <?php
 
-function sql2app_date($date) {
-    list($year, $month, $day) = explode('-', $date);
-    return "{$day}/{$month}/{$year}";
-}
-
-function sql2app_time($time) {
-    list($hour, $minute, $second) = explode(':', $time);
-    return "{$hour}.{$minute}.{$second}";
-}
-
-
-function app2sql_date($date) {
-    $parts = explode('/', $date);
-    if (count($parts) != 3) {
-        return '';
-    }
-    list($day, $month, $year) = $parts;
-    return sprintf("%04d-%02d-%02d", $year, $month, $day);
-}
-
-function app2sql_time($time) {
-    $parts = explode('.', $time);
-    if (count($parts) != 3) {
-        return '';
-    }
-    list($hour, $minute, $second) = $parts;
-    return sprintf("%02d:%02d:%02d", $hour, $minute, $second);
-}
-
 function format_currency($value) {
     return number_format($value, 2, ".", "");
 }
