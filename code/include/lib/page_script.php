@@ -9,9 +9,9 @@ class PageScript
     var $messages;
 
     var $script_name;
-    
+
     var $actions;
-    
+
     var $action;
     var $self_action;
 
@@ -73,23 +73,11 @@ class PageScript
         $actions = array(
             'pg_index' => array(
                 'valid_users' => array(),
-            ),
+           ),
        );
     }
 
-
-    function get_user_access_level()
-    {
-        // Return user access level (string) for selecting allowed actions.
-
-        // NB! Must be redefined to allow access to actions.
-
-        return '';
-    }
-
-
-    function run()
-    {
+    function run() {
         // Read from CGI and run appropriate action.
 
         // Decide what to do:
@@ -97,24 +85,23 @@ class PageScript
         $this->log->write('PageScript', "action = '$action'", 3);
 
         // Ensure that action is valid:
-        if(isset( $this->actions[$action]) ) {
+        if (isset($this->actions[$action])) {
             $this->action = $action;
 
         } else {
-            if($action != '') {
+            if ($action != '') {
                 $this->log->write('PageScript', "Warning! Invalid action.", 1);
             }
             $this->action = 'pg_index';
         }
 
+        $this->create_current_user();
         // Ensure that current user is allowed to run this action:
         // Check user permission level:
         $user_level   = $this->get_user_access_level();
         $valid_levels = $this->actions[$this->action]['valid_users'];
         if (in_array($user_level, $valid_levels)) {
-            // Access is granted.
-            $this->{$this->action}();  // NB! Variable function.
-
+            $this->run_action();
         } else {
             $this->log->write('WebApp', "Warning! Access denied for '$user_level'", 1);
             $this->pg_access_denied();
@@ -124,40 +111,43 @@ class PageScript
         $this->print_page();
     }
 
+    function create_current_user() {
+    }
 
-    function print_page()
-    {
+    function get_user_access_level() {
+        // Return user access level (string) for selecting allowed actions.
+        return "everyone";
+    }
+
+    function run_action() {
+        // Access is granted.
+        $this->{$this->action}();  // NB! Variable function.
+    }
+
+    function print_page() {
         // Print resulting page using template.
-
         echo $this->page->parse_file('page.html');
     }
 
-
-    function get_self_action()
-    {
+    function get_self_action() {
         // Generage URL to be used as self-action (resulting the same page).
-
         return "$_SERVER[PHP_SELF]?action={$this->action}";
     }
-
 
     function get_message($name)
     {
         // Return text of predefined message.
-
         return $this->messages->value($name);
     }
 
-
-    function print_message($msg_name, $msg_type = NULL)
-    {
+    function print_message($msg_name, $msg_type = NULL) {
         // Parse given message and store text to given template variable.
 
         $msg_text = $this->get_message($msg_name);
 
         $this->page->assign(array(
             'text_of_message' => '',
-       ) );
+        ));
         $this->page->parse_text($msg_text, 'text_of_message');
         $this->page->parse_file('message.html', $msg_type);
     }
@@ -291,20 +281,18 @@ class PageScript
         $old_obj = $obj;
         $obj->read($fields_to_update);
 
-        $err = $obj->verify($old_obj);
+        $messages = $obj->verify($old_obj);
 
-        if($err) { // error detected
+        if (count($messages) != 0) { // error detected
             // write to log
             $this->log->write('PageScript', "update '$name' - verify error", 3);
 
-            $this->page->assign(array(
-                'err' => $err,
-           ) );
+            $this->print_status_messages($messages);
 
             $this->print_edit_object_page($obj, $aspect);
 
         } else {  // no errors
-            if($old_obj->is_definite()) {
+            if ($old_obj->is_definite()) {
                 // update existing object:
                 $obj->update($fields_to_update);
                 $obj->fetch();
@@ -413,17 +401,9 @@ class PageScript
                 "?action=pg_view_{$name}&{$name}_{$pr_key_name}={$pr_key_value}");
         }
 
-        $err = $obj->check_links();  // check reference integrity
-        if($err != '') {
-            $this->page->assign(array(
-                'title' =>  "Cannot delete $name",
-                'err'   =>  $err,
-           ) );
-
-            $this->page->assign($obj->write());
-            $this->page->parse_file("{$prefix}info.html", "text_{$name}_info");
-            $this->page->parse_file("{$prefix}view.html",  'body');
-
+        $messages = $obj->check_links();  // check reference integrity
+        if (count($messages) != 0) {
+            $this->error_delete_object_after_check_links($obj, $next_action, $messages);
         } else {
             $n = 1;
             if ($cascading) {
@@ -444,6 +424,9 @@ class PageScript
         }
     }
 
+    function error_delete_object_after_check_links($obj, $next_action, $messages) {
+        self_redirect("?action={$next_action}");
+    }
 
     function finish_delete_object(
         $obj, $aspect, $where_str, $default_order_by, $show_search_form, $next_action = null
@@ -468,7 +451,7 @@ class PageScript
         //$obj = $this->app->create_object($name);
 
         // COMPATIBILITY:
-        if(!is_object( $obj) ) {
+        if (!is_object( $obj) ) {
             $obj = $this->app->create_object($obj);
         }
 
@@ -484,23 +467,24 @@ class PageScript
         // Read filtering (WHERE) and ordering (ORDER_BY) conditions:
         //list($where, $where_params) = $obj->read_where();
         $obj->read_where_cool();
-        $where_str    = $obj->get_where_condition();
+        list ($where_str, $having_str) = $obj->get_where_condition();
         $where_params = $obj->get_where_params();
 
-        if(is_null($default_order_by)) {
+        if (is_null($default_order_by)) {
             $default_order_by = $obj->primary_key_name();
         }
-        list($order_by, $order_by_params) =
+        list ($order_by, $order_by_params) =
             $obj->read_order_by($default_order_by);
         // Apply filtering and ordering conditions to query:
         $query->expand(array(
-            'where' => $where_str,
-            'order_by' => $order_by,
-        ) );
+            "where" => $where_str,
+            "order_by" => $order_by,
+            "having" => $having_str,
+        ));
 
         // Print summary on group fields:
         $group_fields = $obj->get_group_fields($aspect);
-        if(isset($group_fields)) {
+        if (isset($group_fields)) {
             $group_query = $query;
             $group_query->select   = implode(', ', $group_fields);
             $group_query->order_by = '';
@@ -525,8 +509,8 @@ class PageScript
             'pager_suburl' => "{$where_sub_url}{$order_by_sub_url}",
         ));
 
-        if($show_search_form) {
-    //        $this->page->assign($where_params);
+        if ($show_search_form) {
+            $this->page->assign($where_params);
             $this->page->assign($obj->write_search_form());
 
             $this->page->parse_file(
@@ -535,36 +519,42 @@ class PageScript
 
         $n = $this->sql->get_query_num_rows($query);
 
-        if($n > 0) {
+        if ($n > 0) {
             $this->pager->set_total_rows($n);
             $this->pager->read();
 
             $query->expand(array(
                 'limit' => $this->pager->get_limit_clause(),
-            ) );
+            ));
 
             $res = $this->sql->run_select_query($query);
 
             // Fill the table with selected items:
-            while($row = $res->fetch()) {
+            $i = 0;
+            while ($row = $res->fetch()) {
                 $obj->fetch_row($row);
                 $this->page->assign($obj->write());
+                $this->page->assign(array(
+                    "row_parity" => $i % 2,
+                    "row_style" => ($i % 2 == 0) ? "table-row-even" : "table-row-odd",
+                ));
                 $this->page->parse_file("{$prefix}item.html", "text_{$name}_items");
+                $i++;
             }
 
             $this->page->assign(array(
                 'nav_str'        => $this->pager->get_pages_navig($sub_url),
                 'simple_nav_str' => $this->pager->get_simple_navig($sub_url),
-           ) );
+            ));
         }
 
         // Print the page:
         $this->page->assign(array(
             'where_sub_url' => $where_sub_url,
             'total'         => $obj->quantity_str($this->pager->n_min),
-        ) );
+        ));
 
-        if($template_var == 'body') {
+        if ($template_var == 'body') {
             $this->create_view_several_objects_page_title($obj);
         }
         $this->page->parse_file("{$prefix}view_all.html", $template_var);
@@ -636,19 +626,44 @@ class PageScript
         );
     }
 
-    function handleHttpAuth($login, $password, $realm = "Admin area", $page = "Access denied!") {
+    function handleHttpAuth(
+        $login, $password, $realm = "Admin area"
+    ) {
         if (
             (!isset($_SERVER["PHP_AUTH_USER"]) || !isset($_SERVER["PHP_AUTH_PW"])) ||
             $_SERVER["PHP_AUTH_USER"] != $login || $_SERVER["PHP_AUTH_PW"] != $password
         ) {
-            header("WWW-Authenticate: Basic realm=\"{$realm}\"");
-            header("HTTP/1.0 401 Unauthorized");
-            echo $page;
+            $this->sendHttpAuthHeaders($realm);
+            $this->sendHttpAuthErrorPage();
             exit;
         }
     }
 
-}  // class PageScript
+    function sendHttpAuthErrorPage() {
+        echo $this->page->parse_file("access_denied.html");
+    }
 
+    function sendHttpAuthHeaders($realm) {
+        header("WWW-Authenticate: Basic realm=\"{$realm}\"");
+        header("HTTP/1.0 401 Unauthorized");
+    }
+
+    function print_status_messages($messages) {
+        foreach ($messages as $message) {
+            $this->print_status_message($message);
+        }    
+    }
+
+    function print_status_message($message) {
+        $msg_text_raw = $this->get_message($message->resource);
+        $this->page->assign($message->resource_params);
+        $this->page->assign(array(
+            "text" => "",
+            "type" => $message->type,
+        ));
+        $this->page->parse_text($msg_text_raw, "text");
+        return $this->page->parse_file("_status_message.html", "status_messages");
+    }
+}  // class PageScript
 
 ?>

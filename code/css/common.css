@@ -1,0 +1,62 @@
+body, th, td, select, input {
+    font-size: 11px;
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 0px;
+}
+
+th {
+    font-size: 12px;
+}
+
+h1 {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.menu-item-current {
+    font-weight: bold;
+}
+
+.menu-item {
+}
+
+.err {
+    color: red;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.ok {
+    color: green;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.wide input {
+    width: 400px;
+}
+
+.mid-wide input {
+    width: 250px;
+}
+
+.date input {
+    width: 80px;
+}
+
+.currency input {
+    text-align: right;
+}
+
+/* for lines 0, 2 ... */
+.table-row-even {
+    background-color: #f0f0f0;
+}
+
+/* for lines 1, 3 ... */
+.table-row-odd {
+    background-color: #ffffff;
+}

@@ -41,6 +41,26 @@ class CustomApp extends SqlApp {
             OA_Session::setParam("current_language", $new_lang);
         }
     }
+
+    function add_session_status_message($new_msg) {
+        if (OA_Session::hasParam("status_messages")) {
+            $old_msgs = OA_Session::getParam("status_messages");
+        } else {
+            $old_msgs = array();
+        }
+        $msgs = array_merge($old_msgs, array($new_msg));
+        OA_Session::setParam("status_messages", $msgs);
+    }
+
+    function get_and_delete_session_status_messages() {
+        if (!OA_Session::hasParam("status_messages")) {
+            return array();
+        } else {
+            $msgs = OA_Session::getParam("status_messages");
+            OA_Session::unsetParam("status_messages");
+            return $msgs;
+        }
+    }
 }
 
 

@@ -1,29 +1,37 @@
 user_menu_item_pg_index = Home
 user_menu_item_pg_news = News
-user_menu_item_pg_contact_form = Contacts
+user_menu_item_pg_static_contact_form = Contacts
 user_menu_item_pg_static_sample_page1 = SamplePage1
 user_menu_item_pg_static_sample_page2 = SamplePage2
 
-access_denied = Access denied!
-
-app_head_title = (((((WebAppSkeleton)))))
-page_title_pg_index = Home
-page_title_pg_contact_form = Contact form
+app_head_title = !!WebAppSkeleton
+page_title_access_denied = Accesso non autorizzato!
+head_page_title_pg_index = Home
+page_title_pg_index =
+page_title_pg_static_contact_form = Contacts
 page_title_pg_static_sample_page1 = SamplePage1
 page_title_pg_static_sample_page2 = SamplePage2
 page_title_pg_news = News
 
+recent_news = Recent news
+view_all_news = View all news
+
 pager_pages_title = Pages:
 
 operation_view = View
+operation_view_short = View
 operation_edit = Edit
+operation_edit_short = Edit
 operation_add = Add
+operation_add_short = Add
 operation_delete = Delete
+operation_delete_short = Del
 operation_select = Select
 operation_back = Back
 operation_save = Save
 operation_filter = Filter
 operation_send = Send
+operation_show_all = Show all
 actions = Actions
 
 article = article
@@ -34,9 +42,6 @@ article_text = Text
 
 en = English
 it = Italian
-
-recent_news = Recent news
-view_all_news = View all news
 
 label_first_name = First Name:
 label_last_name = Last Name:
@@ -51,3 +56,6 @@ label_phone = Phone:
 label_fax = Fax:
 
 contact_form_processed = Your contact info was processed. Thank you.
+
+sure_delete = Are you sure you want to delete record?
+cannot_delete_record_because_it_has_links = Cannot delete {%main_obj_name%} because it has links to {%dep_objs_data%}

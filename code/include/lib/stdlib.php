@@ -74,35 +74,24 @@ function make_options($items, $select = NULL)
 }
 
 
-function param($name)
-{
-    // Return value of the given CGI variable,
-    // or empty string if the variable is not set.
-
-    global $HTTP_GET_VARS, $HTTP_POST_VARS;
-
-    if(isset( $HTTP_GET_VARS[$name]) ) {
-        return $HTTP_GET_VARS[$name];
+function param($name) {
+    if (isset($_GET[$name])) {
+        $res = $_GET[$name];
+    } else if (isset($_POST[$name])) {
+        $res = $_POST[$name];
+    } else {
+        return null;
+    }
+    
+    if (get_magic_quotes_gpc()) {
+        $res = stripslashes($res);
     }
 
-    if(isset( $HTTP_POST_VARS[$name]) ) {
-        return $HTTP_POST_VARS[$name];
-    }
-
-    return NULL;
+    return $res;
 }
 
-
-function param_cookie($name)
-{
-    // Return value of the given cookie,
-    // or empty string if the variable is not set.
-
-    global $HTTP_COOKIE_VARS;
-
-    return(
-        isset($HTTP_COOKIE_VARS[$name]) ? $HTTP_COOKIE_VARS[$name] : ''
-   );
+function param_cookie($name) {
+    return isset($_COOKIE[$name]) ? $_COOKIE[$name] : '';
 }
 
 function params() {
@@ -129,9 +118,8 @@ function make_sub_url($params)
 }
 
 
-function if_null($variable, $value)
-{
-    return(is_null( $variable) ? $value : $variable );
+function if_null($variable, $value) {
+    return is_null($variable) ? $value : $variable;
 }
 
 
@@ -263,10 +251,12 @@ function is_email($value) {
 }
 
 function is_in_table($table, $where_str, $sql) {
-    $query_str = "select count(*) from {$table} where {$where_str}";
-    $res = $sql->query($query_str);
-    $row = $res->fetch();
-    return ($row[0] == 1);
+    $query = new SelectQuery(array(
+        "from"  => $table,
+        "where" => $where_str,
+    ));
+    $n = $sql->get_query_num_rows($query);
+    return ($n == 1);
 }
 
 function format_double_value(

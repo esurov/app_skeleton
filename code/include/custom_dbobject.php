@@ -13,10 +13,9 @@ class CustomDbObject extends DbObject {
     function CustomDbObject($class_name) {
         parent::DbObject($class_name);
 
-        global $app;
-        $this->messages =& $app->messages;
-        $this->page =& $app->page;
-        $this->lang =& $app->lang;
+        $this->messages =& $this->app->messages;
+        $this->page =& $this->app->page;
+        $this->lang =& $this->app->lang;
     }
 
     function mysql2app_time($time) {
@@ -26,30 +25,33 @@ class CustomDbObject extends DbObject {
 
     function app2mysql_time($time) {
         $parts = explode(".", $time);
-        $second = "00";
-        if (count($parts) >= 2) {
-            $hour = $parts[0];
-            $minute = $parts[1];
+        
+        $hours = "00";
+        $minutes = "00";
+        $seconds = "00";
+
+        $num_parts = count($parts);
+        if ($num_parts >= 1) {
+            $hours = $parts[0] % 24;
         }
-        if (count($parts) == 3) {
-            $second = $parts[2];
-        } else {
-            return "00:00:00";
+        if ($num_parts >= 2) {
+            $minutes = $parts[1] % 60;
         }
-        return "{$hour}:{$minute}:{$second}";
+        if ($num_parts == 3) {
+            $seconds = $parts[2] % 60;
+        }
+        return "{$hours}:{$minutes}:{$seconds}";
     }
 
     /** Multilingual attribute support added */
     function insert_field($field) {
-        global $app;
-
         // adding non-language as virtual field
         if (isset($field["multilingual"]) && $field["multilingual"] == 1) {
 
             // adding language fields
             $child = $field;
             unset($child["multilingual"]);
-            foreach ($app->avail_langs as $lang) {
+            foreach ($this->app->avail_langs as $lang) {
                 $child["column"] = $field["column"] . "_{$lang}";
                 parent::insert_field($child);
             }
@@ -61,8 +63,8 @@ class CustomDbObject extends DbObject {
 
             $table = isset($field["name"]) ? "" : $this->class_name;
 
-            $current = "{$table}.{$field["column"]}_{$app->lang}";
-            $default = "{$table}.{$field["column"]}_{$app->dlang}";
+            $current = "{$table}.{$field["column"]}_{$this->app->lang}";
+            $default = "{$table}.{$field["column"]}_{$this->app->dlang}";
 
             $field["select"] = "if ({$current} != '', {$current}, {$default})";
         }
@@ -70,32 +72,21 @@ class CustomDbObject extends DbObject {
         if (isset($field["table"]) && ($field["table"] != $this->class_name)) {
             $alias = (isset($field["alias"])) ? $field["alias"] : $field["table"];
 
-            $obj = new $app->tables[$field["table"]](true);
+            $obj = new $this->app->tables[$field["table"]](true);
             $obj_field = $obj->fields[$field["column"]];
             if (
                 isset($obj_field["multilingual"]) &&
                 $obj_field["multilingual"]
             ) {
 
-                $current = "{$alias}.{$field['column']}_{$app->lang}";
-                $default = "{$alias}.{$field['column']}_{$app->dlang}";
+                $current = "{$alias}.{$field['column']}_{$this->app->lang}";
+                $default = "{$alias}.{$field['column']}_{$this->app->dlang}";
 
                 $field["select"] = "if ({$current} != '', {$current}, {$default})";
             }
         }
 
         parent::insert_field($field);
-    }
-
-    function status_message($msg_name, $vars = array()) {
-        $msg_text = $this->get_message($msg_name);
-        $this->page->assign(array(
-            "text_of_message" => "",
-        ));
-        $this->page->assign($vars);
-
-        $this->page->parse_text($msg_text, "text_of_message");
-        return $this->page->parse_file("status_message.html");
     }
 
     function get_message($name) {
@@ -109,8 +100,6 @@ class CustomDbObject extends DbObject {
         $this->add_multilingual(&$field_names);
 
         parent::read($field_names);
-
-        global $app;
 
         reset($field_names);
         while (list($i, $name) = each($field_names)) {
@@ -138,7 +127,7 @@ class CustomDbObject extends DbObject {
             $multi = $this->get_multilingual();
             $to_write = array_intersect($field_names, $multi);
             foreach ($to_write as $name) {
-                $this->$name = $this->{"{$name}_{$app->dlang}"};
+                $this->$name = $this->{"{$name}_{$this->app->dlang}"};
             }
         }
     }
@@ -189,8 +178,6 @@ class CustomDbObject extends DbObject {
     }
 
     function write_form($fields_to_write = null) {
-        global $app;
-
         $h = parent::write_form($fields_to_write);
 
         $field_names = isset($fields_to_write) ?
@@ -244,7 +231,7 @@ class CustomDbObject extends DbObject {
             $pname = $this->class_name . "_" . $name;
 
             $lang_inputs = array();
-            foreach ($app->avail_langs as $lang) {
+            foreach ($this->app->avail_langs as $lang) {
                 $lname = $pname . "_" . $lang;
                 $lang_inputs[] =
                     "<tr><th>" .
@@ -271,8 +258,7 @@ class CustomDbObject extends DbObject {
         $field_names = isset($fields) ?
             $fields : array_keys($this->fields);
 
-        global $app;
-        $default = $app->dlang;
+        $default = $this->app->dlang;
 
         foreach ($field_names as $name) {
             $f = $this->fields[$name];
@@ -305,10 +291,9 @@ class CustomDbObject extends DbObject {
     }
 
     function add_multilingual(&$field_names) {
-        global $app;
         foreach ($field_names as $field) {
             if ($this->is_multilingual($field)) {
-                foreach ($app->avail_langs as $lang) {
+                foreach ($this->app->avail_langs as $lang) {
                     $lname = "{$field}_{$lang}";
                     if (!in_array($lname, $field_names)) {
                         $field_names[] = $lname;
@@ -324,6 +309,45 @@ class CustomDbObject extends DbObject {
 
     function singular_name() {
         return $this->get_message($this->singular_resource_name());
+    }
+
+    // check reference integrity
+    function check_links() {
+        $table_link_counters = array();
+        foreach ($this->get_links() as $dep_table_name => $dep_table_field) {
+            $query = new SelectQuery(array(
+                "select" => "id",
+                "from"   => get_table_name($dep_table_name),
+                "where"  => "{$dep_table_field} = {$this->id}",
+            ));
+
+            $n = $this->sql->get_query_num_rows($query);
+            if ($n > 0) {
+                if (array_key_exists($dep_table_name, $table_link_counters)) {
+                    $table_link_counters[$dep_table_name] += $n;
+                } else {
+                    $table_link_counters[$dep_table_name] = $n;
+                }
+            }
+        }
+
+        $messages = array();
+        if (count($table_link_counters) != 0) {
+            $dep_objs_data = array();
+            foreach ($table_link_counters as $dep_table_name => $n) {
+                $dep_obj = $this->app->create_object($dep_table_name);
+                $dep_objs_data[] = $dep_obj->quantity_str($n);
+            }
+            $messages[] = new OA_ErrorStatusMsg(
+                "cannot_delete_record_because_it_has_links",
+                array(
+                    "main_obj_name" => $this->singular_name(),
+                    "dep_objs_data" => join(", ", $dep_objs_data),
+                )    
+            );
+        }
+
+        return $messages;
     }
 }
 

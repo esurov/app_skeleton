@@ -75,7 +75,7 @@ function getMessage(message, language)
         break;
     case 'input_city':
         en = 'Please input your city.';
-        it = 'Inserire la citta.';
+        it = 'Inserire la cittа.';
         ru = 'Пожалуйста, введите город. ';
 
         break;

@@ -10,8 +10,9 @@ class AdminScript extends CustomPageScript {
         $a = array("valid_users" => array("admin"));
 
         $this->actions = array(
+            "pg_static" => $a,
+
             "pg_index" => $a,
-            
             "pg_view_article" => $a,
             "pg_edit_article" => $a,
             "update_article" => $a,
@@ -19,9 +20,11 @@ class AdminScript extends CustomPageScript {
         );
     }
 
-    /** Return user access level (string) for selecting allowed actions.*/
-    function get_user_access_level() {
+    function create_current_user() {
         $this->authorize_admin();
+    }
+
+    function get_user_access_level() {
         return "admin";
     }
 
@@ -29,13 +32,12 @@ class AdminScript extends CustomPageScript {
         $this->handleHttpAuth(
             $this->config->value("admin_login"),
             $this->config->value("admin_password"),
-            $this->get_message("admin_auth_realm"),
-            $this->get_message("admin_auth_access_denied_page")
+            $this->get_message("admin_auth_realm")
         );
     }
 
     function pg_index() {
-        $this->page->parse_file("index.html", "body");
+        $this->print_static_page("index");
     }
 
     function pg_view_article() {

@@ -25,6 +25,7 @@ require_once("include/functions.php");
 
 require_once("include/lib/Session/LoginState.php");
 require_once("include/lib/Session/Session.php");
+require_once("include/lib/StatusMsg.php");
 
 // tables:
 $tables = array(

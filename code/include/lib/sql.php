@@ -106,7 +106,7 @@ function query($query_str)
     // Run MySQL query.
     // Return SQLResult.
 
-    return new SQLResult($this->execute( $query_str) );
+    return new SQLResult($this->execute($query_str), $this->log);
 }
 
 
@@ -147,15 +147,16 @@ function get_query_num_rows($query)
 
     // calculate total number of rows:
     $count_query = $query;
-
-    $count_query->select   = 'count(*)';
-    $count_query->order_by = '';
-
+    $count_query->order_by = "";
+    if ($count_query->group_by == "") {
+        $count_query->select = "count(*) as n_rows";
     $res = $this->run_select_query($count_query);
     $row = $res->fetch();
-
-    $n = intval($row[0]);
-
+        $n = intval($row["n_rows"]);
+    } else {
+        $res = $this->run_select_query($count_query);
+        $n = $res->num_rows();
+    }
     return $n;
 }
 
@@ -184,13 +185,15 @@ class SQLResult {
     // MySQL result of the last query.
 
     var $result;
+    var $log;
 
 
-function SQLResult($res)
+function SQLResult($res, &$log)
 {
     // Constructor.
 
     $this->result = $res;
+    $this->log =& $log;
 }
 
 
@@ -202,11 +205,24 @@ function num_rows()
 }
 
 
-function fetch()
-{
+function fetch($with_numeric_keys = false) {
     // Fetch data trom the result.
+    $row =
+        ($with_numeric_keys) ?
+        mysql_fetch_row($this->result) :
+        mysql_fetch_assoc($this->result);
 
-    return mysql_fetch_array($this->result);
+    if (is_array($row)) {
+        $field_value_pairs = array();
+        foreach ($row as $field => $value) {
+            $field_value_pairs[] = "{$field}='{$value}'";
+        }
+        $log_str = join(", ", $field_value_pairs);
+    } else {
+        $log_str = "no rows left";
+    }
+    $this->log->write("SQLResult", "fetch: {$log_str}", 3);
+    return $row;
 }
 
 
@@ -235,6 +251,7 @@ function SelectQuery($q)
     $this->from     = isset($q['from'    ]) ? $q['from'    ] : '' ;
     $this->where    = isset($q['where'   ]) ? $q['where'   ] : '1';
     $this->group_by = isset($q['group_by']) ? $q['group_by'] : '' ;
+    $this->having   = isset($q['having'])   ? $q['having']      : '' ;
     $this->order_by = isset($q['order_by']) ? $q['order_by'] : '' ;
     $this->limit    = isset($q['limit'   ]) ? $q['limit'   ] : '' ;
 
@@ -265,12 +282,12 @@ function add_sub_query($t_name, $q)
 function str()
 {
     // Return complete query string assembled from clauses.
-
     return
         "select    $this->select" .
         "    from  $this->from  " .
         "    where $this->where " .
         ($this->group_by ? " group by $this->group_by": '') .
+        ($this->having   ? " having $this->having"    : '') .
         ($this->order_by ? " order by $this->order_by": '') .
         ($this->limit    ? " limit    $this->limit   ": '');
 }
@@ -291,6 +308,8 @@ function expand($q)
     $qwote = empty($this->group_by) ? '' : ', ';
     $this->group_by .= isset($q['group_by']) ? $qwote." $q[group_by]" : '';
 
+    $qwote = empty($this->having) ? '' : ' and ';
+    $this->having .= isset($q['having']) ? $qwote."$q[having]" : '';
 }
 
 

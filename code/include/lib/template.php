@@ -114,7 +114,7 @@ function parse_file_new($template_name, $variable = NULL) {
     if (!is_null($variable)) {
         $this->set_value($variable, "");
     }
-    $this->parse_file($template_name, $variable);
+    return $this->parse_file($template_name, $variable);
 }
 
 

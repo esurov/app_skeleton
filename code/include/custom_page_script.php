@@ -19,27 +19,10 @@ class CustomPageScript extends PageScript {
         $this->init_lang_dependent_data();
         $this->init_email_message();
 
-        $action = param("action");
-        $page_name = param("page");
-        $this->page->assign(array(
-            "action" => $action,
-            "page" => $page_name,
-        ));
-        if (is_null($page_name) || trim($page_name) == "") {
-            $title_resource = "page_title_{$action}";
-        } else {
-            $title_resource = "page_title_{$action}_{$page_name}";
-        }
-        $this->print_title($title_resource);
-        $this->print_title_resource($title_resource);
-        $this->print_title("app_head_title", "head_title");
-
         $this->app->page =& $this->page;
     }
 
-    function run() {
-        $this->print_lang_menu();
-
+    function run_action() {
         $this->popup = intval(param("popup"));
         $this->report = intval(param("report"));
 
@@ -49,10 +32,27 @@ class CustomPageScript extends PageScript {
                 "popup_hidden" =>
                     "<input type=\"hidden\" name=\"popup\" value=\"{$this->popup}\">\n",
             ));
-            $this->print_action_message();
+            $this->print_session_status_messages();
         }
+        $page_name = trim(if_null(param("page"), ""));
+        $this->page->assign(array(
+            "action" => $this->action,
+            "page" => $page_name,
+        ));
+        $this->print_page_titles($page_name);
 
-        parent::run();
+        $this->print_lang_menu();
+
+        parent::run_action();
+    }
+
+    function print_page_titles($page_name) {
+        if ($page_name == "") {
+            $title_resource = "page_title_{$this->action}";
+        } else {
+            $title_resource = "page_title_{$this->action}_{$page_name}";
+        }
+        $this->print_title($title_resource);
     }
 
     function drop_pager() {
@@ -162,13 +162,6 @@ class CustomPageScript extends PageScript {
         return "&amp;popup={$this->popup}";
     }
 
-    function print_title($resource, $var_name = "title") {
-        $text = $this->get_message($resource);
-        $this->page->assign(array(
-            $var_name => $text,
-        ));
-    }
-
     function create_view_object_page_title($obj) {
         $resource = $obj->singular_resource_name();
         $resource = "page_title_view_{$resource}_info";
@@ -189,47 +182,13 @@ class CustomPageScript extends PageScript {
         $this->print_title($resource);
     }
 
-    /**
-     * Prints message, sequence: function parameter, cgi, default.
-     */
-    function print_action_message($default = '', $passed = null) {
-        $message = '';
-        if (!is_null($passed)) {
-            $message = $passed;
-        } else if (param('message')) {
-            $message = param('message');
-        } else {
-            $message = $default;
-        }
-        $this->print_status($message, 'ok');
+    function print_session_status_messages() {
+        $this->print_status_messages(
+            $this->app->get_and_delete_session_status_messages()
+        );
     }
 
-    /** Prints special message (ok|err)  */
-    function print_status($msg_name, $msg_type = 'ok')
-    {
-        $msg_text = $this->get_message($msg_name);
-        if (!$msg_text) {
-            $msg_text = $msg_name;
-        }
-        $this->page->assign(array(
-            'text_of_message' => '',
-        ));
-        $this->page->parse_text($msg_text, 'text_of_message');
-        $this->page->parse_file('status_message.html', $msg_type);
-    }
-
-    function status_message($msg_name, $vars = array()) {
-        $msg_text = $this->get_message($msg_name);
-        $this->page->assign(array(
-            'text_of_message' => '',
-        ));
-        $this->page->assign($vars);
-
-        $this->page->parse_text($msg_text, 'text_of_message');
-        return $this->page->parse_file('status_message.html');
-    }
-
-    function create_finish_object_action_status($action, $obj) {
+    function create_finish_object_action_status_resource($action, $obj) {
         if ($action == "delete") {
             $operation = "deleted";
         } else if ($action == "update") {
@@ -242,7 +201,7 @@ class CustomPageScript extends PageScript {
 
     function print_finish_object_action_status($action, $obj) {
         $this->print_status(
-            $this->create_finish_object_action_status($action, $obj), "ok"
+            $this->create_finish_object_action_status_resource($action, $obj), "ok"
         );
     }
 
@@ -250,15 +209,17 @@ class CustomPageScript extends PageScript {
         $action, $obj, $aspect, $where_str,
         $default_order_by, $show_search_form, $next_action
     ) {
+        $resource = $this->create_finish_object_action_status_resource($action, $obj);
+        $message = new OA_OkStatusMsg($resource);
         if (is_null($next_action)) {
-            $this->print_finish_object_action_status($action, $obj);
-
-            $this->print_view_several_objects_page(
-                $obj, $aspect, $where_str, $default_order_by, $show_search_form
-            );
+//            $this->print_status_message($message);
+//
+//            $this->print_view_several_objects_page(
+//                $obj, $aspect, $where_str, $default_order_by, $show_search_form
+//            );
         } else {
-            $message = $this->create_finish_object_action_status($action, $obj);
-            self_redirect("?action={$next_action}&message={$message}&popup={$this->popup}");
+            $this->app->add_session_status_message($message);
+            self_redirect("?action={$next_action}&popup={$this->popup}");
         }
     }
 
@@ -292,6 +253,13 @@ class CustomPageScript extends PageScript {
         );
     }
 
+    function error_delete_object_after_check_links($obj, $next_action, $messages) {
+        foreach ($messages as $message) {
+            $this->app->add_session_status_message($message);
+        }
+        self_redirect("?action={$next_action}&popup={$this->popup}");
+    }
+
     function change_lang() {
         $this->app->set_current_lang(param("new_lang"));
         $cur_action = param("cur_action");
@@ -300,8 +268,13 @@ class CustomPageScript extends PageScript {
     }
 
     function pg_static() {
+        $page_name = trim(if_null(param("page"), ""));
+        $this->print_title("page_title_pg_static_{$page_name}");
+        $this->print_static_page($page_name);
+    }
+
+    function print_static_page($page_name) {
         $avail_pages = explode(",", $this->config->value("static_pages"));
-        $page_name = param("page");
         if (!in_array($page_name, $avail_pages)) {
             $this->pg_access_denied();
         }
@@ -310,21 +283,25 @@ class CustomPageScript extends PageScript {
         if ($this->page->is_template_exist($localized_page_path)) {
             $page_path = $localized_page_path;
         }
-        $this->print_image_title($page_name);
-        $this->print_title("page_title_pg_static_{$page_name}");
-        $this->page->parse_file($page_path, "body");
+        return $this->page->parse_file("static/{$page_name}.html", "body");
     }
 
-    function print_title_resource($resource) {
+    function print_title($resource) {
+        $resource_text = $this->get_message($resource);
         $this->page->assign(array(
+            "title" => $resource_text,
             "title_resource" => $resource,
         ));
+        $this->print_head_title($resource);
     }
 
-    function print_image_title($page_name) {
+    function print_head_title($resource) {
+        $resource_text = if_null(
+            $this->get_message("head_{$resource}"),
+            $this->get_message($resource)
+        );
         $this->page->assign(array(
-            "title_img_url" =>
-                $this->get_message("page_title_img_url_pg_static_{$page_name}"),
+            "head_title" => $resource_text,
         ));
     }
 }

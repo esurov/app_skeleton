@@ -1,13 +1,12 @@
 <?php
 
-// dbobject.php,v 1.67 2002/04/04 15:49:32 alex Exp
-
 // class DbObject.
-
 
 class DbObject {
 
     // Base class for all MySQL table based classes.
+
+    var $app = null;
 
     var $sql;  // SQL object to use for queries
 
@@ -37,9 +36,11 @@ function DbObject($class_name)
         die("No application found!\n");
     }
 
-    $this->sql    = &$app->sql;
-    $this->config = &$app->config;
-    $this->log    = &$app->log;
+    $this->app =& $app;
+
+    $this->sql    =& $this->app->sql;
+    $this->config =& $this->app->config;
+    $this->log    =& $this->app->log;
 
     $this->class_name = $class_name;
 
@@ -465,7 +466,7 @@ function update_table()
     // Check, whether this table already exists in database:
     $table_exists = false;
     $res = $this->sql->query("show tables");
-    while($row = $res->fetch()) {
+    while($row = $res->fetch(true)) {
         if($row[0] == $table_name) {
             $table_exists = true;
             break;
@@ -1073,7 +1074,8 @@ function get_where_condition()
 {
     // Read where conditions (from search form).
 
-    $where_str = '1';
+    $where_str = "1";
+    $havings = array();
 
     foreach($this->where_conditions as $name => $field_conditions) {
         $type   = $this->fields[$name]['type'];
@@ -1160,6 +1162,18 @@ function get_where_condition()
                 $where_str .= " and $select like concat('%', $value_str, '%')";
                 break;
 
+            case "having_equal":
+                $havings[] = "({$select} = {$value_str})";
+                break;
+
+            case "having_less":
+                $havings[] = "({$select} <= {$value_str})";
+                break;
+
+            case "having_greater":
+                $havings[] = "({$select} >= {$value_str})";
+                break;
+
             default:
                 if(is_array($value) ) {
                     $where_arr = array();
@@ -1175,8 +1189,8 @@ function get_where_condition()
             }
         }
     }
-
-    return $where_str;
+    $having_str = join(" and ", $havings);
+    return array($where_str, $having_str);
 }
 
 
@@ -1359,8 +1373,6 @@ function write_form($fields_to_write = NULL)
     // Return an array with given fields stored in it
     // for future use in a form template.
 
-    global $app;
-
     $h = array();
 
     $field_names = isset($fields_to_write) ?
@@ -1415,7 +1427,7 @@ function write_form($fields_to_write = NULL)
                                 $input['query_ex'] :
                                 array();
 
-                            $obj = $app->create_object($from);
+                            $obj = $this->app->create_object($from);
                             $items = $obj->get_items($data, $caption, $query_ex);
                         }
 
@@ -1499,34 +1511,28 @@ function write_form($fields_to_write = NULL)
     return $h;
 }
 
-function write_search_form($nonset_id = '', $nonset_name = '---')
-{
+function write_search_form($nonset_id = '', $nonset_name = '---') {
     // Return an array with given fields stored in it
     // for future use in a search form template.
 
-    global $app;
-
     $h = array();
 
-    foreach($this->where_conditions as $name => $field_conditions) {
-        foreach($field_conditions as $relation => $cond) {
+    foreach ($this->where_conditions as $name => $field_conditions) {
+        foreach ($field_conditions as $relation => $cond) {
             $pname = "{$this->class_name}_{$name}_{$relation}";
 
-            $input =
-                isset($cond['input']) ?
-                $cond['input'] :
-                array('type' => 'text');
+            $input = isset($cond['input']) ? $cond['input'] : array('type' => 'text');
+            $value = isset($cond['value']) ? $cond['value'] : '';
+            $value = htmlspecialchars($value);
+            $h["{$pname}_hidden"] =
+                "<input type=\"hidden\" name=\"$pname\" value=\"$value\">";
 
-            switch($input['type']) {
+            switch ($input['type']) {
             case 'select':
-
-                $value = isset($cond['value']) ? $cond['value'] : '';
-                $value = htmlspecialchars($value);
-
-                if($this->fields[$name]['type'] == 'enum') {
+                if ($this->fields[$name]['type'] == 'enum') {
                     $items = $this->fields[$name]['values'];
 
-                } else if(isset( $input['values']) ) {
+                } else if(isset($input['values'])) {
                     $items = $input['values'];
 
                 } else {
@@ -1538,14 +1544,14 @@ function write_search_form($nonset_id = '', $nonset_name = '---')
                         $input['query_ex'] :
                         array('order_by' => $input['caption']); // default order_by.                        );
 
-                    $obj = $app->create_object($from);
+                    $obj = $this->app->create_object($from);
                     $items = $obj->get_items($data, $caption, $query_ex);
                 }
 
                 array_unshift($items, array(
-                    'id'   => (isset( $input['nonset_id']) ? $input['nonset_id'] : $nonset_id ),
-                    'name' => (isset( $input['nonset_name']) ? $input['nonset_name'] : $nonset_name ),
-               ) );
+                    'id'   => (isset($input['nonset_id']) ? $input['nonset_id'] : $nonset_id),
+                    'name' => (isset($input['nonset_name']) ? $input['nonset_name'] : $nonset_name),
+                ));
                 $options = make_options($items, $value);
 
                 $h[$pname . '_input'] =
@@ -1556,10 +1562,10 @@ function write_search_form($nonset_id = '', $nonset_name = '---')
 
                 $value = isset($cond['value']) ? $cond['value'] : array();
 
-                if($this->fields[$name]['type'] == 'enum') {
+                if ($this->fields[$name]['type'] == 'enum') {
                     $items = $this->fields[$name]['values'];
 
-                } else if(isset( $input['values']) ) {
+                } else if (isset($input['values'])) {
                     $items = $input['values'];
 
                 } else {
@@ -1571,15 +1577,15 @@ function write_search_form($nonset_id = '', $nonset_name = '---')
                         $input['query_ex'] :
                         array('order_by' => $input['caption']); // default order_by.
 
-                    $obj = $app->create_object($from);
+                    $obj = $this->app->create_object($from);
                     $items = $obj->get_items($data, $caption, $query_ex);
                 }
 
-                if(isset( $input['nonset_id']) && isset( $input['nonset_name'] ) ) {
+                if (isset($input['nonset_id']) && isset($input['nonset_name'])) {
                     array_unshift($items, array(
                         'id'   => $input['nonset_id'],
                         'name' => $input['nonset_name'],
-                   ) );
+                    ));
                 }
 
                 $options = make_options($items, $value);
@@ -1589,8 +1595,6 @@ function write_search_form($nonset_id = '', $nonset_name = '---')
                 break;
 
             default:
-                $value = isset($cond['value']) ? $cond['value'] : '';
-                $value = htmlspecialchars($value);
                 $h["{$pname}_input"] =
                     "<input type=\"$input[type]\" name=\"$pname\" value=\"$value\">";
             }
@@ -1608,7 +1612,7 @@ function verify()
     // Check object data.
     // Return error message or empty string if all ok.
 
-    return '';
+    return array();
 }
 
 
@@ -1617,7 +1621,7 @@ function check_links()
     // Check, whether any links to this object exist.
     // Return error message or empty string if all ok.
 
-    return '';
+    return array();
 }
 
 
@@ -1661,18 +1665,16 @@ function get_options($field_name, $table , $order_by = 'id asc')
     // Return HTML code with series of <option> tags,
     // fetched from given table, using fields 'id' and 'name'.
 
-    global $app;
-
     $h = array();
 
-    $obj = $app->create_object($table);  // !!!
+    $obj = $this->app->create_object($table);  // !!!
     $query = $obj->get_select_query();
 
     $query->expand(array(
         'order_by' => $order_by,
    ) );
 
-    $res = $app->sql->run_select_query($query);
+    $res = $this->app->sql->run_select_query($query);
     while($row = $res->fetch()) {
         $obj->fetch_row($row);
         $h[$obj->id] = $obj->name;
@@ -1731,8 +1733,7 @@ function del_cascading()
     $links = $this->get_links(); // check reference integrity
     foreach($links as $table => $field) {
 
-        global $app; // POOR code.
-        $obj = $app->create_object($table);
+        $obj = $this->app->create_object($table);
         $obj_links = $obj->get_links();
 
         $this->log->write('DelCascading',"Try delete in {$table} where {$field}={$this->id}",3);
