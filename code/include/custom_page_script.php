@@ -154,7 +154,7 @@ class CustomPageScript extends PageScript {
     }
 
     function print_title($title, $varName = "title") {
-        $this->page->assign(array('title' => ''));
+        $this->page->assign(array($varName => ''));
         $this->print_message($title, $varName);
     }
 
