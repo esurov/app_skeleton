@@ -18,6 +18,8 @@ operation_edit = Modifica
 operation_add = Aggiungi
 operation_delete = Cancella
 operation_select = Seleziona
+operation_back = Indietro
+operation_save = Salva
 actions = Azioni
 
 article = articolo

@@ -18,6 +18,8 @@ operation_edit = Edit
 operation_add = Add
 operation_delete = Delete
 operation_select = Select
+operation_back = Back
+operation_save = Save
 actions = Actions
 
 article = article
