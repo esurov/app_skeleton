@@ -348,7 +348,9 @@ function ifConfirmed(message) {
 function acceptChoice(formName, input1, value1, input2, value2) {
     var input = eval("window.opener.document." + formName + "." + input1);
     input.value = value1;
-    input.onchange(); // onchange is not fired automatically ;(
+
+    // onchange is not fired automatically ;(
+    input.onchange(); 
 
     if (input2 != null && value2 != null) {
         var input = eval("window.opener.document." + formName + "." + input2);
