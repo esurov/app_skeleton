@@ -199,6 +199,23 @@ function unix_to_mysql_time($time) {
     return date('Y-m-d H:i:s', $time);
 }
 
+function timestamp2unix($stamp)
+{
+    if (strlen($stamp) < 14) {
+        return 0;
+    }
+
+    $year = substr($stamp, 0, 4);
+    $month = substr($stamp, 4, 2);
+    $day = substr($stamp, 6, 2);
+    $hour = substr($stamp, 8, 2);
+    $min = substr($stamp, 10, 2);
+    $sec = substr($stamp, 12, 2);
+
+    $date = "{$year}-{$month}-{$day} {$hour}:{$min}:{$sec}";
+    return strtotime($date);
+}
+
 function pipe_sendmail($msg, $queue = true) {
     // Send email message using local sendmail program.
 
