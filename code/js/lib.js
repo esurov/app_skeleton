@@ -357,3 +357,9 @@ function acceptChoice(formName, input1, value1, input2, value2) {
     window.opener.focus();
     window.close();
 }
+
+function getYear() {
+    var d = new Date();
+    var year = d.getFullYear();
+    return year;
+}
