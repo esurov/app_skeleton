@@ -93,7 +93,8 @@ class DbObject {
             return "0000-00-00";
         }
         list($day, $month, $year) = $parts;
-        return sprintf("%04d-%02d-%02d", $year, $month, $day);
+        $t = mktime(0, 0, 0, $month, $day, $year);
+        return DbObject::mysql_date($t);
     }
 
     function mysql_now_date() {
