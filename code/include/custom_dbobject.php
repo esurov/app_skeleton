@@ -407,27 +407,25 @@ class CustomDbObject extends DbObject {
     }
 
     function verify_image_upload($input_name = "image_file") {
+        $messages = array();
         if (!Image::was_uploaded($input_name)) {
-            return "";
+            return $messages;
         }
 
         switch ($_FILES[$input_name]["error"]) {
             case UPLOAD_ERR_OK:
-                $err = "";
                 break;
             case UPLOAD_ERR_INI_SIZE:
             case UPLOAD_ERR_FORM_SIZE:
-                $err = $this->status_message("too_big_filesize");
+                $messages[] = new OA_ErrorStatusMsg("too_big_filesize");
                 break;
             case UPLOAD_ERR_PARTIAL:
-                $err = $this->status_message("file_was_not_uploaded_completely");
+                $messages[] = new OA_ErrorStatusMsg("file_was_not_uploaded_completely");
                 break;
             default:
-                $err = "";
-                break;
         }
 
-        return $err;
+        return $messages;
     }
 }
 
