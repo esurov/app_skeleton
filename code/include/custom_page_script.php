@@ -212,11 +212,13 @@ class CustomPageScript extends PageScript {
         $this->page->parse_file('status_message.html', $msg_type);
     }
 
-    function status_message($msg_name) {
+    function status_message($msg_name, $vars = array()) {
         $msg_text = $this->get_message($msg_name);
         $this->page->assign(array(
             'text_of_message' => '',
         ));
+        $this->page->assign($vars);
+
         $this->page->parse_text($msg_text, 'text_of_message');
         return $this->page->parse_file('status_message.html');
     }
