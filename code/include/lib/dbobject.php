@@ -102,6 +102,17 @@ function mysql_now_date() {
     return date("Y-m-d");
 }
 
+
+function get_app_double_value($double_value, $decimals = 2) {
+    return format_double_value($double_value);
+}
+
+function get_php_double_value($str) {
+    $result = str_replace('.', '', $str);
+    $result = str_replace(',', '.', $result);
+    return doubleval($result);
+}
+
 function get_date_format()
 {
     // Return PHP date format usable for strftime() function.
@@ -254,10 +265,11 @@ function insert_field($field)
         if(!isset( $field['column']) ) {
             die("$this->class_name: Error! Field name is not specified!<br>");
         }
+        $table_name = (isset($field["alias"])) ? $field["alias"] : $field['table'];
         $field['name'] =
             ($field['table'] == $this->class_name) ?
             $field['column'] :
-            ($field['table'] . '_' . $field['column']);
+            ("{$table_name}_{$field['column']}");
     }
 
     if(!isset( $field['width']) ) {
@@ -1216,7 +1228,7 @@ function read($fields_to_read = NULL)
             }
             break;
         case 'double':
-            $value = doubleval($param_value);
+            $value = $this->get_php_double_value($param_value);
             break;
         default:
             $value = isset($param_value) ? $param_value : '';
@@ -1268,8 +1280,10 @@ function write($fields_to_write = NULL)
             break;
 
         case 'double':
-            $h[$pname] = number_format($value, 2);
-            $h[$pname . '_long'] = number_format($value, 5);
+            $h[$pname] = $this->get_app_double_value($value, 2);
+            $h[$pname . "_orig"] = $this->get_app_double_value($value, $f["prec"]);
+            $h[$pname . "_long"] = $this->get_app_double_value($value, 5);
+
             break;
 
         case 'varchar':
@@ -1462,8 +1476,15 @@ function write_form($fields_to_write = NULL)
             break;
 
         case 'double':
-            $h[$pname] = number_format($value, 2);
-            $h[$pname . '_long'] = number_format($value, 5);
+            $h[$pname] = $this->get_app_double_value($value, 2);
+            $orig_value = $this->get_app_double_value($value, $f["prec"]);
+            $h[$pname . "_orig"] = $orig_value;
+            $h[$pname . "_long"] = $this->get_app_double_value($value, 5);
+
+            $h[$pname . "_input"] =
+                "<input type=\"text\" name=\"$pname\" value=\"{$orig_value}\">";
+            $h[$pname . "_hidden"] =
+                "<input type=\"hidden\" name=\"$pname\" value=\"{$orig_value}\">";
             break;
 
         case "varchar":
@@ -1600,7 +1621,7 @@ function check_links()
 }
 
 
-function plural_name()
+function plural_resource_name()
 {
     // Return class name in plural.
 
@@ -1608,20 +1629,19 @@ function plural_name()
 }
 
 
-/**
-* Return class name in singular.
-*
-* @return string class name in singular
-* @author Alexander Mikhal'chuk <mikhal@skif.net>
-* @version 0.1
-* @access public
-* @see plural_name()
-*/
-function singular_name()
+function singular_resource_name()
 {
+    // Return class name in singular.
     return "$this->class_name";
 }
 
+function plural_name() {
+    return $this->plural_resource_name();
+}
+
+function singular_name() {
+    return $this->singular_resource_name();
+}
 
 function quantity_str($n)
 {
@@ -1737,25 +1757,51 @@ function del_cascading()
 }
 
 
+    function get_dependency_array(
+        $main_objs, $dep_obj_name, $dep_key_name,
+        $dep_field_name = "name", $dep_order_by_field_name = "name",
+        $where_str = "1"
+    ) {
+        $main_obj_ids = get_ids_from_items($main_objs);
+        $main_to_dep_rows = array(array(0));
+
+        foreach ($main_obj_ids as $main_obj_id) {
+            $dep_obj_ids = get_ids_from_items(get_table_field_values(
+                $dep_obj_name,
+                $dep_field_name,
+                array(
+                    "order_by" => $dep_order_by_field_name,
+                    "where" => "{$where_str} and {$dep_key_name} = {$main_obj_id}"
+                )
+            ));
+            array_unshift($dep_obj_ids, 0);
+            $main_to_dep_rows[] = $dep_obj_ids;
+        }
+        return $main_to_dep_rows;
+    }
+
 }  // class DbObject
 
 
 function write_select($name_table, $field_link, $field = 'name', $order_by = 'name asc', $where ='1')
 {
-   $id_equal = param("{$field_link}_equal");
-   $selected = ($id_equal) ? $id_equal : '';
+    $id_equal = param("{$field_link}_equal");
+    $selected = ($id_equal) ? $id_equal : '';
 
-   $option_string = get_option_ex($name_table,
-                                   $field,
-                                   $id_equal,
-                                   $order_by,
-                                   $where);
-  $select = "<select name=\"{$field_link}_equal\"> \n".
-            "<option value=\"0\" {$selected}>all</option>\n".
-            $option_string.
-            "</select>";
+    $option_string = get_option_ex(
+        $name_table,
+        $field,
+        $id_equal,
+        $order_by,
+        $where
+    );
+    
+    $select = "<select name=\"{$field_link}_equal\"> \n".
+    "<option value=\"0\" {$selected}>all</option>\n".
+    $option_string.
+    "</select>";
 
-  return $select;
+    return $select;
 }
 
 
@@ -1777,23 +1823,11 @@ function get_option_ex($table, $field = 'name', $selected = 0,
 {
     // Return HTML code with series of <option> tags,
     // fetched from given table, using fields 'id' and 'name'.
-    $h = get_table_field_values($table, $field, $order_by, $where_str);
-    return write_options($h, $selected);
-}
+    $h = get_table_field_values(
+        $table, $field, array("order_by" => $order_by, "where" => $where_str)
+    );
 
-function get_table_field_values($table, $field = "name", $order_by = "name", $where_str = "1") {
-    global $app;
-    $h = array();
-    $obj = $app->create_object($table);  // !!!
-    $res = $obj->get_expanded_result(array(
-        "order_by" => $order_by,
-        "where"    => $where_str,
-    ));
-    while($row = $res->fetch()) {
-        $obj->fetch_row($row);
-        $h[$obj->id] = $obj->$field;  // !!!
-    }
-    return $h;
+    return write_options($h, $selected);
 }
 
 ?>

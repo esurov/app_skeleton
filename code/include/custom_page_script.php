@@ -45,6 +45,7 @@ class CustomPageScript extends PageScript {
 
         parent::run();
     }
+
     function drop_pager() {
         $this->pager = new Pager($this, 10000, 10000);
     }
@@ -155,35 +156,30 @@ class CustomPageScript extends PageScript {
         $this->print_message($title, $varName);
     }
 
-    function create_view_object_page_title($singular_name) {
-        $obj_name = $this->get_message($singular_name);
-        $operation = $this->get_message('operation_view');
-        $info = $this->get_message('info');
-
+    function create_view_object_page_title($obj) {
+        $resource = $obj->singular_resource_name();
+        $resource = "title_view_{$resource}_info";
         $this->page->assign(array(
-            'title' => $operation . ' ' . $obj_name . ' ' . $info ,
+            'title' => $this->get_message($resource),
         ));
     }
 
-    function create_edit_object_page_title($singular_name, $is_definite) {
-        if ($is_definite) {
-            $operation = $this->get_message('operation_edit');
-            $info = ' ' . $this->get_message('info');
-        } else {
-            $operation = $this->get_message('operation_add');
-            $info = ' ' . $this->get_message('info');
-        }
-
+    function create_view_several_objects_page_title($obj) {
+        $resource = $obj->plural_resource_name();
         $this->page->assign(array(
-            'title' => "{$operation} {$singular_name}{$info}" ,
+            'title' => $this->get_message("title_view_{$resource}"),
         ));
     }
 
-    function create_view_several_objects_page_title($plural_name) {
-        $operation = $this->get_message('operation_view');
+    function create_edit_object_page_title($obj) {
+        $resource = $obj->singular_resource_name();
+        $resource =
+            ($obj->is_definite()) ?
+            "title_edit_{$resource}_info" :
+            "title_add_{$resource}_info";
 
         $this->page->assign(array(
-            'title' => $operation . ' ' . $plural_name,
+            'title' => $this->get_message($resource),
         ));
     }
 

@@ -18,7 +18,6 @@ operation_edit = Edit
 operation_add = Add
 operation_delete = Delete
 operation_select = Select
-info = info
 actions = Actions
 
 article = article
@@ -27,7 +26,7 @@ articles = articles
 news_list = News
 recent_news_list = Recent news
 
-filter_by = Filter by
+filter_by = Filter by:
 article_text = Text
 
 en = English

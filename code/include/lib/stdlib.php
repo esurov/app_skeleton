@@ -269,4 +269,81 @@ function is_in_table($table, $where_str, $sql) {
     return ($row[0] == 1);
 }
 
+function format_double_value(
+    $double_value, $decimals = 2, $dec_point = ",", $thousands_sep = "."
+) {
+    return number_format($double_value, $decimals, $dec_point, $thousands_sep);
+}
+
+function escape_js($str) {
+    return str_replace("'", "\'", $str);
+}
+
+function get_textarea_as_html($str) {
+    $html = htmlspecialchars($str);
+    $html = preg_replace('/\r/', ''    , $html);
+    $html = preg_replace('/\n/', '<br>', $html);
+    return $html;
+}
+
+function create_dependency_js(
+    $formName, $name, $depSelectName, $dep_array
+) {
+    $dependenciesStr = create_dependency_str($dep_array);
+    return
+        "<script language=\"JavaScript\">
+
+        depends[depends.length] = new Dependency(
+            '{$formName}',
+            '{$name}',
+            '{$depSelectName}',
+            new Array(
+{$dependenciesStr}
+            )
+        );
+
+        </script>";
+}
+
+function create_dependency_str($dep_array) {
+    $elements = array();
+    foreach ($dep_array as $dep_select_array) {
+        $elements[] = '    new Array("' . implode('", "', $dep_select_array) . '")';
+    }
+    return implode(",\n", $elements) . "\n";
+}
+
+function get_table_field_values($table, $field_name, $query_ex) {
+    global $app;
+    $h = array();
+    $obj = $app->create_object($table);  // !!!
+    $res = $obj->get_expanded_result($query_ex);
+    while($row = $res->fetch()) {
+        $obj->fetch_row($row);
+        $h[] = array(
+            "id" => $obj->id,
+            "name" => $obj->$field_name   // !!!
+        );
+    }
+    return $h;
+}
+
+function get_ids_from_items($items) {
+    $ids = array();
+    foreach ($items as $item) {
+        $ids[] = $item["id"];    
+    }    
+    return $ids;
+}
+
+function write_options_ex($items, $select = null, $items_begin = null, $items_end = null) {
+    if (!is_null($items_begin)) {
+        $items = array_merge(array($items_begin), $items);
+    }
+    if (!is_null($items_end)) {
+        $items = array_merge($items, array($items_end));
+    }
+    return write_options($items, $select);
+}
+
 ?>

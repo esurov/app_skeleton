@@ -1,10 +1,10 @@
-user_menu_item_pg_index = !!Home
-user_menu_item_pg_news = !!News
+user_menu_item_pg_index = Home
+user_menu_item_pg_news = News
 user_menu_item_pg_contact_form = Contatti
 user_menu_item_pg_static_sample_page1 = !!SamplePage1
 user_menu_item_pg_static_sample_page2 = !!SamplePage2
 
-access_denied = !!Access denied!
+access_denied = Accesso non autorizzato!
 
 app_head_title = (((((WebAppSkeleton)))))
 page_title_contact_form = !!Contact form
@@ -13,21 +13,20 @@ page_title_sample_page2 = !!SamplePage2
 
 pager_pages_title = Pagine:
 
-operation_view = !!View
-operation_edit = !!Edit
-operation_add = !!Add
-operation_delete = !!Delete
-operation_select = !!Select
-info = !!info
-actions = !!Actions
+operation_view = Visualizza
+operation_edit = Modifica
+operation_add = Aggiungi
+operation_delete = Cancella
+operation_select = Seleziona
+actions = Azioni
 
-article = !!article
-articles = !!articles
+article = articolo
+articles = articoli
 
-news_list = !!News
+news_list = News
 recent_news_list = !!Recent news
 
-filter_by = !!Filter by
+filter_by = Filtra per:
 article_text = Testo
 
 en = Inglese
@@ -37,7 +36,7 @@ view_all_news = !!View all news
 
 label_date_created = Data:
 label_article_title = Titolo:
-label_article_body = !!Body:
+label_article_body = Corpo:
 
 label_first_name = Nome:
 label_last_name = Cognome:
@@ -54,16 +53,20 @@ label_send_btn = Invia
 
 contact_form_processed = !!Your contact info was processed. Thank you.
 
-setup_auth_realm = Setup area
-setup_auth_access_denied_page = Access denied!
-admin_auth_realm = !!Admin area
-admin_auth_access_denied_page = !!Access denied!
+setup_auth_realm = Area di setup
+setup_auth_access_denied_page = Accesso non autorizzato!
+admin_auth_realm = Area di amministrazione
+admin_auth_access_denied_page = Accesso non autorizzato!
 
-tables_created = Tables have been created
-tables_deleted = Tables have been deleted
-tables_updated = All tables have been updated
+tables_created = Le tabelle sono state create!
+tables_deleted = Le tabelle sono state eliminate!
+tables_updated = Tutte le tabelle sono state aggiornate!
 test_data_inserted = Test data inserted
 
+title_view_articles = View articles
+title_edit_article_info = Edit article info
+title_add_article_info = Add article info
+title_view_article_info = View article info
 article_added = New article was added
 article_updated = Article was updated
 article_deleted = Article was deleted

@@ -50,7 +50,7 @@ class PageScript
 
         // Assign predefined variables to page template.
         $this->page->assign(array(
-            'self' => $GLOBALS['PHP_SELF'],
+            'self' => $_SERVER['PHP_SELF'],
         ));
 
         // Read messages:
@@ -136,7 +136,7 @@ class PageScript
     {
         // Generage URL to be used as self-action (resulting the same page).
 
-        return "$GLOBALS[PHP_SELF]?action={$this->action}";
+        return "$_SERVER[PHP_SELF]?action={$this->action}";
     }
 
 
@@ -186,14 +186,16 @@ class PageScript
 
     // View object functions:
 
-    function create_view_object_page_title($singular_name) {
+    function create_view_object_page_title($obj) {
+        $singular_name = $obj->singular_name();
         $this->page->assign(array(
             'title' => "View {$singular_name} info",
         ));
     }
 
-    function create_edit_object_page_title($singular_name, $is_definite) {
-        if ($is_definite) {
+    function create_edit_object_page_title($obj) {
+        $singular_name = $obj->singular_name();
+        if ($obj->is_definite()) {
             $operation = "Edit";
             $info = " info";
         } else {
@@ -205,7 +207,8 @@ class PageScript
         ));
     }
 
-    function create_view_several_objects_page_title($plural_name) {
+    function create_view_several_objects_page_title($obj) {
+        $plural_name = $obj->plural_name();
         $this->page->assign(array(
             'title' => "View {$plural_name}",
         ));
@@ -240,7 +243,7 @@ class PageScript
         $this->page->parse_file("{$prefix}info.html", "text_{$name}_info");
 
         // print page:
-        $this->create_view_object_page_title($obj->singular_name());
+        $this->create_view_object_page_title($obj);
         $this->page->parse_file("{$prefix}view.html",  'body');
     }
 
@@ -561,7 +564,7 @@ class PageScript
         ) );
 
         if($template_var == 'body') {
-            $this->create_view_several_objects_page_title($obj->plural_name());
+            $this->create_view_several_objects_page_title($obj);
         }
         $this->page->parse_file("{$prefix}view_all.html", $template_var);
     }
@@ -584,7 +587,7 @@ class PageScript
         $this->page->parse_file("{$prefix}form.html", "text_{$name}_form");
 
         // print page:
-        $this->create_edit_object_page_title($obj->singular_name(), $obj->is_definite());
+        $this->create_edit_object_page_title($obj);
         $this->page->parse_file("{$prefix}edit.html", 'body');
     }
 

@@ -19,6 +19,26 @@ class CustomDbObject extends DbObject {
         $this->lang =& $app->lang;
     }
 
+    function mysql2app_time($time) {
+        list($hour, $minute, $second) = explode(":", $time);
+        return "{$hour}.{$minute}.{$second}";
+    }
+
+    function app2mysql_time($time) {
+        $parts = explode(".", $time);
+        $second = "00";
+        if (count($parts) >= 2) {
+            $hour = $parts[0];
+            $minute = $parts[1];
+        }
+        if (count($parts) == 3) {
+            $second = $parts[2];
+        } else {
+            return "00:00:00";
+        }
+        return "{$hour}:{$minute}:{$second}";
+    }
+
     /** Multilingual attribute support added */
     function insert_field($field) {
         global $app;
@@ -48,6 +68,8 @@ class CustomDbObject extends DbObject {
         }
 
         if (isset($field["table"]) && ($field["table"] != $this->class_name)) {
+            $alias = (isset($field["alias"])) ? $field["alias"] : $field["table"];
+
             $obj = new $app->tables[$field["table"]](true);
             $obj_field = $obj->fields[$field["column"]];
             if (
@@ -55,10 +77,8 @@ class CustomDbObject extends DbObject {
                 $obj_field["multilingual"]
             ) {
 
-                $table = $field["table"];
-
-                $current = "{$table}.{$field['column']}_{$app->lang}";
-                $default = "{$table}.{$field['column']}_{$app->dlang}";
+                $current = "{$alias}.{$field['column']}_{$app->lang}";
+                $default = "{$alias}.{$field['column']}_{$app->dlang}";
 
                 $field["select"] = "if ({$current} != '', {$current}, {$default})";
             }
@@ -67,11 +87,13 @@ class CustomDbObject extends DbObject {
         parent::insert_field($field);
     }
 
-    function status_message($msg_name) {
+    function status_message($msg_name, $vars = array()) {
         $msg_text = $this->get_message($msg_name);
         $this->page->assign(array(
             "text_of_message" => "",
         ));
+        $this->page->assign($vars);
+
         $this->page->parse_text($msg_text, "text_of_message");
         return $this->page->parse_file("status_message.html");
     }
@@ -152,9 +174,6 @@ class CustomDbObject extends DbObject {
                 $value = $this->mysql2app_time($value);
                 $h[$pname] = $value;
                 break;
-            case "double":
-                $h[$pname] = format_currency($value);
-                break;
             case "integer":
                 $h[$pname . "_origin"] = $value;
                 if (isset($f["input"]) && $f["input"] == "checkbox") {
@@ -210,12 +229,6 @@ class CustomDbObject extends DbObject {
                 $h[$pname . "_input"] =
                     "<input type=\"{$f['input']}\" " .
                     "name=\"{$pname}\" value=\"{$value}\">";
-                break;
-            case "double":
-                $h[$pname] = format_currency($value);
-                $h[$pname . "_input"] =
-                    "<input type=\"{$f['input']}\" " .
-                    "name=\"{$pname}\" value=\"{$h[$pname]}\">";
                 break;
             case "text":
                 $h[$pname . "_input"] =
@@ -303,6 +316,14 @@ class CustomDbObject extends DbObject {
                 }
             }
         }
+    }
+
+    function plural_name() {
+        return $this->get_message($this->plural_resource_name());
+    }
+
+    function singular_name() {
+        return $this->get_message($this->singular_resource_name());
     }
 }
 
