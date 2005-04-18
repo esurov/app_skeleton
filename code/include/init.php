@@ -17,15 +17,15 @@ require_once("include/lib/app.php");
 require_once("include/lib/sql_app.php");
 require_once("include/lib/page_script.php");
 
+require_once("include/lib/session.php");
+require_once("include/lib/session_login_state.php");
+require_once("include/lib/StatusMsg.php");
+
 require_once("include/custom_dbobject.php");
 require_once("include/custom_page_script.php");
 require_once('include/custom_app.php');
 
 require_once("include/functions.php");
-
-require_once("include/lib/Session/LoginState.php");
-require_once("include/lib/Session/Session.php");
-require_once("include/lib/StatusMsg.php");
 
 // tables:
 $tables = array(
