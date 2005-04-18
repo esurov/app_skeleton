@@ -69,22 +69,20 @@ class DbObject {
         return "{$hour}:{$minute}:{$second}";
     }
 
-    function mysql2app_datetime($value) {
-        list($year, $month, $day, $hour, $minute, $second) = explode("-", $value);
-        return "{$day}/{$month}/{$year} {$hour}:{$minute}:{$second}";
-    }
-
     function mysql2app_timestamp($value) {
         $datetime_values = array();
         $date_regexp = '/^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)$/';
-        preg_match($date_regexp, $value, $date_values);
+        preg_match($date_regexp, $value, $datetime_values);
         $year   = $datetime_values[1];
         $month  = $datetime_values[2];
         $day    = $datetime_values[3];
         $hour   = $datetime_values[4];
         $minute = $datetime_values[5];
         $second = $datetime_values[6];
-        return sprintf("%02d/%02d/%04d %02d:%02d:%02d", $day, $month, $year, $hour, $minute, $second);
+        return sprintf(
+            "%02d/%02d/%04d %02d:%02d:%02d",
+            $day, $month, $year, $hour, $minute, $second
+        );
     }
 
     function app2mysql_date($date) {
@@ -1774,8 +1772,10 @@ class DbObject {
         }
 
         $res = false;
-        foreach ($field_names as $field_name) {
-            $res = $res || $this->{$field_name} == $old_obj->{$field_name};
+        if (!is_null($old_obj)) {
+            foreach ($field_names as $field_name) {
+                $res = $res || $this->{$field_name} == $old_obj->{$field_name};
+            }
         }
 
         return $res || !$this->field_values_exist($field_names);

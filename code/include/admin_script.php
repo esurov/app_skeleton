@@ -13,6 +13,7 @@ class AdminScript extends CustomPageScript {
             "pg_static" => $a,
 
             "pg_index" => $a,
+            
             "pg_view_article" => $a,
             "pg_edit_article" => $a,
             "update_article" => $a,

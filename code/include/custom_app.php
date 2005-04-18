@@ -19,7 +19,7 @@ class CustomApp extends SqlApp {
     }
 
     function get_current_lang() {
-        $cur_lang = OA_Session::getParam("current_language");
+        $cur_lang = Session::get_param("current_language");
         if (!$this->is_valid_lang($cur_lang)) {
             $cur_lang = $this->config->value('default_language');
         }
@@ -40,26 +40,26 @@ class CustomApp extends SqlApp {
 
     function set_current_lang($new_lang) {
         if ($this->is_valid_lang($new_lang)) {
-            OA_Session::setParam("current_language", $new_lang);
+            Session::set_param("current_language", $new_lang);
         }
     }
 
     function add_session_status_message($new_msg) {
-        if (OA_Session::hasParam("status_messages")) {
-            $old_msgs = OA_Session::getParam("status_messages");
+        if (Session::has_param("status_messages")) {
+            $old_msgs = Session::get_param("status_messages");
         } else {
             $old_msgs = array();
         }
         $msgs = array_merge($old_msgs, array($new_msg));
-        OA_Session::setParam("status_messages", $msgs);
+        Session::set_param("status_messages", $msgs);
     }
 
     function get_and_delete_session_status_messages() {
-        if (!OA_Session::hasParam("status_messages")) {
+        if (!Session::has_param("status_messages")) {
             return array();
         } else {
-            $msgs = OA_Session::getParam("status_messages");
-            OA_Session::unsetParam("status_messages");
+            $msgs = Session::get_param("status_messages");
+            Session::unset_param("status_messages");
             return $msgs;
         }
     }

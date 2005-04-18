@@ -18,6 +18,22 @@ class CustomDbObject extends DbObject {
         $this->lang =& $this->app->lang;
     }
 
+    function mysql2app_datetime($value) {
+        $datetime_values = array();
+        $date_regexp = '/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/';
+        preg_match($date_regexp, $value, $datetime_values);
+        $year   = $datetime_values[1];
+        $month  = $datetime_values[2];
+        $day    = $datetime_values[3];
+        $hour   = $datetime_values[4];
+        $minute = $datetime_values[5];
+        $second = $datetime_values[6];
+        return sprintf(
+            "%02d/%02d/%04d %02d.%02d.%02d",
+            $day, $month, $year, $hour, $minute, $second
+        );
+    }
+
     function mysql2app_time($time) {
         list($hour, $minute, $second) = explode(":", $time);
         return "{$hour}.{$minute}.{$second}";
@@ -150,6 +166,15 @@ class CustomDbObject extends DbObject {
             $pname = $this->class_name . "_" . $name;
 
             switch($type) {
+            case "datetime":
+                if ($value == "0000-00-00 00:00:00") {
+                    $value = "";
+                } else {
+                    $value = $this->mysql2app_datetime($value);
+                }
+
+                $h[$pname] = $value;
+                break;
             case "date":
                 if ($value == "0000-00-00") {
                     $value = "";
@@ -173,6 +198,8 @@ class CustomDbObject extends DbObject {
                 break;
             }
         }
+
+        $this->extend_output($h);
 
         return $h;
     }
@@ -198,6 +225,15 @@ class CustomDbObject extends DbObject {
             $value = htmlspecialchars($value);
 
             switch($type) {
+            case "datetime":
+                if ($value == "0000-00-00 00:00:00") {
+                    $value = "";
+                } else {
+                    $value = $this->mysql2app_datetime($value);
+                }
+
+                $h[$pname] = $value;
+                break;
             case "date":
                 if ($value == "0000-00-00" || $value == "") {
                     $value = "";
@@ -238,12 +274,19 @@ class CustomDbObject extends DbObject {
                 $lang_inputs[] =
                     "<tr><th>" .
                     $this->get_message($lang)  .
-                    ":</th><td>" . $h[$lname . "_input"] . "</td></tr>\n";
+                    ":</th><td class=\"wide\">" . $h[$lname . "_input"] . "</td></tr>\n";
             }
             $h[$pname . "_input"] =
                 "<table>\n" . join("", $lang_inputs) . "</table>";
         }
+
+        $this->extend_output($h);
+        
         return $h;
+    }
+
+
+    function extend_output(&$h) {
     }
 
     function store($fields = NULL) {
@@ -360,9 +403,16 @@ class CustomDbObject extends DbObject {
             if (!is_null($image)) {
                 $this->page->assign($image->write());
                 $image_template_text = $this->page->parse_file($filename);
+            } else {
+                $filename = "{$this->class_name}/{$var_name}_empty.html";
+                if ($this->page->is_template_exist($filename)) {
+                    $image_template_text = $this->page->parse_file($filename);
+                }
             }
         }
-        return array("{$this->class_name}{$var_name}" => $image_template_text);
+        return array(
+            "{$this->class_name}{$var_name}" => $image_template_text
+        );
     }
 
     function get_image($image_id = null) {
@@ -428,6 +478,16 @@ class CustomDbObject extends DbObject {
         }
 
         return $messages;
+    }
+
+    function print_value($param_name, $param_value) {
+        $this->page->assign(array(
+            $param_name => $param_value,
+        ));
+    }
+
+    function print_xml_value($param_name, $param_value) {
+        $this->print_value($param_name, get_xml_printable_value($param_value));
     }
 }
 

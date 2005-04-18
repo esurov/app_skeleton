@@ -79,19 +79,7 @@ class PageScript {
         // Read from CGI and run appropriate action.
 
         // Decide what to do:
-        $action = param('action');
-        $this->log->write('PageScript', "action = '$action'", 3);
-
-        // Ensure that action is valid:
-        if (isset($this->actions[$action])) {
-            $this->action = $action;
-
-        } else {
-            if ($action != '') {
-                $this->log->write('PageScript', "Warning! Invalid action.", 1);
-            }
-            $this->action = 'pg_index';
-        }
+        $this->action = $this->create_action_name();
 
         $this->create_current_user();
         // Ensure that current user is allowed to run this action:
@@ -107,6 +95,22 @@ class PageScript {
 
         // Print page:
         $this->print_page();
+    }
+
+    function create_action_name() {
+        $action_name = param("action");
+
+        $this->log->write('PageScript', "action = '$action_name'", 3);
+
+        // Ensure that action is valid:
+        if (isset($this->actions[$action_name])) {
+            return $action_name;
+        } else {
+            if ($action_name != "") {
+                $this->log->write('PageScript', "Warning! Invalid action.", 1);
+            }
+            return "pg_index";
+        }
     }
 
     function create_current_user() {

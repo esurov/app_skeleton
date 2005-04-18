@@ -4,6 +4,8 @@ class UserScript extends CustomPageScript {
     function UserScript() {
         parent::CustomPageScript("user");
 
+        $this->print_lang_menu = false;
+
         $e = array("valid_users" => array("everyone"));
 
         // Actions:
@@ -12,8 +14,10 @@ class UserScript extends CustomPageScript {
             "pg_static" => $e,
 
             "pg_index" => $e,
+
             "pg_news" => $e,
             "pg_article" => $e,
+            
             "process_contact_form" => $e,
         );
     }

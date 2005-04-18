@@ -30,12 +30,12 @@ class Article extends CustomDbObject {
             "type"   => "text",
             "value"  => "",
             "multilingual" => 1,
-            "input"  => "textarea",
         ));
 //
         $this->insert_field(array(
             "name"   => "full_text",
             "type"   => "text",
+            "value"  => "",
             "select" =>
                 "concat(article.title_{$this->lang}, article.body_{$this->lang})",
         ));
@@ -53,20 +53,27 @@ class Article extends CustomDbObject {
     function write($fields = null) {
         $h = parent::write($fields);
 
+        $h["article_title_short"] = $this->shorten($this->title, 40);
+
         $body_short_len = $this->config->value("article_body_short_length");
-        $body_shortened = strip_tags($this->body);
-        if (strlen($body_shortened) > $body_short_len) {
-            $n = strpos($body_shortened, ' ', $body_short_len);
-            $body_shortened =
-                $n ?
-                substr($body_shortened, 0, $n):
-                substr($body_shortened, 0, $body_short_len);
-            $body_shortened .= '...';
-        } else {
-            $body_shortened = $this->body;
-        }
-        $h["article_body_short"] = $body_shortened;
+        $h["article_body_short"] = $this->shorten($this->body, $body_short_len);
+        
         return $h;
+    }
+
+    function shorten($str, $max_length) {
+        $shortened_str = strip_tags($str);
+        if (strlen($shortened_str) > $max_length) {
+            $n = strpos($shortened_str, ' ', $max_length);
+            $shortened_str =
+                $n ?
+                substr($shortened_str, 0, $n):
+                substr($shortened_str, 0, $max_length);
+            $shortened_str .= "...";
+        } else {
+            $shortened_str = $str;
+        }
+        return $shortened_str;
     }
 }
 

@@ -19,6 +19,9 @@ function send_no_cache_headers() {
     header("Cache-Control: post-check=0, pre-check=0", false);
 }
 
+function send_content_type_xml_header() {
+    header("Content-Type: text/xml");
+}
 
 function self_redirect($sub_url = '') {
     // Perform HTTP redirect to the same script.
@@ -33,42 +36,6 @@ function self_redirect($sub_url = '') {
 
     exit;
 }
-
-
-function write_options($items, $select = NULL) {
-    // OBSOLETE!
-    // Compatibility wrapper for make_options() function.
-
-    return make_options($items, $select) ;
-}
-
-
-function make_options($items, $select = NULL) {
-    // Return a string with a <option> tags created from given array.
-
-    $s = "\n";
-
-    foreach($items as $i => $item) {
-        if (is_array( $item) ) {
-            $id   = $item['id'];
-            $name = $item['name'];
-
-        } else {
-            // compatibility mode:
-            $id   = $i;
-            $name = $item;
-        }
-        if (is_array( $select) ) {
-            $sel = in_array($id, $select) ? ' selected' : '';
-        } else {
-            $sel = (isset($select) && $id == $select) ? ' selected' : '';
-        }
-        $s .= "<option value=\"$id\"$sel>$name</option>\n";
-    }
-
-    return $s;
-}
-
 
 function param($name) {
     if (isset($_GET[$name])) {
@@ -94,6 +61,10 @@ function params() {
     return array_merge($_POST, $_GET);
 }
 
+function if_null($variable, $value) {
+    return is_null($variable) ? $value : $variable;
+}
+
 function make_sub_url($params) {
     // Generate partial URL from given hash of parameters.
 
@@ -116,11 +87,38 @@ function convert_url_to_redirect_url($url) {
     return str_replace("&amp;", "&", $url);
 }
 
-
-function if_null($variable, $value) {
-    return is_null($variable) ? $value : $variable;
+function convert_lf2br($str, $is_xhtml = false) {
+    $br_tag = ($is_xhtml) ? "<br />" : "<br>";
+    return str_replace("\n", $br_tag, convert_crlf2lf($str));
 }
 
+function convert_crlf2lf($str) {
+    return preg_replace('/(\r\n)|\r|\n/m', "\n", $str);
+}
+
+function get_js_safe_string($unsafe_str) {
+    $str = str_replace("\\", "\\\\", $unsafe_str);
+    $str = str_replace("'", "\\'", $str);
+    $str = str_replace("\"", "\\\"", $str);
+    $str = convert_crlf2lf($str);
+    return str_replace("\n", '\n', $str);
+}
+
+function get_absolute_script_url() {
+    return "http://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}";
+}
+
+function get_formatted_currency($value) {
+    return "&euro;&nbsp;" . DbObject::get_app_double_value($value);
+}
+
+function get_xml_formatted_currency($value) {
+    return "\xE2\x82\xAC " . get_xml_printable_value(DbObject::get_app_double_value($value));
+}
+
+function get_xml_printable_value($param_value) {
+    return htmlspecialchars(utf8_encode($param_value));
+}
 
 // Some less standard functions:
 
@@ -224,6 +222,11 @@ function timestamp2unix($stamp)
     return strtotime($date);
 }
 
+function time_unique() {
+    list($usec, $sec) = explode(" ", microtime()); 
+    return date("YmdHis") . substr($usec, 2, 6);
+}
+
 function pipe_sendmail($msg, $queue = true) {
     // Send email message using local sendmail program.
 
@@ -273,16 +276,39 @@ function format_double_value(
     return number_format($double_value, $decimals, $dec_point, $thousands_sep);
 }
 
-function escape_js($str) {
-    return str_replace("'", "\'", $str);
+function write_options($items, $select = NULL) {
+    // OBSOLETE!
+    // Compatibility wrapper for make_options() function.
+
+    return make_options($items, $select) ;
 }
 
-function get_textarea_as_html($str) {
-    $html = htmlspecialchars($str);
-    $html = preg_replace('/\r/', ''    , $html);
-    $html = preg_replace('/\n/', '<br>', $html);
-    return $html;
+function make_options($items, $select = NULL) {
+    // Return a string with a <option> tags created from given array.
+
+    $s = "\n";
+
+    foreach($items as $i => $item) {
+        if (is_array( $item) ) {
+            $id   = $item['id'];
+            $name = $item['name'];
+
+        } else {
+            // compatibility mode:
+            $id   = $i;
+            $name = $item;
+        }
+        if (is_array( $select) ) {
+            $sel = in_array($id, $select) ? ' selected' : '';
+        } else {
+            $sel = (isset($select) && $id == $select) ? ' selected' : '';
+        }
+        $s .= "<option value=\"$id\"$sel>$name</option>\n";
+    }
+
+    return $s;
 }
+
 
 function create_dependency_js(
     $formName, $name, $depSelectName, $dep_array
