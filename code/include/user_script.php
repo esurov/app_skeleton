@@ -17,7 +17,8 @@ class UserScript extends CustomPageScript {
 
             "pg_news" => $e,
             "pg_article" => $e,
-            
+
+            "pg_contact_form" => $e,
             "process_contact_form" => $e,
         );
     }
@@ -66,28 +67,49 @@ class UserScript extends CustomPageScript {
         $this->print_view_object_page($article, "");
     }
 
+    function pg_contact_form() {
+        $this->print_static_page(
+            "static/_contact_form_notice_{$this->lang}.html",
+            "contact_form_notice"
+        );
+        $this->print_static_page("contact_form");
+    }
+
     function process_contact_form() {
-        $fromEmail = param("email");
-        if (trim($fromEmail) != "") {
-            $toEmail = $this->config->value("contact_form_email_to");
-            $toName = $this->config->value("contact_form_from");
-            $fromName = param("first_name") . " " . param("last_name");
-            $subj = $this->config->value("contact_form_subj");
+        $email_from = param("email");
+        if (trim($email_from) != "") {
+            $email_to = $this->config->value("contact_form_email_to");
+            $name_to = $this->config->value("contact_form_name_to");
 
-            $f = params();
-            //insert additional non-string params here (get them from param($name))
-            $this->message->assign($f);
+            $first_name = trim(param("first_name"));
+            $last_name = trim(param("last_name"));
 
-            pipe_sendmail(array(
-                "to"        => $toEmail,
-                "to_name"   => $toName,
-                "from"      => $fromEmail,
-                "from_name" => $fromName,
-                "subj"      => $subj,
-                "text"      => $this->message->parse_file("contact.msg"),
-            ), 0);
+            $name_from = trim("{$first_name} {$last_name}");
+            $subject = $this->config->value("contact_form_subject");
+
+            $this->page->assign(array(
+                "first_name" => htmlspecialchars($first_name),
+                "last_name" => htmlspecialchars($last_name),
+                "email" => htmlspecialchars($email_from),
+                "company" => htmlspecialchars(param("company")),
+                "address" => htmlspecialchars(param("address")),
+                "phone" => htmlspecialchars(param("phone")),
+                "fax" => htmlspecialchars(param("fax")),
+                "message_text" => convert_lf2br(htmlspecialchars(param("message_text"))),
+            ));
+
+            $mailer = new PHPMailer();
+            $mailer->IsSendmail();
+            $mailer->IsHTML(true);
+            $mailer->From = $email_from;
+            $mailer->Sender = $email_from;
+            $mailer->FromName = $name_from;
+            $mailer->AddAddress($email_to, $name_to);
+            $mailer->Subject = $subject;
+            $mailer->Body = $this->page->parse_file("email/contact.html");
+            $mailer->Send();
         }
-        $this->print_static_page("contact_form_processed");
+        self_redirect("?action=pg_static&page=contact_form_processed");
     }
 }
 

@@ -1,6 +1,6 @@
 user_menu_item_pg_index = Home
 user_menu_item_pg_news = News
-user_menu_item_pg_static_contact_form = Contatti
+user_menu_item_pg_contact_form = Contatti
 user_menu_item_pg_static_sample_page1 = !!SamplePage1
 user_menu_item_pg_static_sample_page2 = !!SamplePage2
 
@@ -8,7 +8,8 @@ app_head_title = !!AppSkeleton
 page_title_access_denied = Accesso non autorizzato!
 head_page_title_pg_index = Home
 page_title_pg_index =
-page_title_pg_static_contact_form = Contatti
+page_title_pg_contact_form = Contatti
+page_title_pg_static_contact_form_processed = Contatti
 page_title_pg_static_sample_page1 = !!SamplePage1
 page_title_pg_static_sample_page2 = !!SamplePage2
 page_title_pg_news = News
@@ -59,6 +60,7 @@ label_country = Nazione:
 label_address = Indirizzo:
 label_phone = Telefono:
 label_fax = Fax:
+label_message_text = Messagio:
 
 contact_form_processed = I suoi dati sono stati registrati. Grazie.
 

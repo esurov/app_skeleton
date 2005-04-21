@@ -10,6 +10,13 @@
 </tr>
 
 <tr>
+    <td>{%str_label_email%}</td>
+    <td><input name="email" type="text"></td>
+    <td></td>
+    <td></td>
+</tr>
+
+<tr>
     <td>{%str_label_company%}</td>
     <td><input name="company" type="text"></td>
 
@@ -18,22 +25,16 @@
 </tr>
 
 <tr>
-    <td>{%str_label_email%}</td>
-    <td><input name="email" type="text"></td>
-
-    <td>{%str_label_zip%}</td>
-    <td><input name="zip" type="text"></td>
-</tr>
-
-<tr>
-    <td>{%str_label_city%}</td>
-    <td><input name="city" type="text"></td>
-
     <td>{%str_label_country%}</td>
     <td><input name="country" type="text" value=""></td>
+    <td>{%str_label_city%}</td>
+    <td><input name="city" type="text"></td>
 </tr>
 
 <tr>
+    <td>{%str_label_zip%}</td>
+    <td><input name="zip" type="text"></td>
+
     <td>{%str_label_address%}</td>
     <td colspan="3"><input name="address" type="text" style="width:280px"></td>
 </tr>
@@ -47,6 +48,11 @@
 </tr>
 
 <tr>
+    <td>{%str_label_message_text%}</td>
+    <td colspan="3"><textarea name="message_text" cols="40" rows="8"></textarea></td>
+</tr>
+
+<tr>
     <td colspan="4">
         <center><input name="send_btn" type="submit" value="{%str_operation_send%}"></center>
     </td>
@@ -56,10 +62,5 @@
 </table>
 
 <script language="JavaScript">focusElement('contact', 'first_name');</script>
-<br>
-<small>
-<p><b>INFORMATIVA PER RACCOLTA DATI DAL SITO INTERNET TRAMITE POSTA ELETTRONICA</b><br><br>
-Ai sensi dell'art. 13 del Decreto Legislativo 196/2003  La informiamo che l'invio di posta elettronica tramite lo spazio riservato comporta l'automatica acquisizione dell'indirizzo e-mail del mittente nonche di eventuali altri dati personali contenuti nel testo inviato. Tali dati saranno trattati sia in modalita automatizzata che cartacea dal personale appositamente incaricato da Prato Verde s.r.l., titolare del trattamento, al fine di rispondere alle Sue richieste (comunicazioni o invio di materiale informativo sulle attivita aziendali) e non saranno ne comunicati ne diffusi. Il conferimento dei dati e libero e facoltativo, tuttavia il mancato conferimento puo comportare l'impossibilita di ottenere quanto richiesto. 
-<br>Lei ha diritto, come previsto dall'art.7 del Codice di ottenere la conferma dell'esistenza, l'aggiornamento, la rettifica, il blocco e la cancellazione dei dati trattati. Per esercitare questi diritti potra rivolgersi al "Titolare del trattamento dati", presso la sede legale dell'Azienda.
-</p></small>
 
+{%contact_form_notice%}

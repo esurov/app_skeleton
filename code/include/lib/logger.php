@@ -42,8 +42,17 @@ class Logger {
             ftruncate($f, 0);
         }
 
+        if (is_array($message)) {
+            $messages = array();
+            foreach ($message as $key => $value) {
+                $messages[] = "'{$key}' => '{$value}'";
+            }
+            $message_text = "array(" . join(", ", $messages) . ")";
+        } else {
+            $message_text = $message;
+        }
         $time_str = strftime('%Y.%m.%d %H:%M:%S', time());
-        $s = "$time_str - [$class_name] $message\n";
+        $s = "{$time_str} - [{$class_name}] {$message_text}\n";
         fputs($f, $s);
 
         flock($f, LOCK_UN);  // unlock

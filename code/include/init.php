@@ -27,6 +27,8 @@ require_once('include/custom_app.php');
 
 require_once("include/functions.php");
 
+require_once("include/phpmailer.php");
+
 // tables:
 $tables = array(
     "article" => "Article",
