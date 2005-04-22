@@ -68,7 +68,7 @@ class UserScript extends CustomPageScript {
     }
 
     function pg_contact_form() {
-        $this->print_static_page(
+        $this->page->parse_file(
             "static/_contact_form_notice_{$this->lang}.html",
             "contact_form_notice"
         );
