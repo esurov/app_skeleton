@@ -112,7 +112,7 @@ class DbObject {
     }
 
     function get_app_double_value($double_value, $decimals = 2) {
-        return format_double_value($double_value);
+        return format_double_value($double_value, $decimals);
     }
 
     function get_php_double_value($str) {
