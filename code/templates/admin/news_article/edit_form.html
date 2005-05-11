@@ -1,0 +1,37 @@
+<form action="?" method="post" enctype="multipart/form-data">
+<input type="hidden" name="action" value="update_news_article">
+<input type="hidden" name="news_article_id" value="{%news_article_id%}">
+<table>
+
+<tr>
+<th>{%str_date%}:</th>
+<td><span class="date">{%news_article_created_input%}</span></td>
+</tr>
+
+<tr>
+<th>{%str_title%}:</th>
+<td><span class="wide">{%news_article_title_input%}</span></td>
+</tr>
+
+<tr>
+<th>{%str_body%}:</th>
+<td>{%news_article_body_input%}</td>
+</tr>
+
+<tr>
+<th>{%str_current_image%}:</th>
+<td>{%news_article_image%}</td>
+</tr>
+
+<tr>
+<th>{%str_image%}:</th>
+<td><input type="file" name="image_file"></td>
+</tr>
+
+<tr>
+<td></td>
+<td><input type="submit" value="{%str_link_save%}"></td>
+</tr>
+
+</table>
+</form>

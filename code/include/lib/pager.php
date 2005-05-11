@@ -18,12 +18,12 @@ class Pager {
     var $nav_str;
     var $simple_nav_str;
 
-    var $script;
+    var $app;
 
-    function Pager(&$script, $default_rows, $max_rows) {
+    function Pager(&$app, $default_rows, $max_rows) {
         // Constructor.
 
-        $this->script =& $script;
+        $this->app =& $app;
 
         $this->default_rows = $default_rows;
         $this->max_rows     = $max_rows;
@@ -87,7 +87,7 @@ class Pager {
     function get_pages_navig($url_str) {
         // Create navigation links:
 
-        $nav_str = $this->script->get_message("pager_pages_title") . " \n";
+        $nav_str = $this->app->get_message("pager_pages_title") . " \n";
 
         $p = (int) ceil($this->n_min / $this->rows);
         $cp = $this->offset / $this->rows + 1;
@@ -142,12 +142,9 @@ class Pager {
 
     function run($query, $sub_url) {
         // Compute all data for page splitting.
-
-        // NB! This function is obsolete and will be removed soon.
-
-        global $app;
-
-        $this->set_total_rows($app->sql->get_query_num_rows($query));
+        $this->set_total_rows(
+            $this->app->db->get_select_query_num_rows($query)
+        );
 
         if ($this->n_min == 0) {
             return;

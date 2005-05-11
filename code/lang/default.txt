@@ -1,18 +1,24 @@
-setup_area_head_title = !!AppSkeleton setup area
+["page and head titles (setup area)"]
 setup_auth_realm = !!AppSkeleton setup area
-tables_created = Tables have been created!
-tables_deleted = Tables have been deleted!
+setup_area_head_title = !!AppSkeleton setup area
+
+["status messages (setup area)"]
 tables_updated = Tables have been updated!
+tables_deleted = Tables have been deleted!
 test_data_inserted = Test data have been inserted!
 initial_data_inserted = Initial data have been inserted!
 
-admin_area_head_title = !!AppSkeleton area di amministrazione
+["page and head titles (admin area)"]
 admin_auth_realm = !!AppSkeleton area di amministrazione
+admin_area_head_title = !!AppSkeleton area di amministrazione
 
-page_title_view_articles = Visualizza articoli
-page_title_edit_article_info = Modifica articolo
-page_title_add_article_info = Aggiungi articolo
-page_title_view_article_info = Visualizza articolo
-article_added = Aggiunto nuovo articolo
-article_updated = L'articolo &egrave; stato modificato
-article_deleted = L'articolo &egrave; stato eliminato
+page_title_view_news_articles = Visualizza notizie
+page_title_view_news_article = Visualizza notizia
+page_title_add_news_article = Aggiungi notizia
+page_title_edit_news_article = Modifica notizia
+
+["status messages (admin area)"]
+news_article_added = Aggiunta nuova notizia
+news_article_updated = Notizia è stata modificata
+news_article_deleted = Notizia è stata eliminata
+news_article_title_empty = !!Title empty

@@ -1,65 +1,83 @@
+["db object names"]
+news_article = news article
+news_articles = news articles
+
+["page and head titles"]
+app_head_title = !!AppSkeleton
+page_title_access_denied = Access denied!
+page_title_pg_index =
+head_page_title_pg_index = Home
+page_title_view_news_articles = News
+page_title_view_news_article = View news article
+page_title_pg_contact_form = Contacts
+page_title_pg_static_contact_form_processed =
+page_title_pg_static_sample_page1 = SamplePage1
+page_title_pg_static_sample_page2 = SamplePage2
+
+["menu items"]
 user_menu_item_pg_index = Home
 user_menu_item_pg_news = News
 user_menu_item_pg_contact_form = Contacts
 user_menu_item_pg_static_sample_page1 = SamplePage1
 user_menu_item_pg_static_sample_page2 = SamplePage2
 
-app_head_title = !!AppSkeleton
-page_title_access_denied = Accesso non autorizzato!
-head_page_title_pg_index = Home
-page_title_pg_index =
-page_title_pg_contact_form = Contacts
-page_title_pg_static_contact_form_processed = Contacts
-page_title_pg_static_sample_page1 = SamplePage1
-page_title_pg_static_sample_page2 = SamplePage2
-page_title_pg_news = News
-page_title_view_article_info = View article
+["link captions"]
+link_view = View
+link_view_short = View
+link_edit = Edit
+link_edit_short = Edit
+link_add = Add
+link_add_short = Add
+link_delete = Delete
+link_delete_short = Del
+link_select = Select
+link_back = Back
+link_save = Save
+link_filter = Filter
+link_send = Send
+link_show = Show
+link_show_all = Show all
+link_view_all_news = View all news
 
-recent_news = Recent news
-view_all_news = View all news
-view_article = View article
+["parts of controls"]
+any = Any
+choose_one = Choose one:
+yes = Yes
+no = No
 
-pager_pages_title = Pages:
-
-operation_view = View
-operation_view_short = View
-operation_edit = Edit
-operation_edit_short = Edit
-operation_add = Add
-operation_add_short = Add
-operation_delete = Delete
-operation_delete_short = Del
-operation_select = Select
-operation_back = Back
-operation_save = Save
-operation_filter = Filter
-operation_send = Send
-operation_show_all = Show all
-actions = Actions
-
-article = article
-articles = articles
-
-filter_by = Filter by:
-article_text = Text
-
+["lang"]
 en = English
 it = Italian
+de = German
 
-label_first_name = First Name:
-label_last_name = Last Name:
-label_company = Company:
-label_position = Position:
-label_email = E-mail:
-label_zip = ZIP Code:
-label_city = City:
-label_country = Country:
-label_address = Address:
-label_phone = Phone:
-label_fax = Fax:
-label_message_text = Message:
+["table headers and form fields captions"]
+actions = Actions
+date = Date
+title = Titolo
+body = Corpo
+text = Text
+current_image = Current image
+image = Image
+first_name = First Name
+last_name = Last Name
+company = Company
+position = Position
+email = E-mail
+zip = ZIP
+city = City
+country = Country
+address = Address
+phone = Phone
+fax = Fax
+message_text = Message
 
-contact_form_processed = Your contact info was processed. Thank you.
-
+["status and popup messages"]
 sure_delete = Are you sure you want to delete record?
 cannot_delete_record_because_it_has_links = Cannot delete {%main_obj_name%} because it has links to {%dep_objs_data%}
+contact_form_processed = Your contact info was processed. Thank you.
+
+["parts of page"]
+pager_pages_title = Pages:
+filter_by = Filter by
+no_records_found = No records found
+recent_news = Recent news

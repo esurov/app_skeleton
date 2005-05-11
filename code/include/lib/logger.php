@@ -2,31 +2,53 @@
 
 class Logger {
 
-    // Log file with 'debug level' support.
+    // Logger with 'debug level' support.
 
+    var $truncate_always;
     var $filename;
-    var $level;
+    var $debug_level;
+    var $max_file_size;
 
-
-    function Logger($filename, $level = 1) {
-        // Constructor.
-
-        $this->filename = $filename;
-        $this->level    = $level;
-
-        $this->max_file_size = 1048576;
+    function Logger() {
+        $this->set_truncate_always(false);
+        $this->set_filename("log/app.log");
+        $this->set_debug_level(1);
+        $this->set_max_file_size(1048576);
+    }
+//
+    function set_truncate_always($new_truncate_always) {
+        $this->truncate_always = (bool) $new_truncate_always;
+        
+        if ($this->truncate_always) {
+            $this->truncate();
+        }
     }
 
-    function set_max_file_size($max_file_size) {
-        $this->max_file_size = $max_file_size;
+    function set_filename($new_filename) {
+        $this->filename = $new_filename;
+
+        if ($this->truncate_always) {
+            $this->truncate();
+        }
     }
 
-    function write($class_name, $message, $level = 1) {
+    function set_debug_level($new_debug_level) {
+        $this->debug_level = $new_debug_level;
+    }
+
+    function set_max_file_size($new_max_file_size) {
+        $max_file_size = intval($new_max_file_size);
+        if ($new_max_file_size > 0) {
+            $this->max_file_size = $new_max_file_size;
+        }
+    }
+//
+    function write($class_name, $message, $debug_level = 1) {
         // Write $class_name and $message to log file,
         // if debug level is high enough.
 
         // Skip insignificant messages:
-        if ($level > $this->level) {
+        if ($debug_level > $this->debug_level) {
             return;
         }
 
@@ -51,14 +73,22 @@ class Logger {
         } else {
             $message_text = $message;
         }
-        $time_str = strftime('%Y.%m.%d %H:%M:%S', time());
-        $s = "{$time_str} - [{$class_name}] {$message_text}\n";
-        fputs($f, $s);
+        $time_str = strftime("%Y-%m-%d %H:%M:%S", time());
+        fputs($f, "{$time_str} - [{$class_name}] {$message_text}\n");
 
         flock($f, LOCK_UN);  // unlock
         fclose($f);
     }
 
-}  // class Config
+    function truncate() {
+        $f = @fopen($this->filename, "a");
+        if ($f) {
+            flock($f, LOCK_EX);  // lock
+            ftruncate($f, 0);
+            flock($f, LOCK_UN);  // unlock
+            fclose($f);
+        }
+    }
+}
 
 ?>

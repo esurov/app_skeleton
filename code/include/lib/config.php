@@ -6,7 +6,6 @@ class Config {
     // name = value
 
     var $params;
-    var $ignore_comments = true;
 
 
     function Config() {
@@ -16,10 +15,10 @@ class Config {
     }
 
 
-    function value($name) {
+    function get_value($name, $default_value = null) {
         // Return value of the given parameter.
 
-        return (isset($this->params[$name]) ? $this->params[$name] : NULL);
+        return (isset($this->params[$name]) ? $this->params[$name] : $default_value);
     }
 
     function set_value($name, $value) {
@@ -45,12 +44,12 @@ class Config {
         // Read configuration file, parse it and store all data in hash.
 
         if (!file_exists($filename)) {
-            die("Configuration file '$filename' does not exist.");
+            die("Configuration file '{$filename}' does not exist!");
         }
 
         $f = fopen($filename, "r");
         if (!$f){
-            die("Cannot open configuration file [$filename].");
+            die("Cannot open configuration file '{$filename}'!");
         }
 
         flock($f, LOCK_SH);
@@ -58,26 +57,23 @@ class Config {
         while ($line = fgets($f, 1024)) {
             $line = chop($line);
 
-            if ($this->ignore_comments) {
-                $line = preg_replace('/^#.*$/', '', $line);
-                $line = preg_replace('/([^\\\\])#.*$/', "$1", $line);
-                $line = preg_replace('/\/\/.*$/', '', $line);
-                $line = preg_replace('/\\\\#/', '#', $line);
-                $line = trim($line);
-            }
-            if ($line == '') {
+            if (
+                preg_match('/^#.*$/', $line) ||
+                preg_match('/^\/\/.*$/', $line) ||
+                preg_match('/^\[/', $line)
+            ) {
                 continue;
             }
 
-            list ($name, $value) = preg_split('/\s*=\s?/', $line, 2);
-
-            $this->params[$name] = $value;
+            if (preg_match('/^(.+?)\s*=\s*(.*)$/', $line, $matches)) {
+                $var_name = $matches[1];
+                $var_value = $matches[2];
+                $this->params[$var_name] = $var_value;
+            }
         }
 
         flock($f, LOCK_UN);
         fclose($f);
-
-        return '';
     }
 
 
@@ -86,7 +82,7 @@ class Config {
 
         $f = fopen($filename, "w");
         if (!$f) {
-            die("Cannot open configuration file [$filename].");
+            die("Cannot open configuration file '{$filename}'!");
         }
 
         flock($f, LOCK_EX);

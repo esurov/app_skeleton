@@ -1,69 +1,68 @@
 <?php
 
-class CustomApp extends SqlApp {
-    var $lang;
-    var $dlang;
-    var $avail_langs;
+class CustomApp extends App {
+    var $popup = false;
+    var $report = false;
 
-    function CustomApp($tables) {
-        parent::SqlApp("app_skeleton", $tables);
-
-        $this->avail_langs = $this->get_avail_langs();
-        $this->dlang = $this->config->value("default_language");
-        $this->lang = $this->get_current_lang();
-
-        $this->messages = new Config();
-        $this->messages->ignore_comments = false;
-        $this->messages->read("lang/default.txt");
-        $this->messages->read("lang/{$this->lang}.txt");
+    function CustomApp($app_name, $tables) {
+        parent::App($app_name, $tables);
     }
 
-    function get_current_lang() {
-        $cur_lang = Session::get_param("current_language");
-        if (!$this->is_valid_lang($cur_lang)) {
-            $cur_lang = $this->config->value('default_language');
+    function run_action() {
+        $this->popup = intval(param("popup"));
+        $this->report = intval(param("report"));
+
+        if (!$this->report) {
+            $this->page->assign(array(
+                "popup_url_param" => "&amp;popup={$this->popup}",
+                "popup_hidden" =>
+                    "<input type=\"hidden\" name=\"popup\" value=\"{$this->popup}\">\n",
+            ));
+            $this->print_session_status_messages();
         }
-        return $cur_lang;
+        $page_name = trim(param("page"));
+        $this->page->assign(array(
+            "action" => $this->action,
+            "page" => $page_name,
+        ));
+        $this->print_page_titles($page_name);
+
+        $this->print_lang_menu();
+
+        parent::run_action();
     }
 
-    function get_avail_langs() {
-        return explode(",", $this->config->value("languages"));
+    function drop_pager() {
+        $this->pager = new Pager($this, 10000, 10000);
     }
 
-    function is_valid_lang($lang) {
-        if (is_null($lang) || !in_array($lang, $this->avail_langs)) {
-            return false;
+    function create_html_page_response_body() {
+        if ($this->report) {
+            $template_type = ($this->page->is_template_exist("report.html")) ?
+                "report" :
+                "page";
+        } else if ($this->popup) {
+            $template_type = ($this->page->is_template_exist("popup.html")) ?
+                "popup" :
+                "page";
         } else {
-            return true;
+            $template_type = "page";
         }
-    }
 
-    function set_current_lang($new_lang) {
-        if ($this->is_valid_lang($new_lang)) {
-            Session::set_param("current_language", $new_lang);
-        }
-    }
-
-    function add_session_status_message($new_msg) {
-        if (Session::has_param("status_messages")) {
-            $old_msgs = Session::get_param("status_messages");
+        if ($template_type == "page") {
+            $this->print_menu();
         } else {
-            $old_msgs = array();
+            $this->page_template_name = "{$template_type}.html";
         }
-        $msgs = array_merge($old_msgs, array($new_msg));
-        Session::set_param("status_messages", $msgs);
+        
+        return parent::create_html_page_response_body();
     }
 
-    function get_and_delete_session_status_messages() {
-        if (!Session::has_param("status_messages")) {
-            return array();
-        } else {
-            $msgs = Session::get_param("status_messages");
-            Session::unset_param("status_messages");
-            return $msgs;
-        }
+    function get_app_extra_suburl_params() {
+        return array(
+            "popup" => $this->popup,
+        );
     }
 }
-
 
 ?>

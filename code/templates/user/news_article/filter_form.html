@@ -1,0 +1,14 @@
+<form method="post" action="?">
+<input type="hidden" name="action" value="pg_view_news_articles">
+
+<table border="0">
+<tr>
+<td>
+    <b>{%str_filter_by%}:</b><br>
+    {%str_text%}: <span class="wide">{%news_article_full_text_like_input%}</span><br>
+    <input type="submit" value="{%str_link_filter%}">
+</td>
+</tr>
+</table>
+
+</form>

@@ -37,12 +37,6 @@ class Template {
         $this->fillings[$var_name] = $value;
     }
 
-    function assign($more_fillings) {
-        foreach ($more_fillings as $name => $value) {
-            $this->set_value($name, $value);
-        }
-    }
-
     // Parse given text, return it with variables filled.
     function parse($raw_text) {
 
@@ -57,7 +51,7 @@ class Template {
 
     // Parse given text, return it with variables filled.
     // Also append result to given variable in fillings.
-    function parse_text($raw_text, $append_to = NULL) {
+    function parse_text($raw_text, $append_to = null) {
         
         $parsed_text = $this->parse($raw_text);
         if (!is_null(($append_to))) {
@@ -65,35 +59,6 @@ class Template {
         }
 
         return $parsed_text;
-    }
-
-    // Parse given template using values from internal hash.
-    // Return filled template.
-    function parse_file($template_name, $append_to = NULL) {
-
-        $raw_text = $this->get_raw_text($template_name);
-
-        if ($this->print_template_name) {
-            $raw_text = sprintf(
-                $this->TEMPLATE_NAME_PATTERN,
-                $template_name,
-                $raw_text,
-                $template_name
-            );
-        }
-
-        $parsed_text = $this->parse_text($raw_text, $append_to);
-
-        return $parsed_text;
-    }
-
-    // Parse given template using values from internal hash.
-    // Return filled template and empty the variable.
-    function parse_file_new($template_name, $variable = NULL) {
-        if (!is_null($variable)) {
-            $this->set_value($variable, "");
-        }
-        return $this->parse_file($template_name, $variable);
     }
 
     // Return non-parsed template text.
@@ -120,12 +85,66 @@ class Template {
             $this->set_value($name, $text);
         }
     }
+//
+    function assign($more_fillings, $filling_value = null) {
+        if (is_array($more_fillings)) {
+            foreach ($more_fillings as $filling_name => $filling_value) {
+                $this->set_value($filling_name, $filling_value);
+            }
+        } else {
+            $filling_name = $more_fillings;
+            $this->set_value($filling_name, $filling_value);
+        }
+    }
+
+    // Parse given template using values from internal hash.
+    // Return filled template.
+    function parse_file($template_name, $append_to = NULL) {
+        $raw_text = $this->get_raw_text($template_name);
+
+        if ($this->print_template_name) {
+            $raw_text = sprintf(
+                $this->TEMPLATE_NAME_PATTERN,
+                $template_name,
+                $raw_text,
+                $template_name
+            );
+        }
+
+        $parsed_text = $this->parse_text($raw_text, $append_to);
+
+        return $parsed_text;
+    }
+
+    // Parse given template using values from internal hash.
+    // Return filled template and empty the variable.
+    function parse_file_new($template_name, $variable = null) {
+        if (!is_null($variable)) {
+            $this->set_value($variable, "");
+        }
+        return $this->parse_file($template_name, $variable);
+    }
 
     function is_template_exist($template_name) {
         $filename = "{$this->templates_dir}/{$template_name}";
         return file_exists($filename);
     }
 
+    function parse_file_if_exists($template_name, $variable = null) {
+        if ($this->is_template_exist($template_name)) {
+            $this->parse_file($template_name, $variable);    
+        } else {
+            return "";
+        }
+    }
+
+    function parse_file_new_if_exists($template_name, $variable = null) {
+        if ($this->is_template_exist($template_name)) {
+            $this->parse_file_new($template_name, $variable);    
+        } else {
+            return "";
+        }
+    }
 }  // class Template
 
 ?>

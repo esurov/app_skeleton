@@ -4,18 +4,14 @@
  * @access public
  * @param  string
  */
-function validate(formName)
-{
+function validate(formName) {
     switch (formName) {
     case 'contact':
         conditions = [
             ['first_name', 'not_empty', 'input_first_name'],
             ['last_name', 'not_empty', 'input_last_name'],
             ['email', 'not_empty', 'input_email'],
-            ['email', 'email', 'incorrect_email'],
-            ['zip', 'zip', 'incorrect_zip'],
-            ['country', 'not_empty', 'input_country'],
-            ['city', 'not_empty', 'input_city']
+            ['email', 'email', 'incorrect_email']
         ];
         break;
     default:
@@ -32,8 +28,7 @@ function validate(formName)
  * @access public
  * @param  string
  */
-function getMessage(message, language)
-{
+function getMessage(message, language) {
     var en = '';
     var it = '';
     var ru = '';
@@ -108,7 +103,7 @@ function getMessage(message, language)
 
     if (language == 'en') {
         return en;
-    } else if (language == 'it'){
+    } else if (language == 'it') {
         return it;
     } else {
         return ru;
@@ -121,8 +116,7 @@ function getMessage(message, language)
  * @access public
  * @param  string
  */
-function check(conditions, formName)
-{
+function check(conditions, formName) {
     form = document.forms[formName];
     elems = form.elements;
 
@@ -255,8 +249,7 @@ function check(conditions, formName)
  * @param  string
  * @return bool
  */
-function isCorrectDate(str)
-{
+function isCorrectDate(str) {
     parts = str.split('/');
     if (parts.length != 3) {
         return false;
@@ -280,8 +273,7 @@ function isCorrectDate(str)
  * @param  string
  * @return bool
  */
-function isCorrectCurrency(value)
-{
+function isCorrectCurrency(value) {
     return value.match(/^\d+(,\d{3})*(\.\d+)?$/);
 }
 
@@ -292,8 +284,7 @@ function isCorrectCurrency(value)
  * @param string
  * @param object element
  */
-function fail(message, formName, field)
-{
+function fail(message, formName, field) {
     alert(getMessage(message, language));
     focus(field);
 }
@@ -304,8 +295,7 @@ function fail(message, formName, field)
  * @access public
  * @param  object element
  */
-function focus(element)
-{
+function focus(element) {
     if (element != null) {
         element.focus();
     }
@@ -318,14 +308,12 @@ function focus(element)
  * @param  string
  * @param  string
  */
-function focusElement(formName, elementName)
-{
+function focusElement(formName, elementName) {
     focus(document.forms[formName].elements[elementName]);
 }
 
 
-function openIT(theURL)
-{
+function openIT(theURL) {
     var windowprops = "width=500,height=400,location=no,toolbar=no,menubar=no,scrollbars=no,resizable=yes";
     var subwin;
 

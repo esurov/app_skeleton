@@ -1,9 +1,9 @@
 <?php
 
-require_once("include/init.php");
-require_once("include/user_script.php");
+require_once("include/_init.php");
+require_once("include/user_app.php");
 
-$script = new UserScript();
-$script->run();
+$app = new UserApp($tables);
+$app->run();
 
 ?>

@@ -1,9 +1,9 @@
 <?php
 
-require_once("include/init.php");
-require_once("include/setup_script.php");
+require_once("include/_init.php");
+require_once("include/setup_app.php");
 
-$script = new SetupScript();
-$script->run();
+$app = new SetupApp($tables);
+$app->run();
 
 ?>

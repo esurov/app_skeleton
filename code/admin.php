@@ -1,9 +1,9 @@
 <?php
 
-require_once("include/init.php");
-require_once("include/admin_script.php");
+require_once("include/_init.php");
+require_once("include/admin_app.php");
 
-$script = new AdminScript();
-$script->run();
+$app = new AdminApp($tables);
+$app->run();
 
 ?>

@@ -1,1 +1,0 @@
-# The file is for user messages, see lang folder

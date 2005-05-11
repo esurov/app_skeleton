@@ -1,68 +1,83 @@
+["db object names"]
+news_article = notizia
+news_articles = notizie
+
+["page and head titles"]
+app_head_title = !!AppSkeleton
+page_title_access_denied = Accesso non autorizzato!
+page_title_pg_index =
+head_page_title_pg_index = Home
+page_title_view_news_articles = News
+page_title_view_news_article = Visualizza notizia
+page_title_pg_contact_form = Contatti
+page_title_pg_static_contact_form_processed =
+page_title_pg_static_sample_page1 = SamplePage1
+page_title_pg_static_sample_page2 = SamplePage2
+
+["menu items"]
 user_menu_item_pg_index = Home
 user_menu_item_pg_news = News
 user_menu_item_pg_contact_form = Contatti
-user_menu_item_pg_static_sample_page1 = !!SamplePage1
-user_menu_item_pg_static_sample_page2 = !!SamplePage2
+user_menu_item_pg_static_sample_page1 = SamplePage1
+user_menu_item_pg_static_sample_page2 = SamplePage2
 
-app_head_title = !!AppSkeleton
-page_title_access_denied = Accesso non autorizzato!
-head_page_title_pg_index = Home
-page_title_pg_index =
-page_title_pg_contact_form = Contatti
-page_title_pg_static_contact_form_processed = Contatti
-page_title_pg_static_sample_page1 = !!SamplePage1
-page_title_pg_static_sample_page2 = !!SamplePage2
-page_title_pg_news = News
-page_title_view_article_info = View article
+["operation names"]
+link_view = Visualizza
+link_view_short = Vis
+link_edit = Modifica
+link_edit_short = Mod
+link_add = Aggiungi
+link_add_short = Agg
+link_delete = Cancella
+link_delete_short = Canc
+link_select = Seleziona
+link_back = Indietro
+link_send = Invia
+link_filter = Filtra
+link_save = Salva
+link_show = Invio
+link_show_all = Mostra Tutto
+link_view_all_news = Tutte le News
 
-recent_news = Ultime novit&agrave;
-view_all_news = Tutte le News
+["parts of controls"]
+any = Qualsiasi
+choose_one = Selezionare:
+yes = Sì
+no = No
 
-pager_pages_title = Pagine:
-
-operation_view = Visualizza
-operation_view_short = Vis
-operation_edit = Modifica
-operation_edit_short = Mod
-operation_add = Aggiungi
-operation_add_short = Agg
-operation_delete = Cancella
-operation_delete_short = Canc
-operation_select = Seleziona
-operation_back = Indietro
-operation_send = Invia
-operation_filter = Filtra
-operation_save = Salva
-operation_show_all = Mostra Tutto
-actions = Azioni
-
-article = articolo
-articles = articoli
-
-filter_by = Filtra per:
-article_text = Testo
-
+["lang"]
 en = Inglese
 it = Italiano
+de = Tedesco
 
-label_date_created = Data:
-label_article_title = Titolo:
-label_article_body = Corpo:
+["table headers and form fields captions"]
+actions = Azioni
+date = Data
+title = Titolo
+body = Corpo
+text = Testo
+current_image = Immagine attuale
+image = Immagine
+first_name = Nome
+last_name = Cognome
+company = Azienda
+position = Ruolo aziendale
+email = E-mail
+zip = CAP
+city = Città
+country = Nazione
+address = Indirizzo
+phone = Telefono
+fax = Fax
+message_text = Messagio
 
-label_first_name = Nome:
-label_last_name = Cognome:
-label_company = Azienda:
-label_position = Ruolo aziendale:
-label_email = E-mail:
-label_zip = CAP:
-label_city = Citt&agrave;:
-label_country = Nazione:
-label_address = Indirizzo:
-label_phone = Telefono:
-label_fax = Fax:
-label_message_text = Messagio:
-
-contact_form_processed = I suoi dati sono stati registrati. Grazie.
-
+["status and popup messages"]
 sure_delete = Sei sicuro di voler cancellare l\'informazione?
 cannot_delete_record_because_it_has_links = Impossibile eliminare {%main_obj_name%} perch&eacute; in relazione con {%dep_objs_data%}
+contact_form_processed = I suoi dati sono stati registrati. Grazie.
+
+["parts of page"]
+pager_pages_title = Pagine:
+filter_by = Filtra per
+no_records_found = Non sono stati trovati dati
+recent_news = Ultime novità
