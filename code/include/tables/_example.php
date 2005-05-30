@@ -2,8 +2,10 @@
 
 // These are parameters for insert_field():
 
-// "table" - table name, if not specified - current table
+// "table" - table name, if not specified - current table name
+// "table_alias" - table alias name, if not specified - table name
 // "field" - field name
+// "field_alias" - field alias name, if not specified - field name
 // "type" - field type (type is then mapped to real database specific type)
 // "width" - output width for field
 // "prec" - output precision after decimal point for field
@@ -50,6 +52,19 @@ class Example extends CustomDbObject {
             "join" => array(
                 "type" => "left",
                 "table" => "news_article",
+                "field" => "id",
+            ),
+        ));
+
+        $this->insert_field(array(
+            "field" => "news_article2_id",
+            "type" => "foreign_key",
+            
+            // another join example in insert_field()
+            "join" => array(
+                "type" => "left",
+                "table" => "news_article",
+                "table_alias" => "news_article2",
                 "field" => "id",
             ),
         ));
@@ -149,9 +164,6 @@ class Example extends CustomDbObject {
             // create field for every language
             "multilingual" => 1,
 
-            // create ordinary index on this field
-            "index" => "fulltext",
-
             // this is optional
             "input" => array(
                 "type" => "textarea",
@@ -171,9 +183,15 @@ class Example extends CustomDbObject {
         $this->insert_field(array(
             "field" => "field_double",
             "type" => "double",
+            "value" => 1234567890123456.12,
+        ));
+
+        $this->insert_field(array(
+            "field" => "field_double_12_7",
+            "type" => "double",
             "width" => "12",
             "prec" => "7",
-            "value" => 1000000.12345678,
+            "value" => 1234567890.1234567,
         ));
 
         $this->insert_field(array(
@@ -219,33 +237,6 @@ class Example extends CustomDbObject {
             "type" => "time",
         ));
 //
-        // multilingual field from news_article table
-        // note: no need to specify type because it is taken from another table,
-        // note: fields from another tables are never created in DB
-        $this->insert_field(array(
-            "table" => "news_article",
-            "field" => "title",
-        ));
-
-//!!NB: cannot specify multilingual field in "field"
-        // alias for the field from current table
-        // note: should not be created in DB
-        $this->insert_field(array(
-            "field" => "field_varchar_{$this->lang}",
-            "field_alias" => "field_varchar_alias",
-            "type" => "varchar",
-            "create" => 0,
-        ));
-
-        // alias for the field from joined (self-joined) table
-//!!NB: Doesn't work - recursion in insert_field
-//        $this->insert_field(array(
-//            "table" => "_example",
-//            "table_alias" => "_example_alias",
-//            "field" => "field_text",
-//            "field_alias" => "field_text_alias"
-//        ));
-
         // calculated field example
         $this->insert_field(array(
             "field" => "calculated_field",
@@ -254,11 +245,49 @@ class Example extends CustomDbObject {
                 "CONCAT(_example.field_varchar_{$this->lang}, _example.field_text_{$this->lang})",
         ));
 
+        // alias for the multilingual field from current table
+        // note: fields with alias are never created in DB
+        // note: no need to specify type because it is taken from current table field
+        $this->insert_field(array(
+            "field" => "field_varchar",
+            "field_alias" => "field_varchar_alias",
+        ));
+
+        // field 'field_text' from self-joined table
+        // note: calculated fields cannot be get when table_alias specified
+        $this->insert_field(array(
+            "table_alias" => "_example_alias",
+            "field" => "field_text",
+        ));
+
+        // alias field name 'field_text_alias' for the field 'field_text' from self-joined table
+        // note: calculated fields cannot be get when table_alias specified
+        $this->insert_field(array(
+            "table_alias" => "_example_alias",
+            "field" => "field_text",
+            "field_alias" => "field_text_alias"
+        ));
+
         // calculated field from news_article table
-        // need not to specify type because it is taken from another table
+        // note: do not specify type because it is taken from another table
         $this->insert_field(array(
             "table" => "news_article",
             "field" => "full_text",
+        ));
+
+        // multilingual field from news_article table
+        // note: no need to specify type because it is taken from another table
+        // note: fields from another tables are never created in DB
+        $this->insert_field(array(
+            "table" => "news_article",
+            "field" => "title",
+        ));
+
+        // field from news_article joined with alias name news_article2
+        $this->insert_field(array(
+            "table" => "news_article",
+            "table_alias" => "news_article2",
+            "field" => "title",
         ));
 
         // complex index example

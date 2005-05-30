@@ -9,6 +9,8 @@ class UserApp extends CustomApp {
         $e = array("valid_users" => array("everyone"));
 
         $this->actions = array(
+            "test" => $e,
+
             "change_lang" => $e,
             "pg_static" => $e,
             "get_image" => $e,
@@ -29,6 +31,7 @@ class UserApp extends CustomApp {
 //
     function test() {
         $t = new Example();
+//        $t->store();
         $query = $t->get_select_query();
 var_dump($query);
         $this->db->run_select_query($query);

@@ -39,7 +39,7 @@ class NewsArticle extends CustomDbObject {
             "field" => "full_text",
             "type" => "text",
             "select" =>
-                "concat(news_article.title_{$this->lang}, news_article.body_{$this->lang})",
+                "CONCAT(news_article.title_{$this->lang}, news_article.body_{$this->lang})",
         ));
 //
         $this->insert_filter(array(

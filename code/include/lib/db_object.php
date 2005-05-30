@@ -344,56 +344,69 @@ class DbObject {
     }
 //
     function insert_field($field_info) {
-        $sql_field_name = get_param_value($field_info, "field", null);
-        if (is_null($sql_field_name)) {
-            die("{$this->table_name}: field name not specified!");
+        $field_array_index = count($this->fields);
+        $field_name = get_param_value($field_info, "field", null);
+        if (is_null($field_name)) {
+            die("{$this->table_name}: field name not specified for field {$field_array_index}!");
         }
-        $sql_field_name_alias = get_param_value($field_info, "field_alias", $sql_field_name);
+        $field_name_alias = get_param_value($field_info, "field_alias", null);
 
         $table_name = get_param_value($field_info, "table", null);
         $table_name_alias = get_param_value($field_info, "table_alias", null);
         
-        if (is_null($table_name)) {
-            // insert info for field from current table or for calculated field
+        if (is_null($table_name) || $table_name == $this->table_name) {
+            $table_name = $this->table_name;
+            if (is_null($table_name_alias) && is_null($field_name_alias)) {
+                // case of real or calculated field from current table
+                $multilingual = get_param_value($field_info, "multilingual", 0);
+                $field_select_expression = get_param_value($field_info, "select", null);
+                if (is_null($field_select_expression)) {
+                    $field_select_expression = $this->create_field_select_expression(
+                        if_null($table_name_alias, $table_name),
+                        $field_name,
+                        $multilingual
+                    );
+                    $default_create = 1;
+                } else {
+                    $default_create = 0;
+                }
+                if ($multilingual) {
+                    $new_field_info = $field_info;
+                    $new_field_info["multilingual"] = 0;
+                    $new_field_info["multilingual_child"] = 1;
+
+                    foreach ($this->avail_langs as $lang) {
+                        $new_field_info["field"] = "{$field_name}_{$lang}";
+                        $this->insert_field($new_field_info);
+                    }
+                }
+                $field_name_alias = $field_name;
+            } else {
+                // case of alias to real field from current table
+                if (!isset($this->fields[$field_name])) {
+                    die("{$table_name}: cannot find field '{$field_name}'");
+                }
+                $field_info = $this->fields[$field_name];
+                $table_name_alias = if_null($table_name_alias, $table_name);
+                $field_select_expression = $this->create_field_select_expression(
+                    $table_name_alias,
+                    $field_name,
+                    $field_info["multilingual"]
+                );
+                $field_info["multilingual"] = 0;
+                $field_info["multilingual_child"] = 0;
+                
+                $field_name_alias = (is_null($field_name_alias)) ?
+                    "{$table_name_alias}_{$field_name}" :
+                    "{$table_name_alias}_{$field_name_alias}";
+                $default_create = 0;
+            }
+            $multilingual = get_param_value($field_info, "multilingual", 0);
+            $multilingual_child = get_param_value($field_info, "multilingual_child", 0);
+
             $field_type = get_param_value($field_info, "type", null);
             if (is_null($field_type)) {
-                die(
-                    "{$this->table_name}: field type for" .
-                    " '{$field_name}' not specified!"
-                );
-            }
-
-            $field_select_sql = get_param_value($field_info, "select", null);
-            if (is_null($field_select_sql)) {
-                $field_select_sql = (is_null($table_name_alias)) ?
-                    "{$this->table_name}.{$sql_field_name}" :
-                    "{$table_name_alias}.{$sql_field_name}";
-            }
-
-            $field_name = $sql_field_name_alias;
-
-            $multilingual = get_param_value($field_info, "multilingual", false);
-            $multilingual_child = get_param_value($field_info, "multilingual_child", false);
-
-            if ($multilingual) {
-                $new_field_info = $field_info;
-                $new_field_info["multilingual"] = false;
-                $new_field_info["multilingual_child"] = true;
-
-                foreach ($this->avail_langs as $lang) {
-                    $new_field_info["field"] = "{$sql_field_name}_{$lang}";
-                    $new_field_info["field_alias"] = "{$sql_field_name_alias}_{$lang}";
-                    $this->insert_field($new_field_info);
-                }
-                
-                $current_lang_field_select_sql = "{$field_select_sql}_{$this->lang}";
-                $default_lang_field_select_sql = "{$field_select_sql}_{$this->dlang}";
-                
-                $field_select_sql =
-                    "IF ({$current_lang_field_select_sql} = '', " .
-                    "{$default_lang_field_select_sql}, " .
-                    "{$current_lang_field_select_sql}" .
-                    ")";
+                die("{$table_name}: field type for '{$field_name}' not specified!");
             }
 
             $width = null;
@@ -440,14 +453,14 @@ class DbObject {
                 $initial_field_value = get_param_value($field_info, "value", null);
                 if (is_null($initial_field_value)) {
                     die(
-                        "{$this->table_name}: initial field 'value' for enum" .
+                        "{$table_name}: initial field 'value' for enum" .
                         " '{$field_name}' not specified!"
                     );
                 }
                 $input = get_param_value($field_info, "input", null);
                 if (is_null($input)) {
                     die(
-                        "{$this->table_name}: 'input' for enum" .
+                        "{$table_name}: 'input' for enum" .
                         " '{$field_name}' not specified!"
                     );
                 }
@@ -487,15 +500,11 @@ class DbObject {
                 $initial_field_value = get_param_value($field_info, "value", "00:00:00");
                 break;
             default:
-                die(
-                    "{$this->table_name}: unknown type '{$field_type}' " .
-                    "for field '{$field_name}'"
-                );
+                die("{$table_name}: unknown type '{$field_type}' for field '{$field_name}'");
             }
 
             $attr = get_param_value($field_info, "attr", "");
             
-            $default_create = is_null(get_param_value($field_info, "select", null));
             $create = ($multilingual) ?
                 false :
                 get_param_value($field_info, "create", $default_create);
@@ -525,26 +534,32 @@ class DbObject {
             // insert info for field from another table
             $obj = $this->create_db_object($table_name);
             if (is_null($obj)) {
-                die(
-                    "{$this->table_name}: cannot find joined '{$table_name}'!"
-                );
+                die("{$this->table_name}: cannot find joined '{$table_name}'!");
             }
 
-            if (!isset($obj->fields[$sql_field_name_alias])) {
+            if (!isset($obj->fields[$field_name])) {
                 die(
                     "{$this->table_name}: cannot find field " .
-                    "'{$sql_field_name_alias}' in joined '{$table_name}'!"
+                    "'{$field_name}' in joined '{$table_name}'!"
                 );
             }
 
-            $field_info2 = $obj->fields[$sql_field_name_alias];
-            
+            $field_info2 = $obj->fields[$field_name];
             $field_type = $field_info2["type"];
 
-            $field_select_sql = $field_info2["select"];
-            $field_name = (is_null($table_name_alias)) ?
-                "{$table_name}_{$sql_field_name_alias}" :
-                "{$table_name_alias}_{$sql_field_name_alias}";
+            if (is_null($table_name_alias)) {
+                $field_select_expression = $field_info2["select"];
+                $table_name_alias = $table_name;
+            } else {
+                $field_select_expression = $this->create_field_select_expression(
+                    $table_name_alias,
+                    $field_name,
+                    $field_info2["multilingual"]
+                );
+            }
+            $field_name_alias = (is_null($field_name_alias)) ?
+                "{$table_name_alias}_{$field_name}" :
+                "{$table_name_alias}_{$field_name_alias}";
 
             $initial_field_value = $field_info2["value"];
             $width = get_param_value($field_info2, "width", null);
@@ -552,25 +567,25 @@ class DbObject {
 
             $attr = $field_info2["attr"];
             
-            $create = false;
-            $store = false;
-            $update = false;
+            $create = 0;
+            $store = 0;
+            $update = 0;
 
             $read = $field_info2["read"];
             $print = $field_info2["print"];
             $input = $field_info2["input"];
 
-            $multilingual = false;
-            $multilingual_child = false;
+            $multilingual = 0;
+            $multilingual_child = 0;
         }
         
-        $this->fields[$field_name] = array(
+        $this->fields[$field_name_alias] = array(
             "type" => $field_type,
             "value" => $initial_field_value,
             "width" => $width,
             "prec" => $prec,
 
-            "select" => $field_select_sql,
+            "select" => $field_select_expression,
             "attr" => $attr,
             
             "create" => $create,
@@ -585,7 +600,24 @@ class DbObject {
             "multilingual_child" => $multilingual_child,
         );
 
-        $this->set_field_value($field_name, $initial_field_value);
+        $this->set_field_value($field_name_alias, $initial_field_value);
+    }
+
+    function create_field_select_expression(
+        $table_name_alias,
+        $field_name,
+        $multilingual
+    ) {
+        if ($multilingual) {
+            $field_select_expression =
+                "IF ({$table_name_alias}.{$field_name}_{$this->lang} = '', " .
+                "{$table_name_alias}.{$field_name}_{$this->dlang}, " .
+                "{$table_name_alias}.{$field_name}_{$this->lang}" .
+                ")";
+        } else {
+            $field_select_expression = "{$table_name_alias}.{$field_name}";
+        }
+        return $field_select_expression;
     }
 //
     function insert_index($index_info) {
