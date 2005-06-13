@@ -2432,15 +2432,6 @@ class DbObject {
         return $query;
     }
 
-    function run_select_query(
-        $field_names_to_select = null,
-        $field_names_to_not_select = null
-    ) {
-        return $this->run_expanded_select_query(
-            array(), $field_names_to_select, $field_names_to_not_select
-        );
-    }
-
     function run_expanded_select_query(
         $query_ex = array(),
         $field_names_to_select = null,
