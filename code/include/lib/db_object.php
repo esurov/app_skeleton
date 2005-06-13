@@ -715,7 +715,7 @@ class DbObject {
     function create_table() {
         $create_table_expression = $this->get_create_table_expression();
         if ($create_table_expression != "") {
-            $this->db->run_query(
+            $this->run_query(
                 "CREATE TABLE IF NOT EXISTS {%{$this->table_name}_table%} " .
                 "({$create_table_expression})"
             );
@@ -832,7 +832,7 @@ class DbObject {
     function update_table() {
         $update_table_expression = $this->get_update_table_expression();
         if ($update_table_expression != "") {
-            $this->db->run_query(
+            $this->run_query(
                 "ALTER TABLE {%{$this->table_name}_table%} " .
                 "{$update_table_expression}"
             );
@@ -1020,7 +1020,7 @@ class DbObject {
             $fields_expression .= $this->get_update_field_expression($field_name);
         }
 
-        $this->db->run_query(
+        $this->run_query(
             "INSERT INTO {%{$this->table_name}_table%} SET {$fields_expression}"
         );
 
@@ -1056,7 +1056,7 @@ class DbObject {
             $fields_expression .= $this->get_update_field_expression($field_name);
         }
         $where_str = $this->get_default_where_str(false);
-        $this->db->run_query(
+        $this->run_query(
             "UPDATE {%{$this->table_name}_table%} SET {$fields_expression} WHERE {$where_str}"
         );
     }
@@ -1150,7 +1150,7 @@ class DbObject {
     }
 
     function del_where($where_str) {
-        $this->db->run_query(
+        $this->run_query(
             "DELETE FROM {%{$this->table_name}_table%} " .
             "WHERE {$where_str}"
         );
@@ -2432,18 +2432,35 @@ class DbObject {
         return $query;
     }
 
+    function run_select_query(
+        $field_names_to_select = null,
+        $field_names_to_not_select = null
+    ) {
+        return $this->run_expanded_select_query(
+            array(), $field_names_to_select, $field_names_to_not_select
+        );
+    }
+
     function run_expanded_select_query(
         $query_ex = array(),
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        return $this->db->run_select_query(
+        return $this->run_select_query(
             $this->get_expanded_select_query(
                 $query_ex, $field_names_to_select, $field_names_to_not_select
             )
         );
     }
 
+    function run_query($query_str) {
+        return $this->db->run_query($query_str);    
+    }
+
+    function run_select_query($query) {
+        return $this->db->run_select_query($query);
+    }
+//
     function get_default_where_str($use_table_alias = true) {
         // Return default WHERE condition for fetching one object.
         $pr_key_name  = $this->get_primary_key_name();

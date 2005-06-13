@@ -34,7 +34,7 @@ class UserApp extends CustomApp {
 //        $t->store();
         $query = $t->get_select_query();
 var_dump($query);
-        $this->db->run_select_query($query);
+        $this->run_select_query($query);
     }
 //
     function pg_index() {
