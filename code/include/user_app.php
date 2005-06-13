@@ -29,14 +29,6 @@ class UserApp extends CustomApp {
         $this->create_self_redirect_response();
     }
 //
-    function test() {
-        $t = new Example();
-//        $t->store();
-        $query = $t->get_select_query();
-var_dump($query);
-        $this->db->run_select_query($query);
-    }
-//
     function pg_index() {
         $this->print_recent_news_articles();
         $this->print_static_page("index");
