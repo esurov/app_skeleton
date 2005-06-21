@@ -20,11 +20,49 @@ class HttpHeader {
     }
 }
 
+class Cookie {
+    var $name;
+    var $value;
+    var $expire;
+    var $path;
+    var $domain;
+    var $secure;
+
+    function Cookie(
+        $name,
+        $value,
+        $expire = 0,
+        $path = null,
+        $domain = null,
+        $secure = false
+    ) {
+        $this->name = $name;
+        $this->value = $value;
+        $this->expire = $expire;
+        $this->path = $path;
+        $this->domain = $domain;
+        $this->secure = $secure;
+    }
+
+    function send() {
+        setcookie(
+            $this->name,
+            $this->value,
+            $this->expire,
+            $this->path,
+            $this->domain,
+            $this->secure
+        );
+    }    
+}
+
 class HttpResponse {
     var $headers;
+    var $cookies;
 
     function HttpResponse() {
         $this->headers = array();
+        $this->cookies = array();
     }
 
     // Add header to the end of headers list
@@ -75,6 +113,10 @@ class HttpResponse {
     function add_last_modified_header($last_modified_gmt_str) {
         $this->add_header(new HttpHeader("Last-Modified", $last_modified_gmt_str));
     }
+
+    function add_cookie($cookie) {
+        $this->cookies[] = $cookie;
+    }
 //
     function get_body() {
         return "";
@@ -82,12 +124,19 @@ class HttpResponse {
 
     function send() {
         $this->send_headers();
+        $this->send_cookies();
         $this->send_body();
     }
 
     function send_headers() {
         foreach ($this->headers as $header) {
             $header->send();
+        }
+    }
+
+    function send_cookies() {
+        foreach ($this->cookies as $cookie) {
+            $cookie->send();
         }
     }
 

@@ -110,9 +110,9 @@ class App {
 
     function init_lang_dependent_data() {
         foreach ($this->messages->params as $key => $value) {
-            $this->page->assign(array("str_{$key}" => $value));
+            $this->page->assign("str_{$key}", $value);
         }
-        $this->page->assign(array("lang" => $this->lang));
+        $this->page->assign("lang", $this->lang);
     }
 //
     function run() {
@@ -203,6 +203,10 @@ class App {
         return $this->page->parse_file($this->page_template_name);
     }
 
+    function create_xml_page_response($body) {
+        $this->response = new XmlPageResponse($body);
+    }
+
     function create_access_denied_html_page_response() {
         $this->page_template_name = "access_denied.html";
         $this->create_html_page_response();
@@ -260,7 +264,7 @@ class App {
 
         return $obj;
     }
-
+//
     function get_message($name) {
         return $this->messages->get_value($name);
     }
@@ -317,14 +321,8 @@ class App {
         $page_path = "static/{$page_name}_{$this->lang}.html";
         if (!$this->page->is_template_exist($page_path)) {
             $page_path = "static/{$page_name}.html";
-            if (!$this->page->is_template_exist($page_path)) {
-                $this->page->assign(array(
-                    "body" => "",
-                ));
-                return "";
-            }
         }
-        return $this->page->parse_file($page_path, "body");
+        return $this->page->parse_file_if_exists($page_path, "body");
     }
 
     function print_menu($menu_prefix = "", $menu_var = "menu") {
@@ -334,10 +332,10 @@ class App {
         }
         if (!is_null($menu_actions)) {
             $menu_items = explode(",", $menu_actions);
+
             $i = 0;
-            $this->page->assign(array(
-                "menu_items" => "",
-            ));
+            $this->page->assign("menu_items", "");
+
             foreach ($menu_items as $menu_action) {
                 $i++;
                 $caption = $this->get_message(
@@ -363,6 +361,7 @@ class App {
                     "url" => $url,
                     "marker" => $menu_action,
                 ));
+
                 if (
                     $menu_action == $this->action ||
                     $menu_action == $this->action . "_" . param("page")
@@ -376,10 +375,8 @@ class App {
                 }
             }
         }
-        $menu_template_name = "_{$menu_var}.html";
-        if ($this->page->is_template_exist($menu_template_name)) {
-            $this->page->parse_file($menu_template_name, $menu_var);
-        }
+        
+        $this->page->parse_file_if_exists("_{$menu_var}.html", $menu_var);
     }
 
     function print_lang_menu() {
@@ -417,6 +414,7 @@ class App {
         $obj = $this->create_db_object($obj_name);
 
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
+        $templates_ext = get_param_value($params, "templates_ext", "html");
         $context = get_param_value($params, "context", "");
         $template_var = get_param_value($params, "template_var", "body");
         $query = get_param_value($params, "query", $obj->get_select_query());
@@ -473,7 +471,7 @@ class App {
             $this->page->assign($actual_where_params);
             $obj->print_filter_form_values();
             $this->page->parse_file_new(
-                "{$templates_dir}/filter_form.html", "{$obj_name}_filter_form"
+                "{$templates_dir}/filter_form.{$templates_ext}", "{$obj_name}_filter_form"
             );
         }
 
@@ -497,6 +495,7 @@ class App {
             "obj_name" => $obj_name,
             "query" => $query,
             "templates_dir" => $templates_dir,
+            "templates_ext" => $templates_ext,
             "context" => $context,
             "template_var" => "{$obj_name}_list",
             "objects" => $objects,
@@ -515,17 +514,18 @@ class App {
             $this->print_many_objects_list_page_title($obj);
         }
 
-        return $this->page->parse_file_new("{$templates_dir}/list.html", $template_var);
+        return $this->page->parse_file("{$templates_dir}/list.{$templates_ext}", $template_var);
     }
 //
     function print_many_objects_list($params) {
         $obj_name = get_param_value($params, "obj_name", null);
         if (is_null($obj_name)) {
-            die("No obj_name in in print_many_objects_list()");
+            die("No obj_name in print_many_objects_list()");
         }
         $obj = $this->create_db_object($obj_name);
 
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
+        $templates_ext = get_param_value($params, "templates_ext", "html");
         $context = get_param_value($params, "context", "");
         $template_var = get_param_value($params, "template_var", null);
         $query = get_param_value($params, "query", $obj->get_select_query());
@@ -542,14 +542,11 @@ class App {
             $n = $res->get_num_rows();
         }
 
-        if ($n == 0) {
-            $this->page->parse_file_new_if_exists(
-                "{$templates_dir}/list_no_items.html", $template_var
-            );
+        $no_items_template_name = "{$templates_dir}/list_no_items.{$templates_ext}";
+        if ($n == 0 && $this->page->is_template_exist($no_items_template_name)) {
+            $this->page->parse_file_new($no_items_template_name, $template_var);
         } else {
-            $this->page->assign(array(
-                "{$obj_name}_items" => "",
-            ));
+            $this->page->assign("{$obj_name}_items", "");
 
             for ($i = 0; $i < $n; $i++) {
                 if ($objects_passed) {
@@ -572,23 +569,20 @@ class App {
 
                 $this->page->assign(array(
                     "list_item_parity" => $parity,
-                    "list_item_style" =>
-                        ($parity == 0) ?
-                            "list-item-even" :
-                            "list-item-odd",
+                    "list_item_style" => ($parity == 0) ?
+                        "list-item-even" :
+                        "list-item-odd",
                 ));
 
                 $this->page->parse_file(
-                    "{$templates_dir}/list_item.html", "{$obj_name}_items"
+                    "{$templates_dir}/list_item.{$templates_ext}", "{$obj_name}_items"
                 );
             }
 
-            $this->page->assign(array(
-                "total" => $obj->get_quantity_str($this->pager->n_min),
-            ));
+            $this->page->assign("total", $obj->get_quantity_str($this->pager->n_min));
 
             return $this->page->parse_file_new(
-                "{$templates_dir}/list_items.html", $template_var
+                "{$templates_dir}/list_items.{$templates_ext}", $template_var
             );
         }
     }
@@ -710,9 +704,7 @@ class App {
             $this->get_message("head_{$resource}"),
             $this->get_message($resource)
         );
-        $this->page->assign(array(
-            "head_page_title" => $resource_text,
-        ));
+        $this->page->assign("head_page_title", $resource_text);
     }
 
     function print_many_objects_list_page_title($obj) {

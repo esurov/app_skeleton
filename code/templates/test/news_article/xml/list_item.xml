@@ -1,0 +1,7 @@
+<list_item
+    id="{%news_article_id%}"
+    created="{%news_article_created%}"
+    title="{%news_article_title%}"
+    body="{%news_article_body%}"
+    image_id="{%news_article_image_id%}"
+/>

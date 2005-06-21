@@ -70,7 +70,7 @@ function unset_array_value_if_exists($value, &$values) {
 }
 
 function get_param_value($params, $param_name, $default_value) {
-    if (isset($params[$param_name])) {
+    if (array_key_exists($param_name, $params)) {
         return $params[$param_name];
     } else {
         return $default_value;

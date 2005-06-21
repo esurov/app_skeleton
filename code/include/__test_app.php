@@ -8,6 +8,10 @@ class TestApp extends CustomApp {
 
         $this->actions = array(
             "pg_index" => $e,
+
+            "set_cookie" => $e,
+            "check_cookie" => $e,
+            "get_news_articles_xml" => $e,
         );
     }
 //
@@ -22,6 +26,29 @@ var_dump($query);
             "order_by" => "id ASC",
         ));
         exit;
+    }
+
+    function set_cookie() {
+        $this->create_self_redirect_response(array(
+            "action" => "check_cookie",
+        ));
+
+        $this->response->add_cookie(new Cookie("Cookie1", "&%$#@!Value1"));
+    }
+
+    function check_cookie() {
+        var_dump($_COOKIE);
+        exit;
+    }
+
+    function get_news_articles_xml() {
+        $xml_page = $this->print_many_objects_list(array(
+            "templates_dir" => "news_article/xml",
+            "templates_ext" => "xml",
+            "obj_name" => "news_article",
+            "default_order_by" => array("created desc", "id desc"),
+        ));
+        $this->create_xml_page_response($xml_page);
     }
 }
 

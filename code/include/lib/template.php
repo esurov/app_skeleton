@@ -1,6 +1,6 @@
 <?php
 
-// HTML templates parser and manager.
+// HTML templates parser and manager
 
 class Template {
 
@@ -15,8 +15,7 @@ class Template {
         $templates_dir = "templates",
         $print_template_name = false
     ) {
-        // Constructor.
-        // Store path to templates in the internal variable.
+        // Store path to templates in the internal variable
 
         $this->templates_dir = $templates_dir;
         $this->parsed_files = array();
@@ -33,11 +32,13 @@ class Template {
         return $this->fillings[$var_name];
     }
 
-    function set_value($var_name, $value) {
-        $this->fillings[$var_name] = $value;
+    function set_value($var_name, $var_value) {
+        if (!is_null($var_name)) {
+            $this->fillings[$var_name] = $var_value;
+        }
     }
 
-    // Parse given text, return it with variables filled.
+    // Parse given text, return it with variables filled
     function parse($raw_text) {
 
         $parsed_text = preg_replace(
@@ -49,13 +50,13 @@ class Template {
         return $parsed_text;
     }
 
-    // Parse given text, return it with variables filled.
-    // Also append result to given variable in fillings.
-    function parse_text($raw_text, $append_to = null) {
+    // Parse given text, return it with variables filled
+    // Also append result to given variable in fillings
+    function parse_text($raw_text, $append_to_var_name = null) {
         
         $parsed_text = $this->parse($raw_text);
-        if (!is_null(($append_to))) {
-            $this->append($append_to, $parsed_text);
+        if (!is_null(($append_to_var_name))) {
+            $this->append($append_to_var_name, $parsed_text);
         }
 
         return $parsed_text;
@@ -68,17 +69,17 @@ class Template {
         if (isset($this->parsed_files[$template_name])) {
             $text = $this->parsed_files[$template_name];
         } else {
-            $filename = "{$this->templates_dir}/{$template_name}";
-            $text = join('', file($filename));
+            $filepath = "{$this->templates_dir}/{$template_name}";
+            $text = file_get_contents($filepath);
             $this->parsed_files[$template_name] = $text;
         }
 
         return $text;
     }
 
+    // Append given text to the current filling value
     function append($name, $text) {
-        // Append given text to the current filling value.
-
+        
         if (isset($this->fillings[$name])) {
             $this->set_value($name, $this->fillings[$name] . $text);
         } else {
@@ -97,9 +98,14 @@ class Template {
         }
     }
 
-    // Parse given template using values from internal hash.
-    // Return filled template.
-    function parse_file($template_name, $append_to = NULL) {
+    function is_template_exist($template_name) {
+        $filepath = "{$this->templates_dir}/{$template_name}";
+        return file_exists($filepath);
+    }
+
+    // Parse given template using values from internal hash
+    // Return filled template
+    function parse_file($template_name, $append_to_var_name = null) {
         $raw_text = $this->get_raw_text($template_name);
 
         if ($this->print_template_name) {
@@ -111,40 +117,32 @@ class Template {
             );
         }
 
-        $parsed_text = $this->parse_text($raw_text, $append_to);
+        $parsed_text = $this->parse_text($raw_text, $append_to_var_name);
 
         return $parsed_text;
     }
 
-    // Parse given template using values from internal hash.
-    // Return filled template and empty the variable.
-    function parse_file_new($template_name, $variable = null) {
-        if (!is_null($variable)) {
-            $this->set_value($variable, "");
-        }
-        return $this->parse_file($template_name, $variable);
+    // Parse given template using values from internal hash
+    // Return filled template and empty the variable
+    function parse_file_new($template_name, $var_name = null) {
+        $this->set_value($var_name, "");
+        return $this->parse_file($template_name, $var_name);
     }
 
-    function is_template_exist($template_name) {
-        $filename = "{$this->templates_dir}/{$template_name}";
-        return file_exists($filename);
-    }
-
-    function parse_file_if_exists($template_name, $variable = null) {
+    function parse_file_if_exists($template_name, $var_name = null) {
         if ($this->is_template_exist($template_name)) {
-            $this->parse_file($template_name, $variable);    
+            $parsed_text = $this->parse_file($template_name, $var_name);    
         } else {
-            return "";
+            $parsed_text = "";
+            $this->set_value($var_name, $parsed_text);
         }
+        return $parsed_text;
     }
 
-    function parse_file_new_if_exists($template_name, $variable = null) {
-        if ($this->is_template_exist($template_name)) {
-            $this->parse_file_new($template_name, $variable);    
-        } else {
-            return "";
-        }
+    function parse_file_new_if_exists($template_name, $var_name = null) {
+        $this->set_value($var_name, "");
+        return $this->parse_file_if_exists($template_name, $var_name);
     }
-}  // class Template
+}
 
 ?>
