@@ -37,64 +37,64 @@ function getMessage(message, language) {
     case 'input_first_name':
         en = 'Please input your first name.';
         it = 'Inserire il nome.';
-        ru = 'Пожалуйста, введите свое имя. ';
+        ru = 'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ СЃРІРѕРµ РёРјСЏ. ';
         break;
     case 'input_last_name':
         en = 'Please input your last name.';
         it = 'Inserire il cognome.';
-        ru = 'Пожалуйста, введите свою фамилию. ';
+        ru = 'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ СЃРІРѕСЋ С„Р°РјРёР»РёСЋ. ';
         break;
     case 'input_email':
         en = 'Please input your e-mail.';
         it = "Inserire l'e-mail.";
-        ru = 'Пожалуйста, введите e-mail. ';
+        ru = 'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ e-mail. ';
 
         break;
     case 'incorrect_email':
         en = 'Please input correct e-mail address.';
         it = 'Inserire un indirizzo e-mail valido.';
-        ru = 'Пожалуйста, введите корректный e-mail. ';
+        ru = 'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ e-mail. ';
 
         break;
     case 'incorrect_zip':
         en = 'Postal code should be a number with minimum 5 digits.';
         it = 'Il codice postale dovrebbe essere un numero di 5 cifre.';
-        ru = 'Почтовый индекс должен состоять как минимум из 5 цифр. ';
+        ru = 'РџРѕС‡С‚РѕРІС‹Р№ РёРЅРґРµРєСЃ РґРѕР»Р¶РµРЅ СЃРѕСЃС‚РѕСЏС‚СЊ РєР°Рє РјРёРЅРёРјСѓРј РёР· 5 С†РёС„СЂ. ';
 
         break;
     case 'input_country':
         en = 'Please input your country.';
         it = 'Inserire la nazione.';
-        ru = 'Пожалуйста, введите страну. ';
+        ru = 'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ СЃС‚СЂР°РЅСѓ. ';
 
         break;
     case 'input_city':
         en = 'Please input your city.';
-        it = 'Inserire la cittа.';
-        ru = 'Пожалуйста, введите город. ';
+        it = 'Inserire la cittГ .';
+        ru = 'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ РіРѕСЂРѕРґ. ';
 
         break;
     case 'input_phone':
         en = 'Please input your contact phone.';
         it = 'Inserire il nr. di telefono.';
-        ru = 'Пожалуйста, введите телефон. ';
+        ru = 'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ С‚РµР»РµС„РѕРЅ. ';
 
         break;
     case 'invalid_phone':
         en = 'Bad phone number format.';
         it = 'Nr. di telefono non valido.';
-        ru = 'Пожалуйста, введите корректный номер телефона. ';
+        ru = 'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ РЅРѕРјРµСЂ С‚РµР»РµС„РѕРЅР°. ';
 
         break;
     case 'invalid_fax':
         en = 'Bad fax number format.';
         it = 'Nr. di telefono non valido.';
-        ru = 'Пожалуйста, введите корректный номер факса. ';
+        ru = 'РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РІРІРµРґРёС‚Рµ РєРѕСЂСЂРµРєС‚РЅС‹Р№ РЅРѕРјРµСЂ С„Р°РєСЃР°. ';
         break;
     case 'incorrect_form':
         en = 'Error! Incorrect form name.';
         it = 'Errore! Nome campo non valido.';
-        ru = 'Ошибка! Неправильное имя формы. ';
+        ru = 'РћС€РёР±РєР°! РќРµРїСЂР°РІРёР»СЊРЅРѕРµ РёРјСЏ С„РѕСЂРјС‹. ';
         break;
 
     default:

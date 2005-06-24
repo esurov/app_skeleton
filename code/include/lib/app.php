@@ -5,8 +5,9 @@ class App {
 
     // Html page template
     var $page;
+    var $html_charset;
 
-    // E-mail message template
+    // E-mail messages sender
     var $email_sender;
 
     var $messages;
@@ -40,15 +41,10 @@ class App {
         $this->create_db();
 
         $this->create_page_template();
+        $this->html_charset = $this->config->get_value("html_charset");
+        $this->page->assign("html_charset", $this->html_charset);
 
         $this->create_pager();
-
-        // One action defined, but nobody can access it:
-        $actions = array(
-            "pg_index" => array(
-                "valid_users" => array(),
-            ),
-        );
 
         $this->avail_langs = $this->get_avail_langs();
         $this->dlang = $this->config->get_value("default_language");
@@ -60,6 +56,13 @@ class App {
 
         $this->init_lang_dependent_data();
         $this->create_email_sender();
+
+        // One action defined, but nobody can access it:
+        $actions = array(
+            "pg_index" => array(
+                "valid_users" => array(),
+            ),
+        );
 
         $this->log->write("App", "App '{$this->app_name}' started", 3);
     }
@@ -106,6 +109,7 @@ class App {
         $this->email_sender = new PHPMailer();
         $this->email_sender->IsSendmail();
         $this->email_sender->IsHTML(true);
+        $this->email_sender->CharSet = $this->html_charset;
     }
 
     function init_lang_dependent_data() {
@@ -172,8 +176,16 @@ class App {
 
     function run_action() {
         // Run action and return its response
+
+        $page_name = trim(param("page"));
+        $this->page->assign(array(
+            "action" => $this->action,
+            "page" => $page_name,
+        ));
+        $this->print_page_titles($page_name);
+        
         $this->log->write("App", "Running action '{$this->action}'", 3);
-        return $this->{$this->action}();  // NB! Variable function
+        $this->{$this->action}();  // NB! Variable function
     }
 
     function run_access_denied_action() {
@@ -227,10 +239,24 @@ class App {
 
     function create_self_redirect_response($suburl_params = array()) {
         $extra_suburl_params = $this->get_app_extra_suburl_params();
-        $self_url = create_self_url($suburl_params + $extra_suburl_params);
+        $self_url = create_self_url(
+            $suburl_params + $extra_suburl_params
+        );
         $this->create_redirect_response($self_url);
     }
-//
+
+    function create_self_full_redirect_response(
+        $suburl_params = array(),
+        $protocol = "http"
+    ) {
+        $extra_suburl_params = $this->get_app_extra_suburl_params();
+        $self_full_url = create_self_full_url(
+            $suburl_params + $extra_suburl_params,
+            $protocol
+        );
+        $this->create_redirect_response($self_full_url);
+    }
+
     function get_app_extra_suburl_params() {
         return array();
     }

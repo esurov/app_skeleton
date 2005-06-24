@@ -14,19 +14,13 @@ class CustomApp extends App {
 
         if (!$this->report) {
             $this->page->assign(array(
-                "popup_url_param" => "&amp;popup={$this->popup}",
+                "popup_url_param" =>
+                    "&amp;popup={$this->popup}",
                 "popup_hidden" =>
                     "<input type=\"hidden\" name=\"popup\" value=\"{$this->popup}\">\n",
             ));
             $this->print_session_status_messages();
         }
-        $page_name = trim(param("page"));
-        $this->page->assign(array(
-            "action" => $this->action,
-            "page" => $page_name,
-        ));
-        $this->print_page_titles($page_name);
-
         $this->print_lang_menu();
 
         parent::run_action();
@@ -59,9 +53,11 @@ class CustomApp extends App {
     }
 
     function get_app_extra_suburl_params() {
-        return array(
-            "popup" => $this->popup,
-        );
+        $params = array();
+        if ($this->popup != 0) {
+            $params["popup"] = $this->popup;
+        }
+        return $params;
     }
 }
 

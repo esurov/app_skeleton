@@ -78,11 +78,11 @@ function get_param_value($params, $param_name, $default_value) {
 }
 //
 function is_value_empty($value) {
-    return !is_value_not_empty($value);
+    return trim($value) == "";
 }
 
 function is_value_not_empty($value) {
-    return preg_match('/\w+/', $value);
+    return !is_value_empty($value);
 }
 
 function is_value_email($value) {
@@ -112,6 +112,14 @@ function get_html_safe_string($unsafe_str) {
     return htmlspecialchars($unsafe_str);
 }
 
+function get_html_safe_array($unsafe_array) {
+    $safe_array = array();
+    foreach ($unsafe_array as $key => $unsafe_str) {
+        $safe_array[$key] = get_html_safe_string($unsafe_str);
+    }
+    return $safe_array;
+}
+
 function get_js_safe_string($unsafe_str) {
     $str = str_replace("\\", "\\\\", $unsafe_str);
     $str = str_replace("'", "\\'", $str);
@@ -131,10 +139,11 @@ function get_shortened_string($str, $max_length, $end_str = "...") {
 
 function get_word_shortened_string($str, $max_length, $end_str = "...") {
     if (strlen($str) > $max_length) {
-        $n = strpos($str, " ", $max_length);
-        $str = ($n) ?
-            substr($str, 0, $n):
-            substr($str, 0, $max_length);
+        $str = substr($str, 0, $max_length);
+        $n = strrpos($str, " ");
+        if ($n !== false) {
+            $str = substr($str, 0, $n);
+        }
         return "{$str}{$end_str}";
     } else {
         return $str;

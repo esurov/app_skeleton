@@ -1191,12 +1191,17 @@ class DbObject {
 //  CGI functions:
     function read_order_by($default_order_by_fields) {
         $order_by_fields = param("order_by");
-        if (is_null($order_by_fields) || trim($order_by_fields) == "") {
-            $order_by_fields = $default_order_by_fields;
-        }
 
+        if (!is_array($default_order_by_fields)) {
+            $default_order_by_fields = array($default_order_by_fields);
+        }
+        
         if (!is_array($order_by_fields)) {
-            $order_by_fields = array($order_by_fields);
+            if (is_null($order_by_fields) || trim($order_by_fields) == "") {
+                $order_by_fields = $default_order_by_fields;
+            } else {
+                $order_by_fields = array($order_by_fields);
+            }
         }
 
         $field_names = $this->get_field_names();

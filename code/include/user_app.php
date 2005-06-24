@@ -81,16 +81,20 @@ class UserApp extends CustomApp {
             $name_from = trim("{$first_name} {$last_name}");
             $subject = $this->config->get_value("contact_form_subject");
 
-            $this->page->assign(array(
-                "first_name" => htmlspecialchars($first_name),
-                "last_name" => htmlspecialchars($last_name),
-                "email" => htmlspecialchars($email_from),
-                "company" => htmlspecialchars(param("company")),
-                "address" => htmlspecialchars(param("address")),
-                "phone" => htmlspecialchars(param("phone")),
-                "fax" => htmlspecialchars(param("fax")),
-                "message_text" => convert_lf2br(htmlspecialchars(param("message_text"))),
-            ));
+            $fillings = array(
+                "first_name" => $first_name,
+                "last_name" => $last_name,
+                "email" => $email_from,
+                "company" => param("company"),
+                "address" => param("address"),
+                "phone" => param("phone"),
+                "fax" => param("fax"),
+            );
+            $this->page->assign(get_html_safe_array($fillings));
+            $this->page->assign(
+                "message_text",
+                convert_lf2br(get_html_safe_string(param("message_text")))
+            );
 
             $this->email_sender->From = $email_from;
             $this->email_sender->Sender = $email_from;

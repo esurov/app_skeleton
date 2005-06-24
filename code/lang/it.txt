@@ -42,7 +42,7 @@ link_view_all_news = Tutte le News
 ["parts of controls"]
 any = Qualsiasi
 choose_one = Selezionare:
-yes = SÏ
+yes = S√¨
 no = No
 
 ["lang"]
@@ -64,7 +64,7 @@ company = Azienda
 position = Ruolo aziendale
 email = E-mail
 zip = CAP
-city = Citt‡
+city = Citt√†
 country = Nazione
 address = Indirizzo
 phone = Telefono
@@ -73,11 +73,11 @@ message_text = Messaggio
 
 ["status and popup messages"]
 sure_delete = Sei sicuro di voler cancellare l\'informazione?
-cannot_delete_record_because_it_has_links = Impossibile eliminare {%main_obj_name%} perch&eacute; in relazione con {%dep_objs_data%}
+cannot_delete_record_because_it_has_links = Impossibile eliminare {%main_obj_name%} perch√© in relazione con {%dep_objs_data%}
 contact_form_processed = I suoi dati sono stati registrati. Grazie.
 
 ["parts of page"]
 pager_pages_title = Pagine:
 filter_by = Filtra per
 no_records_found = Non sono stati trovati dati
-recent_news = Ultime novit‡
+recent_news = Ultime novit√†
