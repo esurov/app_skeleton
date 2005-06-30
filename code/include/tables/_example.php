@@ -309,21 +309,47 @@ class Example extends CustomDbObject {
     }
 //
 
-//    function print_values($params = array()) {
-//        $h1 = parent::print_values($params);
-//        $h = array();
-//
-//        $title_short_len = $this->config->value("article_title_short_length");
-//        $h["article_title_short"] =
-//            get_word_shortened_string(strip_tags($this->title), $title_short_len);
-//        $body_short_len = $this->config->value("article_body_short_length");
-//        $h["article_body_short"] =
-//            get_word_shortened_string(strip_tags($this->body), $body_short_len);
-//
-//        $this->assign_values($h);
-//        return $h1 + $h;
-//    }
-//
+    function print_values($params = array()) {
+        $h1 = parent::print_values($params);
+        $h = array();
+
+        // This template variable is extension to default printed variables for all contexts
+//        $h["_example_field_double_currency"] = format_currency_with_sign($this->field_double);
+
+        // Context handling
+        switch ($this->print_params["context"]) {
+        case "context1":
+            // Accessing templates directory for current list
+            // May be used for printing inner lists
+            $templates_dir = $this->print_params["templates_dir"];
+
+            // Accessing custom parameters of this list
+            // May be used for creating complex links
+            $param1_value = $this->print_params["custom_params"]["param1"];
+            $param2_value = $this->print_params["custom_params"]["param2"];
+
+            // Access to original fetched resultset row, its number in the list and parity
+            // May be used to access expanded query special or calculated fields
+            // which have no physical equivalents in DB
+            $row = $this->print_params["row"];
+            $row_number = $this->print_params["row_number"];
+            $row_parity = $this->print_params["row_parity"];
+
+            // Add context-specific template variable
+            $h["_example_context1_specific_value"] =
+                get_html_safe_string("str1&{$row_number}<>{$row_parity}");
+            break;
+
+        case "context2":
+            // Add context-specific template variable
+            $h["_example_context2_specific_value"] = 1 - $this->field_boolean;
+            break;
+        }
+
+        $this->assign_values($h);
+        return $h1 + $h;
+    }
+
 //    function validate($old_obj = null) {
 //        $messages = array();
 //

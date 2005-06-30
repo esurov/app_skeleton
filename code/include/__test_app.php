@@ -12,20 +12,22 @@ class TestApp extends CustomApp {
             "set_cookie" => $e,
             "check_cookie" => $e,
             "get_news_articles_xml" => $e,
+
+            "pg_view_examples_in_context1" => $e,
+            "pg_view_examples_in_context2" => $e,
+            "pg_view_all_examples_in_context1_as_objects" => $e,
         );
     }
 //
     function pg_index() {
-        $t = new Example();
-//        $t->store();
-        $query = $t->get_select_query();
-var_dump($query);
-        $this->db->run_select_query($query);
-
-        $t->run_expanded_select_query(array(
-            "order_by" => "id ASC",
-        ));
-        exit;
+        foreach (array_keys($this->actions) as $action) {
+            $this->page->assign(array(
+                "action_name" => get_html_safe_string($action),
+                "action_suburl" => "?action=" . urlencode($action),
+            ));
+            $this->page->parse_file("actions_list/list_item.html", "actions_list");
+        }
+        $this->page->parse_file("actions_list/list_items.html", "body");
     }
 
     function set_cookie() {
@@ -49,6 +51,38 @@ var_dump($query);
             "default_order_by" => array("created desc", "id desc"),
         ));
         $this->create_xml_page_response($xml_page);
+    }
+
+//  Context usage example
+//  Print list with specific to context1 template variables
+    function pg_view_examples_in_context1() {
+        $this->print_many_objects_list_page(array(
+            "templates_dir" => "_example/list_context1",
+            "obj_name" => "_example",
+            "context" => "context1",
+            "custom_params" => array(
+                "param1" => "param1_value",
+                "param2" => "param2_value",
+            ),
+        ));
+    }
+
+    function pg_view_examples_in_context2() {
+        $this->print_many_objects_list_page(array(
+            "templates_dir" => "_example/list_context2",
+            "obj_name" => "_example",
+            "context" => "context2",
+        ));
+    }
+
+    function pg_view_all_examples_in_context1_as_objects() {
+        $examples = $this->fetch_db_objects_list("_example", array(
+            "order_by" => "created DESC",
+        ));
+
+        foreach ($examples as $example) {
+            var_dump($example);
+        }
     }
 }
 

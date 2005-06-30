@@ -62,6 +62,10 @@ function if_null($variable, $value) {
     return is_null($variable) ? $value : $variable;
 }
 
+function if_not_null($variable, $value) {
+    return !is_null($variable) ? $value : $variable;
+}
+
 function unset_array_value_if_exists($value, &$values) {
     $i = array_search($value, $values);
     if ($i !== false) {
@@ -295,26 +299,6 @@ function get_selected_value($value_caption_pairs, $current_value, $default_value
         $selected_value = $values[0];
     }
     return $selected_value;
-}
-
-function fetch_db_object(
-    $obj_name,
-    $id,
-    $where_str = "1",
-    $field_names_to_select = null,
-    $field_names_to_not_select = null
-) {
-    global $app;
-
-    $obj = $app->create_db_object($obj_name);
-    if ($id != 0) {
-        $obj->fetch(
-            "{$obj_name}.id = {$id} AND {$where_str}",
-            $field_names_to_select,
-            $field_names_to_not_select
-        );
-    }
-    return $obj;
 }
 
 function get_db_object_value_caption_pairs($obj_name, $field_name, $query_ex) {

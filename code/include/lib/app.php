@@ -273,22 +273,48 @@ class App {
         return new $obj_class_name();
     }
 
-    function read_id_fetch_object(
+    function fetch_db_object(
+        $obj_name,
+        $id,
+        $where_str = "1",
+        $field_names_to_select = null,
+        $field_names_to_not_select = null
+    ) {
+        $obj = $this->create_db_object($obj_name);
+        if ($id != 0) {
+            $obj->fetch(
+                "{$obj_name}.id = {$id} AND {$where_str}",
+                $field_names_to_select,
+                $field_names_to_not_select
+            );
+        }
+        return $obj;
+    }
+
+    function fetch_db_objects_list($obj_name, $query_ex) {
+        $obj = $this->create_db_object($obj_name);
+        $res = $obj->run_expanded_select_query($query_ex);
+        $objects = array();
+        while ($row = $res->fetch()) {
+            $obj->fetch_row($row);
+            $objects[] = $obj;
+        }
+        return $objects;
+    }
+
+    function read_id_fetch_db_object(
         $obj_name,
         $where_str = "1",
         $id_param_name = null
     ) {
         // Create new object, read it's PRIMARY KEY from CGI
         // (using CGI variable with name $id_param_name),
-        // then fetch object data from database table.
-
+        // then fetch object from database table
         if (is_null($id_param_name)) {
             $id_param_name = "{$obj_name}_id";
         }
         $pr_key_value = intval(param($id_param_name));
-        $obj = fetch_db_object($obj_name, $pr_key_value, $where_str);
-
-        return $obj;
+        return $this->fetch_db_object($obj_name, $pr_key_value, $where_str);
     }
 //
     function get_message($name) {
@@ -618,7 +644,7 @@ class App {
         if (is_null($obj)) {
             $obj_name = get_param_value($params, "obj_name", null);
             if (!is_null($obj_name)) {
-                $obj = $this->read_id_fetch_object($obj_name);
+                $obj = $this->read_id_fetch_db_object($obj_name);
             } else {
                 die("No obj_name in print_object_edit_page()");
             }
@@ -647,7 +673,7 @@ class App {
         if (is_null($obj)) {
             $obj_name = get_param_value($params, "obj_name", null);
             if (!is_null($obj_name)) {
-                $obj = $this->read_id_fetch_object($obj_name);
+                $obj = $this->read_id_fetch_db_object($obj_name);
             } else {
                 die("No obj_name in print_object_edit_page()");
             }
@@ -676,7 +702,7 @@ class App {
         if (is_null($obj)) {
             $obj_name = get_param_value($params, "obj_name", null);
             if (!is_null($obj_name)) {
-                $obj = $this->read_id_fetch_object($obj_name);
+                $obj = $this->read_id_fetch_db_object($obj_name);
             } else {
                 die("No obj_name in delete_object()");
             }
@@ -844,7 +870,7 @@ class App {
     }
 //
     function get_image() {
-        $image = $this->read_id_fetch_object("image");
+        $image = $this->read_id_fetch_db_object("image");
         if ($image->is_definite()) {
             $cached_gmt_str = (isset($_SERVER["HTTP_IF_MODIFIED_SINCE"])) ?
                 $_SERVER["HTTP_IF_MODIFIED_SINCE"] : null;

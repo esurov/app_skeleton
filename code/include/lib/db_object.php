@@ -206,6 +206,18 @@ class DbObject {
         $result = str_replace(",", "", $app_integer_value);
         return intval($result);
     }
+
+//    function format_currency_with_sign(
+//        $currency_value, $currency_sign = "\xE2\x82\xAC ", $is_prefix = true
+//    ) {
+//        $formatted_currency_value = format_double_value($currency_value, $decimals, $dec_point, $thousands_sep);
+//        if ($is_prefix) {
+//            return "{$currency_sign}{$formatted_currency_value}";
+//        } else {
+//            return "{$formatted_currency_value}{$currency_sign}";
+//        }
+//    }
+
 //
     function get_primary_key_name() {
         // Return name of the PRIMARY KEY column.
@@ -1171,11 +1183,10 @@ class DbObject {
             if (count($obj_relations) == 0) {
                 $obj->del_where("{$field_name} = {$this->id}");
             } else {
-                $res = $obj->run_expanded_select_query(array(
+                $objects_to_delete = $this->fetch_db_objects_list($obj, array(
                     "where" => "{$table_name}.{$field_name} = {$this->id}",
                 ));
-                while ($row = $res->fetch()) {
-                    $obj->fetch_row($row);
+                foreach ($objects_to_delete as $obj) {
                     $obj->del_cascade();
                 }
             }
@@ -2470,33 +2481,35 @@ class DbObject {
         }
     }
 //
-    function fetch_object(
+    function fetch_db_object(
         $obj_name,
         $id,
         $where_str = "1",
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        $obj = $this->create_db_object($obj_name);
-        if ($id != 0) {
-            $obj->fetch(
-                "{$obj_name}.id = {$id} AND {$where_str}",
-                $field_names_to_select,
-                $field_names_to_not_select
-            );
-        }
-        return $obj;
+        return $this->app->fetch_db_object(
+            $obj_name,
+            $id,
+            $where_str,
+            $field_names_to_select,
+            $field_names_to_not_select
+        );
+    }
+
+    function fetch_db_objects_list($obj_name, $query_ex) {
+        return $this->app->fetch_db_objects_list($obj_name, $query_ex);
     }
 
 //  Uploaded image helpers
     function fetch_image($image_id_field_name = "image_id") {
         $image_id = $this->{$image_id_field_name};
-        return $this->fetch_object("image", $image_id);
+        return $this->fetch_db_object("image", $image_id);
     }
 
     function fetch_image_without_content($image_id_field_name = "image_id") {
         $image_id = $this->{$image_id_field_name};
-        return $this->fetch_object("image", $image_id, "1", null, array("content"));
+        return $this->fetch_db_object("image", $image_id, "1", null, array("content"));
     }
 
     function print_image($image_id_field_name = "image_id", $template_var = "_image") {

@@ -49,7 +49,7 @@ class AdminApp extends CustomApp {
     }
 
     function update_news_article() {
-        $news_article = $this->read_id_fetch_object("news_article");
+        $news_article = $this->read_id_fetch_db_object("news_article");
         $news_article_old = $news_article;
         $news_article->read();
 
