@@ -13,7 +13,7 @@ class Image extends CustomDbObject {
         $this->insert_field(array(
             "field" => "created",
             "type" => "datetime",
-            "value" => $this->get_db_now_datetime(),
+            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
             "update" => 0,
             "index" => "index",
@@ -22,7 +22,7 @@ class Image extends CustomDbObject {
         $this->insert_field(array(
             "field" => "updated",
             "type" => "datetime",
-            "value" => $this->get_db_now_datetime(),
+            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
             "index" => "index",
         ));
@@ -65,13 +65,13 @@ class Image extends CustomDbObject {
     }
 //
     function update($fields = null) {
-        $this->updated = $this->get_db_now_datetime();
+        $this->updated = $this->app->get_db_now_datetime();
         parent::update($fields);
     }
 //
     function get_updated_as_gmt_str() {
         return get_gmt_str_from_timestamp(
-            $this->get_timestamp_from_db_datetime($this->updated)
+            $this->app->get_timestamp_from_db_datetime($this->updated)
         );
     }
 //

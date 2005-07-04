@@ -16,6 +16,8 @@ class TestApp extends CustomApp {
             "pg_view_examples_in_context1" => $e,
             "pg_view_examples_in_context2" => $e,
             "pg_view_all_examples_in_context1_as_objects" => $e,
+
+            "print_one_example" => $e,
         );
     }
 //
@@ -83,6 +85,18 @@ class TestApp extends CustomApp {
         foreach ($examples as $example) {
             var_dump($example);
         }
+    }
+
+    function print_one_example() {
+        $example = $this->fetch_db_object("_example", 1);
+        var_dump(
+            $this->get_app_currency_with_sign_value($example->field_currency + 12345678.09)
+        );
+        var_dump(
+            $example->print_values()
+        );
+        $example->field_currency = 99999999.99;
+        $example->save();
     }
 }
 

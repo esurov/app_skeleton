@@ -118,7 +118,7 @@ class Example extends CustomDbObject {
         $this->insert_field(array(
             "field" => "created",
             "type" => "datetime",
-            "value" => $this->get_db_now_datetime(),
+            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
             "update" => 0,
 
@@ -132,7 +132,7 @@ class Example extends CustomDbObject {
         $this->insert_field(array(
             "field" => "updated",
             "type" => "datetime",
-            "value" => $this->get_db_now_datetime(),
+            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
         ));
 
@@ -192,6 +192,12 @@ class Example extends CustomDbObject {
             "width" => "12",
             "prec" => "7",
             "value" => 1234567890.1234567,
+        ));
+
+        $this->insert_field(array(
+            "field" => "field_currency",
+            "type" => "currency",
+            "value" => 0.0,
         ));
 
         $this->insert_field(array(
@@ -304,7 +310,7 @@ class Example extends CustomDbObject {
     }
 //
     function update($fields = null) {
-        $this->updated = $this->mysql_now_datetime();
+        $this->updated = $this->app->get_db_now_datetime();
         parent::update($fields);
     }
 //

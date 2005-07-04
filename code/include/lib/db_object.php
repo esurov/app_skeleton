@@ -53,33 +53,6 @@ class DbObject {
 
         $this->insert_select_from();
     }
-
-
-//  Core functions:
-//
-    function get_app_datetime_format() {
-        return "d/m/y h:i:s";
-    }
-
-    function get_app_date_format() {
-        return "d/m/y";
-    }
-
-    function get_app_time_format() {
-        return "h:i:s";
-    }
-
-    function get_db_datetime_format() {
-        return "y-m-d h:i:s";
-    }
-
-    function get_db_date_format() {
-        return "y-m-d";
-    }
-
-    function get_db_time_format() {
-        return "h:i:s";
-    }
 //
     function get_plural_name() {
         return $this->get_message($this->get_plural_resource_name());
@@ -104,120 +77,6 @@ class DbObject {
             $this->get_plural_name()
         ));
     }
-//
-    function get_db_datetime($app_datetime, $date_if_unknown = "0000-00-00 00:00:00") {
-        $date_parts = parse_date_by_format(
-            $this->get_app_datetime_format(), $app_datetime
-        );
-        return create_date_by_format(
-            $this->get_db_datetime_format(), $date_parts, $date_if_unknown
-        );
-    }
-
-    function get_db_date($app_date, $date_if_unknown = "0000-00-00") {
-        $date_parts = parse_date_by_format(
-            $this->get_app_date_format(), $app_date
-        );
-        return create_date_by_format(
-            $this->get_db_date_format(), $date_parts, $date_if_unknown
-        );
-    }
-
-    function get_db_time($app_time, $date_if_unknown = "00:00:00") {
-        $date_parts = parse_date_by_format(
-            $this->get_app_time_format(), $app_time
-        );
-        return create_date_by_format(
-            $this->get_db_time_format(), $date_parts, $date_if_unknown
-        );
-    }
-
-    function get_app_datetime($db_datetime, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format(
-            $this->get_db_datetime_format(), $db_datetime
-        );
-        return create_date_by_format(
-            $this->get_app_datetime_format(), $date_parts, $date_if_unknown
-        );
-    }
-
-    function get_app_date($db_date, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format(
-            $this->get_db_date_format(), $db_date
-        );
-        return create_date_by_format(
-            $this->get_app_date_format(), $date_parts, $date_if_unknown
-        );
-    }
-
-    function get_app_time($db_time, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format(
-            $this->get_db_time_format(), $db_time
-        );
-        return create_date_by_format(
-            $this->get_app_time_format(), $date_parts, $date_if_unknown
-        );
-    }
-
-    function get_db_now_datetime() {
-        $date_parts = get_date_parts_from_timestamp(time());
-        return create_date_by_format(
-            $this->get_db_datetime_format(), $date_parts, ""
-        );
-    }
-
-    function get_db_now_date() {
-        $date_parts = get_date_parts_from_timestamp(time());
-        return create_date_by_format(
-            $this->get_db_date_format(), $date_parts, ""
-        );
-    }
-
-    function get_timestamp_from_db_datetime($db_datetime) {
-        return get_timestamp_from_date_parts(
-            parse_date_by_format(
-                $this->get_db_datetime_format(), $db_datetime
-            )
-        );
-    }
-
-    function get_timestamp_from_db_date($db_date) {
-        return get_timestamp_from_date_parts(
-            parse_date_by_format(
-                $this->get_db_date_format(), $db_date
-            )
-        );
-    }
-//
-    function get_app_double_value($php_double_value, $decimals) {
-        return format_double_value($php_double_value, $decimals, ".", ",");
-    }
-
-    function get_php_double_value($app_double_value) {
-        $result = str_replace(",", "", $app_double_value);
-        return doubleval($result);
-    }
-
-    function get_app_integer_value($php_integer_value) {
-        return format_integer_value($php_integer_value, ",");
-    }
-
-    function get_php_integer_value($app_integer_value) {
-        $result = str_replace(",", "", $app_integer_value);
-        return intval($result);
-    }
-
-//    function format_currency_with_sign(
-//        $currency_value, $currency_sign = "\xE2\x82\xAC ", $is_prefix = true
-//    ) {
-//        $formatted_currency_value = format_double_value($currency_value, $decimals, $dec_point, $thousands_sep);
-//        if ($is_prefix) {
-//            return "{$currency_sign}{$formatted_currency_value}";
-//        } else {
-//            return "{$formatted_currency_value}{$currency_sign}";
-//        }
-//    }
-
 //
     function get_primary_key_name() {
         // Return name of the PRIMARY KEY column.
@@ -455,6 +314,11 @@ class DbObject {
             case "double":
                 $initial_field_value = get_param_value($field_info, "value", 0.0);
                 $width = get_param_value($field_info, "width", 16);
+                $prec = get_param_value($field_info, "prec", 2);
+                break;
+            case "currency":
+                $initial_field_value = get_param_value($field_info, "value", 0.0);
+                $width = get_param_value($field_info, "width", 10);
                 $prec = get_param_value($field_info, "prec", 2);
                 break;
             case "boolean":
@@ -782,6 +646,9 @@ class DbObject {
         case "double":
             $type_expression = "DOUBLE({$field_info['width']},{$field_info['prec']})";
             break;
+        case "currency":
+            $type_expression = "DECIMAL({$field_info['width']},{$field_info['prec']})";
+            break;
         case "boolean":
             $type_expression = "TINYINT({$field_info['width']})";
             break;
@@ -1083,6 +950,7 @@ class DbObject {
         case "foreign_key":
         case "integer":
         case "double":
+        case "currency":
         case "boolean":
             $field_value_str = $field_value;
             break;
@@ -1115,45 +983,6 @@ class DbObject {
 
         return $was_definite;
     }
-//
-    function fetch(
-        $where_str = null,
-        $field_names_to_select = null,
-        $field_names_to_not_select = null
-    ) {
-        // Fetch data from database table using given WHERE condition
-        // Return true if ONE record found
-        if (is_null($where_str)) {
-            $where_str = $this->get_default_where_str();
-        }
-
-        $query_ex = array(
-            "where" => $where_str,
-        );
-
-        $res = $this->run_expanded_select_query(
-            $query_ex,
-            $field_names_to_select,
-            $field_names_to_not_select
-        );
-
-        if ($res->get_num_rows() != 1) {  // record not found
-            return false;
-        }
-
-        $row = $res->fetch();
-        $this->fetch_row($row);
-
-        return true;
-    }
-
-    function fetch_row($row) {
-        // Fetch data from query result row.
-        foreach ($row as $field_name => $field_value) {
-            $this->set_field_value($field_name, $field_value);
-        }
-    }
-
 //
     function del() {
         $this->del_where(
@@ -1406,14 +1235,25 @@ class DbObject {
                     }
                     break;
 
+                case "currency":
+                    if (is_array($value)) {
+                        $value_str = array();
+                        foreach($value as $val) {
+                            $value_str[] = double($val);
+                        }
+                    } else {
+                        $value_str = double($value);
+                    }
+                    break;
+
                 case "date":
                     if (is_array($value)) {
                         $value_str = array();
                         foreach($value as $val) {
-                            $value_str[] = qw($this->get_db_date($val));
+                            $value_str[] = qw($this->app->get_db_date($val));
                         }
                     } else {
-                        $value_str = qw($this->get_db_date($val));
+                        $value_str = qw($this->app->get_db_date($val));
                     }
                     break;
 
@@ -1513,7 +1353,7 @@ class DbObject {
             $field_names_to_read, $field_names_to_not_read
         );
 
-        $use_read_flag = (is_null($field_names_to_read));
+        $use_read_flag = is_null($field_names_to_read);
 
         foreach ($field_names as $field_name) {
             $field_info = $this->fields[$field_name];
@@ -1534,6 +1374,9 @@ class DbObject {
                 break;
             case "double":
                 $field_value = $this->get_double_field_value($param_value);
+                break;
+            case "currency":
+                $field_value = $this->get_currency_field_value($param_value);
                 break;
             case "boolean":
                 $field_value = $this->get_boolean_field_value($param_value);
@@ -1600,14 +1443,21 @@ class DbObject {
         if (is_null($param_value)) {
             return null;
         }
-        return $this->get_php_integer_value($param_value);
+        return $this->app->get_php_integer_value($param_value);
     }
 
     function get_double_field_value($param_value) {
         if (is_null($param_value)) {
             return null;
         }
-        return $this->get_php_double_value($param_value);
+        return $this->app->get_php_double_value($param_value);
+    }
+
+    function get_currency_field_value($param_value) {
+        if (is_null($param_value)) {
+            return null;
+        }
+        return $this->app->get_php_double_value($param_value);
     }
 
     function get_boolean_field_value($param_value) {
@@ -1654,21 +1504,21 @@ class DbObject {
         if (is_null($app_datetime)) {
             return null;
         }
-        return $this->get_db_datetime($app_datetime);
+        return $this->app->get_db_datetime($app_datetime);
     }
 
     function get_date_field_value($app_date) {
         if (is_null($app_date)) {
             return null;
         }
-        return $this->get_db_date($app_date);
+        return $this->app->get_db_date($app_date);
     }
     
     function get_time_field_value($app_time) {
         if (is_null($app_time)) {
             return null;
         }
-        return $this->get_db_time($app_time);
+        return $this->app->get_db_time($app_time);
     }
 //
     function init_print_param($params, $param_name, $default_value) {
@@ -1722,6 +1572,9 @@ class DbObject {
             case "double":
                 $h1 = $this->print_double_field_value($template_var, $value, $field_info["prec"]);
                 break;
+            case "currency":
+                $h1 = $this->print_currency_field_value($template_var, $value, $field_info["prec"]);
+                break;
             case "boolean":
                 $value_captions = array(
                     0 => $this->get_message("no"),
@@ -1772,16 +1625,25 @@ class DbObject {
 
     function print_integer_field_value($template_var, $value) {
         return array(
-            "{$template_var}" => $this->get_app_integer_value($value),
+            "{$template_var}" => $this->app->get_app_integer_value($value),
             "{$template_var}_orig" => $value,
         );
     }
 
     function print_double_field_value($template_var, $value, $decimals) {
         return array(
-            "{$template_var}" => $this->get_app_double_value($value, $decimals),
-            "{$template_var}_2" => $this->get_app_double_value($value, 2),
-            "{$template_var}_5" => $this->get_app_double_value($value, 5),
+            "{$template_var}" => $this->app->get_app_double_value($value, $decimals),
+            "{$template_var}_2" => $this->app->get_app_double_value($value, 2),
+            "{$template_var}_5" => $this->app->get_app_double_value($value, 5),
+            "{$template_var}_orig" => $value,
+        );
+    }
+
+    function print_currency_field_value($template_var, $value, $decimals) {
+        return array(
+            "{$template_var}" => $this->app->get_app_currency_value($value, $decimals),
+            "{$template_var}_with_sign" =>
+                $this->app->get_app_currency_with_sign_value($value, $decimals),
             "{$template_var}_orig" => $value,
         );
     }
@@ -1801,8 +1663,10 @@ class DbObject {
     }
 
     function print_varchar_field_value($template_var, $value) {
+        $safe_value = get_html_safe_string($value);
         return array(
-            "{$template_var}" => get_html_safe_string($value),
+            "{$template_var}" => $safe_value,
+            "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
             "{$template_var}_orig" => $value,
         );
     }
@@ -1812,27 +1676,28 @@ class DbObject {
         return array(
             "{$template_var}" => $safe_value,
             "{$template_var}_lf2br" => convert_lf2br($safe_value),
+            "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
             "{$template_var}_orig" => $value,
         );
     }
 
     function print_datetime_field_value($template_var, $db_datetime) {
         return array(
-            "{$template_var}" => get_html_safe_string($this->get_app_datetime($db_datetime)),
+            "{$template_var}" => get_html_safe_string($this->app->get_app_datetime($db_datetime)),
             "{$template_var}_orig" => get_html_safe_string($db_datetime),
         );
     }
 
     function print_date_field_value($template_var, $db_date) {
         return array(
-            "{$template_var}" => get_html_safe_string($this->get_app_date($db_date)),
+            "{$template_var}" => get_html_safe_string($this->app->get_app_date($db_date)),
             "{$template_var}_orig" => get_html_safe_string($db_date),
         );
     }
 
     function print_time_field_value($template_var, $db_time) {
         return array(
-            "{$template_var}" => get_html_safe_string($this->get_app_time($db_time)),
+            "{$template_var}" => get_html_safe_string($this->app->get_app_time($db_time)),
             "{$template_var}_orig" => get_html_safe_string($db_time),
         );
     }
@@ -1872,6 +1737,11 @@ class DbObject {
                 break;
             case "double":
                 $h1 = $this->print_double_field_form_value(
+                    $template_var, $value, $field_info["prec"]
+                );
+                break;
+            case "currency":
+                $h1 = $this->print_currency_field_form_value(
                     $template_var, $value, $field_info["prec"]
                 );
                 break;
@@ -1989,7 +1859,7 @@ class DbObject {
     }
     
     function print_integer_field_form_value($template_var, $value) {
-        $app_integer_value = $this->get_app_integer_value($value);
+        $app_integer_value = $this->app->get_app_integer_value($value);
         return array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $app_integer_value),
             "{$template_var}_input" => print_html_input("text", $template_var, $app_integer_value),
@@ -1997,10 +1867,18 @@ class DbObject {
     }
     
     function print_double_field_form_value($template_var, $value, $decimals) {
-        $app_double_value = $this->get_app_double_value($value, $decimals);
+        $app_double_value = $this->app->get_app_double_value($value, $decimals);
         return array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $app_double_value),
             "{$template_var}_input" => print_html_input("text", $template_var, $app_double_value),
+        );
+    }
+
+    function print_currency_field_form_value($template_var, $value, $decimals) {
+        $app_currency_value = $this->app->get_app_currency_value($value, $decimals);
+        return array(
+            "{$template_var}_hidden" => print_html_hidden($template_var, $app_currency_value),
+            "{$template_var}_input" => print_html_input("text", $template_var, $app_currency_value),
         );
     }
 
@@ -2138,7 +2016,7 @@ class DbObject {
     }
 
     function print_datetime_field_form_value($template_var, $db_datetime) {
-        $app_datetime = $this->get_app_datetime($db_datetime);
+        $app_datetime = $this->app->get_app_datetime($db_datetime);
         return array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $app_datetime),
             "{$template_var}_input" => print_html_input("text", $template_var, $app_datetime),
@@ -2146,7 +2024,7 @@ class DbObject {
     }
 
     function print_date_field_form_value($template_var, $db_date) {
-        $app_date = $this->get_app_date($db_date);
+        $app_date = $this->app->get_app_date($db_date);
         return array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $app_date),
             "{$template_var}_input" => print_html_input("text", $template_var, $app_date),
@@ -2154,7 +2032,7 @@ class DbObject {
     }
 
     function print_time_field_form_value($template_var, $db_time) {
-        $app_time = $this->get_app_time($db_time);
+        $app_time = $this->app->get_app_time($db_time);
         return array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $app_time),
             "{$template_var}_input" => print_html_input("text", $template_var, $app_time),
@@ -2276,7 +2154,7 @@ class DbObject {
     }
 
     function validate_email_field($field_name) {
-        return (is_value_email($this->{field_name}));
+        return is_value_email($this->{field_name});
     }
 
     function validate_unique_field($field_name, $old_obj) {
@@ -2481,6 +2359,44 @@ class DbObject {
         }
     }
 //
+    function fetch(
+        $where_str = null,
+        $field_names_to_select = null,
+        $field_names_to_not_select = null
+    ) {
+        // Fetch data from database table using given WHERE condition
+        // Return true if ONE record found
+        if (is_null($where_str)) {
+            $where_str = $this->get_default_where_str();
+        }
+
+        $query_ex = array(
+            "where" => $where_str,
+        );
+
+        $res = $this->run_expanded_select_query(
+            $query_ex,
+            $field_names_to_select,
+            $field_names_to_not_select
+        );
+
+        if ($res->get_num_rows() != 1) {  // record not found
+            return false;
+        }
+
+        $row = $res->fetch();
+        $this->fetch_row($row);
+
+        return true;
+    }
+
+    function fetch_row($row) {
+        // Fetch data from query result row.
+        foreach ($row as $field_name => $field_value) {
+            $this->set_field_value($field_name, $field_value);
+        }
+    }
+
     function fetch_db_object(
         $obj_name,
         $id,

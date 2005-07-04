@@ -317,6 +317,159 @@ class App {
         return $this->fetch_db_object($obj_name, $pr_key_value, $where_str);
     }
 //
+    function get_app_datetime_format() {
+        return $this->config->get_value("app_datetime_format");
+    }
+
+    function get_app_date_format() {
+        return $this->config->get_value("app_date_format");
+    }
+
+    function get_app_time_format() {
+        return $this->config->get_value("app_time_format");
+    }
+
+    function get_db_datetime_format() {
+        return $this->config->get_value("db_datetime_format");
+    }
+
+    function get_db_date_format() {
+        return $this->config->get_value("db_date_format");
+    }
+
+    function get_db_time_format() {
+        return $this->config->get_value("db_time_format");
+    }
+//
+    function get_app_datetime($db_datetime, $date_if_unknown = "") {
+        $date_parts = parse_date_by_format(
+            $this->get_db_datetime_format(), $db_datetime
+        );
+        return create_date_by_format(
+            $this->get_app_datetime_format(), $date_parts, $date_if_unknown
+        );
+    }
+
+    function get_app_date($db_date, $date_if_unknown = "") {
+        $date_parts = parse_date_by_format(
+            $this->get_db_date_format(), $db_date
+        );
+        return create_date_by_format(
+            $this->get_app_date_format(), $date_parts, $date_if_unknown
+        );
+    }
+
+    function get_app_time($db_time, $date_if_unknown = "") {
+        $date_parts = parse_date_by_format(
+            $this->get_db_time_format(), $db_time
+        );
+        return create_date_by_format(
+            $this->get_app_time_format(), $date_parts, $date_if_unknown
+        );
+    }
+
+    function get_db_datetime($app_datetime, $date_if_unknown = "0000-00-00 00:00:00") {
+        $date_parts = parse_date_by_format(
+            $this->get_app_datetime_format(), $app_datetime
+        );
+        return create_date_by_format(
+            $this->get_db_datetime_format(), $date_parts, $date_if_unknown
+        );
+    }
+
+    function get_db_date($app_date, $date_if_unknown = "0000-00-00") {
+        $date_parts = parse_date_by_format(
+            $this->get_app_date_format(), $app_date
+        );
+        return create_date_by_format(
+            $this->get_db_date_format(), $date_parts, $date_if_unknown
+        );
+    }
+
+    function get_db_time($app_time, $date_if_unknown = "00:00:00") {
+        $date_parts = parse_date_by_format(
+            $this->get_app_time_format(), $app_time
+        );
+        return create_date_by_format(
+            $this->get_db_time_format(), $date_parts, $date_if_unknown
+        );
+    }
+//    
+    function get_db_now_datetime() {
+        $date_parts = get_date_parts_from_timestamp(time());
+        return create_date_by_format(
+            $this->get_db_datetime_format(), $date_parts, ""
+        );
+    }
+
+    function get_db_now_date() {
+        $date_parts = get_date_parts_from_timestamp(time());
+        return create_date_by_format(
+            $this->get_db_date_format(), $date_parts, ""
+        );
+    }
+//
+    function get_timestamp_from_db_datetime($db_datetime) {
+        return get_timestamp_from_date_parts(
+            parse_date_by_format(
+                $this->get_db_datetime_format(), $db_datetime
+            )
+        );
+    }
+//
+    function get_timestamp_from_db_date($db_date) {
+        return get_timestamp_from_date_parts(
+            parse_date_by_format(
+                $this->get_db_date_format(), $db_date
+            )
+        );
+    }
+//
+    function get_app_integer_value($php_integer_value) {
+        return format_integer_value($php_integer_value, ",");
+    }
+
+    function get_php_integer_value($app_integer_value) {
+        $result = str_replace(",", "", $app_integer_value);
+        return intval($result);
+    }
+
+    function get_app_double_value($php_double_value, $decimals) {
+        return format_double_value($php_double_value, $decimals, ".", ",");
+    }
+
+    function get_php_double_value($app_double_value) {
+        $result = str_replace(",", "", $app_double_value);
+        return doubleval($result);
+    }
+
+    function get_app_currency_value($php_double_value, $decimals) {
+        return $this->get_app_double_value($php_double_value, $decimals);
+    }
+
+    function get_app_currency_with_sign_value(
+        $php_double_value, $decimals = 2, $currency_sign = null, $sign_at_start = null
+    ) {
+        if (is_null($currency_sign)) {
+            $currency_sign = $this->get_currency_sign();
+        }
+        if (is_null($sign_at_start)) {
+            $sign_at_start = $this->is_currency_sign_at_start();
+        }
+        $formatted_currency_value = $this->get_app_currency_value($php_double_value, $decimals);
+        return ($sign_at_start) ?
+            "{$currency_sign}{$formatted_currency_value}" :
+            "{$formatted_currency_value}{$currency_sign}";
+    }
+
+    function get_currency_sign() {
+        return "\xE2\x82\xAC ";
+    }
+
+    function is_currency_sign_at_start() {
+        return true;
+    }
+//
     function get_message($name) {
         return $this->messages->get_value($name);
     }

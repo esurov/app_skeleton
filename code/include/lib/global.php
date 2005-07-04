@@ -63,7 +63,7 @@ function if_null($variable, $value) {
 }
 
 function if_not_null($variable, $value) {
-    return !is_null($variable) ? $value : $variable;
+    return !is_null($variable) ? $value : null;
 }
 
 function unset_array_value_if_exists($value, &$values) {

@@ -12,7 +12,7 @@ class NewsArticle extends CustomDbObject {
         $this->insert_field(array(
             "field" => "created",
             "type" => "date",
-            "value" => $this->get_db_now_date(),
+            "value" => $this->app->get_db_now_date(),
             "index" => "index",
         ));
 
