@@ -47,9 +47,9 @@ class TestApp extends CustomApp {
 
     function get_news_articles_xml() {
         $xml_page = $this->print_many_objects_list(array(
+            "obj_name" => "news_article",
             "templates_dir" => "news_article/xml",
             "templates_ext" => "xml",
-            "obj_name" => "news_article",
             "query_ex" => array(
                 "order_by" => "created DESC, id DESC"
             ),
@@ -61,8 +61,8 @@ class TestApp extends CustomApp {
 //  Print list with specific to context1 template variables
     function pg_view_examples_in_context1() {
         $this->print_many_objects_list_page(array(
-            "templates_dir" => "_example/list_context1",
             "obj_name" => "_example",
+            "templates_dir" => "_example/list_context1",
             "context" => "context1",
             "custom_params" => array(
                 "param1" => "param1_value",
@@ -73,8 +73,8 @@ class TestApp extends CustomApp {
 
     function pg_view_examples_in_context2() {
         $this->print_many_objects_list_page(array(
-            "templates_dir" => "_example/list_context2",
             "obj_name" => "_example",
+            "templates_dir" => "_example/list_context2",
             "context" => "context2",
         ));
     }
@@ -84,9 +84,9 @@ class TestApp extends CustomApp {
             "order_by" => "created DESC",
         ));
         $this->print_many_objects_list(array(
+            "obj_name" => "_example",
             "templates_dir" => "_example/list_as_objects",
             "template_var" => "body",
-            "obj_name" => "_example",
         ));
     }
 

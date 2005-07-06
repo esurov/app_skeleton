@@ -27,7 +27,7 @@ class CustomApp extends App {
     }
 
     function drop_pager() {
-        $this->pager = new Pager($this, 10000, 10000);
+        $this->pager->n_rows_per_page = 10000;
     }
 
     function create_html_page_response_body() {

@@ -100,9 +100,8 @@ class App {
     }
 
     function create_pager() {
-        $default_rows = $this->config->get_value("{$this->app_name}_default_rows", 20);
-        $max_rows = $this->config->get_value("{$this->app_name}_max_rows", 20);
-        $this->pager = new Pager($this, $default_rows, $max_rows);
+        $n_rows_per_page = $this->config->get_value("{$this->app_name}_rows_per_page", 20);
+        $this->pager = new Pager($this, $n_rows_per_page);
     }
 
     function create_email_sender() {
@@ -687,13 +686,12 @@ class App {
         } else {
             $this->pager->set_total_rows($n);
             $this->pager->read();
-
             if ($query->limit == "") {
                 $query->expand(array(
                     "limit" => $this->pager->get_limit_clause(),
                 ));
             }
-            $objects = null; // use query to get objects
+            $objects = null; // use constructed query to get objects list
         }
 
         $this->print_many_objects_list(array(
@@ -701,8 +699,8 @@ class App {
             "query" => $query,
             "templates_dir" => $templates_dir,
             "templates_ext" => $templates_ext,
-            "context" => $context,
             "template_var" => "{$obj_name}_list",
+            "context" => $context,
             "objects" => $objects,
             "custom_params" => $custom_params,
         ));
@@ -710,8 +708,9 @@ class App {
         if ($n > 0) {
             $pager_suburl = "?{$action_where_order_by_suburl}";
             $this->page->assign(array(
-                "nav_str" => $this->pager->get_pages_navig($pager_suburl),
-                "simple_nav_str" => $this->pager->get_simple_navig($pager_suburl),
+                "simple_nav_str" => $this->pager->get_simple_nav_str($pager_suburl),
+                "nav_str" => $this->pager->get_pages_nav_str($pager_suburl),
+                "total" => $obj->get_quantity_str($n),
             ));
         }
 
@@ -743,7 +742,7 @@ class App {
 
             $query = get_param_value($params, "query", $obj->get_select_query());
             $query_ex = get_param_value($params, "query_ex", array());
-
+            
             $query->expand($query_ex);
             $res = $this->db->run_select_query($query);
             $n = $res->get_num_rows();
@@ -785,8 +784,6 @@ class App {
                     "{$templates_dir}/list_item.{$templates_ext}", "{$obj_name}_items"
                 );
             }
-
-            $this->page->assign("total", $obj->get_quantity_str($this->pager->n_min));
 
             return $this->page->parse_file_new(
                 "{$templates_dir}/list_items.{$templates_ext}", $template_var
