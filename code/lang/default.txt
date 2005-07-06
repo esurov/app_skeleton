@@ -21,4 +21,4 @@ page_title_edit_news_article = Modifica notizia
 news_article_added = Aggiunta nuova notizia
 news_article_updated = Notizia è stata modificata
 news_article_deleted = Notizia è stata eliminata
-news_article_title_empty = !!Title empty
+news_article_title_empty = Titolo assente
