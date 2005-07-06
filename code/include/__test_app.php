@@ -15,7 +15,7 @@ class TestApp extends CustomApp {
 
             "pg_view_examples_in_context1" => $e,
             "pg_view_examples_in_context2" => $e,
-            "pg_view_all_examples_in_context1_as_objects" => $e,
+            "pg_view_all_examples_as_objects" => $e,
 
             "print_one_example" => $e,
         );
@@ -50,7 +50,9 @@ class TestApp extends CustomApp {
             "templates_dir" => "news_article/xml",
             "templates_ext" => "xml",
             "obj_name" => "news_article",
-            "default_order_by" => array("created desc", "id desc"),
+            "query_ex" => array(
+                "order_by" => "created DESC, id DESC"
+            ),
         ));
         $this->create_xml_page_response($xml_page);
     }
@@ -77,14 +79,15 @@ class TestApp extends CustomApp {
         ));
     }
 
-    function pg_view_all_examples_in_context1_as_objects() {
+    function pg_view_all_examples_as_objects() {
         $examples = $this->fetch_db_objects_list("_example", array(
             "order_by" => "created DESC",
         ));
-
-        foreach ($examples as $example) {
-            var_dump($example);
-        }
+        $this->print_many_objects_list(array(
+            "templates_dir" => "_example/list_as_objects",
+            "template_var" => "body",
+            "obj_name" => "_example",
+        ));
     }
 
     function print_one_example() {
@@ -97,6 +100,7 @@ class TestApp extends CustomApp {
         );
         $example->field_currency = 99999999.99;
         $example->save();
+        exit;
     }
 }
 

@@ -320,7 +320,7 @@ class Example extends CustomDbObject {
         $h = array();
 
         // This template variable is extension to default printed variables for all contexts
-//        $h["_example_field_double_currency"] = format_currency_with_sign($this->field_double);
+        $h["_example_field_double_decorated"] = "!!" . $h1["_example_field_double"] . "!!";
 
         // Context handling
         switch ($this->print_params["context"]) {

@@ -727,22 +727,24 @@ class App {
         if (is_null($obj_name)) {
             die("No obj_name in print_many_objects_list()");
         }
-        $obj = $this->create_db_object($obj_name);
-
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
         $templates_ext = get_param_value($params, "templates_ext", "html");
         $context = get_param_value($params, "context", "");
         $template_var = get_param_value($params, "template_var", null);
-        $query = get_param_value($params, "query", $obj->get_select_query());
-        $query_ex = get_param_value($params, "query_ex", array());
-        $objects = get_param_value($params, "objects", null);
         $custom_params = get_param_value($params, "custom_params", array());
 
+        $objects = get_param_value($params, "objects", null);
         $objects_passed = !is_null($objects);
 
         if ($objects_passed) {
             $n = count($objects);
         } else {
+            $obj = $this->create_db_object($obj_name);
+
+            $query = get_param_value($params, "query", $obj->get_select_query());
+            $query_ex = get_param_value($params, "query_ex", array());
+
+            $query->expand($query_ex);
             $res = $this->db->run_select_query($query);
             $n = $res->get_num_rows();
         }
