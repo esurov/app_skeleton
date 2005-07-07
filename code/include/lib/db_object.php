@@ -659,7 +659,11 @@ class DbObject {
                 "ENUM('{$enum_values_expression}')";
             break;
         case "varchar":
-            $type_expression = "VARCHAR({$field_info['width']})";
+            if ($field_info["width"] <= 3) {
+                $type_expression = "CHAR({$field_info['width']})";
+            } else {
+                $type_expression = "VARCHAR({$field_info['width']})";
+            }
             break;
         case "text":
             $type_expression = "LONGTEXT";
