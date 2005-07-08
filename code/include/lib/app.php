@@ -817,7 +817,7 @@ class App {
         $this->page->parse_file_new("{$templates_dir}/view_info.html", "{$obj_name}_info");
 
         $this->print_object_view_page_title($obj);
-        $this->page->parse_file_new("{$templates_dir}/view.html", $template_var);
+        return $this->page->parse_file_new("{$templates_dir}/view.html", $template_var);
     }
 //
     function print_object_edit_page($params) {
@@ -846,7 +846,7 @@ class App {
         $this->page->parse_file_new("{$templates_dir}/edit_form.html", "{$obj_name}_form");
 
         $this->print_object_edit_page_title($obj);
-        $this->page->parse_file_new("{$templates_dir}/edit.html", $template_var);
+        return $this->page->parse_file_new("{$templates_dir}/edit.html", $template_var);
     }
 //
     function delete_object($params = array()) {

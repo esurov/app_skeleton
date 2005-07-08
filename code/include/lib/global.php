@@ -497,4 +497,18 @@ function get_gmt_str_from_timestamp($timestamp) {
     return "{$gmt_str} GMT";
 }
 
+if (!function_exists("file_put_contents")) {
+
+function file_put_contents($filename, $content, $should_append = false) {
+    $fp = fopen($filename, ($should_append) ? "a+" : "w+");
+    if (!$fp) {
+        return false;
+    }
+    $result = fwrite($fp, $content);
+    fclose($fp);
+    return ($result !== false);
+}
+
+}
+
 ?>
