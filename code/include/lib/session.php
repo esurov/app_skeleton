@@ -45,6 +45,28 @@ class Session {
     function destroy_login_state() {
         Session::unset_param("login_state");
     }
+
+    function save_request_data() {
+        Session::set_param("auto_login_get_vars", $_GET);
+        Session::set_param("auto_login_post_vars", $_POST);
+    }
+
+    function restore_request_data() {
+        $_GET = Session::get_param("auto_login_get_vars");
+        $_POST = Session::get_param("auto_login_post_vars");
+        Session::destroy_request_data();
+    }
+
+    function has_request_data() {
+        return
+            Session::has_param("auto_login_get_vars") &&
+            Session::has_param("auto_login_post_vars");
+    }
+
+    function destroy_request_data() {
+        Session::unset_param("auto_login_get_vars");
+        Session::unset_param("auto_login_post_vars");
+    }
 }
 
 class SessionLoginState {
