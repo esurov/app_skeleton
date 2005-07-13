@@ -41,7 +41,8 @@ class AdminApp extends CustomApp {
         ));
     }
 
-    function pg_edit_news_article($news_article = null) {
+    function pg_edit_news_article() {
+        $news_article = get_param_value($this->action_params, "news_article", null);
         $this->print_object_edit_page(array(
             "obj" => $news_article,
             "obj_name" => "news_article",
@@ -57,7 +58,9 @@ class AdminApp extends CustomApp {
 
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
-            $this->pg_edit_news_article($news_article);
+            $this->run_action("pg_edit_news_article", array(
+                "news_article" => $news_article,
+            ));
         } else {
             if (Image::was_uploaded()) {
                 $uploaded_file_info = $_FILES["image_file"];

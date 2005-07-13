@@ -8,7 +8,7 @@ class CustomApp extends App {
         parent::App($app_name, $tables);
     }
 
-    function run_action() {
+    function run_action($action_name = null, $action_params = array()) {
         $this->popup = intval(param("popup"));
         $this->report = intval(param("report"));
 
@@ -23,7 +23,7 @@ class CustomApp extends App {
         }
         $this->print_lang_menu();
 
-        parent::run_action();
+        parent::run_action($action_name, $action_params);
     }
 
     function drop_pager() {

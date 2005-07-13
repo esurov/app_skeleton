@@ -14,6 +14,7 @@ class App {
     var $actions;
 
     var $action;
+    var $action_params;
     var $page_template_name;
     var $response;
 
@@ -57,6 +58,8 @@ class App {
         $this->init_lang_dependent_data();
         $this->create_email_sender();
 
+        $action_params = array();
+        
         // One action defined, but nobody can access it:
         $actions = array(
             "pg_index" => array(
@@ -173,8 +176,12 @@ class App {
         return "everyone";
     }
 
-    function run_action() {
+    function run_action($action_name = null, $action_params = array()) {
         // Run action and return its response
+        if (!is_null($action_name)) {
+            $this->action = $action_name;
+        }
+        $this->action_params = $action_params;
 
         $page_name = trim(param("page"));
         $this->page->assign(array(
@@ -588,6 +595,7 @@ class App {
             return;
         }
         $avail_langs = $this->get_avail_langs();
+        $this->page->assign("lang_menu_items", "");
         foreach ($avail_langs as $lang) {
             if ($lang == $this->lang) {
                 $this->page->assign(array(
@@ -606,7 +614,7 @@ class App {
                 $this->page->parse_file("_lang_menu_item.html", "lang_menu_items");
             }
         }
-        $this->page->parse_file("_lang_menu.html", "lang_menu");
+        $this->page->parse_file_new("_lang_menu.html", "lang_menu");
     }
 
 //  Object functions
@@ -714,10 +722,6 @@ class App {
             ));
         }
 
-        if ($template_var == "body") {
-            $this->print_many_objects_list_page_title($obj);
-        }
-
         return $this->page->parse_file("{$templates_dir}/list.{$templates_ext}", $template_var);
     }
 //
@@ -815,8 +819,6 @@ class App {
             "custom_params" => $custom_params,
         ));
         $this->page->parse_file_new("{$templates_dir}/view_info.html", "{$obj_name}_info");
-
-        $this->print_object_view_page_title($obj);
         return $this->page->parse_file_new("{$templates_dir}/view.html", $template_var);
     }
 //
@@ -844,8 +846,7 @@ class App {
             "custom_params" => $custom_params,
         ));
         $this->page->parse_file_new("{$templates_dir}/edit_form.html", "{$obj_name}_form");
-
-        $this->print_object_edit_page_title($obj);
+        $this->print_object_edit_page_titles($obj);
         return $this->page->parse_file_new("{$templates_dir}/edit.html", $template_var);
     }
 //
@@ -885,48 +886,45 @@ class App {
     }
 //
 //  Page titles and status messages
-    function print_page_titles($page_name) {
-        if ($page_name == "") {
-            $title_resource = "page_title_{$this->action}";
-        } else {
-            $title_resource = "page_title_{$this->action}_{$page_name}";
-        }
-        $this->print_page_title($title_resource);
+    function print_page_titles($page_name = "") {
+        $this->print_head_and_page_title(
+            $this->create_page_title_resource($page_name)
+        );
     }
 
-    function print_page_title($resource) {
-        $resource_text = $this->get_message($resource);
-        $this->page->assign(array(
-            "page_title" => $resource_text,
-            "page_title_resource" => $resource,
-        ));
+    function create_page_title_resource($page_name = "") {
+        if ($page_name == "") {
+            $resource = "page_title_{$this->action}";
+        } else {
+            $resource = "page_title_{$this->action}_{$page_name}";
+        }
+        return $resource;
+    }
+
+    function print_head_and_page_title($resource) {
+        $this->page->assign("page_title_resource", $resource);
+        $this->print_page_title($resource);
         $this->print_head_page_title($resource);
     }
 
+    function print_page_title($resource) {
+        $this->page->assign("page_title", $this->get_message($resource));
+    }
+
     function print_head_page_title($resource) {
-        $resource_text = if_null(
-            $this->get_message("head_{$resource}"),
-            $this->get_message($resource)
-        );
+        $resource_text = $this->get_message("head_{$resource}");
+        if (is_null($resource_text)) {
+            $resource_text = $this->get_message($resource);
+        }
         $this->page->assign("head_page_title", $resource_text);
     }
 
-    function print_many_objects_list_page_title($obj) {
-        $resource = $obj->get_plural_resource_name();
-        $this->print_page_title("page_title_view_{$resource}");
-    }
-
-    function print_object_view_page_title($obj) {
-        $resource = $obj->get_singular_resource_name();
-        $this->print_page_title("page_title_view_{$resource}");
-    }
-
-    function print_object_edit_page_title($obj) {
-        $resource = $obj->get_singular_resource_name();
-        $resource = ($obj->is_definite()) ?
-            "page_title_edit_{$resource}" :
-            "page_title_add_{$resource}";
-        $this->print_page_title($resource);
+    function print_object_edit_page_titles($obj) {
+        $resource = $this->create_page_title_resource();
+        if (!$obj->is_definite()) {
+            $resource .= "_new";
+        }
+        $this->print_head_and_page_title($resource);
     }
 
     function print_status_message($message) {

@@ -9,8 +9,6 @@ class UserApp extends CustomApp {
         $e = array("valid_users" => array("everyone"));
 
         $this->actions = array(
-            "test" => $e,
-
             "change_lang" => $e,
             "pg_static" => $e,
             "get_image" => $e,

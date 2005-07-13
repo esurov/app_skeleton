@@ -12,10 +12,10 @@ initial_data_inserted = Initial data have been inserted!
 admin_auth_realm = !!AppSkeleton area di amministrazione
 admin_area_head_title = !!AppSkeleton area di amministrazione
 
-page_title_view_news_articles = Visualizza notizie
-page_title_view_news_article = Visualizza notizia
-page_title_add_news_article = Aggiungi notizia
-page_title_edit_news_article = Modifica notizia
+page_title_pg_view_news_articles = Visualizza notizie
+page_title_pg_view_news_article = Visualizza notizia
+page_title_pg_edit_news_article_new = Aggiungi notizia
+page_title_pg_edit_news_article = Modifica notizia
 
 ["status messages (admin area)"]
 news_article_added = Aggiunta nuova notizia
