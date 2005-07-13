@@ -20,7 +20,7 @@ class Session {
     }
 
     function has_param($name) {
-        return isset($_SESSION[$name]);
+        return array_key_exists($name, $_SESSION);
     }
 
     function clear() {
@@ -83,11 +83,11 @@ class SessionLoginState {
     }
 
     function is_expired() {
-        $total_time_elapsed = time() - $this->state_params["time_created"];
         $idle_time_elapsed = time() - $this->state_params["time_updated"];
+        $total_time_elapsed = time() - $this->state_params["time_created"];
 
         $is_expired_by_idle_timeout =
-            $total_time_elapsed > $this->state_params["idle_timeout"];
+            $idle_time_elapsed > $this->state_params["idle_timeout"];
         $is_expired_by_max_timeout =
             $total_time_elapsed > $this->state_params["max_timeout"];
         $is_expired = ($is_expired_by_idle_timeout || $is_expired_by_max_timeout);

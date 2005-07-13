@@ -296,12 +296,14 @@ class DbObject {
             case "foreign_key":
                 $initial_field_value = 0;
                 $width = get_param_value($field_info, "width", 10);
-                $default_input = array(
-                    "type" => "text",
-                    "values" => null,
-                );
-                $input = get_param_value($field_info, "input", $default_input);
-
+                $input = get_param_value($field_info, "input", array());
+                if (!isset($input["type"])) {
+                    $input["type"] = "text";
+                }
+                if (!isset($input["values"])) {
+                    $input["values"] = null;
+                }
+                
                 $this->insert_index(array(
                     "type" => "index",
                     "fields" => $field_name,
@@ -344,24 +346,28 @@ class DbObject {
             case "varchar":
                 $width = get_param_value($field_info, "width", 255);
                 $initial_field_value = get_param_value($field_info, "value", "");
-                $default_input = array(
-                    "type" => "text",
-                    "type_attrs" => array(
+                $input = get_param_value($field_info, "input", array());
+                if (!isset($input["type"])) {
+                    $input["type"] = "text";
+                }
+                if (!isset($input["type_attrs"])) {
+                    $input["type_attrs"] = array(
                         "maxlength" => $width,
-                    ),
-                );
-                $input = get_param_value($field_info, "input", $default_input);
+                    );
+                }
                 break;
             case "text":
                 $initial_field_value = get_param_value($field_info, "value", "");
-                $default_input = array(
-                    "type" => "textarea",
-                    "type_attrs" => array(
+                $input = get_param_value($field_info, "input", array());
+                if (!isset($input["type"])) {
+                    $input["type"] = "textarea";
+                }
+                if (!isset($input["type_attrs"])) {
+                    $input["type_attrs"] = array(
                         "cols" => 60,
                         "rows" => 9,
-                    ),
-                );
-                $input = get_param_value($field_info, "input", $default_input);
+                    );
+                }
                 break;
             case "blob":
                 $initial_field_value = get_param_value($field_info, "value", "");
@@ -1939,10 +1945,11 @@ class DbObject {
 
         switch ($input_type) {
         case "text":
+        case "password":
             $maxlength = $input_type_attrs["maxlength"];
             $attrs = "maxlength=\"{$maxlength}\"";
             $h["{$template_var}_input"] =
-                print_html_input("text", $template_var, $str_value, $attrs);
+                print_html_input($input_type, $template_var, $str_value, $attrs);
             break;
         default:
             die(
@@ -2137,7 +2144,7 @@ class DbObject {
     }
 
 //  Objects validation for store/update and validation helpers
-    function validate() {
+    function validate($old_obj = null, $field_names_to_validate = null) {
         return array();
     }
 
@@ -2158,7 +2165,7 @@ class DbObject {
     }
 
     function validate_email_field($field_name) {
-        return is_value_email($this->{field_name});
+        return is_value_email($this->{$field_name});
     }
 
     function validate_unique_field($field_name, $old_obj) {
@@ -2168,7 +2175,7 @@ class DbObject {
             $field_names = array($field_name);
         }
 
-        $was_definite = $old_obj->is_definite();
+        $was_definite = is_null($old_obj) ? false : $old_obj->is_definite();
         $multilingual_field_names = $this->get_multilingual_field_names($field_names);
 
         if (count($multilingual_field_names) == 0) {
@@ -2223,6 +2230,12 @@ class DbObject {
         return join(" AND ", $where_expressions);
     }
 
+    function should_validate_field($field_name, $field_names_to_validate) {
+        return (
+            is_null($field_names_to_validate) ||
+            in_array($field_name, $field_names_to_validate)
+        );
+    }
 //
     // check reference integrity
     function check_restrict_relations_before_delete() {

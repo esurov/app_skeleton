@@ -119,8 +119,8 @@ class App {
     }
 //
     function run() {
-        $this->create_action_name();
         $this->create_current_user();
+        $this->create_action_name();
 
         // Ensure that current user is allowed to run this action
         // Check user permission level
@@ -144,6 +144,9 @@ class App {
         $this->response->send();
     }
     
+    function create_current_user() {
+    }
+
     function create_action_name() {
         $action_name = trim(param("action"));
         $this->log->write("App", "Validating action '{$action_name}'", 3);
@@ -164,10 +167,7 @@ class App {
         return "pg_index";
     }
 
-    function create_current_user() {
-    }
-
-    function get_user_access_level() {
+    function get_user_access_level($user = null) {
         // Return user access level (string) for selecting allowed actions
         // for previously created user by function create_current_user()
         return "everyone";
