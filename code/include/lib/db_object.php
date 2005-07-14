@@ -1474,7 +1474,7 @@ class DbObject {
         if (is_null($param_value)) {
             return null;
         }
-        return ($this->get_php_integer_value($param_value) > 0) ? 1 : 0;
+        return ($this->app->get_php_integer_value($param_value) > 0) ? 1 : 0;
     }
 
     function get_enum_field_value($enum_value, $enum_values) {
