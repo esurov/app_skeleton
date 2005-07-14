@@ -43,7 +43,7 @@ class SelectQuery {
             $this->select .= ", " . $query_ex["select"];
         }
         if (isset($query_ex["from"])) {
-            $this->from .= $query_ex["from"];
+            $this->from .= " " . $query_ex["from"];
         }
         if (isset($query_ex["where"])) {
             $this->where .= " AND " . $query_ex["where"];
