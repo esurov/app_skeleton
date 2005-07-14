@@ -1844,7 +1844,7 @@ class DbObject {
                         $values_info["data"]["begin_value_caption_pair"] +
                         $value_caption_pairs;
                 }
-                if (isset($values_info["end_value_caption_pair"])) {
+                if (isset($values_info["data"]["end_value_caption_pair"])) {
                     $value_caption_pairs =
                         $value_caption_pairs +
                         $values_info["data"]["end_value_caption_pair"];
