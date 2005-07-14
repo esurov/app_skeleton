@@ -577,12 +577,27 @@ class App {
                     $menu_action == $this->action ||
                     $menu_action == $this->action . "_" . param("page")
                 ) {
-                    $this->page->parse_file("_menu_{$menu_prefix}item_current.html", "menu_items");
+                    $current_item_template_name = "_menu_{$menu_prefix}item_current.html";
+                    if ($this->page->is_template_exist($current_item_template_name)) {
+                        $this->page->parse_file($current_item_template_name, "menu_items");
+                    } else {
+                        $this->page->parse_file("_menu_item_current.html", "menu_items");
+                    }
                 } else {
-                    $this->page->parse_file("_menu_{$menu_prefix}item.html", "menu_items");
+                    $item_template_name = "_menu_{$menu_prefix}item.html";
+                    if ($this->page->is_template_exist($item_template_name)) {
+                        $this->page->parse_file($item_template_name, "menu_items");
+                    } else {
+                        $this->page->parse_file("_menu_item.html", "menu_items");
+                    }
                 }
                 if ($i != count($menu_items)) {
-                    $this->page->parse_file("_menu_{$menu_prefix}item_delimiter.html", "menu_items");
+                    $delimiter_template_name = "_menu_{$menu_prefix}item_delimiter.html";
+                    if ($this->page->is_template_exist($delimiter_template_name)) {
+                        $this->page->parse_file($delimiter_template_name, "menu_items");
+                    } else {
+                        $this->page->parse_file("_menu_item_delimiter.html", "menu_items");
+                    }
                 }
             }
         }
