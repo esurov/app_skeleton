@@ -48,14 +48,26 @@ class SelectQuery {
         if (isset($query_ex["where"])) {
             $this->where .= " AND " . $query_ex["where"];
         }
-        if (isset($query_ex["group_by"]) && !empty($this->group_by)) {
-            $this->group_by .= " " . $query_ex["group_by"];
+        if (isset($query_ex["group_by"])) {
+            if (empty($this->group_by)) {
+                $this->group_by = $query_ex["group_by"];
+            } else {
+                $this->group_by .= ", " . $query_ex["group_by"];    
+            }
         }
-        if (isset($query_ex["having"]) && !empty($this->having)) {
-            $this->having .= " AND " . $query_ex["having"];
+        if (isset($query_ex["having"])) {
+            if (empty($this->having)) {
+                $this->having = $query_ex["having"];
+            } else {
+                $this->having .= " AND " . $query_ex["having"];
+            }
         }
-        if (isset($query_ex["order_by"]) && !empty($this->order_by)) {
-            $this->order_by .= ", " . $query_ex["order_by"];
+        if (isset($query_ex["order_by"])) {
+            if (empty($this->order_by)) {
+                $this->order_by = $query_ex["order_by"];
+            } else {
+                $this->order_by .= ", " . $query_ex["order_by"];
+            }
         }
         if (isset($query_ex["limit"])) {
             $this->limit = $query_ex["limit"];
