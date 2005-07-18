@@ -216,7 +216,7 @@ function print_html_checkbox($name, $value) {
 
 function print_html_select($name, $value_caption_pairs, $current_value, $attrs = "") {
     if ($attrs != "") {
-        $attrs = " " . $attrs;
+        $attrs = " {$attrs}";
     }
     $select_options = print_html_select_options($value_caption_pairs, $current_value);
     $output =
@@ -232,17 +232,22 @@ function print_html_select_options($value_caption_pairs, $current_value) {
         return "";
     }
 
-    $selected_value = get_selected_value(
-        $value_caption_pairs, $current_value, $current_value
-    );
+    if (is_array($current_value)) {
+        $selected_value = get_multiple_selected_values($value_caption_pairs, $current_values);
+    } else {
+        $selected_value = get_selected_value($value_caption_pairs, $current_value, $current_value);
+    }
 
     $output = "";
     foreach ($value_caption_pairs as $value => $caption) {
-        $output .= print_html_select_option(
-            $value,
-            $caption,
-            ($value == $selected_value) ? " selected" : ""
-        );
+        $selected_str = "";
+        if (
+            (!is_array($selected_value) && $value == $selected_value) ||
+            (is_array($selected_value) && in_array($value, $selected_value))
+        ) {
+            $selected_str = " selected";
+        }
+        $output .= print_html_select_option($value, $caption, $selected_str);
     }
     return $output;
 }
@@ -256,7 +261,7 @@ function print_html_select_option($value, $caption, $selected_str = "") {
 function print_html_radio_group(
     $name, $value_caption_pairs, $current_value, $default_value = null
 ) {
-    if (count($values) == 0) {
+    if (count($value_caption_pairs) == 0) {
         return "";
     }
 
@@ -299,6 +304,17 @@ function get_selected_value($value_caption_pairs, $current_value, $default_value
         $selected_value = $values[0];
     }
     return $selected_value;
+}
+
+function get_multiple_selected_values($value_caption_pairs, $current_values) {
+    $values = array_keys($value_caption_pairs);
+    $selected_values = array();
+    foreach ($current_values as $current_value) {
+        if (in_array($current_value, $values)) {
+            $selected_values[] = $current_value;
+        }
+    }
+    return $selected_values;
 }
 
 function get_db_object_value_caption_pairs($obj_name, $field_name, $query_ex) {

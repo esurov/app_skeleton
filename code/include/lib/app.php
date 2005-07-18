@@ -634,12 +634,17 @@ class App {
 
 //  Object functions
     function print_many_objects_list_page($params = array()) {
+        $obj = get_param_value($params, "obj", null);
         $obj_name = get_param_value($params, "obj_name", null);
-        if (is_null($obj_name)) {
-            die("No obj_name in print_many_objects_list_page()");    
+        if (is_null($obj)) {
+            if (is_null($obj_name)) {
+                die("No obj or obj_name in print_many_objects_list_page()");
+            } else {
+                $obj = $this->create_db_object($obj_name);
+            }
+        } else {
+            $obj_name = $obj->table_name;
         }
-        $obj = $this->create_db_object($obj_name);
-
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
         $templates_ext = get_param_value($params, "templates_ext", "html");
         $context = get_param_value($params, "context", "");
@@ -652,50 +657,49 @@ class App {
 
         $query->expand($query_ex);
 
-        // Read filtering (WHERE) and ordering (ORDER_BY) conditions:
+        // Apply filters to query
         $obj->read_filters();
-        list($actual_where_sql, $actual_having_sql) = $obj->get_filter_sql();
-        $actual_where_params = $obj->get_filters_params();
+        $filters_params = $obj->get_filters_params();
+        $query->expand($obj->get_filters_query_ex());
 
-        list($actual_order_by_sql, $actual_order_by_param) =
-            $obj->read_order_by($default_order_by);
-        // Apply filtering and ordering conditions to query:
-        $query->expand(array(
-            "where" => $actual_where_sql,
-            "order_by" => $actual_order_by_sql,
-            "having" => $actual_having_sql,
-        ));
-
-        // Make sub-URLs with all necessary parameters stored:
-        $action_param = array("action" => $this->action);
+        // Apply ordering to query
+        $obj->read_order_by($default_order_by);
+        $order_by_params = $obj->get_order_by_params();
+        $query->expand($obj->get_order_by_query_ex());
+        
+        // Make sub-URLs with all necessary parameters stored
+        $action_suburl_param = array("action" => $this->action);
         $extra_suburl_params = $this->get_app_extra_suburl_params();
 
         $action_suburl = create_html_suburl(
-            $action_param +
+            $action_suburl_param +
+            $custom_params +
             $extra_suburl_params
         );
                
-        $action_where_suburl = create_html_suburl(
-            $action_param +
-            $actual_where_params +
+        $action_filters_suburl = create_html_suburl(
+            $action_suburl_param +
+            $filters_params +
+            $custom_params +
             $extra_suburl_params
         );
 
-        $action_where_order_by_suburl = create_html_suburl(
-            $action_param +
-            $actual_where_params +
-            $actual_order_by_param +
+        $action_filters_order_by_suburl = create_html_suburl(
+            $action_suburl_param +
+            $filters_params +
+            $order_by_params +
+            $custom_params +
             $extra_suburl_params
         );
 
         $this->page->assign(array(
             "action_suburl" => "?{$action_suburl}",
-            "action_where_suburl" => "?{$action_where_suburl}",
-            "action_where_order_by_suburl" => "?{$action_where_order_by_suburl}",
+            "action_filters_suburl" => "?{$action_filters_suburl}",
+            "action_filters_order_by_suburl" => "?{$action_filters_order_by_suburl}",
         ));
 
         if ($show_filter_form) {
-            $this->page->assign($actual_where_params);
+            $this->page->assign($filters_params);
             $obj->print_filter_form_values();
             $this->page->parse_file_new(
                 "{$templates_dir}/filter_form.{$templates_ext}", "{$obj_name}_filter_form"
@@ -729,7 +733,7 @@ class App {
         ));
 
         if ($n > 0) {
-            $pager_suburl = "?{$action_where_order_by_suburl}";
+            $pager_suburl = "?{$action_filters_order_by_suburl}";
             $this->page->assign(array(
                 "simple_nav_str" => $this->pager->get_simple_nav_str($pager_suburl),
                 "nav_str" => $this->pager->get_pages_nav_str($pager_suburl),
@@ -929,6 +933,7 @@ class App {
     function print_head_page_title($resource) {
         $resource_text = $this->get_message("head_{$resource}");
         if (is_null($resource_text)) {
+            // If have no head_page_title use page_title instead
             $resource_text = $this->get_message($resource);
         }
         $this->page->assign("head_page_title", $resource_text);

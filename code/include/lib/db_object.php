@@ -7,10 +7,11 @@ class DbObject {
     var $table_name;  // Table name (without db specific prefix)
     var $fields;
     var $indexes;
-    var $filters;
     var $select_from;      // FROM clause for SELECT query
 
     var $print_params = array();
+    var $filters;
+    var $order_by;
 
     var $app = null;
 
@@ -564,33 +565,24 @@ class DbObject {
             " ON {$join_condition}";
     }
 //
-    function insert_filter($condition) {
-        // Store all parameters of the table field (column) in hash $fields .
-        // The key of this hash is parameter 'name'.
-
-        $name     = $condition['name'];
-        $relation = $condition['relation'];
-        $this->filters[$name][$relation] = $condition;
+    function insert_filter($filter_info) {
+        if (!isset($filter_info["value"])) {
+            $filter_info["value"] = $this->get_nonset_filter_value($filter_info);
+        }
+        $this->filters[] = $filter_info;
     }
 
-    function set_filter_value($name, $relation, $value) {
-        // Set (default) where condition value.
-
-        if (isset($this->filters[$name][$relation])) {
-            $this->filters[$name][$relation]['value'] = $value;
-
-        } else {
-            die("Non-existent where condition for {$this->table_name}!");
-        };
+    function get_nonset_filter_value($filter_info) {
+        return (isset($filter_info["input"]["values"]["nonset_value"])) ?
+            $filter_info["input"]["values"]["nonset_value"] :
+            "";
     }
-
 //
     function insert_select_from($select_from = null) {
         // Store FROM clause for SELECT query.
-
-        $this->select_from = isset($select_from) ?
-            $select_from :
-            "{%{$this->table_name}_table%} AS {$this->table_name}";
+        $this->select_from = is_null($select_from) ?
+            "{%{$this->table_name}_table%} AS {$this->table_name}" :
+            $select_from;
     }
 
 //  Db tables management functions (create, update, delete)
@@ -1039,319 +1031,6 @@ class DbObject {
     }
 
 //  CGI functions:
-    function read_order_by($default_order_by_fields) {
-        $order_by_fields = param("order_by");
-
-        if (!is_array($default_order_by_fields)) {
-            $default_order_by_fields = array($default_order_by_fields);
-        }
-        
-        if (!is_array($order_by_fields)) {
-            if (is_null($order_by_fields) || trim($order_by_fields) == "") {
-                $order_by_fields = $default_order_by_fields;
-            } else {
-                $order_by_fields = array($order_by_fields);
-            }
-        }
-
-        $field_names = $this->get_field_names();
-        $order_by_sqls = array();
-        $order_by_params = array();
-        foreach ($order_by_fields as $order_by_field) {
-            $order_by_field_parts = explode(" ", $order_by_field, 2);
-            $order_by_field_name = $order_by_field_parts[0];
-            if (!in_array($order_by_field_name, $field_names)) {
-                continue;
-            }
-            $order_by_direction = (isset($order_by_field_parts[1])) ?
-                $order_by_field_parts[1] : "asc";
-            $order_by_direction_sql = ($order_by_direction == "asc") ?
-                "ASC" : "DESC";
-            $order_by_sqls[] = "{$order_by_field_name} {$order_by_direction_sql}";
-            $order_by_params[] = "{$order_by_field_name} {$order_by_direction}";
-        }
-        $order_by_sql = join(", ", $order_by_sqls);
-        $order_by_cgi_param = array(
-            "order_by" => $order_by_params,
-        );
-        return array($order_by_sql, $order_by_cgi_param);
-    }
-
-//    function read_where($fields_to_read = NULL) {
-//        // Return list ($where, $params).
-//        // $where --
-//        //     with 'WHERE' clause, read from CGI and tested to be valid.
-//        // $params --
-//        //     valid read parameters for use in pager-generated links.
-//
-//        $where = "1";
-//        $params = array();
-//
-//        $field_names = isset($fields_to_read) ?
-//            $fields_to_read : $this->get_field_names();
-//
-//        reset($field_names);
-//        while (list($i, $name) = each($field_names)) {
-//            $f = $this->fields[$name];
-//
-//            /*
-//            if (!$f["read"]) {
-//                continue;
-//            }
-//            */
-//
-//            $type  = $f["type"];
-//            $pname = $this->table_name . "_" . $name;
-//
-//            switch($type) {
-//            case "datetime":
-//            case "date":
-//                $less = param("{$pname}_less");
-//                if ($less) {
-//                    $where .= " and $f[select] <= ". qw($less);
-//                    $params["{$pname}_less"] = $less;
-//                }
-//                $greater = param("{$pname}_greater");
-//                if ($greater) {
-//                    $where .= " and $f[select] >= " . qw($greater);
-//                    $params["{$pname}_greater"] = $greater;
-//                }
-//                break;
-//
-//            case "integer":
-//                $less = param("{$pname}_less");
-//                if ($less) {
-//                    $where .= " and $f[select] <= " . intval($less);
-//                    $params["{$pname}_less"] = $less;
-//                }
-//
-//                $greater = param("{$pname}_greater");
-//                if ($greater) {
-//                    $where .= " and $f[select] >= " . intval($greater);
-//                    $params["{$pname}_greater"] = $greater;
-//                }
-//
-//                $equal = param("{$pname}_equal");
-//                if ($equal) {
-//                    $where .= " and $f[select] = " . intval($equal);
-//                    $params["{$pname}_equal"] = $equal;
-//                }
-//
-//                break;
-//
-//            case "double":
-//                $less = param("{$pname}_less");
-//                if ($less) {
-//                    $where .= " and $f[select] <= " . doubleval($less);
-//                    $params["{$pname}_less"] = $less;
-//                }
-//
-//                $greater = param("{$pname}_greater");
-//                if ($greater) {
-//                    $where .= " and $f[select] >= " . doubleval($greater);
-//                    $params["{$pname}_greater"] = $greater;
-//                }
-//
-//                $equal = param("{$pname}_equal");
-//                if ($equal) {
-//                    $where .= " and $f[select] = " . doubleval($equal);
-//                    $params["{$pname}_equal"] = $equal;
-//                }
-//
-//                break;
-//
-//            case "varchar":
-//            case "enum":
-//                $like = param("{$pname}_like");
-//                if ($like != "") {
-//                    $where .= " and $f[select] like " . qw("%$like%");
-//                    $params["{$pname}_like"] = $like;
-//                }
-//
-//                // NB! no 'break' here.
-//
-//                $equal = param("{$pname}_equal");
-//                if ($equal != "") {
-//                    $where .= " and $f[select] = " . qw($equal);
-//                    $params["{$pname}_equal"] = $equal;
-//                }
-//
-//                break;
-//            //default:
-//            }
-//        }
-//
-//        return array($where, $params);
-//    }
-
-    function read_filters($conditions_to_read = NULL) {
-        // Read filters (from filter form).
-        $condition_names = isset($conditions_to_read) ?
-            $conditions_to_read : array_keys($this->filters);
-
-        foreach ($this->filters as $name => $field_conditions) {
-            if (in_array($name, $condition_names)) {
-                foreach ($field_conditions as $relation => $cond) {
-                    $pname = "{$this->table_name}_{$name}_{$relation}";
-                    $value = param($pname);
-                    if (!is_null($value)) {
-                        $this->filters[$name][$relation]["value"] = $value;
-                    }
-                }
-            }
-        }
-    }
-
-
-    function get_filter_sql() {
-        // Read where conditions (from search form).
-
-        $where_str = "1";
-        $havings = array();
-
-        foreach ($this->filters as $name => $field_conditions) {
-            $type   = $this->fields[$name]["type"];
-            $select = $this->fields[$name]["select"];
-
-            foreach ($field_conditions as $relation => $cond) {
-                $nonset_value =
-                    (isset($cond["input"]["nonset_id"])) ? $cond["input"]["nonset_id"] : "";
-
-                if (!isset($cond["value"]) || $cond["value"] == $nonset_value) {
-                    continue;
-                }
-                $value = $cond["value"];
-
-                switch ($type) {
-                case "integer":
-                    if (is_array($value)) {
-                        $value_str = array();
-                        foreach($value as $val) {
-                            $value_str[] = intval($val);
-                        }
-                    } else {
-                        $value_str = intval($value);
-                    }
-                    break;
-
-                case "double":
-                    if (is_array($value)) {
-                        $value_str = array();
-                        foreach($value as $val) {
-                            $value_str[] = double($val);
-                        }
-                    } else {
-                        $value_str = double($value);
-                    }
-                    break;
-
-                case "currency":
-                    if (is_array($value)) {
-                        $value_str = array();
-                        foreach($value as $val) {
-                            $value_str[] = double($val);
-                        }
-                    } else {
-                        $value_str = double($value);
-                    }
-                    break;
-
-                case "date":
-                    if (is_array($value)) {
-                        $value_str = array();
-                        foreach($value as $val) {
-                            $value_str[] = qw($this->app->get_db_date($val));
-                        }
-                    } else {
-                        $value_str = qw($this->app->get_db_date($val));
-                    }
-                    break;
-
-                default:
-                    if (is_array($value)) {
-                        $value_str = array();
-                        foreach($value as $val) {
-                            $value_str[] = qw($val);
-                        }
-                    } else {
-                        $value_str = qw($value);
-                    }
-                }
-
-                switch($relation) {
-                case "less":
-                    $where_str .= " and $select <= $value_str";
-                    break;
-
-                case "greater":
-                    $where_str .= " and $select >= $value_str";
-                    break;
-
-                case "equal":
-
-                    if (is_array($value)) {
-                        $where_arr = array();
-                        foreach($value as $val) {
-                            $where_arr[] = "$select = $val";
-                        }
-                        $where_str .= " and (" . join(" or ", $where_arr) . ")";
-                    } else {
-                        $where_str .= " and $select = $value_str";
-                    }
-
-                    break;
-
-                case "like":
-                    $where_str .= " and $select LIKE CONCAT('%', $value_str, '%')";
-                    //!use lqw here!
-                    break;
-
-                case "having_equal":
-                    $havings[] = "({$select} = {$value_str})";
-                    break;
-
-                case "having_less":
-                    $havings[] = "({$select} <= {$value_str})";
-                    break;
-
-                case "having_greater":
-                    $havings[] = "({$select} >= {$value_str})";
-                    break;
-
-                default:
-                    if (is_array($value)) {
-                        $where_arr = array();
-                        foreach($value_str as $val) {
-                            $where_arr[] = "$select = $val";
-                        }
-                        $where_str .= " and (" . join(" or ", $where_arr) . ")";
-                    } else {
-                        $where_str .= " and $select = $value_str";
-                    }
-
-                    break;
-                }
-            }
-        }
-        $having_str = join(" and ", $havings);
-        return array($where_str, $having_str);
-    }
-
-
-    function get_filters_params() {
-        $params = array();
-        foreach ($this->filters as $name => $field_conditions) {
-            foreach ($field_conditions as $relation => $cond) {
-                if (isset($cond["value"])) {
-                    $pname = "{$this->table_name}_{$name}_{$relation}";
-                    $params[$pname] = $cond["value"];
-                }
-            }
-        }
-        return $params;
-    }
-
-//
     function read(
         $field_names_to_read = null,
         $field_names_to_not_read = null
@@ -1471,10 +1150,10 @@ class DbObject {
     }
 
     function get_boolean_field_value($param_value) {
-        if (is_null($param_value)) {
-            return 0;
-        } else {
+        if (intval($param_value) == 1) {
             return 1;
+        } else {
+            return 0;
         }
     }
 
@@ -1530,6 +1209,183 @@ class DbObject {
             return null;
         }
         return $this->app->get_db_time($app_time);
+    }
+//
+    function read_filters() {
+        foreach ($this->filters as $i => $filter_info) {
+            $filter_name = $filter_info["name"];
+            $filter_relation = $filter_info["relation"];
+            
+            $param_value = param("{$this->table_name}_{$filter_name}_{$filter_relation}");
+            if (is_null($param_value)) {
+                $this->filters[$i]["value"] = $this->get_nonset_filter_value($filter_info);
+            } else {
+                $this->filters[$i]["value"] = $param_value;
+            }
+        }
+    }
+
+    function get_filters_query_ex() {
+        $wheres = array();
+        $havings = array();
+        foreach ($this->filters as $filter_info) {
+            // If filter has its own field type and select - use them
+            // (useful for filters on expanded resultsets)
+            // else take it from corresponding field with the same name
+            $filter_name = $filter_info["name"];
+            if (isset($filter_info["type"])) {
+                $field_info = array();
+                $field_type = $filter_info["type"];
+                $field_select = $filter_info["select"];
+            } else {
+                $field_info = $this->fields[$filter_name];
+                $field_type = $field_info["type"];
+                $field_select = $field_info["select"];
+            }
+            
+            $filter_value = $filter_info["value"];
+            $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
+            if ($filter_value == $nonset_filter_value) {
+                continue;
+            }
+
+            switch ($field_type) {
+            case "primary_key":
+            case "foreign_key":
+                $db_value = $this->get_key_field_value($filter_value);
+                break;
+            case "integer":
+                $db_value = $this->get_integer_field_value($filter_value);
+                break;
+            case "double":
+                $db_value = $this->get_double_field_value($filter_value);
+                break;
+            case "currency":
+                $db_value = $this->get_currency_field_value($filter_value);
+                break;
+            case "boolean":
+                $db_value = $this->get_boolean_field_value($filter_value);
+                break;
+            case "enum":
+                $db_value = $this->get_enum_field_value($filter_value, array($filter_value => ""));
+                break;
+            case "varchar":
+                $db_value = $this->get_varchar_field_value($filter_value);
+                break;
+            case "text":
+                $db_value = $this->get_text_field_value($filter_value);
+                break;
+            case "blob":
+                $db_value = $this->get_blob_field_value($filter_value);
+                break;
+            case "datetime":
+                $db_value = $this->get_datetime_field_value($filter_value);
+                break;
+            case "date":
+                $db_value = $this->get_date_field_value($filter_value);
+                break;
+            case "time":
+                $db_value = $this->get_time_field_value($filter_value);
+                break;
+            }
+                
+            switch ($filter_info["relation"]) {
+            case "less":
+                $wheres[] = "{$field_select} <= " . qw($db_value);
+                break;
+            case "greater":
+                $wheres[] = "{$field_select} >= " . qw($db_value);
+                break;
+            case "equal":
+                $wheres[] = "{$field_select} = " . qw($db_value);
+                break;
+            case "like":
+                $wheres[] = "{$field_select} LIKE " . lqw($db_value, "%", "%");
+                break;
+            case "having_equal":
+                $havings[] = "({$field_select} = " . qw($db_value) . ")";
+                break;
+            case "having_less":
+                $havings[] = "({$field_select} <= " . qw($db_value) . ")";
+                break;
+            case "having_greater":
+                $havings[] = "({$field_select} >= " . qw($db_value) . ")";
+                break;
+            }
+        }
+        return array(
+            "where" => join(" AND ", $wheres),
+            "having" => join(" AND ", $havings),
+        );
+    }
+
+    function get_filters_params() {
+        $params = array();
+        foreach ($this->filters as $filter_info) {
+            $filter_name = $filter_info["name"];
+            $filter_relation = $filter_info["relation"];
+            $filter_value = $filter_info["value"];
+            $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
+            if ($filter_value != $nonset_filter_value) {
+                $params["{$this->table_name}_{$filter_name}_{$filter_relation}"] = $filter_value;
+            }
+        }
+        return $params;
+    }
+//
+    function read_order_by($default_order_by_fields) {
+        $this->order_by = array();
+
+        if (!is_array($default_order_by_fields)) {
+            $default_order_by_fields = array($default_order_by_fields);
+        }
+        
+        $order_by_fields = param("order_by");
+        if (!is_array($order_by_fields)) {
+            if (is_null($order_by_fields) || trim($order_by_fields) == "") {
+                $order_by_fields = $default_order_by_fields;
+            } else {
+                $order_by_fields = array($order_by_fields);
+            }
+        }
+
+        $field_names = $this->get_field_names();
+        foreach ($order_by_fields as $order_by_field) {
+            $order_by_field_parts = explode(" ", $order_by_field, 2);
+            $order_by_field_name = $order_by_field_parts[0];
+            if (!in_array($order_by_field_name, $field_names)) {
+                continue;
+            }
+            $order_by_direction = (isset($order_by_field_parts[1])) ?
+                $order_by_field_parts[1] : "asc";
+            $this->order_by[] = array(
+                "field_name" => $order_by_field_name,
+                "direction" => $order_by_direction,
+            );
+        }
+    }
+
+    function get_order_by_params() {
+        $order_by_values = array();
+        foreach ($this->order_by as $order_by_info) {
+            $order_by_values[] = "{$order_by_info['field_name']} {$order_by_info['direction']}";
+        }
+        return array(
+            "order_by" => $order_by_values,
+        );
+    }
+
+    function get_order_by_query_ex() {
+        $order_by_sqls = array();
+        foreach ($this->order_by as $order_by_info) {
+            $order_by_direction_sql = ($order_by_info["direction"] == "asc") ?
+                "ASC" :
+                "DESC";
+            $order_by_sqls[] = "{$order_by_info['field_name']} {$order_by_direction_sql}";
+        }
+        return array(
+            "order_by" => join(", ", $order_by_sqls),
+        );
     }
 //
     function init_print_param($params, $param_name, $default_value) {
@@ -1830,7 +1686,9 @@ class DbObject {
             break;
         case "select":
         case "radio":
-            switch ($values_info["source"]) {
+            $input_source = $values_info["source"];
+
+            switch ($input_source) {
             case "array":
                 $value_caption_pairs = $values_info["data"];
                 break;
@@ -1855,6 +1713,11 @@ class DbObject {
                 $func = $values_info["data"];
                 $value_caption_pairs = $this->{$func}();
                 break;
+            default:
+                die(
+                    "{$this->table_name}: unknown input source '{$input_source}' " .
+                    "in print_foreign_key_field_form_value()"
+                );
             }
             $h["{$template_var}_input"] = ($input_type == "select") ?
                 print_html_select($template_var, $value_caption_pairs, $value) :
@@ -2051,92 +1914,102 @@ class DbObject {
         );
     }
 //
-    function print_filter_form_values($nonset_id = '', $nonset_name = '---') {
-        // Return an array with given fields stored in it
-        // for future use in a search form template.
-
+    function print_filter_form_values() {
         $h = array();
 
-        foreach ($this->filters as $name => $field_conditions) {
-            foreach ($field_conditions as $relation => $cond) {
-                $pname = "{$this->table_name}_{$name}_{$relation}";
+        foreach ($this->filters as $filter_info) {
+            $filter_name = $filter_info["name"];
+            $filter_relation = $filter_info["relation"];
+            $filter_value = $filter_info["value"];
+            $filter_input_type = isset($filter_info["input"]["type"]) ?
+                $filter_info["input"]["type"] :
+                "text";
 
-                $input = isset($cond['input']) ? $cond['input'] : array('type' => 'text');
-                $value = isset($cond['value']) ? $cond['value'] : '';
-//                $value = get_html_safe_string($value);
-                $h["{$pname}_hidden"] = print_html_hidden($pname, $value);
+            $template_var = "{$this->table_name}_{$filter_name}_{$filter_relation}";
+            $h["{$template_var}_hidden"] = print_html_hidden($template_var, $filter_value);
 
-                switch ($input['type']) {
-                case 'select':
-                    if ($this->fields[$name]['type'] == 'enum') {
-                        $items = $this->fields[$name]['values'];
+            switch ($filter_input_type) {
+            case "text":
+                $h["{$template_var}_input"] =
+                    print_html_input("text", $template_var, $filter_value);
+                break;
+            case "checkbox":
+                $h["{$template_var}_input"] =
+                    print_html_checkbox($template_var, $filter_value);
+                break;
+            case "radio":
+            case "select":
+            case "listbox":
+                $values_info = $filter_info["input"]["values"];
+                if (
+                    isset($values_info["data"]) &&
+                    is_array($values_info["data"]) &&
+                    isset($values_info["data"]["begin_value_caption_pair"])
+                ) {
+                    $begin_value_caption_pair =
+                        $values_info["data"]["begin_value_caption_pair"];
+                } else {
+                    $begin_value_caption_pair = null;
+                }
 
-                    } else if (isset($input['values'])) {
-                        $items = $input['values'];
+                if (
+                    isset($values_info["data"]) &&
+                    is_array($values_info["data"]) &&
+                    isset($values_info["data"]["end_value_caption_pair"])
+                ) {
+                    $end_value_caption_pair =
+                        $values_info["data"]["end_value_caption_pair"];
+                } else {
+                    $end_value_caption_pair = null;
+                }
+                
+                $input_source = $values_info["source"];
+                if ($input_source == "field") {
+                    $values_info = $this->fields[$filter_name]["input"]["values"];
+                    $input_source = $values_info["source"];
+                }
 
-                    } else {
-                        $from     = $input['from'];
-                        $data     = $input['data'];
-                        $caption  = $input['caption'];
-                        $query_ex =
-                            isset($input['query_ex']) ?
-                            $input['query_ex'] :
-                            array('order_by' => $input['caption']); // default order_by.                        );
-
-                        $obj = $this->create_db_object($from);
-                        $items = get_db_object_value_caption_pairs(
-                            $obj->table_name, $caption, $query_ex
-                        );
-                    }
-
-                    $items = array(
-                        isset($input['nonset_id']) ? $input['nonset_id'] : $nonset_id =>
-                            isset($input['nonset_name']) ? $input['nonset_name'] : $nonset_name
-                    ) + $items;
-
-                    $h[$pname . '_input'] = print_html_select($pname, $items, $value);
+                switch ($input_source) {
+                case "array":
+                    $value_caption_pairs = $values_info["data"];
                     break;
-
-                case 'multiselect':
-
-                    $value = isset($cond['value']) ? $cond['value'] : array();
-
-                    if ($this->fields[$name]['type'] == 'enum') {
-                        $items = $this->fields[$name]['values'];
-
-                    } else if (isset($input['values'])) {
-                        $items = $input['values'];
-
-                    } else {
-                        $from     = $input['from'];
-                        $data     = $input['data'];
-                        $caption  = $input['caption'];
-                        $query_ex =
-                            isset($input['query_ex']) ?
-                            $input['query_ex'] :
-                            array('order_by' => $input['caption']); // default order_by.
-
-                        $obj = $this->create_db_object($from);
-                        $items = get_db_object_value_caption_pairs(
-                            $obj->table_name, $caption, $query_ex
-                        );
-                    }
-
-                    $items = array(
-                        isset($input['nonset_id']) ? $input['nonset_id'] : $nonset_id =>
-                            isset($input['nonset_name']) ? $input['nonset_name'] : $nonset_name
-                    ) + $items;
-
-                    $h[$pname . '_input'] = print_html_select(
-                        "{$pname}[]", $items, $value, "multiple"
+                case "db_object":
+                    $value_caption_pairs = get_db_object_value_caption_pairs(
+                        $values_info["data"]["obj_name"],
+                        $values_info["data"]["caption_field_name"],
+                        $values_info["data"]["query_ex"]
                     );
                     break;
-
+                case "function":
+                    $func = $values_info["data"];
+                    $value_caption_pairs = $this->{$func}();
+                    break;
                 default:
-                    $h["{$pname}_input"] = print_html_input(
-                        $input["type"], $pname, $value
+                    die(
+                        "{$this->table_name}: unknown input source '{$input_source}' " .
+                        "for filter '{$filter_name}' in print_filter_form_values()"
                     );
                 }
+                if (!is_null($begin_value_caption_pair)) {
+                    $value_caption_pairs = $begin_value_caption_pair + $value_caption_pairs;
+                }
+                if (!is_null($end_value_caption_pair)) {
+                    $value_caption_pairs = $value_caption_pairs + $end_value_caption_pair;
+                }
+                
+                if ($filter_input_type == "select") {
+                    $h["{$template_var}_input"] =
+                        print_html_select($template_var, $value_caption_pairs, $filter_value);
+                } else if ($filter_input_type == "listbox") {
+                    $h["{$template_var}_input"] =
+                        print_html_select(
+                            $template_var, $value_caption_pairs, $filter_value, "multiple"
+                        );
+                } else {
+                    $h["{$template_var}_input"] =
+                        print_html_radio_group($template_var, $value_caption_pairs, $filter_value);
+                }
+                break;
             }
         }
 
@@ -2193,7 +2066,7 @@ class DbObject {
             }
 
             if ($should_check_db_table) {
-                if ($this->field_values_exist($field_names)) {
+                if ($this->are_field_values_exist($field_names)) {
                     return false;
                 }            
             }
@@ -2213,7 +2086,7 @@ class DbObject {
         return true;
     }
 
-    function field_values_exist($field_names) {
+    function are_field_values_exist($field_names) {
         $query = new SelectQuery(array(
             "from" => "{%{$this->table_name}_table%} AS {$this->table_name}",
             "where" => $this->create_where_expression($field_names),
@@ -2470,27 +2343,27 @@ class DbObject {
         }
     }
 
-    function validate_image_upload($input_name = "image_file") {
-        $messages = array();
-
-        if (!Image::was_uploaded($input_name)) {
-            return $messages;
-        }
-
-        switch ($_FILES[$input_name]["error"]) {
-            case UPLOAD_ERR_OK:
-                break;
-            case UPLOAD_ERR_INI_SIZE:
-            case UPLOAD_ERR_FORM_SIZE:
-                $messages[] = new ErrorStatusMsg("too_big_filesize");
-                break;
-            case UPLOAD_ERR_PARTIAL:
-                $messages[] = new ErrorStatusMsg("file_was_not_uploaded_completely");
-                break;
-        }
-
-        return $messages;
-    }
+//    function validate_image_upload($input_name = "image_file") {
+//        $messages = array();
+//
+//        if (!Image::was_uploaded($input_name)) {
+//            return $messages;
+//        }
+//
+//        switch ($_FILES[$input_name]["error"]) {
+//            case UPLOAD_ERR_OK:
+//                break;
+//            case UPLOAD_ERR_INI_SIZE:
+//            case UPLOAD_ERR_FORM_SIZE:
+//                $messages[] = new ErrorStatusMsg("too_big_filesize");
+//                break;
+//            case UPLOAD_ERR_PARTIAL:
+//                $messages[] = new ErrorStatusMsg("file_was_not_uploaded_completely");
+//                break;
+//        }
+//
+//        return $messages;
+//    }
 //
 //    function process_image_upload(
 //        $image_id_field_name = "image_id", $input_name = "image_file"
@@ -2507,7 +2380,6 @@ class DbObject {
 //            }
 //        }
 //    }
-
-}  // class DbObject
+}
 
 ?>
