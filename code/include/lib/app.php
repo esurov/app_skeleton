@@ -698,14 +698,6 @@ class App {
             "action_filters_order_by_suburl" => "?{$action_filters_order_by_suburl}",
         ));
 
-        if ($show_filter_form) {
-            $this->page->assign($filters_params);
-            $obj->print_filter_form_values();
-            $this->page->parse_file_new(
-                "{$templates_dir}/filter_form.{$templates_ext}", "{$obj_name}_filter_form"
-            );
-        }
-
         $n = $this->db->get_select_query_num_rows($query);
 
         if ($n == 0) {
@@ -741,6 +733,14 @@ class App {
             ));
         }
 
+        if ($show_filter_form) {
+            $this->page->assign($filters_params);
+            $obj->print_filter_form_values();
+            $this->page->parse_file_new(
+                "{$templates_dir}/filter_form.{$templates_ext}", "{$obj_name}_filter_form"
+            );
+        }
+
         return $this->page->parse_file("{$templates_dir}/list.{$templates_ext}", $template_var);
     }
 //
@@ -770,6 +770,8 @@ class App {
             $res = $this->db->run_select_query($query);
             $n = $res->get_num_rows();
         }
+
+        $this->print_custom_params_values($custom_params);
 
         $no_items_template_name = "{$templates_dir}/list_no_items.{$templates_ext}";
         if ($n == 0 && $this->page->is_template_exist($no_items_template_name)) {
@@ -821,7 +823,7 @@ class App {
             if (!is_null($obj_name)) {
                 $obj = $this->read_id_fetch_db_object($obj_name);
             } else {
-                die("No obj_name in print_object_edit_page()");
+                die("No obj or obj_name in print_object_view_page()");
             }
         } else {
             $obj_name = $obj->table_name;
@@ -832,6 +834,7 @@ class App {
         $template_var = get_param_value($params, "template_var", "body");
         $custom_params = get_param_value($params, "custom_params", array());
 
+        $this->print_custom_params_values($custom_params);
         $obj->print_values(array(
             "templates_dir" => $templates_dir,
             "context" => $context,
@@ -848,7 +851,7 @@ class App {
             if (!is_null($obj_name)) {
                 $obj = $this->read_id_fetch_db_object($obj_name);
             } else {
-                die("No obj_name in print_object_edit_page()");
+                die("No obj or obj_name in print_object_edit_page()");
             }
         } else {
             $obj_name = $obj->table_name;
@@ -859,6 +862,7 @@ class App {
         $template_var = get_param_value($params, "template_var", "body");
         $custom_params = get_param_value($params, "custom_params", array());
 
+        $this->print_custom_params_values($custom_params);
         $obj->print_form_values(array(
             "templates_dir" => $templates_dir,
             "context" => $context,
@@ -869,6 +873,23 @@ class App {
         return $this->page->parse_file_new("{$templates_dir}/edit.html", $template_var);
     }
 //
+    function print_custom_params_values($custom_params) {
+        foreach ($custom_params as $param_name => $param_value) {
+            $this->page->assign(
+                $this->get_custom_param_printable_values($param_name, $param_value)
+            );
+        }
+    }
+    
+    function get_custom_param_printable_values($param_name, $param_value) {
+        return array(
+            "{$param_name}" => get_html_safe_string($param_value),
+            "{$param_name}_orig" => $param_value,
+            "{$param_name}_suburl" => create_html_suburl(array($param_name => $param_value)),
+            "{$param_name}_hidden" => print_html_hidden($param_name, $param_value),
+        );
+    }
+//
     function delete_object($params = array()) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
@@ -876,7 +897,7 @@ class App {
             if (!is_null($obj_name)) {
                 $obj = $this->read_id_fetch_db_object($obj_name);
             } else {
-                die("No obj_name in delete_object()");
+                die("No obj or obj_name in delete_object()");
             }
         } else {
             $obj_name = $obj->table_name;

@@ -25,6 +25,7 @@ foreach (array_keys($tables) as $table_name) {
 
 chdir($__tmp_saved_app_dir);
 
+ini_set("session.gc_maxlifetime", 14400);
 session_start();
 
 ?>
