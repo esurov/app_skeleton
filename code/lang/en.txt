@@ -44,6 +44,7 @@ any = Any
 choose_one = Choose one:
 yes = Yes
 no = No
+other = Other
 
 ["lang"]
 en = English

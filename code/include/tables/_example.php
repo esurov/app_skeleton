@@ -79,12 +79,16 @@ class Example extends CustomDbObject {
                     // "source" can be "array", "db_object", "function"
                     "source" => "db_object",
                     "data" => array(
+                        "nonset_value_caption_pair" =>
+                            array(0, $this->get_message("choose_one")),
                         "obj_name" => "image",
-                        "caption_field_name" => "filename",
-                        "query_ex" => array("order_by" => "filename"),
-                        "begin_value_caption_pair" => array(
-                            0 => $this->get_message("choose_one")
-                        )
+                        "captions_field_name" => "filename",
+                        "query_ex" => array(
+                            "order_by" => "filename",
+                        ),
+                        "end_value_caption_pairs" => array(
+                            array(-1, $this->get_message("other")),
+                        ),
                     ),
                 ),
             ),
@@ -215,9 +219,11 @@ class Example extends CustomDbObject {
                 "values" => array(
                     "source" => "array",
                     "data" => array(
-                        "value1" => $this->get_message("_example_field_enum_value1"),
-                        "value2" => $this->get_message("_example_field_enum_value2"),
-                        "value3" => $this->get_message("_example_field_enum_value3"),
+                        "array" => array(
+                            array("value1", $this->get_message("_example_field_enum_value1")),
+                            array("value2", $this->get_message("_example_field_enum_value2")),
+                            array("value3", $this->get_message("_example_field_enum_value3")),
+                        ),
                     ),
                 ),
             ),

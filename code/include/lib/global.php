@@ -80,6 +80,7 @@ function get_param_value($params, $param_name, $default_value) {
         return $default_value;
     }
 }
+
 //
 function is_value_empty($value) {
     return trim($value) == "";
@@ -92,6 +93,7 @@ function is_value_not_empty($value) {
 function is_value_email($value) {
     return preg_match('/.+@.+\..+/', $value);
 }
+
 //
 function format_double_value(
     $double_value, $decimals, $dec_point, $thousands_sep
@@ -167,64 +169,31 @@ function lqw($str, $prefix_str = "", $suffix_str = "") {
     return "'{$prefix_str}{$str}{$suffix_str}'";
 }
 
-function create_dependency_js(
-    $formName, $name, $depSelectName, $dep_array
-) {
-    $dependenciesStr = create_dependency_str($dep_array);
-    return <<<JS
-        <script>
-
-        dependencies[dependencies.length] = new Dependency(
-            '{$formName}',
-            '{$name}',
-            '{$depSelectName}',
-            new Array(
-{$dependenciesStr}
-            )
-        );
-
-        </script>
-
-JS;
-}
-
-function create_dependency_str($dep_array) {
-    $elements = array();
-    foreach ($dep_array as $dep_select_array) {
-        $elements[] = '    new Array("' . implode('", "', $dep_select_array) . '")';
-    }
-    return implode(",\n", $elements) . "\n";
-}
-
 // Print common HTML controls
-function print_html_input($type, $name, $value, $attrs = "") {
-    if ($attrs != "") {
-        $attrs = " " . $attrs;
-    }
+function print_html_input($type, $name, $value, $attrs = array()) {
+    $attrs_str = get_html_attrs_str($attrs);
     $value_safe = get_html_safe_string($value);
-    return "<input type=\"{$type}\" name=\"{$name}\" value=\"{$value_safe}\"{$attrs}>";
+    return "<input type=\"{$type}\" name=\"{$name}\" value=\"{$value_safe}\"{$attrs_str}>";
 }
 
 function print_html_hidden($name, $value) {
     return print_html_input("hidden", $name, $value);
 }
 
-function print_html_checkbox($name, $value) {
-    $checked_str = (intval($value) == 0) ? "" : "checked";
-    return print_html_input("checkbox", $name, "1", $checked_str);
+function print_html_checkbox($name, $value, $attrs = array()) {
+    if (intval($value) != 0) {
+        $attrs["checked"] = null;
+    }
+    return print_html_input("checkbox", $name, "1", $attrs);
 }
 
-function print_html_select($name, $value_caption_pairs, $current_value, $attrs = "") {
-    if ($attrs != "") {
-        $attrs = " {$attrs}";
-    }
+function print_html_select($name, $value_caption_pairs, $current_value, $attrs = array()) {
+    $attrs_str = get_html_attrs_str($attrs);
     $select_options = print_html_select_options($value_caption_pairs, $current_value);
-    $output =
-        "<select name=\"{$name}\"{$attrs}>\n" .
+    return
+        "<select name=\"{$name}\"{$attrs_str}>\n" .
         "{$select_options}" .
         "</select>\n";
-
-    return $output;
 }
 
 function print_html_select_options($value_caption_pairs, $current_value) {
@@ -233,33 +202,40 @@ function print_html_select_options($value_caption_pairs, $current_value) {
     }
 
     if (is_array($current_value)) {
-        $selected_value = get_multiple_selected_values($value_caption_pairs, $current_values);
+//        $selected_value = get_multiple_selected_values(
+//            $value_caption_pairs, $current_values
+//        );
     } else {
-        $selected_value = get_selected_value($value_caption_pairs, $current_value, $current_value);
+        $selected_value = get_selected_value(
+            $value_caption_pairs, $current_value, $current_value
+        );
     }
 
     $output = "";
-    foreach ($value_caption_pairs as $value => $caption) {
-        $selected_str = "";
+    foreach ($value_caption_pairs as $value_caption_pair) {
+        $value = get_value_from_value_caption_pair($value_caption_pair);
+        $caption = get_caption_from_value_caption_pair($value_caption_pair);
+        $attrs = array();
         if (
-            (!is_array($selected_value) && $value == $selected_value) ||
+            (!is_array($selected_value) && strval($value) == strval($selected_value)) ||
             (is_array($selected_value) && in_array($value, $selected_value))
         ) {
-            $selected_str = " selected";
+            $attrs["selected"] = null;
         }
-        $output .= print_html_select_option($value, $caption, $selected_str);
+        $output .= print_html_select_option($value, $caption, $attrs);
     }
     return $output;
 }
 
-function print_html_select_option($value, $caption, $selected_str = "") {
+function print_html_select_option($value, $caption, $attrs = array()) {
+    $attrs_str = get_html_attrs_str($attrs);
     $value_safe = get_html_safe_string($value);
     $caption_safe = get_html_safe_string($caption);
-    return "<option value=\"{$value_safe}\"{$selected_str}>{$caption_safe}</option>\n";
+    return "<option value=\"{$value_safe}\"{$attrs_str}>{$caption_safe}</option>\n";
 }
 
 function print_html_radio_group(
-    $name, $value_caption_pairs, $current_value, $default_value = null
+    $name, $value_caption_pairs, $current_value, $default_value = null, $is_xhtml = false
 ) {
     if (count($value_caption_pairs) == 0) {
         return "";
@@ -275,27 +251,31 @@ function print_html_radio_group(
 
     $output = "";
     foreach ($value_caption_pairs as $value => $caption) {
-        $checked_str = ($value == $checked_value) ? "checked" : "";
-        $output .= print_html_radio($name, $value, $checked_str);
-        $output .= get_html_safe_string($caption) . "<br>\n";
+        $attrs = array();
+        if ($value == $checked_value) {
+            $attrs["checked"] = null;
+        }
+        $output .= print_html_radio($name, $value, $attrs);
+        $output .= get_html_safe_string($caption) . ($is_xhtml) ? "<br />\n" : "<br>\n";
     }
     return $output;
 }
 
-function print_html_radio($name, $value, $checked_str = "") {
-    return print_html_input("radio", $name, $value, $checked_str);
+function print_html_radio($name, $value, $attrs = array()) {
+    return print_html_input("radio", $name, $value, $attrs);
 }
 
-function print_html_textarea($name, $value, $cols, $rows) {
+function print_html_textarea($name, $value, $attrs = array()) {
+    $attrs_str = get_html_attrs_str($attrs);
     return
-        "<textarea name=\"{$name}\" cols=\"{$cols}\" rows=\"{$rows}\">" .
+        "<textarea name=\"{$name}\"{$attrs_str}>" .
         get_html_safe_string($value) .
         "</textarea>";
 }
-//
 
+//
 function get_selected_value($value_caption_pairs, $current_value, $default_value) {
-    $values = array_keys($value_caption_pairs);
+    $values = get_values_from_value_caption_pairs($value_caption_pairs);
     if (in_array($current_value, $values)) {
         $selected_value = $current_value;
     } else if (in_array($default_value, $values)) {
@@ -306,40 +286,86 @@ function get_selected_value($value_caption_pairs, $current_value, $default_value
     return $selected_value;
 }
 
-function get_multiple_selected_values($value_caption_pairs, $current_values) {
-    $values = array_keys($value_caption_pairs);
-    $selected_values = array();
-    foreach ($current_values as $current_value) {
-        if (in_array($current_value, $values)) {
-            $selected_values[] = $current_value;
+//function get_multiple_selected_values($value_caption_pairs, $current_values) {
+//    $values = get_values_from_value_caption_pairs($value_caption_pairs);
+//    $selected_values = array();
+//    foreach ($current_values as $current_value) {
+//        if (in_array($current_value, $values)) {
+//            $selected_values[] = $current_value;
+//        }
+//    }
+//    return $selected_values;
+//}
+
+function get_html_attrs_str($attrs) {
+    if (count($attrs) == 0) {
+        return "";
+    }
+    $attrs_lines = array();
+    foreach ($attrs as $attr_name => $attr_value) {
+        $attr_name_safe = get_html_safe_string($attr_name);
+        if (is_null($attr_value)) {
+            $attrs_lines[] = get_html_safe_string($attr_name);
+        } else { 
+            $attr_value_safe = get_html_safe_string($attr_value);
+            $attrs_lines[] = "{$attr_name_safe}=\"{$attr_value_safe}\"";
         }
     }
-    return $selected_values;
+    return " " . join(" ", $attrs_lines);
 }
 
-function get_db_object_value_caption_pairs($obj_name, $field_name, $query_ex) {
-    global $app;
-    
-    $obj = $app->create_db_object($obj_name);
-    $res = $obj->run_expanded_select_query(
-        $query_ex, array("id", $field_name)
-    );
+function get_value_from_value_caption_pair($value_caption_pair) {
+    return $value_caption_pair[0];
+}
 
-    $value_caption_pairs = array();
-    while($row = $res->fetch()) {
-        $obj->fetch_row($row);
-        $value_caption_pairs[$obj->id] = $obj->{$field_name};
+function get_caption_from_value_caption_pair($value_caption_pair) {
+    return $value_caption_pair[1];
+}
+
+function get_values_from_value_caption_pairs($value_caption_pairs) {
+    $values = array();
+    foreach ($value_caption_pairs as $value_caption_pair) {
+        $values[] = get_value_from_value_caption_pair($value_caption_pair);
     }
-    return $value_caption_pairs;
+    return $values;
 }
 
-function get_values_from_value_caption_pairs($pairs) {
-    return array_keys($pairs);
+function get_captions_from_value_caption_pairs($value_caption_pairs) {
+    $captions = array();
+    foreach ($value_caption_pairs as $value_caption_pair) {
+        $values[] = get_caption_from_value_caption_pair($value_caption_pair);
+    }
+    return $captions;
 }
 
-function get_captions_from_value_caption_pairs($pairs) {
-    return array_values($pairs);
+//
+function create_select_dependency_js(
+    $form_name, $main_select_name, $dependent_select_name, $dependency_array
+) {
+    $dependency_str = create_select_dependency_str($dependency_array);
+    return <<<JS
+<script>
+dependencies[dependencies.length] = new Dependency(
+    '{$form_name}',
+    '{$main_select_name}',
+    '{$dependent_select_name}',
+    new Array(
+{$dependency_str}
+    )
+);
+</script>
+
+JS;
 }
+
+function create_select_dependency_str($dependency_array) {
+    $lines = array();
+    foreach ($dependency_array as $dependent_select_values) {
+        $lines[] = '    new Array("' . join('", "', $dependent_select_values) . '")';
+    }
+    return join(",\n", $lines) . "\n";
+}
+
 //
 function parse_date_by_format($format, $value) {
     $regexp = create_date_regexp_by_format($format);

@@ -297,9 +297,16 @@ class App {
         return $obj;
     }
 
-    function fetch_db_objects_list($obj_name, $query_ex) {
+    function fetch_db_objects_list(
+        $obj_name,
+        $query_ex,
+        $field_names_to_select = null,
+        $field_names_to_not_select = null
+    ) {
         $obj = $this->create_db_object($obj_name);
-        $res = $obj->run_expanded_select_query($query_ex);
+        $res = $obj->run_expanded_select_query(
+            $query_ex, $field_names_to_select, $field_names_to_not_select
+        );
         $objects = array();
         while ($row = $res->fetch()) {
             $obj->fetch_row($row);

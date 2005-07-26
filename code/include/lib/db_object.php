@@ -287,7 +287,7 @@ class DbObject {
             switch ($field_type) {
             case "primary_key":
                 $initial_field_value = 0;
-                $width = get_param_value($field_info, "width", 10);
+                $width = get_param_value($field_info, "width", 11);
                 
                 $this->insert_index(array(
                     "type" => "primary_key",
@@ -296,14 +296,11 @@ class DbObject {
                 break;
             case "foreign_key":
                 $initial_field_value = 0;
-                $width = get_param_value($field_info, "width", 10);
+                $width = get_param_value($field_info, "width", 11);
                 $input = get_param_value($field_info, "input", array());
-                if (!isset($input["type"])) {
-                    $input["type"] = "text";
-                }
-                if (!isset($input["values"])) {
-                    $input["values"] = null;
-                }
+                $input["type"] = get_param_value($input, "type", "text");
+                $input["type_attrs"] = get_param_value($input, "type_attrs", array());
+                $input["values"] = get_param_value($input, "values", null);
                 
                 $this->insert_index(array(
                     "type" => "index",
@@ -348,27 +345,21 @@ class DbObject {
                 $width = get_param_value($field_info, "width", 255);
                 $initial_field_value = get_param_value($field_info, "value", "");
                 $input = get_param_value($field_info, "input", array());
-                if (!isset($input["type"])) {
-                    $input["type"] = "text";
-                }
-                if (!isset($input["type_attrs"])) {
-                    $input["type_attrs"] = array(
-                        "maxlength" => $width,
-                    );
-                }
+                $input["type"] = get_param_value($input, "type", "text");
+                $default_input_attrs = array(
+                    "maxlength" => $width,
+                );
+                $input["type_attrs"] = get_param_value($input, "type_attrs", $default_input_attrs);
                 break;
             case "text":
                 $initial_field_value = get_param_value($field_info, "value", "");
                 $input = get_param_value($field_info, "input", array());
-                if (!isset($input["type"])) {
-                    $input["type"] = "textarea";
-                }
-                if (!isset($input["type_attrs"])) {
-                    $input["type_attrs"] = array(
-                        "cols" => 60,
-                        "rows" => 9,
-                    );
-                }
+                $input["type"] = get_param_value($input, "type", "textarea");
+                $default_input_attrs = array(
+                    "cols" => 60,
+                    "rows" => 9,
+                );
+                $input["type_attrs"] = get_param_value($input, "type_attrs", $default_input_attrs);
                 break;
             case "blob":
                 $initial_field_value = get_param_value($field_info, "value", "");
@@ -573,9 +564,14 @@ class DbObject {
     }
 
     function get_nonset_filter_value($filter_info) {
-        return (isset($filter_info["input"]["values"]["nonset_value"])) ?
-            $filter_info["input"]["values"]["nonset_value"] :
-            "";
+        if (isset($filter_info["input"]["values"]["data"]["nonset_value_caption_pair"])) {
+            $nonset_value_caption_pair =
+                $filter_info["input"]["values"]["data"]["nonset_value_caption_pair"];
+            $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
+        } else {
+            $nonset_value = "";
+        }
+        return $nonset_value;
     }
 //
     function insert_select_from($select_from = null) {
@@ -636,7 +632,7 @@ class DbObject {
         switch ($field_type) {
         case "primary_key":
         case "foreign_key":
-            $type_expression = "INT({$field_info['width']}) UNSIGNED";
+            $type_expression = "INT({$field_info['width']})";
             break;
         case "integer":
             $type_expression = "INT({$field_info['width']})";
@@ -651,10 +647,10 @@ class DbObject {
             $type_expression = "TINYINT({$field_info['width']})";
             break;
         case "enum":
-            $enum_values_expression =
-                join("','", array_keys($field_info["input"]["values"]["data"]));
-            $type_expression =
-                "ENUM('{$enum_values_expression}')";
+            $enum_value_caption_pairs = $field_info["input"]["values"]["data"]["array"];
+            $enum_values = get_values_from_value_caption_pairs($enum_value_caption_pairs);
+            $enum_values_expression = "'" . join("','", $enum_values) . "'";
+            $type_expression = "ENUM({$enum_values_expression})";
             break;
         case "varchar":
             if ($field_info["width"] <= 3) {
@@ -1072,7 +1068,7 @@ class DbObject {
                 break;
             case "enum":
                 $field_value = $this->get_enum_field_value(
-                    $param_value, $field_info["input"]["values"]["data"]
+                    $param_value, $field_info["input"]["values"]["data"]["array"]
                 );
                 break;
             case "varchar":
@@ -1157,16 +1153,11 @@ class DbObject {
         }
     }
 
-    function get_enum_field_value($enum_value, $enum_values) {
+    function get_enum_field_value($enum_value, $enum_value_caption_pairs) {
         if (is_null($enum_value)) {
             return null;
         }
-        if (isset($enum_values[$enum_value])) {
-            return $enum_value;
-        } else {
-            $avail_enum_values = array_keys($enum_values);
-            return $avail_enum_values[0];
-        }
+        return get_selected_value($enum_value_caption_pairs, $enum_value, $enum_value);
     }
 
     function get_varchar_field_value($param_value) {
@@ -1245,7 +1236,7 @@ class DbObject {
             
             $filter_value = $filter_info["value"];
             $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
-            if ($filter_value == $nonset_filter_value) {
+            if (strval($filter_value) == strval($nonset_filter_value)) {
                 continue;
             }
 
@@ -1267,7 +1258,12 @@ class DbObject {
                 $db_value = $this->get_boolean_field_value($filter_value);
                 break;
             case "enum":
-                $db_value = $this->get_enum_field_value($filter_value, array($filter_value => ""));
+                $default_enum_value_caption_pairs = array(
+                    array($filter_value, ""),
+                );
+                $db_value = $this->get_enum_field_value(
+                    $filter_value, $default_enum_value_caption_pairs
+                );
                 break;
             case "varchar":
                 $db_value = $this->get_varchar_field_value($filter_value);
@@ -1451,7 +1447,7 @@ class DbObject {
                 break;
             case "enum":
                 $h1 = $this->print_enum_field_value(
-                    $template_var, $value, $field_info["input"]["values"]["data"]
+                    $template_var, $value, $field_info["input"]["values"]["data"]["array"]
                 );
                 break;
             case "varchar":
@@ -1522,9 +1518,19 @@ class DbObject {
         );
     }
 
-    function print_enum_field_value($template_var, $enum_value, $enum_values) {
+    function print_enum_field_value($template_var, $enum_value, $enum_value_caption_pairs) {
+        $enum_caption = null;
+        foreach ($enum_value_caption_pairs as $enum_value_caption_pair) {
+            if ($enum_value == get_value_from_value_caption_pair($enum_value_caption_pair)) {
+                $enum_caption = get_caption_from_value_caption_pair($enum_value_caption_pair);
+                break;
+            }
+        }
+        if (is_null($enum_caption)) {
+            $enum_caption = get_caption_from_value_caption_pair($enum_value_caption_pairs[0]);
+        } 
         return array(
-            "{$template_var}" => $enum_values[$enum_value],
+            "{$template_var}" => $enum_caption,
             "{$template_var}_orig" => $enum_value,
         );
     }
@@ -1585,6 +1591,16 @@ class DbObject {
                 continue;
             }
 
+            $input_type = isset($field_info["input"]["type"]) ?
+                $field_info["input"]["type"] :
+                "text";
+            $input_attrs = isset($field_info["input"]["type_attrs"]) ?
+                $field_info["input"]["type_attrs"] :
+                array();
+            $values_info = isset($field_info["input"]["values"]) ?
+                $field_info["input"]["values"] :
+                null;
+
             $template_var = "{$this->table_name}_{$field_name}";
             $value = $this->{$field_name};
 
@@ -1593,10 +1609,8 @@ class DbObject {
                 $h1 = $this->print_primary_key_field_form_value($template_var, $value);
                 break;
             case "foreign_key":
-                $input_type = $field_info["input"]["type"];
-                $values_info = $field_info["input"]["values"];
                 $h1 = $this->print_foreign_key_field_form_value(
-                    $template_var, $value, $input_type, $values_info
+                    $template_var, $value, $input_type, $input_attrs, $values_info
                 );
                 break;
             case "integer":
@@ -1616,10 +1630,8 @@ class DbObject {
                 $h1 = $this->print_boolean_field_form_value($template_var, $value);
                 break;
             case "enum":
-                $input_type = $field_info["input"]["type"];
-                $values_info = $field_info["input"]["values"];
                 $h1 = $this->print_enum_field_form_value(
-                    $template_var, $value, $input_type, $values_info
+                    $template_var, $value, $input_type, $input_attrs, $values_info
                 );
                 break;
             case "varchar":
@@ -1628,10 +1640,8 @@ class DbObject {
                         $template_var, $value, $h
                     );
                 } else {
-                    $input_type = $field_info["input"]["type"];
-                    $input_type_attrs = $field_info["input"]["type_attrs"];
                     $h1 = $this->print_varchar_field_form_value(
-                        $template_var, $value, $input_type, $input_type_attrs
+                        $template_var, $value, $input_type, $input_attrs
                     );
                 }
                 break;
@@ -1641,10 +1651,8 @@ class DbObject {
                         $template_var, $value, $h
                     );
                 } else {
-                    $input_type = $field_info["input"]["type"];
-                    $input_type_attrs = $field_info["input"]["type_attrs"];
                     $h1 = $this->print_text_field_form_value(
-                        $template_var, $value, $input_type, $input_type_attrs
+                        $template_var, $value, $input_type, $input_attrs
                     );
                 }
                 break;
@@ -1674,64 +1682,46 @@ class DbObject {
     }
 
     function print_foreign_key_field_form_value(
-        $template_var, $value, $input_type, $values_info
+        $template_var, $value, $input_type, $input_attrs, $values_info
     ) {
-        $h = array(
-            "{$template_var}_hidden" => print_html_hidden($template_var, $value),
-        );
-
         switch ($input_type) {
         case "text":
-            $h["{$template_var}_input"] = print_html_input("text", $template_var, $value);
+            $h1 = $this->print_text_input_form_value($template_var, $value);
+            break;
+        case "radio":
+            $h1 = $this->print_radio_input_form_value($template_var, $value, $values_info);
             break;
         case "select":
-        case "radio":
-            $input_source = $values_info["source"];
-
-            switch ($input_source) {
-            case "array":
-                $value_caption_pairs = $values_info["data"];
-                break;
-            case "db_object":
-                $value_caption_pairs = get_db_object_value_caption_pairs(
-                    $values_info["data"]["obj_name"],
-                    $values_info["data"]["caption_field_name"],
-                    $values_info["data"]["query_ex"]
-                );
-                if (isset($values_info["data"]["begin_value_caption_pair"])) {
-                    $value_caption_pairs =
-                        $values_info["data"]["begin_value_caption_pair"] +
-                        $value_caption_pairs;
-                }
-                if (isset($values_info["data"]["end_value_caption_pair"])) {
-                    $value_caption_pairs =
-                        $value_caption_pairs +
-                        $values_info["data"]["end_value_caption_pair"];
-                }
-                break;
-            case "function":
-                $func = $values_info["data"];
-                $value_caption_pairs = $this->{$func}();
-                break;
-            default:
-                die(
-                    "{$this->table_name}: unknown input source '{$input_source}' " .
-                    "in print_foreign_key_field_form_value()"
-                );
-            }
-            $h["{$template_var}_input"] = ($input_type == "select") ?
-                print_html_select($template_var, $value_caption_pairs, $value) :
-                print_html_radio_group($template_var, $value_caption_pairs, $value);
+            $h1 = $this->print_select_input_form_value(
+                $template_var, $value, $input_attrs, $values_info
+            );
+            break;
+        case "main_select":
+            $dependency_info = $values_info["dependency"];
+            $dependent_field_name = get_param_value($dependency_info, "field", "unknown");
+            $dependent_select_name = "{$this->table_name}_{$dependent_field_name}";
+            
+            $h1 = $this->print_main_select_input_form_value(
+                $template_var,
+                $value,
+                $input_attrs,
+                $dependent_select_name,
+                $dependency_info,
+                $values_info
+            );
             break;
         default:
-            die(
-                "{$this->table_name}: unknown input type '{$input_type}' for " .
-                "'{$template_var}' in print_integer_field_form_value()"
-            );
+            $h1 = array();
         }
-        return $h;
+
+        return array_merge(
+            $h1,
+            array(
+                "{$template_var}_hidden" => print_html_hidden($template_var, $value),
+            )
+        );
     }
-    
+
     function print_integer_field_form_value($template_var, $value) {
         $app_integer_value = $this->app->get_app_integer_value($value);
         return array(
@@ -1764,44 +1754,31 @@ class DbObject {
     }
 
     function print_enum_field_form_value(
-        $template_var, $enum_value, $input_type, $values_info
+        $template_var, $enum_value, $input_type, $input_attrs, $values_info
     ) {
-        $h = array(
-            "{$template_var}_hidden" => print_html_hidden($template_var, $enum_value),
-        );
-
         switch ($input_type) {
-        case "select":
         case "radio":
-            $input_source = $values_info["source"];
-
-            switch ($input_source) {
-            case "array":
-                $value_caption_pairs = $values_info["data"];
-                break;
-            default:
-                die(
-                    "{$this->table_name}: unknown input source '{$input_source}' " .
-                    "in print_enum_field_form_value()"
-                );
-            }
-            
-            $h["{$template_var}_input"] = ($input_type == "select") ?
-                print_html_select($template_var, $value_caption_pairs, $enum_value) :
-                print_html_radio_group($template_var, $value_caption_pairs, $enum_value);
+            $h1 = $this->print_radio_input_form_value($template_var, $enum_value, $values_info);
+            break;
+        case "select":
+            $h1 = $this->print_select_input_form_value(
+                $template_var, $enum_value, $input_attrs, $values_info
+            );
             break;
         default:
-            die(
-                "{$this->table_name}: unknown input type '{$input_type}' for " .
-                "'{$template_var}' in print_enum_field_form_value()"
-            );
+            $h1 = array();
         }
 
-        return $h;
+        return array_merge(
+            $h1,
+            array(
+                "{$template_var}_hidden" => print_html_hidden($template_var, $enum_value),
+            )
+        );
     }
 
     function print_varchar_field_form_value(
-        $template_var, $str_value, $input_type, $input_type_attrs
+        $template_var, $str_value, $input_type, $input_attrs
     ) {
         $h = array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $str_value),
@@ -1810,16 +1787,9 @@ class DbObject {
         switch ($input_type) {
         case "text":
         case "password":
-            $maxlength = $input_type_attrs["maxlength"];
-            $attrs = "maxlength=\"{$maxlength}\"";
             $h["{$template_var}_input"] =
-                print_html_input($input_type, $template_var, $str_value, $attrs);
+                print_html_input($input_type, $template_var, $str_value, $input_attrs);
             break;
-        default:
-            die(
-                "{$this->table_name}: unknown input type '{$input_type}' for " .
-                "'{$template_var}' in print_varchar_field_form_value()"
-            );
         }
 
         return $h;
@@ -1834,7 +1804,7 @@ class DbObject {
     }
 
     function print_text_field_form_value(
-        $template_var, $str_value, $input_type, $input_type_attrs
+        $template_var, $str_value, $input_type, $input_attrs
     ) {
         $h = array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $str_value),
@@ -1842,16 +1812,9 @@ class DbObject {
 
         switch ($input_type) {
         case "textarea":
-            $cols = $input_type_attrs["cols"];
-            $rows = $input_type_attrs["rows"];
             $h["{$template_var}_input"] =
-                print_html_textarea($template_var, $str_value, $cols, $rows);
+                print_html_textarea($template_var, $str_value, $input_attrs);
             break;
-        default:
-            die(
-                "{$this->table_name}: unknown input type '{$input_type}' for " .
-                "'{$template_var}' in print_text_field_form_value()"
-            );
         }
 
         return $h;
@@ -1914,107 +1877,336 @@ class DbObject {
         );
     }
 //
+    function print_text_input_form_value($template_var, $value) {
+        return array(
+            "{$template_var}_input" => print_html_input("text", $template_var, $value),
+        );
+    }
+
+    function print_checkbox_input_form_value($template_var, $value) {
+        return array(
+            "{$template_var}_input" => print_html_checkbox($template_var, $value),
+        );
+    }
+
+    function print_radio_input_form_value(
+        $template_var, $value, $values_info, $alt_values_info = null
+    ) {
+        $value_caption_pairs = $this->get_value_caption_pairs($values_info);
+        $value_caption_pairs = $this->expand_value_caption_pairs_with_begin_end(
+            $value_caption_pairs, $values_info
+        );
+
+        if (!is_null($alt_values_info)) {
+            $values_info = $alt_values_info;
+        }
+        $value_caption_pairs = $this->expand_value_caption_pairs_with_nonset(
+            $value_caption_pairs, $values_values_info
+        );
+                
+        return array(
+            "{$template_var}_input" => print_html_radio_group(
+                $template_var, $value_caption_pairs, $value
+            ),
+        );
+    }
+
+    function print_select_input_form_value(
+        $template_var, $value, $input_attrs, $values_info, $alt_values_info = null
+    ) {
+        $value_caption_pairs = $this->get_value_caption_pairs($values_info);
+        $value_caption_pairs = $this->expand_value_caption_pairs_with_begin_end(
+            $value_caption_pairs, $values_info
+        );
+        
+        if (!is_null($alt_values_info)) {
+            $values_info = $alt_values_info;
+        }
+        $value_caption_pairs = $this->expand_value_caption_pairs_with_nonset(
+            $value_caption_pairs, $values_info
+        );
+
+        return array(
+            "{$template_var}_input" => print_html_select(
+                $template_var, $value_caption_pairs, $value, $input_attrs
+            ),
+        );
+    }
+
+    function print_main_select_input_form_value(
+        $template_var,
+        $value,
+        $input_attrs,
+        $dependent_select_name,
+        $dependency_info,
+        $values_info,
+        $alt_values_info = null
+    ) {
+        $value_caption_pairs = $this->get_value_caption_pairs($values_info);
+        $value_caption_pairs = $this->expand_value_caption_pairs_with_begin_end(
+            $value_caption_pairs, $values_info
+        );
+        
+        if (!is_null($alt_values_info)) {
+            $values_info = $alt_values_info;
+        }
+        $value_caption_pairs = $this->expand_value_caption_pairs_with_nonset(
+            $value_caption_pairs, $values_info
+        );
+
+        $form_name = get_param_value($dependency_info, "form_name", "form");
+        $dependent_field_name = get_param_value($dependency_info, "field", "unknown");
+        $dependency_key_field_name = get_param_value($dependency_info, "key_field_name", "unknown");
+        $dependency_query_ex = get_param_value($dependency_info, "query_ex", array());
+
+        $dependent_values_info = $this->fields[$dependent_field_name]["input"]["values"];
+        $main_select_name = $template_var;
+
+        $input_attrs["onchange"] =
+            "updateDependentSelect(this, '{$dependent_select_name}'); " .
+            "if (this.form.{$dependent_select_name}.onchange) { " .
+                "this.form.{$dependent_select_name}.onchange(); " .
+            "}";
+
+        $dependency_array = $this->get_select_dependency_array(
+            $value_caption_pairs,
+            $dependent_values_info,
+            $dependency_key_field_name,
+            $dependency_query_ex
+        );
+
+        $dependency_js = create_select_dependency_js(
+            $form_name,
+            $main_select_name,
+            $dependent_select_name,
+            $dependency_array
+        );
+
+        return array(
+            "{$template_var}_input" => print_html_select(
+                $template_var, $value_caption_pairs, $value, $input_attrs
+            ),
+            "{$template_var}_dependency_js" => $dependency_js,
+        );
+    }
+
+    function get_value_caption_pairs($values_info) {
+        switch ($values_info["source"]) {
+        case "array":
+            $value_caption_pairs = $values_info["data"]["array"];
+            break;
+        case "db_object":
+            $data_info = $values_info["data"];
+            
+            $obj_name = get_param_value($data_info, "obj_name", null);
+            $values_field_name = get_param_value($data_info, "values_field_name", "id");
+            $captions_field_name = get_param_value($data_info, "captions_field_name", "name");
+            $query_ex = get_param_value($data_info, "query_ex", array());
+
+            $value_caption_pairs = $this->get_value_caption_pairs_from_db_object(
+                $obj_name, $values_field_name, $captions_field_name, $query_ex
+            );
+            break;
+        case "function":
+            $function_name = $values_info["data"]["function"];
+            $value_caption_pairs = $this->{$function_name}();
+            break;
+        }
+        return $value_caption_pairs;
+    }
+
+    function get_value_caption_pairs_from_db_object(
+        $obj_name, $values_field_name, $captions_field_name, $query_ex
+    ) {
+        $objects = $this->fetch_db_objects_list($obj_name, $query_ex);
+        $value_caption_pairs = array();
+        foreach ($objects as $obj) {
+            $value_caption_pairs[] = array(
+                $obj->{$values_field_name},
+                $obj->{$captions_field_name},
+            );
+        }
+        return $value_caption_pairs;
+    }
+
+    function expand_value_caption_pairs_with_begin_end($value_caption_pairs, $values_info) {
+        if (isset($values_info["data"]["begin_value_caption_pairs"])) {
+            $value_caption_pairs = array_merge(
+                $values_info["data"]["begin_value_caption_pairs"],
+                $value_caption_pairs
+            );
+        }
+        if (isset($values_info["data"]["end_value_caption_pairs"])) {
+            $value_caption_pairs = array_merge(
+                $value_caption_pairs,
+                $values_info["data"]["end_value_caption_pairs"]
+            );
+        }
+        return $value_caption_pairs;
+    }
+
+    function expand_value_caption_pairs_with_nonset($value_caption_pairs, $values_info) {
+        if (isset($values_info["data"]["nonset_value_caption_pair"])) {
+            $value_caption_pairs = array_merge(
+                array($values_info["data"]["nonset_value_caption_pair"]),
+                $value_caption_pairs
+            );
+        }
+        return $value_caption_pairs;
+    }
+    
+    function get_select_dependency_array(
+        $main_select_value_caption_pairs,
+        $dependent_values_info,
+        $dependency_key_field_name,
+        $dependency_query_ex
+    ) {
+        $dependent_query_ex = get_param_value(
+            $dependent_values_info["data"], "query_ex", array()
+        );
+
+        $query_ex = new SelectQuery();
+        $query_ex->expand($dependent_query_ex);
+        $query_ex->expand($dependency_query_ex);
+
+        $main_select_values = get_values_from_value_caption_pairs(
+            $main_select_value_caption_pairs
+        );
+        
+        if (isset($dependent_values_info["data"]["nonset_value_caption_pair"])) {
+            $dependent_select_nonset_value = get_value_from_value_caption_pair(
+                $dependent_values_info["data"]["nonset_value_caption_pair"]
+            );
+        } else {
+            $dependent_select_nonset_value = 0;
+        }
+
+        $dependency_array = array();
+        foreach ($main_select_values as $main_select_value) {
+            if ($main_select_value == $dependent_select_nonset_value) {
+                $dependency_array[] = array($dependent_select_nonset_value);
+                continue;
+            }
+
+            $final_query_ex = $query_ex;
+            $final_query_ex->expand(array(
+                "where" => "{$dependency_key_field_name} = {$main_select_value}",
+            ));
+            $dependent_values_info["data"]["query_ex"] = $final_query_ex;
+            
+            $dependent_select_value_caption_pairs =
+                $this->get_value_caption_pairs($dependent_values_info);
+            $dependent_select_value_caption_pairs =
+                $this->expand_value_caption_pairs_with_begin_end(
+                    $dependent_select_value_caption_pairs, $dependent_values_info
+                );
+            $dependent_select_value_caption_pairs =
+                $this->expand_value_caption_pairs_with_nonset(
+                    $dependent_select_value_caption_pairs, $dependent_values_info
+                );
+
+            $dependency_array[] = get_values_from_value_caption_pairs(
+                $dependent_select_value_caption_pairs
+            );
+        }
+        return $dependency_array;
+    }
+//
     function print_filter_form_values() {
         $h = array();
 
         foreach ($this->filters as $filter_info) {
             $filter_name = $filter_info["name"];
             $filter_relation = $filter_info["relation"];
-            $filter_value = $filter_info["value"];
-            $filter_input_type = isset($filter_info["input"]["type"]) ?
-                $filter_info["input"]["type"] :
-                "text";
-
+            
             $template_var = "{$this->table_name}_{$filter_name}_{$filter_relation}";
-            $h["{$template_var}_hidden"] = print_html_hidden($template_var, $filter_value);
-
-            switch ($filter_input_type) {
-            case "text":
-                $h["{$template_var}_input"] =
-                    print_html_input("text", $template_var, $filter_value);
-                break;
-            case "checkbox":
-                $h["{$template_var}_input"] =
-                    print_html_checkbox($template_var, $filter_value);
-                break;
-            case "radio":
-            case "select":
-            case "listbox":
-                $values_info = $filter_info["input"]["values"];
-                if (
-                    isset($values_info["data"]) &&
-                    is_array($values_info["data"]) &&
-                    isset($values_info["data"]["begin_value_caption_pair"])
-                ) {
-                    $begin_value_caption_pair =
-                        $values_info["data"]["begin_value_caption_pair"];
-                } else {
-                    $begin_value_caption_pair = null;
-                }
-
-                if (
-                    isset($values_info["data"]) &&
-                    is_array($values_info["data"]) &&
-                    isset($values_info["data"]["end_value_caption_pair"])
-                ) {
-                    $end_value_caption_pair =
-                        $values_info["data"]["end_value_caption_pair"];
-                } else {
-                    $end_value_caption_pair = null;
-                }
-                
-                $input_source = $values_info["source"];
-                if ($input_source == "field") {
-                    $values_info = $this->fields[$filter_name]["input"]["values"];
-                    $input_source = $values_info["source"];
-                }
-
-                switch ($input_source) {
-                case "array":
-                    $value_caption_pairs = $values_info["data"];
-                    break;
-                case "db_object":
-                    $value_caption_pairs = get_db_object_value_caption_pairs(
-                        $values_info["data"]["obj_name"],
-                        $values_info["data"]["caption_field_name"],
-                        $values_info["data"]["query_ex"]
-                    );
-                    break;
-                case "function":
-                    $func = $values_info["data"];
-                    $value_caption_pairs = $this->{$func}();
-                    break;
-                default:
-                    die(
-                        "{$this->table_name}: unknown input source '{$input_source}' " .
-                        "for filter '{$filter_name}' in print_filter_form_values()"
-                    );
-                }
-                if (!is_null($begin_value_caption_pair)) {
-                    $value_caption_pairs = $begin_value_caption_pair + $value_caption_pairs;
-                }
-                if (!is_null($end_value_caption_pair)) {
-                    $value_caption_pairs = $value_caption_pairs + $end_value_caption_pair;
-                }
-                
-                if ($filter_input_type == "select") {
-                    $h["{$template_var}_input"] =
-                        print_html_select($template_var, $value_caption_pairs, $filter_value);
-                } else if ($filter_input_type == "listbox") {
-                    $h["{$template_var}_input"] =
-                        print_html_select(
-                            $template_var, $value_caption_pairs, $filter_value, "multiple"
-                        );
-                } else {
-                    $h["{$template_var}_input"] =
-                        print_html_radio_group($template_var, $value_caption_pairs, $filter_value);
-                }
-                break;
-            }
+            $h1 = $this->print_filter_input_form_values($template_var, $filter_info);
+            
+            $h = array_merge($h, $h1);
         }
 
         $this->assign_values($h);
         return $h;
+    }
+
+    function print_filter_input_form_values($template_var, $filter_info) {
+        $filter_name = $filter_info["name"];
+        $filter_relation = $filter_info["relation"];
+        $filter_value = $filter_info["value"];
+        $filter_input_type = isset($filter_info["input"]["type"]) ?
+            $filter_info["input"]["type"] :
+            "text";
+        $filter_input_attrs = isset($filter_info["input"]["type_attrs"]) ?
+            $filter_info["input"]["type_attrs"] :
+            array();
+
+        $values_info = null;
+        $alt_values_info = null;
+        if (isset($filter_info["input"]["values"])) {
+            $values_info = $filter_info["input"]["values"];
+            if ($values_info["source"] == "field") {
+                $alt_values_info = $values_info;
+                $values_info = $this->fields[$filter_name]["input"]["values"];
+            }
+        }
+
+        switch ($filter_input_type) {
+        case "text":
+            $h1 = $this->print_text_input_form_value($template_var, $filter_value);
+            break;
+        case "checkbox":
+            $h1 = $this->print_checkbox_input_form_value($template_var, $filter_value);
+            break;
+        case "radio":
+            $h1 = $this->print_radio_input_form_value(
+                $template_var, $filter_value, $values_info, $alt_values_info
+            );
+            break;
+        case "select":
+            $h1 = $this->print_select_input_form_value(
+                $template_var,
+                $filter_value,
+                $filter_input_attrs,
+                $values_info,
+                $alt_values_info
+            );
+            break;
+        case "listbox":
+            $filter_input_attrs["multiple"] = null;
+            $h1 = $this->print_select_input_form_value(
+                $template_var,
+                $filter_value,
+                $filter_input_attrs,
+                $values_info,
+                $alt_values_info
+            );
+            break;
+        case "main_select":
+            $dependency_info = $values_info["dependency"];
+            $dependent_field_name = get_param_value($dependency_info, "field", "unknown");
+            $dependent_select_name =
+                "{$this->table_name}_{$dependent_field_name}_{$filter_relation}";
+
+            $h1 = $this->print_main_select_input_form_value(
+                $template_var,
+                $filter_value,
+                $filter_input_attrs,
+                $dependent_select_name,
+                $dependency_info,
+                $values_info,
+                $alt_values_info
+            );
+            break;
+        default:
+            $h1 = array();
+        }
+
+        return array_merge(
+            $h1,
+            array(
+                "{$template_var}_hidden" => print_html_hidden($template_var, $filter_value),
+            )
+        );
     }
 
 //  Objects validation for store/update and validation helpers
@@ -2150,35 +2342,6 @@ class DbObject {
         }
 
         return $messages;
-    }
-//
-    function get_dependency_array(
-        $main_objs,
-        $dep_obj_name,
-        $dep_key_name,
-        $dep_data_field_name = "name",
-        $query_clauses = array()
-    ) {
-        $main_obj_ids = get_values_from_value_caption_pairs($main_objs);
-        $main_to_dep_rows = array(array(0));
-
-        if (!isset($query_clauses["where"])) {
-            $query_clauses["where"] = "1";
-        }
-        foreach ($main_obj_ids as $main_obj_id) {
-            $q = $query_clauses;
-            $q["where"] .= " and {$dep_key_name} = {$main_obj_id}";
-
-            $dep_obj_ids = get_captions_from_value_caption_pairs(
-                get_db_object_value_caption_pairs(
-                    $dep_obj_name,
-                    $dep_data_field_name,
-                    $q
-                )
-            );
-            $main_to_dep_rows[] = array(0) + $dep_obj_ids;
-        }
-        return $main_to_dep_rows;
     }
 //
     function get_select_query(
