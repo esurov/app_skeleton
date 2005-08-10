@@ -1328,7 +1328,7 @@ class App {
                 );
             }
 
-            return $this->page->parse_file_new(
+            return $this->page->parse_file(
                 "{$templates_dir}/list_items.{$templates_ext}", $template_var
             );
         }

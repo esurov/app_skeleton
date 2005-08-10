@@ -125,8 +125,7 @@ class Template {
     // Parse given template using values from internal hash
     // Return filled template and empty the variable
     function parse_file_new($template_name, $var_name = null) {
-        $this->set_value($var_name, "");
-        return $this->parse_file($template_name, $var_name);
+        $this->set_value($var_name, $this->parse_file($template_name));
     }
 
     function parse_file_if_exists($template_name, $var_name = null) {
