@@ -9,8 +9,7 @@ page_title_pg_index =
 head_page_title_pg_index = Home
 page_title_view_news_articles = News
 page_title_view_news_article = View news article
-page_title_pg_contact_form = Contacts
-page_title_pg_static_contact_form_processed =
+page_title_pg_contact_form = Contact form
 page_title_pg_static_sample_page1 = SamplePage1
 page_title_pg_static_sample_page2 = SamplePage2
 
@@ -38,9 +37,18 @@ link_send = Send
 link_show = Show
 link_show_all = Show all
 link_view_all_news = View all news
+link_login = Login
+link_logout = Logout
+link_signup = Signup
+link_confirm = Confirm
+link_unconfirm = Undo confirm
+link_deactivate = Deactivate
+link_activate = Activate
+link_proceed = Proceed
 
 ["parts of controls"]
 any = Any
+all = All
 choose_one = Choose one:
 yes = Yes
 no = No
@@ -54,14 +62,14 @@ de = German
 ["table headers and form fields captions"]
 actions = Actions
 date = Date
-title = Titolo
-body = Corpo
+title = Title
+body = Body
 text = Text
 current_image = Current image
 image = Image
 first_name = First Name
 last_name = Last Name
-company = Company
+company_name = Company
 position = Position
 email = E-mail
 zip = ZIP
@@ -75,7 +83,20 @@ message_text = Message
 ["status and popup messages"]
 sure_delete = Are you sure you want to delete record?
 cannot_delete_record_because_it_has_links = Cannot delete {%main_obj_name%} because it has links to {%dep_objs_data%}
-contact_form_processed = Your contact info was processed. Thank you.
+
+status_message_first_name_empty = Please input your first name
+status_message_last_name_empty = Please input your last name
+status_message_email_empty = Please input your e-mail
+status_message_bad_email = Please input correct e-mail address
+status_message_zip_empty = Please input ZIP Code 
+status_message_zip_bad = ZIP Code should be a number with minimum 5 digits
+status_message_country_empty = Please input country
+status_message_city_empty = Please input city
+status_message_phone_empty = Please input contact phone
+status_message_phone_bad = Bad phone number format
+status_message_message_text_empty = Input message
+
+contact_form_processed = Your contact info was processed. Thank you!
 
 ["parts of page"]
 pager_pages_title = Pages:

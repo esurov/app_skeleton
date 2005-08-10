@@ -158,6 +158,10 @@ class DbObject {
         return $result_field_names;
     }
 
+    function is_field_exist($field_name) {
+        return isset($this->fields[$field_name]);
+    }
+
     function is_field_multilingual($field_name) {
         return $this->fields[$field_name]["multilingual"];
     }
@@ -191,12 +195,13 @@ class DbObject {
     function expand_multilingual_field_names($field_names, $multilingual_field_names) {
         $expanded_field_names = $field_names;
         foreach ($multilingual_field_names as $multilingual_field_name) {
-            foreach ($this->avail_langs as $lang) {
-                $full_multilingual_field_name = "{$multilingual_field_name}_{$lang}";
+            $full_field_names =
+                $this->get_full_field_names_for_multilingual_field_name($multilingual_field_name);
+            foreach ($full_field_names as $full_field_name) {
                 unset_array_value_if_exists(
-                    $full_multilingual_field_name, $expanded_field_names
+                    $full_field_name, $expanded_field_names
                 );
-                $expanded_field_names[] = $full_multilingual_field_name;
+                $expanded_field_names[] = $full_field_name;
             }
             unset_array_value_if_exists(
                 $multilingual_field_name, $expanded_field_names
@@ -206,6 +211,13 @@ class DbObject {
         return $expanded_field_names;
     }
 
+    function get_full_field_names_for_multilingual_field_name($multilingual_field_name) {
+        $full_field_names = array();
+        foreach ($this->avail_langs as $lang) {
+            $full_field_names[] = "{$multilingual_field_name}_{$lang}";
+        }
+        return $full_field_names;
+    }
 //
     function get_message($name) {
         return $this->app->messages->get_value($name);
@@ -1424,46 +1436,42 @@ class DbObject {
 
             switch ($field_type) {
             case "primary_key":
-                $h1 = $this->print_primary_key_field_value($template_var, $value);
+                $h1 = $this->app->print_primary_key_value($template_var, $value);
                 break;
             case "foreign_key":
-                $h1 = $this->print_foreign_key_field_value($template_var, $value);
+                $h1 = $this->app->print_foreign_key_value($template_var, $value);
                 break;
             case "integer":
-                $h1 = $this->print_integer_field_value($template_var, $value);
+                $h1 = $this->app->print_integer_value($template_var, $value);
                 break;
             case "double":
-                $h1 = $this->print_double_field_value($template_var, $value, $field_info["prec"]);
+                $h1 = $this->app->print_double_value($template_var, $value, $field_info["prec"]);
                 break;
             case "currency":
-                $h1 = $this->print_currency_field_value($template_var, $value, $field_info["prec"]);
+                $h1 = $this->app->print_currency_value($template_var, $value, $field_info["prec"]);
                 break;
             case "boolean":
-                $value_captions = array(
-                    0 => $this->get_message("no"),
-                    1 => $this->get_message("yes"),
-                );
-                $h1 = $this->print_boolean_field_value($template_var, $value, $value_captions);
+                $h1 = $this->app->print_boolean_value($template_var, $value);
                 break;
             case "enum":
-                $h1 = $this->print_enum_field_value(
+                $h1 = $this->app->print_enum_value(
                     $template_var, $value, $field_info["input"]["values"]["data"]["array"]
                 );
                 break;
             case "varchar":
-                $h1 = $this->print_varchar_field_value($template_var, $value);
+                $h1 = $this->app->print_varchar_value($template_var, $value);
                 break;
             case "text":
-                $h1 = $this->print_text_field_value($template_var, $value);
+                $h1 = $this->app->print_text_value($template_var, $value);
                 break;
             case "datetime":
-                $h1 = $this->print_datetime_field_value($template_var, $value);
+                $h1 = $this->app->print_datetime_value($template_var, $value);
                 break;
             case "date":
-                $h1 = $this->print_date_field_value($template_var, $value);
+                $h1 = $this->app->print_date_value($template_var, $value);
                 break;
             case "time":
-                $h1 = $this->print_time_field_value($template_var, $value);
+                $h1 = $this->app->print_time_value($template_var, $value);
                 break;
             }
 
@@ -1472,107 +1480,6 @@ class DbObject {
 
         $this->assign_values($h);
         return $h;
-    }
-//
-    function print_primary_key_field_value($template_var, $value) {
-        return array(
-            "{$template_var}" => $value,
-        );
-    }
-
-    function print_foreign_key_field_value($template_var, $value) {
-        return array(
-            "{$template_var}" => $value,
-        );
-    }
-
-    function print_integer_field_value($template_var, $value) {
-        return array(
-            "{$template_var}" => $this->app->get_app_integer_value($value),
-            "{$template_var}_orig" => $value,
-        );
-    }
-
-    function print_double_field_value($template_var, $value, $decimals) {
-        return array(
-            "{$template_var}" => $this->app->get_app_double_value($value, $decimals),
-            "{$template_var}_2" => $this->app->get_app_double_value($value, 2),
-            "{$template_var}_5" => $this->app->get_app_double_value($value, 5),
-            "{$template_var}_orig" => $value,
-        );
-    }
-
-    function print_currency_field_value($template_var, $value, $decimals) {
-        return array(
-            "{$template_var}" => $this->app->get_app_currency_value($value, $decimals),
-            "{$template_var}_with_sign" =>
-                $this->app->get_app_currency_with_sign_value($value, $decimals),
-            "{$template_var}_orig" => $value,
-        );
-    }
-
-    function print_boolean_field_value($template_var, $value, $value_captions) {
-        return array(
-            "{$template_var}" => $value_captions[$value],
-            "{$template_var}_orig" => $value,
-        );
-    }
-
-    function print_enum_field_value($template_var, $enum_value, $enum_value_caption_pairs) {
-        $enum_caption = null;
-        foreach ($enum_value_caption_pairs as $enum_value_caption_pair) {
-            if ($enum_value == get_value_from_value_caption_pair($enum_value_caption_pair)) {
-                $enum_caption = get_caption_from_value_caption_pair($enum_value_caption_pair);
-                break;
-            }
-        }
-        if (is_null($enum_caption)) {
-            $enum_caption = get_caption_from_value_caption_pair($enum_value_caption_pairs[0]);
-        } 
-        return array(
-            "{$template_var}" => $enum_caption,
-            "{$template_var}_orig" => $enum_value,
-        );
-    }
-
-    function print_varchar_field_value($template_var, $value) {
-        $safe_value = get_html_safe_string($value);
-        return array(
-            "{$template_var}" => $safe_value,
-            "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
-            "{$template_var}_orig" => $value,
-        );
-    }
-
-    function print_text_field_value($template_var, $value) {
-        $safe_value = get_html_safe_string($value);
-        return array(
-            "{$template_var}" => $safe_value,
-            "{$template_var}_lf2br" => convert_lf2br($safe_value),
-            "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
-            "{$template_var}_orig" => $value,
-        );
-    }
-
-    function print_datetime_field_value($template_var, $db_datetime) {
-        return array(
-            "{$template_var}" => get_html_safe_string($this->app->get_app_datetime($db_datetime)),
-            "{$template_var}_orig" => get_html_safe_string($db_datetime),
-        );
-    }
-
-    function print_date_field_value($template_var, $db_date) {
-        return array(
-            "{$template_var}" => get_html_safe_string($this->app->get_app_date($db_date)),
-            "{$template_var}_orig" => get_html_safe_string($db_date),
-        );
-    }
-
-    function print_time_field_value($template_var, $db_time) {
-        return array(
-            "{$template_var}" => get_html_safe_string($this->app->get_app_time($db_time)),
-            "{$template_var}_orig" => get_html_safe_string($db_time),
-        );
     }
 //
     function print_form_values($params = array()) {
@@ -1670,6 +1577,8 @@ class DbObject {
             $h = array_merge($h, $h1);
         }
 
+        $h = array_merge($h, $this->print_client_validation_js());
+        
         $this->assign_values($h);
         return $h + $printed_values;
     }
@@ -1724,25 +1633,31 @@ class DbObject {
 
     function print_integer_field_form_value($template_var, $value) {
         $app_integer_value = $this->app->get_app_integer_value($value);
+        $attrs = array("style" => "text-align: right;");
         return array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $app_integer_value),
-            "{$template_var}_input" => print_html_input("text", $template_var, $app_integer_value),
+            "{$template_var}_input" =>
+                print_html_input("text", $template_var, $app_integer_value, $attrs),
         );
     }
     
     function print_double_field_form_value($template_var, $value, $decimals) {
         $app_double_value = $this->app->get_app_double_value($value, $decimals);
+        $attrs = array("style" => "text-align: right;");
         return array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $app_double_value),
-            "{$template_var}_input" => print_html_input("text", $template_var, $app_double_value),
+            "{$template_var}_input" =>
+                print_html_input("text", $template_var, $app_double_value, $attrs),
         );
     }
 
     function print_currency_field_form_value($template_var, $value, $decimals) {
         $app_currency_value = $this->app->get_app_currency_value($value, $decimals);
+        $attrs = array("style" => "text-align: right;");
         return array(
             "{$template_var}_hidden" => print_html_hidden($template_var, $app_currency_value),
-            "{$template_var}_input" => print_html_input("text", $template_var, $app_currency_value),
+            "{$template_var}_input" =>
+                print_html_input("text", $template_var, $app_currency_value, $attrs),
         );
     }
 
@@ -2210,17 +2125,114 @@ class DbObject {
     }
 
 //  Objects validation for store/update and validation helpers
-    function validate($old_obj = null, $field_names_to_validate = null) {
+    function get_validate_conditions($context, $context_params) {
         return array();
     }
 
-    function validate_not_empty_field($field_name) {
+    function get_validate_context_field_names($context, $context_params) {
+        return null;
+    }
+
+    function validate(
+        $old_obj = null, $context = "", $context_params = array()
+    ) {
+        $conditions = $this->get_validate_conditions($context, $context_params);
+        $field_names_to_validate =
+            $this->get_validate_context_field_names($context, $context_params);
+
+        $messages = array();
+        foreach ($conditions as $condition_info) {
+            $field_name = $condition_info["field"];
+            if (!$this->should_validate_field($field_name, $field_names_to_validate)) {
+                continue;
+            }
+            $message = $this->validate_condition($condition_info, $old_obj);
+            if (!is_null($message)) {
+                $messages[] = $message;
+            }
+        }
+        return $messages;
+    }
+
+    function validate_condition($condition_info, $old_obj) {
+        $field_name = $condition_info["field"];
+        $type = $condition_info["type"];
+        $param = get_param_value($condition_info, "param", null);
+        $message_resource = $condition_info["message"];
+        $message_resource_params = get_param_value($condition_info, "message_params", array());
+
+        if ($this->validate_condition_by_type($field_name, $type, $param, $old_obj)) {
+            $condition_info = get_param_value($condition_info, "dependency", null);
+            if (is_null($condition_info)) {
+                return null;
+            } else {
+                return $this->validate_condition($condition_info, $old_obj);
+            }
+        } else {
+            if (is_null($message_resource)) {
+                return null;
+            } else {
+                return new ErrorStatusMsg($message_resource, $message_resource_params);
+            }
+        }
+    }
+
+    function validate_condition_by_type($field_name, $type, $param, $old_obj) {
+        switch ($type) {
+        case "regexp":
+            $result = $this->validate_regexp_condition($field_name, $param);
+            break;
+        case "empty":
+            $result = $this->validate_empty_condition($field_name);
+            break;
+        case "not_empty":
+            $result = $this->validate_not_empty_condition($field_name);
+            break;
+        case "email":
+            $result = $this->validate_email_condition($field_name);
+            break;
+        case "unique":
+            $result = $this->validate_unique_condition($field_name, $old_obj);
+            break;
+        case "equal":
+            $result = $this->validate_equal_condition($field_name, $param);
+            break;
+        case "not_equal":
+            $result = $this->validate_not_equal_condition($field_name, $param);
+            break;
+        default:
+            $result = true;
+        }
+        return $result;
+    }
+
+    function validate_regexp_condition($field_name, $regexp) {
+        return preg_match($regexp, $this->{$field_name});
+    }
+
+    function validate_empty_condition($field_name) {
         if ($this->is_field_multilingual($field_name)) {
             foreach ($this->avail_langs as $lang) {
                 $field_names = $this->get_field_names_with_lang_subst(
                     array($field_name), $lang
                 );
-                if (!$this->validate_not_empty_field($field_names[0])) {
+                if (!$this->validate_empty_condition($field_names[0])) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return (is_value_empty($this->{$field_name}));
+        }
+    }
+
+    function validate_not_empty_condition($field_name) {
+        if ($this->is_field_multilingual($field_name)) {
+            foreach ($this->avail_langs as $lang) {
+                $field_names = $this->get_field_names_with_lang_subst(
+                    array($field_name), $lang
+                );
+                if (!$this->validate_not_empty_condition($field_names[0])) {
                     return false;
                 }
             }
@@ -2230,11 +2242,11 @@ class DbObject {
         }
     }
 
-    function validate_email_field($field_name) {
+    function validate_email_condition($field_name) {
         return is_value_email($this->{$field_name});
     }
 
-    function validate_unique_field($field_name, $old_obj) {
+    function validate_unique_condition($field_name, $old_obj) {
         if (is_array($field_name)) {
             $field_names = $field_name;
         } else {
@@ -2267,17 +2279,14 @@ class DbObject {
                 $field_names_to_validate = $this->get_field_names_with_lang_subst(
                     $field_names, $lang
                 );
-                if (!$this->validate_unique_field(
-                    $field_names_to_validate, $old_obj
-                )) {
+                if (!$this->validate_unique_condition($field_names_to_validate, $old_obj)) {
                     return false;
                 }
             }
         }
-
         return true;
     }
-
+    
     function are_field_values_exist($field_names) {
         $query = new SelectQuery(array(
             "from" => "{%{$this->table_name}_table%} AS {$this->table_name}",
@@ -2296,11 +2305,90 @@ class DbObject {
         return join(" AND ", $where_expressions);
     }
 
+    function validate_equal_condition($field_name, $value) {
+        return ($this->{$field_name} == $value);
+    }
+
+    function validate_not_equal_condition($field_name, $value) {
+        return ($this->{$field_name} != $value);
+    }
+
     function should_validate_field($field_name, $field_names_to_validate) {
         return (
             is_null($field_names_to_validate) ||
             in_array($field_name, $field_names_to_validate)
         );
+    }
+//
+    function print_client_validation_js() {
+        $context = $this->print_params["context"];
+        $conditions = $this->get_validate_conditions($context, array());
+        $field_names_to_validate = $this->get_validate_context_field_names($context, array());
+        
+        $client_validate_condition_strs = array();
+        foreach ($conditions as $condition_info) {
+            $field_name = $condition_info["field"];
+            if (!$this->should_validate_field($field_name, $field_names_to_validate)) {
+                continue;
+            }
+            
+            if ($this->is_field_multilingual($field_name)) {
+                foreach ($this->avail_langs as $lang) {
+                    $client_validate_condition_strs[] =
+                        $this->get_client_validate_condition_str($condition_info, $lang);
+                }
+            } else {
+                $client_validate_condition_strs[] =
+                    $this->get_client_validate_condition_str($condition_info);
+            }
+        }
+        return array(
+            "{$this->table_name}_client_validation_js" =>
+                create_client_validation_js($client_validate_condition_strs),
+        );
+    }
+
+    function get_client_validate_condition_str($condition_info, $lang = null) {
+        $dependent_condition_info = get_param_value($condition_info, "dependency", null);
+        $dependent_validate_condition_str = (is_null($dependent_condition_info)) ?
+            null : $this->get_client_validate_condition_str($dependent_condition_info, $lang);
+
+        $field_name = $condition_info["field"];
+        if (!is_null($lang)) {
+            $full_field_name = "{$field_name}_{$lang}";
+            if ($this->is_field_exist($full_field_name)) {
+                $field_name = $full_field_name;
+            }
+        }
+            
+        $input_name = "{$this->table_name}_{$field_name}";
+        $type = $condition_info["type"];
+        $message_resource = $condition_info["message"];
+        $message_text = (is_null($message_resource)) ? null : $this->get_message($message_resource);
+        $param = get_param_value($condition_info, "param", null);
+        
+        switch ($type) {
+        case "regexp":
+        case "empty":
+        case "not_empty":
+        case "email":
+        case "equal":
+        case "not_equal":
+        case "zip":
+        case "phone":
+        case "number":
+        case "number_greater":
+        case "number_greater_equal":
+        case "number_less":
+        case "number_less_equal":
+            $validate_condition_str = create_client_validate_condition_str(
+                $input_name, $type, $message_text, $param, $dependent_validate_condition_str
+            );
+            break;
+        default:
+            $validate_condition_str = null;
+        }
+        return $validate_condition_str;
     }
 //
     // check reference integrity

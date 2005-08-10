@@ -61,38 +61,27 @@ class UserApp extends CustomApp {
 //
     function pg_contact_form() {
         $this->page->parse_file(
-            "static/_contact_form_notice_{$this->lang}.html",
-            "contact_form_notice"
+            "contact/form_notice_{$this->lang}.html", "contact_form_notice"
         );
-        $this->print_static_page("contact_form");
+        $contact = $this->create_db_object("contact");
+        $contact->print_form_values();
+        $this->page->parse_file("contact/form.html", "body");
     }
 
     function process_contact_form() {
-        $email_from = param("email");
-        if (trim($email_from) != "") {
+        $contact = $this->create_db_object("contact");
+        $contact->read();
+        if (is_value_not_empty($contact->email)) {
             $email_to = $this->config->get_value("contact_form_email_to");
             $name_to = $this->config->get_value("contact_form_name_to");
 
-            $first_name = trim(param("first_name"));
-            $last_name = trim(param("last_name"));
+            $first_name = trim($contact->first_name);
+            $last_name = trim($contact->last_name);
 
             $name_from = trim("{$first_name} {$last_name}");
             $subject = $this->config->get_value("contact_form_subject");
 
-            $fillings = array(
-                "first_name" => $first_name,
-                "last_name" => $last_name,
-                "email" => $email_from,
-                "company" => param("company"),
-                "address" => param("address"),
-                "phone" => param("phone"),
-                "fax" => param("fax"),
-            );
-            $this->page->assign(get_html_safe_array($fillings));
-            $this->page->assign(
-                "message_text",
-                convert_lf2br(get_html_safe_string(param("message_text")))
-            );
+            $contact->print_values();
 
             $this->email_sender->From = $email_from;
             $this->email_sender->Sender = $email_from;
@@ -102,10 +91,8 @@ class UserApp extends CustomApp {
             $this->email_sender->Body = $this->page->parse_file("email/contact.html");
             $this->email_sender->Send();
         }
-        $this->create_self_redirect_response(array(
-            "action" => "pg_static",
-            "page" => "contact_form_processed",
-        ));
+        $this->add_session_status_message(new OkStatusMsg("contact_form_processed"));
+        $this->create_self_redirect_response(array("action" => "pg_contact_form"));
     }
 }
 

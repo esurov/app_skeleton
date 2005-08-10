@@ -15,6 +15,10 @@ class SetupApp extends CustomApp {
 
             "create_update_tables" => $u,
             "delete_tables" => $u,
+            "pg_tables_dump" => $u,
+            "pg_tables_dump_url" => $u,
+            "pg_view_tables_dump" => $u,
+            "download_tables_dump" => $u,
             "insert_test_data" => $u,
 //            "insert_initial_data" => $u,
         );
@@ -25,7 +29,7 @@ class SetupApp extends CustomApp {
     }
 
     function run_access_denied_action() {
-        $this->create_http_auth_html_page_response($this->get_message("setup_auth_realm"));
+        $this->create_http_auth_html_document_response($this->get_message("setup_auth_realm"));
     }
 //
     function pg_index() {
@@ -43,7 +47,63 @@ class SetupApp extends CustomApp {
         $this->add_session_status_message(new OkStatusMsg("tables_deleted"));
         $this->create_self_redirect_response();
     }
+//
+    function pg_tables_dump() {
+        $actual_table_names = $this->db->get_actual_table_names(true);
+        foreach ($actual_table_names as $actual_table_name) {
+            $this->page->assign($this->print_varchar_value("table_name", $actual_table_name));
+            $this->page->parse_file("tables_dump/tables_list/form_item.html", "form_items");
+        }
+        $this->page->parse_file("tables_dump/tables_list/form.html", "body");
+    }
 
+    function pg_tables_dump_url() {
+        $table_names = param("table_names");
+        $table_names_str = join(" ", $table_names);
+        
+        $url = create_self_full_url(array(
+            "action" => "pg_view_tables_dump",
+            "table_names" => $table_names_str,
+        ));
+        $this->page->assign($this->print_varchar_value("view_dump_url", $url));
+
+        $url = create_self_full_url(array(
+            "action" => "download_tables_dump",
+            "table_names" => $table_names_str,
+        ));
+        $this->page->assign($this->print_varchar_value("download_dump_url", $url));
+
+        $this->page->parse_file("tables_dump/url/body.html", "body");
+    }
+
+    function pg_view_tables_dump() {
+        $dump_text = $this->create_tables_dump(param("table_names"), false);
+        $n_dump_lines = count(explode("\n", $dump_text));
+        $this->page->assign($this->print_varchar_value("dump_text", $dump_text));
+        $this->page->assign($this->print_integer_value("n_dump_lines", $n_dump_lines));
+        $this->page->parse_file("tables_dump/dump_text/body.html", "body");
+    }
+
+    function download_tables_dump() {
+        $dump_text = $this->create_tables_dump(param("table_names"), true);
+        $now_date_str = $this->get_db_now_date();
+        $this->create_binary_content_response($dump_text, "dump-{$now_date_str}.sql.bz2");
+    }
+
+    function create_tables_dump($table_names_str, $should_compress) {
+        $db_connection_info = $this->db->get_connection_info();
+        $host = $db_connection_info["host"];
+        $database = $db_connection_info["database"];
+        $username = $db_connection_info["username"];
+        $password = $db_connection_info["password"];
+        $compress_subcmdline = ($should_compress) ?
+            " | bzip2 -" : "";
+        $cmdline =
+            "mysqldump --add-drop-table -u{$username} -p{$password} -h{$host} {$database} " .
+            "{$table_names_str}{$compress_subcmdline}";
+        return `{$cmdline}`;
+    }
+//
     function insert_test_data() {
         $this->insert_test_news_articles();
         $this->add_session_status_message(new OkStatusMsg("test_data_inserted"));

@@ -26,7 +26,7 @@ class AdminApp extends CustomApp {
     }
 
     function run_access_denied_action() {
-        $this->create_http_auth_html_page_response($this->get_message("admin_auth_realm"));
+        $this->create_http_auth_html_document_response($this->get_message("admin_auth_realm"));
     }
 //
     function pg_index() {

@@ -30,7 +30,7 @@ class CustomApp extends App {
         $this->pager->n_rows_per_page = 10000;
     }
 
-    function create_html_page_response_body() {
+    function create_html_document_body_content() {
         if ($this->report) {
             $template_type = ($this->page->is_template_exist("report.html")) ?
                 "report" :
@@ -49,7 +49,7 @@ class CustomApp extends App {
             $this->page_template_name = "{$template_type}.html";
         }
         
-        return parent::create_html_page_response_body();
+        return parent::create_html_document_body_content();
     }
 
     function get_app_extra_suburl_params() {

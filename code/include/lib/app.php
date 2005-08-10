@@ -142,7 +142,7 @@ class App {
         }
 
         if (is_null($this->response)) {
-            $this->create_html_page_response();
+            $this->create_html_document_response();
         }
         $this->response->send();
     }
@@ -195,7 +195,7 @@ class App {
     }
 
     function run_access_denied_action() {
-        $this->create_access_denied_html_page_response();
+        $this->create_access_denied_html_document_response();
     }
 //
     function get_http_auth_user_access_level() {
@@ -211,33 +211,6 @@ class App {
             $_SERVER["PHP_AUTH_PW"] == $password;
     }
 //
-    function create_html_page_response() {
-        $page_response_body = $this->create_html_page_response_body();
-        $charset = $this->config->get_value("html_pages_charset");
-        $this->response = new HtmlPageResponse($page_response_body, $charset);
-    }
-
-    function create_html_page_response_body() {
-        return $this->page->parse_file($this->page_template_name);
-    }
-
-    function create_xml_page_response($body) {
-        $this->response = new XmlPageResponse($body);
-    }
-
-    function create_access_denied_html_page_response() {
-        $this->page_template_name = "access_denied.html";
-        $this->create_html_page_response();
-    }
-
-    function create_http_auth_html_page_response($realm) {
-        $this->create_access_denied_html_page_response();
-        $this->response->push_headers(array(
-            new HttpHeader("WWW-Authenticate", "Basic realm=\"{$realm}\""),
-            new HttpHeader("HTTP/1.0 401 Unauthorized"),
-        ));
-    }
-
     function create_redirect_response($url) {
         $this->response = new RedirectResponse($url);
         $this->log->write("App", "Redirect to {$url}", 3);
@@ -265,6 +238,51 @@ class App {
 
     function get_app_extra_suburl_params() {
         return array();
+    }
+//
+    function create_binary_content_response($content, $filename) {
+        $this->response = new BinaryContentResponse($content, "application/octet-stream");
+        $this->response->add_content_disposition_header($filename);
+    }
+
+//
+    function create_html_document_response() {
+        $content = $this->create_html_document_body_content();
+        $charset = $this->config->get_value("html_pages_charset");
+        $this->response = new HtmlDocumentResponse($content, $charset);
+    }
+
+    function create_html_document_body_content() {
+        return $this->page->parse_file($this->page_template_name);
+    }
+
+    function create_access_denied_html_document_response() {
+        $this->page_template_name = "access_denied.html";
+        $this->create_html_document_response();
+    }
+
+    function create_http_auth_html_document_response($realm) {
+        $this->create_access_denied_html_document_response();
+        $this->response->push_headers(array(
+            new HttpHeader("WWW-Authenticate", "Basic realm=\"{$realm}\""),
+            new HttpHeader("HTTP/1.0 401 Unauthorized"),
+        ));
+    }
+//
+    function create_xml_document_response($content) {
+        $this->response = new XmlDocumentResponse($content);
+    }
+
+    function create_plain_text_document_response(
+        $content, $filename = null, $open_inline = true
+    ) {
+        $this->response = new PlainTextDocumentResponse($content, $filename, $open_inline);
+    }
+
+    function create_pdf_document_response(
+        $content, $filename = null, $open_inline = true
+    ) {
+        $this->response = new PdfDocumentResponse($content, $filename, $open_inline);
     }
 //
     function create_db_object($obj_name) {
@@ -481,6 +499,113 @@ class App {
 
     function is_currency_sign_at_start() {
         return true;
+    }
+//
+    function print_primary_key_value($template_var, $value) {
+        return array(
+            "{$template_var}" => $value,
+        );
+    }
+
+    function print_foreign_key_value($template_var, $value) {
+        return array(
+            "{$template_var}" => $value,
+        );
+    }
+
+    function print_integer_value($template_var, $value) {
+        return array(
+            "{$template_var}" => $this->get_app_integer_value($value),
+            "{$template_var}_orig" => $value,
+        );
+    }
+
+    function print_double_value($template_var, $value, $decimals) {
+        return array(
+            "{$template_var}" => $this->get_app_double_value($value, $decimals),
+            "{$template_var}_2" => $this->get_app_double_value($value, 2),
+            "{$template_var}_5" => $this->get_app_double_value($value, 5),
+            "{$template_var}_orig" => $value,
+        );
+    }
+
+    function print_currency_value($template_var, $value, $decimals) {
+        return array(
+            "{$template_var}" => $this->get_app_currency_value($value, $decimals),
+            "{$template_var}_with_sign" =>
+                $this->get_app_currency_with_sign_value($value, $decimals),
+            "{$template_var}_orig" => $value,
+        );
+    }
+
+    function print_boolean_value($template_var, $value, $value_captions = null) {
+        if (is_null($value_captions)) {
+            $value_captions = array(
+                0 => $this->get_message("no"),
+                1 => $this->get_message("yes"),
+            );
+        }
+        return array(
+            "{$template_var}" => $value_captions[$value],
+            "{$template_var}_orig" => $value,
+        );
+    }
+
+    function print_enum_value($template_var, $enum_value, $enum_value_caption_pairs) {
+        $enum_caption = null;
+        foreach ($enum_value_caption_pairs as $enum_value_caption_pair) {
+            if ($enum_value == get_value_from_value_caption_pair($enum_value_caption_pair)) {
+                $enum_caption = get_caption_from_value_caption_pair($enum_value_caption_pair);
+                break;
+            }
+        }
+        if (is_null($enum_caption)) {
+            $enum_caption = get_caption_from_value_caption_pair($enum_value_caption_pairs[0]);
+        } 
+        return array(
+            "{$template_var}" => $enum_caption,
+            "{$template_var}_orig" => $enum_value,
+        );
+    }
+
+    function print_varchar_value($template_var, $value) {
+        $safe_value = get_html_safe_string($value);
+        return array(
+            "{$template_var}" => $safe_value,
+            "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
+            "{$template_var}_orig" => $value,
+        );
+    }
+
+    function print_text_value($template_var, $value) {
+        $safe_value = get_html_safe_string($value);
+        return array(
+            "{$template_var}" => $safe_value,
+            "{$template_var}_lf2br" => convert_lf2br($safe_value),
+            "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
+            "{$template_var}_orig" => $value,
+        );
+    }
+
+    function print_datetime_value($template_var, $db_datetime) {
+        return array(
+            "{$template_var}" => get_html_safe_string($this->get_app_datetime($db_datetime)),
+            "{$template_var}_orig" => get_html_safe_string($db_datetime),
+        );
+    }
+
+    function print_date_value($template_var, $db_date) {
+        return array(
+            "{$template_var}" => get_html_safe_string($this->get_app_date($db_date)),
+            "{$template_var}_orig" => get_html_safe_string($db_date),
+        );
+    }
+
+    function print_time_value($template_var, $db_time) {
+        return array(
+            "{$template_var}" => get_html_safe_string($this->get_app_time($db_time)),
+            "{$template_var}_orig" => get_html_safe_string($db_time),
+        );
     }
 //
     function get_message($name) {

@@ -104,6 +104,10 @@ class HttpResponse {
         $this->add_header(new HttpHeader("Content-Type", "{$mime_type}{$charset_str}"));
     }
 
+    function add_content_length_header($length) {
+        $this->add_header(new HttpHeader("Content-Length", $length));
+    }
+
     function add_content_disposition_header($filename, $disposition_type = "attachment") {
         $this->add_header(new HttpHeader(
             "Content-Disposition", "{$disposition_type}; filename=\"{$filename}\""
@@ -154,73 +158,116 @@ class RedirectResponse extends HttpResponse {
     }
 }
 
-class HtmlPageResponse extends HttpResponse {
-    
-    var $page_content;
+class BinaryContentResponse extends HttpResponse {
 
-    function HtmlPageResponse($page_content, $charset) {
+    var $content;
+
+    function BinaryContentResponse(
+        $content, $mime_type = null, $content_length = null, $no_cache = true
+    ) {
         parent::HttpResponse();
 
-        $this->page_content = $page_content;
+        $this->content = $content;
+        
+        if (!is_null($mime_type)) {
+            $this->add_content_type_header($mime_type);
+        }
 
-        $this->add_content_type_header("text/html", $charset);
-        $this->add_no_cache_headers();
-    }
+        if ($no_cache) {
+            $this->add_no_cache_headers();
+        }
 
-    function get_body() {
-        return $this->page_content;
-    }
-}
+        if (is_null($content_length)) {
+            if (!is_null($content)) {
+                $content_length = strlen($content);
+            }
+        }
 
-class XmlPageResponse extends HttpResponse {
-    
-    var $page_content;
-
-    function XmlPageResponse($page_content) {
-        parent::HttpResponse();
-
-        $this->page_content = $page_content;
-
-        $this->add_content_type_header("text/xml");
-        $this->add_no_cache_headers();
-    }
-
-    function get_body() {
-        return $this->page_content;
-    }
-}
-
-class ImageResponse extends HttpResponse {
-    
-    var $image;
-    var $should_send_body;
-
-    function ImageResponse($image, $cached_gmt_str) {
-        parent::HttpResponse();
-
-        $updated_gmt_str = $image->get_updated_as_gmt_str();
-        if ($updated_gmt_str == $cached_gmt_str) {
-            $this->image = null;
-            $this->add_header(new HttpHeader("HTTP/1.1 304 Not Modified"));
-        } else {
-            $this->image = $image;
-            $this->add_content_type_header($this->image->type);
-            $this->add_content_disposition_header($this->image->filename);
-            $this->add_headers(array(
-                new HttpHeader("Accept-Ranges", "bytes"),
-                new HttpHeader("Content-Length", $this->image->filesize),
-                new HttpHeader("Expires", "0"),
-                new HttpHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0"),
-            ));
-            $this->add_last_modified_header($updated_gmt_str);
+        if (!is_null($content) && !is_null($content_length)) {
+            $this->add_content_length_header($content_length);
         }
     }
 
     function get_body() {
-        if (is_null($this->image)) {
+        if (is_null($this->content)) {
             return "";
         } else {
-            return $this->image->content;
+            return $this->content;
+        }
+    }
+}
+
+class HtmlDocumentResponse extends BinaryContentResponse {
+    
+    function HtmlDocumentResponse($content, $charset) {
+        parent::BinaryContentResponse($content);
+
+        $this->add_content_type_header("text/html", $charset);
+    }
+}
+
+class XmlDocumentResponse extends BinaryContentResponse {
+    
+    function XmlDocumentResponse($content) {
+        parent::BinaryContentResponse($content, "text/xml");
+    }
+}
+
+class PlainTextDocumentResponse extends BinaryContentResponse {
+    
+    function PlainTextDocumentResponse($content, $filename, $open_inline) {
+
+        parent::BinaryContentResponse($content, "plain/text");
+
+        if (is_null($filename)) {
+            $filename = "text_document.txt";
+        }
+        $this->add_content_disposition_header(
+            $filename,
+            ($open_inline) ? "inline" : "attachment"
+        );
+    }
+}
+
+class PdfDocumentResponse extends BinaryContentResponse {
+    
+    function PdfDocumentResponse($content, $filename, $open_inline) {
+        
+        parent::BinaryContentResponse($content, "application/pdf");
+
+        if (is_null($filename)) {
+            $filename = "pdf_document.pdf";
+        }
+        $this->add_content_disposition_header(
+            $filename,
+            ($open_inline) ? "inline" : "attachment"
+        );
+    }
+}
+
+class ImageResponse extends BinaryContentResponse {
+    
+    function ImageResponse($image, $cached_gmt_str) {
+        $updated_gmt_str = $image->get_updated_as_gmt_str();
+        if ($updated_gmt_str == $cached_gmt_str) {
+            $content = null;
+            $mime_type = null;
+        } else {
+            $content = $image->content;
+            $mime_type = $image->type;
+        }
+        
+        parent::BinaryContentResponse($content, $mime_type, $this->image->filesize, false);
+
+        if (is_null($content)) {
+            $this->add_header(new HttpHeader("HTTP/1.1 304 Not Modified"));
+        } else {
+            $this->add_content_disposition_header($this->image->filename);
+            $this->add_headers(array(
+                new HttpHeader("Expires", "0"),
+                new HttpHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0"),
+            ));
+            $this->add_last_modified_header($updated_gmt_str);
         }
     }
 }

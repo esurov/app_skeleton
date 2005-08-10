@@ -46,7 +46,7 @@ class TestApp extends CustomApp {
     }
 
     function get_news_articles_xml() {
-        $xml_page = $this->print_many_objects_list(array(
+        $xml_content = $this->print_many_objects_list(array(
             "obj_name" => "news_article",
             "templates_dir" => "news_article/xml",
             "templates_ext" => "xml",
@@ -54,7 +54,7 @@ class TestApp extends CustomApp {
                 "order_by" => "created DESC, id DESC"
             ),
         ));
-        $this->create_xml_page_response($xml_page);
+        $this->create_xml_document_response($xml_content);
     }
 
 //  Context usage example
@@ -92,12 +92,8 @@ class TestApp extends CustomApp {
 
     function print_one_example() {
         $example = $this->fetch_db_object("_example", 1);
-        var_dump(
-            $this->get_app_currency_with_sign_value($example->field_currency + 12345678.09)
-        );
-        var_dump(
-            $example->print_values()
-        );
+        v($this->get_app_currency_with_sign_value($example->field_currency + 12345678.09));
+        v($example->print_values());
         $example->field_currency = 99999999.99;
         $example->save();
         exit;

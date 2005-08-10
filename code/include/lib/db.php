@@ -3,18 +3,20 @@
 class Db {
 
     // MySQL connection.
+    var $connection_info;
     var $connection;
     var $table_prefix;
 
     var $log;
 
-    function Db($params, &$log) {
-        $host = $params["host"];
-        $username = $params["username"];
-        $password = $params["password"];
-        $database = $params["database"];
+    function Db($connection_info, &$log) {
+        $this->connection_info = $connection_info;
+        $host = $connection_info["host"];
+        $database = $connection_info["database"];
+        $username = $connection_info["username"];
+        $password = $connection_info["password"];
 
-        $this->table_prefix = $params["table_prefix"];
+        $this->table_prefix = $connection_info["table_prefix"];
         $this->log =& $log;
 
         $this->connection = mysql_pconnect($host, $username, $password);
@@ -47,6 +49,10 @@ class Db {
             "Selected database '{$database}'",
             3
         );
+    }
+
+    function get_connection_info() {
+        return $this->connection_info;
     }
 
     function get_full_table_name($table_name) {
@@ -128,7 +134,7 @@ class Db {
         $this->run_query("DROP TABLE IF EXISTS {%{$table_name}_table%}");
     }
 
-    function get_actual_table_names() {
+    function get_actual_table_names($with_prefix = false) {
         $table_names = array();
 
         $res = $this->run_query("SHOW TABLES");
@@ -137,7 +143,11 @@ class Db {
             if (preg_match(
                 '/^' . $this->table_prefix . '(\w+)$/', $table_name_with_prefix, $matches
             )) {
-                $table_names[] = $matches[1];
+                if ($with_prefix) {
+                    $table_names[] = $table_name_with_prefix;
+                } else {
+                    $table_names[] = $matches[1];
+                }
             }
         }
 

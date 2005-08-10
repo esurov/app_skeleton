@@ -1,11 +1,11 @@
-<form method="post" action="?">
+<form action="?" method="post" onsubmit="onsubmitFormHandler(this);">
 <input type="hidden" name="action" value="pg_view_news_articles">
 <table border="0">
 <tr>
 <td>
     <b>{%str_filter_by%}:</b><br>
     {%str_text%}: <span class="wide">{%news_article_full_text_like_input%}</span><br>
-    <input type="submit" value="{%str_link_filter%}">
+    <input type="submit" name="submit_btn" value="{%str_link_filter%}">
 </td>
 </tr>
 </table>

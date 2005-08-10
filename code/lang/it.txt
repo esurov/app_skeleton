@@ -10,7 +10,6 @@ head_page_title_pg_index = Home
 page_title_view_news_articles = News
 page_title_view_news_article = Visualizza notizia
 page_title_pg_contact_form = Contatti
-page_title_pg_static_contact_form_processed =
 page_title_pg_static_sample_page1 = SamplePage1
 page_title_pg_static_sample_page2 = SamplePage2
 
@@ -38,6 +37,14 @@ link_save = Salva
 link_show = Invio
 link_show_all = Mostra Tutto
 link_view_all_news = Tutte le News
+link_login = Login
+link_logout = Logout
+link_signup = Iscriviti
+link_confirm = Conferma
+link_unconfirm = Rimuovi conferma
+link_deactivate = Disattiva
+link_activate = Activate
+link_proceed = Procedi
 
 ["parts of controls"]
 any = Qualsiasi
@@ -61,7 +68,7 @@ current_image = Immagine attuale
 image = Immagine
 first_name = Nome
 last_name = Cognome
-company = Azienda
+company_name = Azienda
 position = Ruolo aziendale
 email = E-mail
 zip = CAP
@@ -75,7 +82,20 @@ message_text = Messaggio
 ["status and popup messages"]
 sure_delete = Sei sicuro di voler cancellare l\'informazione?
 cannot_delete_record_because_it_has_links = Impossibile eliminare {%main_obj_name%} perché in relazione con {%dep_objs_data%}
-contact_form_processed = I suoi dati sono stati registrati. Grazie.
+
+status_message_first_name_empty = Inserire il nome
+status_message_last_name_empty = Inserire il cognome
+status_message_email_empty = Inserire l'e-mail
+status_message_bad_email = Inserire un indirizzo e-mail valido
+status_message_zip_empty = Inserire il CAP
+status_message_zip_bad = Il CAP dovrebbe essere un numero di 5 cifre
+status_message_country_empty = Inserire la nazione
+status_message_city_empty = Inserire la città
+status_message_phone_empty = Inserire il nr. di telefono
+status_message_phone_bad = Nr. di telefono non valido
+status_message_message_text_empty = Inserire il messagio
+
+contact_form_processed = I suoi dati sono stati registrati. Grazie!
 
 ["parts of page"]
 pager_pages_title = Pagine:

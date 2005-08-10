@@ -1,30 +1,38 @@
 <table>
 <tr>
-    <td>
-        <form action="?" method="post">
-        <input type="hidden" name="action" value="insert_test_data">
-        <input type="submit" value="Insert test data">
-        </form>
-    </td>
-    <td>
-<!--        <form action="?" method="post">
-        <input type="hidden" name="action" value="insert_initial_data">
-        <input type="submit" value="Insert initial data">
-        </form> -->
-    </td>
+<td>
+    <form action="?" method="post" onsubmit="onsubmitFormHandler(this);">
+    <input type="hidden" name="action" value="insert_test_data">
+    <input type="submit" name="submit_btn" value="Insert test data">
+    </form>
+</td>
+<td>
+<!--    <form action="?" method="post" onsubmit="onsubmitFormHandler(this);">
+    <input type="hidden" name="action" value="insert_initial_data">
+    <input type="submit" name="submit_btn" value="Insert initial data">
+    </form>-->
+</td>
 </tr>
 <tr>
-    <td>
-        <form action="?" method="post">
-        <input type="hidden" name="action" value="delete_tables">
-        <input type="submit" value="Delete MySQL tables">
-        </form>
-    </td>
-    <td>
-        <form action="?" method="post">
-        <input type="hidden" name="action" value="create_update_tables">
-        <input type="submit" value="Create/Update MySQL tables">
-        </form>
-    </td>
+<td>
+    <form action="?" method="post" onsubmit="onsubmitFormHandler(this);">
+    <input type="hidden" name="action" value="delete_tables">
+    <input type="submit" name="submit_btn" value="Delete MySQL tables">
+    </form>
+</td>
+<td>
+    <form action="?" method="post" onsubmit="onsubmitFormHandler(this);">
+    <input type="hidden" name="action" value="create_update_tables">
+    <input type="submit" name="submit_btn" value="Create/Update MySQL tables">
+    </form>
+</td>
+</tr>
+<tr>
+<td colspan="2">
+    <form action="?" method="post" onsubmit="onsubmitFormHandler(this);">
+    <input type="hidden" name="action" value="pg_tables_dump">
+    <input type="submit" name="submit_btn" value="Dump MySQL tables">
+    </form>
+</td>
 </tr>
 </table>

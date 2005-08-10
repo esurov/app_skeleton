@@ -1,5 +1,9 @@
 <?php
 
+function v($obj) {
+    var_dump($obj);
+}
+
 function param($name) {
     if (isset($_GET[$name])) {
         $res = $_GET[$name];
@@ -134,6 +138,23 @@ function get_js_safe_string($unsafe_str) {
     return str_replace("\n", '\n', $str);
 }
 
+function quote_string($str) {
+    return "'{$str}'";
+}
+
+// Quote and escape string for MySql.
+function qw($str) {
+    return quote_string(mysql_escape_string($str));
+}
+
+// Quote and escape string for MySql LIKE expression.
+function lqw($str, $prefix_str = "", $suffix_str = "") {
+    $str = mysql_escape_string($str);
+    $str = str_replace('%', '\%', $str);
+    $str = str_replace('_', '\_', $str);
+    return quote_string("{$prefix_str}{$str}{$suffix_str}");
+}
+
 function get_shortened_string($str, $max_length, $end_str = "...") {
     if (strlen($str) > $max_length) {
         $str = substr($str, 0, $max_length);
@@ -154,19 +175,6 @@ function get_word_shortened_string($str, $max_length, $end_str = "...") {
     } else {
         return $str;
     }
-}
-
-// Quote and escape string for MySql.
-function qw($str) {
-    return "'" . mysql_escape_string($str) . "'" ;
-}
-
-// Quote and escape string for MySql LIKE expression.
-function lqw($str, $prefix_str = "", $suffix_str = "") {
-    $str = mysql_escape_string($str);
-    $str = str_replace('%', '\%', $str);
-    $str = str_replace('_', '\_', $str);
-    return "'{$prefix_str}{$str}{$suffix_str}'";
 }
 
 // Print common HTML controls
@@ -217,7 +225,7 @@ function print_html_select_options($value_caption_pairs, $current_value) {
         $caption = get_caption_from_value_caption_pair($value_caption_pair);
         $attrs = array();
         if (
-            (!is_array($selected_value) && strval($value) == strval($selected_value)) ||
+            (!is_array($selected_value) && ((string) $value == (string) $selected_value)) ||
             (is_array($selected_value) && in_array($value, $selected_value))
         ) {
             $attrs["selected"] = null;
@@ -250,13 +258,17 @@ function print_html_radio_group(
     );
 
     $output = "";
-    foreach ($value_caption_pairs as $value => $caption) {
+    foreach ($value_caption_pairs as $value_caption_pair) {
+        $value = get_value_from_value_caption_pair($value_caption_pair);
+        $caption = get_caption_from_value_caption_pair($value_caption_pair);
+
         $attrs = array();
-        if ($value == $checked_value) {
+        if ((string) $value == (string) $checked_value) {
             $attrs["checked"] = null;
         }
         $output .= print_html_radio($name, $value, $attrs);
-        $output .= get_html_safe_string($caption) . ($is_xhtml) ? "<br />\n" : "<br>\n";
+        $br_str = ($is_xhtml) ? "<br />\n" : "<br>\n";
+        $output .= get_html_safe_string($caption) . $br_str;
     }
     return $output;
 }
@@ -361,9 +373,60 @@ JS;
 function create_select_dependency_str($dependency_array) {
     $lines = array();
     foreach ($dependency_array as $dependent_select_values) {
-        $lines[] = '    new Array("' . join('", "', $dependent_select_values) . '")';
+        $dependent_select_values_str = join("', '", $dependent_select_values);
+        $lines[] = <<<JS
+new Array('{$dependent_select_values_str}')
+
+JS;
     }
     return join(",\n", $lines) . "\n";
+}
+
+function create_client_validation_js($client_validate_condition_strs) {
+    $client_validate_conditions_str = join(",\n", $client_validate_condition_strs);
+    return <<<JS
+<script>
+conditions = new Array(
+{$client_validate_conditions_str}
+);
+document.forms['form'].onsubmit = onsubmitValidateFormHandler;
+</script>
+
+JS;
+}
+
+function create_client_validate_condition_str(
+    $input_name, $condition_type, $message_text, $param, $dependent_validate_condition_str
+) {
+    $message_text_param = (is_null($message_text)) ?
+        "null" : quote_string(get_js_safe_string($message_text));
+
+    $params_safe = array();
+    if (!is_null($param)) {
+        if (!is_array($param)) {
+            $param = array($param);
+        }
+        foreach ($param as $param_value) {
+            $params_safe[] = get_js_safe_string($param_value);
+        }
+    }
+    $params_str = (count($params_safe) == 0) ?
+        "" :
+        quote_string(join("', '", $params_safe));
+
+    if (is_null($dependent_validate_condition_str)) {
+        $dependent_validate_condition_str = "null";
+    }
+
+    return <<<JS
+new ValidateCondition(
+    '{$input_name}',
+    '{$condition_type}',
+    {$message_text_param},
+    new Array({$params_str}),
+{$dependent_validate_condition_str}
+)
+JS;
 }
 
 //

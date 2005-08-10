@@ -1,0 +1,19 @@
+<div>
+<br>
+<form action="?" method="post" onsubmit="onsubmitFormHandler(this);">
+<input type="hidden" name="action" value="pg_tables_dump_url">
+
+<h1>Actual tables</h1>
+<table border="1">
+<tr>
+<th>Table name</th>
+<th>Include in dump?</th>
+</tr>
+
+{%form_items%}
+
+</table>
+<br>
+<input type="submit" name="submit_btn" value="Generate URL for dump download">
+</form>
+</div>

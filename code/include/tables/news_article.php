@@ -47,7 +47,23 @@ class NewsArticle extends CustomDbObject {
             "relation" => "like",
         ));
     }
-
+//
+    function del() {
+        $this->del_image();
+      
+        parent::del();
+    }
+//
+    function get_validate_conditions() {
+        return array(
+            array(
+                "field" => "title",
+                "type" => "not_empty",
+                "message" => "news_article_title_empty",
+            ),
+        );
+    }
+//
     function print_values($params = array()) {
         $h1 = parent::print_values($params);
         $h = array();
@@ -64,26 +80,6 @@ class NewsArticle extends CustomDbObject {
 
         $this->assign_values($h);
         return $h1 + $h;
-    }
-
-    function del() {
-        $this->del_image();
-      
-        parent::del();
-    }
-
-    function validate($old_obj = null) {
-        $messages = array();
-
-        if (!$this->validate_not_empty_field("title")) {
-            $messages[] = new ErrorStatusMsg("news_article_title_empty");
-//        } else {
-//            if (!$this->validate_unique_field("title", $old_obj)) {
-//                $messages[] = new ErrorStatusMsg("shop_name_exists");
-//            }
-        }
-
-        return $messages;
     }
 }
 

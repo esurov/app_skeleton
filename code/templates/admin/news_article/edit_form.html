@@ -1,8 +1,8 @@
-<form action="?" method="post" enctype="multipart/form-data">
+<form action="?" method="post" name="form" enctype="multipart/form-data">
 <input type="hidden" name="action" value="update_news_article">
-<input type="hidden" name="news_article_id" value="{%news_article_id%}">
-<table>
+{%news_article_id_hidden%}
 
+<table>
 <tr>
 <th>{%str_date%}:</th>
 <td><span class="date">{%news_article_created_input%}</span></td>
@@ -30,8 +30,10 @@
 
 <tr>
 <td></td>
-<td><input type="submit" value="{%str_link_save%}"></td>
+<td><input type="submit" name="submit_btn" value="{%str_link_save%}"></td>
 </tr>
-
 </table>
+
 </form>
+
+{%news_article_client_validation_js%}

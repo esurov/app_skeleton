@@ -17,6 +17,7 @@ $tables = array(
     "_example" => "Example",
     "image" => "Image",
     "news_article" => "NewsArticle",
+    "contact" => "Contact",
 );
 
 foreach (array_keys($tables) as $table_name) {
