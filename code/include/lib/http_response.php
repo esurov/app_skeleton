@@ -76,7 +76,7 @@ class HttpResponse {
 
     // Push header to the beginning of headers list
     function push_header($header) {
-        $this->headers = array_unshift($this->headers, $header);
+        array_unshift($this->headers, $header);
     }
 
     function push_headers($headers) {
@@ -249,20 +249,15 @@ class ImageResponse extends BinaryContentResponse {
     
     function ImageResponse($image, $cached_gmt_str) {
         $updated_gmt_str = $image->get_updated_as_gmt_str();
-        if ($updated_gmt_str == $cached_gmt_str) {
-            $content = null;
-            $mime_type = null;
-        } else {
-            $content = $image->content;
-            $mime_type = $image->type;
-        }
+        $content = ($updated_gmt_str == $cached_gmt_str) ?
+            null : $image->content;
         
-        parent::BinaryContentResponse($content, $mime_type, $this->image->filesize, false);
+        parent::BinaryContentResponse($content, $image->type, $image->filesize, false);
 
         if (is_null($content)) {
-            $this->add_header(new HttpHeader("HTTP/1.1 304 Not Modified"));
+            $this->push_header(new HttpHeader("HTTP/1.1 304 Not Modified"));
         } else {
-            $this->add_content_disposition_header($this->image->filename);
+            $this->add_content_disposition_header($image->filename);
             $this->add_headers(array(
                 new HttpHeader("Expires", "0"),
                 new HttpHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0"),

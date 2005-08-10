@@ -9,16 +9,12 @@ class CustomApp extends App {
     }
 
     function run_action($action_name = null, $action_params = array()) {
-        $this->popup = intval(param("popup"));
-        $this->report = intval(param("report"));
+        $this->popup = (int) param("popup");
+        $this->report = (int) param("report");
 
         if (!$this->report) {
-            $this->page->assign(array(
-                "popup_url_param" =>
-                    "&amp;popup={$this->popup}",
-                "popup_hidden" =>
-                    "<input type=\"hidden\" name=\"popup\" value=\"{$this->popup}\">\n",
-            ));
+            $this->print_hidden_input_form_value("popup", $this->popup);
+            $this->print_varchar_value("popup_url_param", "&popup={$this->popup}");
             $this->print_session_status_messages();
         }
         $this->print_lang_menu();
@@ -67,7 +63,7 @@ class CustomApp extends App {
     function get_php_double_value($app_double_value) {
         $result = str_replace(".", "", $app_double_value);
         $result = str_replace(",", ".", $result);
-        return doubleval($result);
+        return (double) $result;
     }
 
     function get_app_integer_value($php_integer_value) {
@@ -77,7 +73,7 @@ class CustomApp extends App {
     function get_php_integer_value($app_integer_value) {
         $result = str_replace(".", "", $app_integer_value);
         $result = str_replace(",", "", $result);
-        return intval($result);
+        return (int) $result;
     }
 }
 

@@ -188,11 +188,16 @@ function print_html_hidden($name, $value) {
     return print_html_input("hidden", $name, $value);
 }
 
-function print_html_checkbox($name, $value, $attrs = array()) {
-    if (intval($value) != 0) {
+function print_html_checkbox($name, $value, $checked = null, $attrs = array()) {
+    if (is_null($checked)) {
+        $value = (((int) $value) != 0) ? 1 : 0;
+        if ($value) {
+            $attrs["checked"] = null;
+        }
+    } else if ($checked) {
         $attrs["checked"] = null;
     }
-    return print_html_input("checkbox", $name, "1", $attrs);
+    return print_html_input("checkbox", $name, $value, $attrs);
 }
 
 function print_html_select($name, $value_caption_pairs, $current_value, $attrs = array()) {

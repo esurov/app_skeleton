@@ -51,7 +51,7 @@ class SetupApp extends CustomApp {
     function pg_tables_dump() {
         $actual_table_names = $this->db->get_actual_table_names(true);
         foreach ($actual_table_names as $actual_table_name) {
-            $this->page->assign($this->print_varchar_value("table_name", $actual_table_name));
+            $this->print_varchar_value("table_name", $actual_table_name);
             $this->page->parse_file("tables_dump/tables_list/form_item.html", "form_items");
         }
         $this->page->parse_file("tables_dump/tables_list/form.html", "body");
@@ -65,13 +65,13 @@ class SetupApp extends CustomApp {
             "action" => "pg_view_tables_dump",
             "table_names" => $table_names_str,
         ));
-        $this->page->assign($this->print_varchar_value("view_dump_url", $url));
+        $this->print_varchar_value("view_dump_url", $url);
 
         $url = create_self_full_url(array(
             "action" => "download_tables_dump",
             "table_names" => $table_names_str,
         ));
-        $this->page->assign($this->print_varchar_value("download_dump_url", $url));
+        $this->print_varchar_value("download_dump_url", $url);
 
         $this->page->parse_file("tables_dump/url/body.html", "body");
     }
@@ -79,8 +79,8 @@ class SetupApp extends CustomApp {
     function pg_view_tables_dump() {
         $dump_text = $this->create_tables_dump(param("table_names"), false);
         $n_dump_lines = count(explode("\n", $dump_text));
-        $this->page->assign($this->print_varchar_value("dump_text", $dump_text));
-        $this->page->assign($this->print_integer_value("n_dump_lines", $n_dump_lines));
+        $this->print_varchar_value("dump_text", $dump_text);
+        $this->print_integer_value("n_dump_lines", $n_dump_lines);
         $this->page->parse_file("tables_dump/dump_text/body.html", "body");
     }
 

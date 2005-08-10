@@ -65,21 +65,21 @@ class NewsArticle extends CustomDbObject {
     }
 //
     function print_values($params = array()) {
-        $h1 = parent::print_values($params);
-        $h = array();
-
-        $title_short_len = $this->config->get_value("news_article_title_short_length");
-        $h["news_article_title_short"] =
-            get_word_shortened_string(strip_tags($this->title), $title_short_len);
-        
-        $body_short_len = $this->config->get_value("news_article_body_short_length");
-        $h["news_article_body_short"] =
-            get_word_shortened_string(strip_tags($this->body), $body_short_len);
+        parent::print_values($params);
 
         $this->print_image();
 
-        $this->assign_values($h);
-        return $h1 + $h;
+        $title_short_len = $this->config->get_value("news_article_title_short_length");
+        $this->app->print_varchar_value(
+            "news_article_title_short",
+            get_word_shortened_string(strip_tags($this->title), $title_short_len)
+        );
+        
+        $body_short_len = $this->config->get_value("news_article_body_short_length");
+        $this->app->print_varchar_value(
+            "news_article_body_short",
+            get_word_shortened_string(strip_tags($this->body), $body_short_len)
+        );
     }
 }
 

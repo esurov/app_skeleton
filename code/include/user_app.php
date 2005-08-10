@@ -83,8 +83,8 @@ class UserApp extends CustomApp {
 
             $contact->print_values();
 
-            $this->email_sender->From = $email_from;
-            $this->email_sender->Sender = $email_from;
+            $this->email_sender->From = $contact->email;
+            $this->email_sender->Sender = $contact->email;
             $this->email_sender->FromName = $name_from;
             $this->email_sender->AddAddress($email_to, $name_to);
             $this->email_sender->Subject = $subject;

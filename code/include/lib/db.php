@@ -112,7 +112,7 @@ class Db {
             $count_query->select = "COUNT(*) AS n_rows";
             $res = $this->run_select_query($count_query);
             $row = $res->fetch();
-            $n = intval($row["n_rows"]);
+            $n = (int) $row["n_rows"];
         } else {
             $res = $this->run_select_query($count_query);
             $n = $res->get_num_rows();

@@ -322,11 +322,13 @@ class Example extends CustomDbObject {
 //
 
     function print_values($params = array()) {
-        $h1 = parent::print_values($params);
-        $h = array();
+        parent::print_values($params);
 
         // This template variable is extension to default printed variables for all contexts
-        $h["_example_field_double_decorated"] = "!!" . $h1["_example_field_double"] . "!!";
+        $this->page->assign(
+            "_example_field_double_decorated",
+            "!!" . $this->page->get_value("_example_field_double") . "!!"
+        );
 
         // Context handling
         switch ($this->print_params["context"]) {
@@ -348,33 +350,21 @@ class Example extends CustomDbObject {
             $row_parity = $this->print_params["row_parity"];
 
             // Add context-specific template variable
-            $h["_example_context1_specific_value"] =
-                get_html_safe_string("str1&{$row_number}<>{$row_parity}");
+            $this->print_varchar_value(
+                "_example_context1_specific_value",
+                "str1&{$row_number}<>{$row_parity}"
+            );
             break;
 
         case "context2":
             // Add context-specific template variable
-            $h["_example_context2_specific_value"] = 1 - $this->field_boolean;
+            $this->print_boolean_value(
+                "_example_context2_specific_value",
+                1 - $this->field_boolean
+            );
             break;
         }
-
-        $this->assign_values($h);
-        return $h1 + $h;
     }
-
-//    function validate($old_obj = null) {
-//        $messages = array();
-//
-//        if (!$this->validate_not_empty_field("title")) {
-//            $messages[] = new ErrorStatusMsg("article_title_empty");
-////        } else {
-////            if (!$this->validate_unique_field("title", $old_obj)) {
-////                $messages[] = new ErrorStatusMsg("shop_name_exists");
-////            }
-//        }
-//
-//        return $messages;
-//    }
 }
 
 ?>

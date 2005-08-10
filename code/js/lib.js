@@ -310,10 +310,10 @@ function ValidateCondition(elementName, type, messageText, params, dependentCond
             result = (value.match(re)) ? true : false;
             break;
         case 'empty':
-            result = (value.match(/^\s*$/m)) ? true : false;
+            result = (value.match(/^\s*$/)) ? true : false;
             break;
         case 'not_empty':
-            result = (value.match(/^\s*$/m)) ? false : true;
+            result = (value.match(/^\s*$/)) ? false : true;
             break;
         case 'email':
             result = (value.match(/.+@.+\..+/)) ? true : false;
@@ -379,33 +379,37 @@ function onsubmitValidateFormHandler(form) {
 }
 
 //        case 'url':
-//            result = true;
-//                case 'date':
-//                    if (value != '' && !isCorrectDate(value)) {
-//                    }
-//                    break;
-//                case 'currency':
-//                    if (value != '' && !isCorrectCurrency(value)) {
-//                    }
-//                    break;
-//                case 'currency/date':
-//                    if (value != '') {
-//                        parts = value.split('/');
-//                        if (parts.length != 4) {
-//                            fail(message_text, formName, elem);
-//                            return false;
-//                        }
-//                        price = parts[0];
-//                        date = parts[1] + '/' + parts[2] + '/' + parts[3];
-//
-//                        if (!(
-//                            isCorrectCurrency(price) &&
-//                            isCorrectDate(date)
-//                        )) {
-//                        }
-//                    }
-//                    break;
+//        if (!(
+//            value == 'http://www.' ||
+//            value == '' ||
+//            value.match(/^https?:\/\/([\w-]+\.)+[\w-]+(\/.*|)$/)
+//        )) {
+//        case 'date':
+//            if (value != '' && !isCorrectDate(value)) {
 //            }
+//            break;
+//        case 'currency':
+//            if (value != '' && !isCorrectCurrency(value)) {
+//            }
+//            break;
+//        case 'currency/date':
+//            if (value != '') {
+//                parts = value.split('/');
+//                if (parts.length != 4) {
+//                    fail(message_text, formName, elem);
+//                    return false;
+//                }
+//                price = parts[0];
+//                date = parts[1] + '/' + parts[2] + '/' + parts[3];
+//
+//                if (!(
+//                    isCorrectCurrency(price) &&
+//                    isCorrectDate(date)
+//                )) {
+//                }
+//            }
+//            break;
+//        }
 //    }
 ///**
 // * Checks if given string is a correct date in format mm/dd/yyyy.

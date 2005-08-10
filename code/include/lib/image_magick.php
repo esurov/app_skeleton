@@ -129,15 +129,15 @@ class ImageMagick {
         $dst_ratio = $dst_width / $dst_height;
 
         if ($src_ratio > $dst_ratio) {
-            $resized_width = intval($src_height * $dst_ratio);
+            $resized_width = (int) ($src_height * $dst_ratio);
             $resized_height = $src_height;
-            $crop_offset_x = intval(($src_width - $resized_width) / 2);
+            $crop_offset_x = (int) (($src_width - $resized_width) / 2);
             $crop_offset_y = 0;
         } else {
             $resized_width = $src_width;
-            $resized_height = intval($src_width / $dst_ratio);
+            $resized_height = (int) ($src_width / $dst_ratio);
             $crop_offset_x = 0;
-            $crop_offset_y = intval(($src_height - $resized_height) / 2);
+            $crop_offset_y = (int) (($src_height - $resized_height) / 2);
         }
 
         $cmdline = $this->create_convert_cmdline(

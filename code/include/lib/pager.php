@@ -23,13 +23,13 @@ class Pager {
 
     function read() {
         // Read current offset from CGI and ensure correct it if needed
-        $offset = intval(param("offset"));
+        $offset = (int) param("offset");
 
         if ($this->n_rows_per_page >= $this->n_total_rows) {
             $offset = 0;
         }
         if ($offset >= $this->n_total_rows) {
-            $offset = intval(
+            $offset = (int) (
                 (($this->n_total_rows - 1) / $this->n_rows_per_page) * $this->n_rows_per_page
             );
         }
@@ -46,7 +46,7 @@ class Pager {
         // Create navigation links
         $nav_str = $this->app->get_message("pager_pages_title") . " \n";
 
-        $p = intval(ceil($this->n_total_rows / $this->n_rows_per_page));
+        $p = (int) ceil($this->n_total_rows / $this->n_rows_per_page);
         $cp = $this->offset / $this->n_rows_per_page + 1;
 
         for ($i = 0; $i < $p; ++$i) {

@@ -37,7 +37,7 @@ class Logger {
     }
 
     function set_max_file_size($new_max_file_size) {
-        $max_file_size = intval($new_max_file_size);
+        $max_file_size = $new_max_file_size;
         if ($new_max_file_size > 0) {
             $this->max_file_size = $new_max_file_size;
         }

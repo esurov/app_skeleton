@@ -344,7 +344,7 @@ class App {
         if (is_null($id_param_name)) {
             $id_param_name = "{$obj_name}_id";
         }
-        $pr_key_value = intval(param($id_param_name));
+        $pr_key_value = (int) param($id_param_name);
         return $this->fetch_db_object($obj_name, $pr_key_value, $where_str);
     }
 //
@@ -462,7 +462,7 @@ class App {
 
     function get_php_integer_value($app_integer_value) {
         $result = str_replace(",", "", $app_integer_value);
-        return intval($result);
+        return (int) $result;
     }
 
     function get_app_double_value($php_double_value, $decimals) {
@@ -471,7 +471,7 @@ class App {
 
     function get_php_double_value($app_double_value) {
         $result = str_replace(",", "", $app_double_value);
-        return doubleval($result);
+        return (double) $result;
     }
 
     function get_app_currency_value($php_double_value, $decimals) {
@@ -502,40 +502,40 @@ class App {
     }
 //
     function print_primary_key_value($template_var, $value) {
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => $value,
-        );
+        ));
     }
 
     function print_foreign_key_value($template_var, $value) {
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => $value,
-        );
+        ));
     }
 
     function print_integer_value($template_var, $value) {
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => $this->get_app_integer_value($value),
             "{$template_var}_orig" => $value,
-        );
+        ));
     }
 
     function print_double_value($template_var, $value, $decimals) {
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => $this->get_app_double_value($value, $decimals),
             "{$template_var}_2" => $this->get_app_double_value($value, 2),
             "{$template_var}_5" => $this->get_app_double_value($value, 5),
             "{$template_var}_orig" => $value,
-        );
+        ));
     }
 
     function print_currency_value($template_var, $value, $decimals) {
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => $this->get_app_currency_value($value, $decimals),
             "{$template_var}_with_sign" =>
                 $this->get_app_currency_with_sign_value($value, $decimals),
             "{$template_var}_orig" => $value,
-        );
+        ));
     }
 
     function print_boolean_value($template_var, $value, $value_captions = null) {
@@ -545,10 +545,10 @@ class App {
                 1 => $this->get_message("yes"),
             );
         }
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => $value_captions[$value],
             "{$template_var}_orig" => $value,
-        );
+        ));
     }
 
     function print_enum_value($template_var, $enum_value, $enum_value_caption_pairs) {
@@ -562,50 +562,436 @@ class App {
         if (is_null($enum_caption)) {
             $enum_caption = get_caption_from_value_caption_pair($enum_value_caption_pairs[0]);
         } 
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => $enum_caption,
             "{$template_var}_orig" => $enum_value,
-        );
+        ));
     }
 
     function print_varchar_value($template_var, $value) {
         $safe_value = get_html_safe_string($value);
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => $safe_value,
             "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
             "{$template_var}_orig" => $value,
-        );
+        ));
     }
 
     function print_text_value($template_var, $value) {
         $safe_value = get_html_safe_string($value);
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => $safe_value,
             "{$template_var}_lf2br" => convert_lf2br($safe_value),
             "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
             "{$template_var}_orig" => $value,
-        );
+        ));
     }
 
     function print_datetime_value($template_var, $db_datetime) {
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => get_html_safe_string($this->get_app_datetime($db_datetime)),
             "{$template_var}_orig" => get_html_safe_string($db_datetime),
-        );
+        ));
     }
 
     function print_date_value($template_var, $db_date) {
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => get_html_safe_string($this->get_app_date($db_date)),
             "{$template_var}_orig" => get_html_safe_string($db_date),
-        );
+        ));
     }
 
     function print_time_value($template_var, $db_time) {
-        return array(
+        $this->page->assign(array(
             "{$template_var}" => get_html_safe_string($this->get_app_time($db_time)),
             "{$template_var}_orig" => get_html_safe_string($db_time),
+        ));
+    }
+//
+    function print_primary_key_form_value($template_var, $value) {
+        $this->print_hidden_input_form_value($template_var, $value);
+        $this->print_text_input_form_value($template_var, $value);
+    }
+
+    function print_foreign_key_form_value(
+        $template_var,
+        $value,
+        $input_type,
+        $input_attrs,
+        $values_info,
+        $input_type_params
+    ) {
+        $this->print_hidden_input_form_value($template_var, $value);
+
+        switch ($input_type) {
+        case "text":
+            $this->print_text_input_form_value($template_var, $value, $input_attrs);
+            break;
+        case "radio":
+            $this->print_radio_group_input_form_value($template_var, $value, $values_info);
+            break;
+        case "select":
+            $this->print_select_input_form_value(
+                $template_var, $value, $input_attrs, $values_info
+            );
+            break;
+        case "main_select":
+            $this->print_main_select_input_form_value(
+                $template_var,
+                $value,
+                $input_attrs,
+                $values_info,
+                $input_type_params["dependent_select_name"],
+                $input_type_params["dependent_values_info"],
+                $input_type_params["dependency_info"]
+            );
+            break;
+        }
+    }
+
+    function print_integer_form_value($template_var, $value) {
+        $app_integer_value = $this->get_app_integer_value($value);
+        $this->print_hidden_input_form_value($template_var, $app_integer_value);
+        $this->print_text_input_form_value(
+            $template_var, $app_integer_value, array("style" => "text-align: right;")
         );
+    }
+    
+    function print_double_form_value($template_var, $value, $decimals) {
+        $app_double_value = $this->get_app_double_value($value, $decimals);
+        $this->print_hidden_input_form_value($template_var, $app_double_value);
+        $this->print_text_input_form_value(
+            $template_var, $app_double_value, array("style" => "text-align: right;")
+        );
+    }
+
+    function print_currency_form_value($template_var, $value, $decimals) {
+        $app_currency_value = $this->get_app_currency_value($value, $decimals);
+        $this->print_hidden_input_form_value($template_var, $app_currency_value);
+        $this->print_text_input_form_value(
+            $template_var, $app_currency_value, array("style" => "text-align: right;")
+        );
+    }
+
+    function print_boolean_form_value($template_var, $value) {
+        $this->print_hidden_input_form_value($template_var, $value);
+        $this->print_checkbox_input_form_value($template_var, $value);
+    }
+
+    function print_enum_form_value(
+        $template_var, $enum_value, $input_type, $input_attrs, $values_info
+    ) {
+        $this->print_hidden_input_form_value($template_var, $enum_value);
+
+        switch ($input_type) {
+        case "radio":
+            $this->print_radio_group_input_form_value($template_var, $enum_value, $values_info);
+            break;
+        case "select":
+            $this->print_select_input_form_value(
+                $template_var, $enum_value, $input_attrs, $values_info
+            );
+            break;
+        }
+    }
+
+    function print_varchar_form_value(
+        $template_var, $value, $input_type, $input_attrs
+    ) {
+        $this->print_hidden_input_form_value($template_var, $value);
+        
+        switch ($input_type) {
+        case "text":
+        case "password":
+            $this->print_input_form_value($input_type, $template_var, $value, $input_attrs);
+            break;
+        }
+    }
+
+    function print_text_form_value(
+        $template_var, $value, $input_type, $input_attrs
+    ) {
+        $this->print_hidden_input_form_value($template_var, $value);
+        
+        switch ($input_type) {
+        case "textarea":
+            $this->print_textarea_input_form_value($template_var, $value, $input_attrs);
+            break;
+        }
+    }
+
+    function print_multilingual_form_value($template_var, $value) {
+        $lang_inputs_with_captions_str = "";
+        foreach ($this->avail_langs as $lang) {
+            $lang_str = $this->get_message($lang);
+            $lang_input = $this->page->get_value("{$template_var}_{$lang}_input");
+            $lang_inputs_with_captions_str .=
+                "<tr>\n" .
+                "<th>{$lang_str}:</th>\n" .
+                "<td>{$lang_input}</td>\n" .
+                "</tr>\n";
+        }
+        $this->page->assign(array(
+            "{$template_var}_input" =>
+                "<table>\n" .
+                $lang_inputs_with_captions_str .
+                "</table>\n",
+            "{$template_var}_hidden" =>
+                $this->page->get_value("{$template_var}_{$this->lang}_hidden"),
+        ));
+    }
+
+    function print_datetime_form_value($template_var, $db_datetime) {
+        $app_datetime = $this->get_app_datetime($db_datetime);
+        $this->print_hidden_input_form_value($template_var, $app_datetime);
+        $this->print_text_input_form_value($template_var, $app_datetime);
+    }
+
+    function print_date_form_value($template_var, $db_date) {
+        $app_date = $this->get_app_date($db_date);
+        $this->print_hidden_input_form_value($template_var, $app_date);
+        $this->print_text_input_form_value($template_var, $app_date);
+    }
+
+    function print_time_form_value($template_var, $db_time) {
+        $app_time = $this->get_app_time($db_time);
+        $this->print_hidden_input_form_value($template_var, $app_time);
+        $this->print_text_input_form_value($template_var, $app_time);
+    }
+//
+    function print_input_form_value(
+        $input_type, $template_var, $value, $input_attrs = array()
+    ) {
+        $this->page->assign(
+            "{$template_var}_input",
+            print_html_input($input_type, $template_var, $value, $input_attrs)
+        );
+    }
+
+    function print_hidden_input_form_value($template_var, $value) {
+        $this->page->assign(
+            "{$template_var}_hidden",
+            print_html_hidden($template_var, $value)
+        );
+    }
+
+    function print_text_input_form_value($template_var, $value, $input_attrs = array()) {
+        $this->print_input_form_value("text", $template_var, $value, $input_attrs);
+    }
+
+    function print_textarea_input_form_value($template_var, $value, $input_attrs = array()) {
+        $this->page->assign(
+            "{$template_var}_input", print_html_textarea($template_var, $value, $input_attrs)
+        );
+    }
+
+    function print_checkbox_input_form_value($template_var, $value) {
+        $this->page->assign(
+            "{$template_var}_input", print_html_checkbox($template_var, $value)
+        );
+    }
+
+    function print_radio_group_input_form_value(
+        $template_var, $value, $values_info, $alt_values_info = null
+    ) {
+        $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
+
+        $this->page->assign(
+            "{$template_var}_input",
+            print_html_radio_group($template_var, $value_caption_pairs, $value)
+        );
+    }
+
+    function print_select_input_form_value(
+        $template_var,
+        $value,
+        $input_attrs,
+        $values_info,
+        $alt_values_info = null
+    ) {
+        $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
+
+        $this->page->assign(
+            "{$template_var}_input",
+            print_html_select($template_var, $value_caption_pairs, $value, $input_attrs)
+        );
+    }
+
+    function print_main_select_input_form_value(
+        $template_var,
+        $value,
+        $input_attrs,
+        $values_info,
+        $dependent_select_name,
+        $dependency_info,
+        $dependent_values_info,
+        $alt_values_info = null
+    ) {
+        $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
+
+        $form_name = get_param_value($dependency_info, "form_name", "form");
+        $main_select_name = $template_var;
+        $dependency_key_field_name = $dependency_info["key_field_name"];
+        $dependency_query_ex = get_param_value($dependency_info, "query_ex", array());
+
+        $input_attrs["onchange"] =
+            "updateDependentSelect(this, '{$dependent_select_name}'); " .
+            "if (this.form.{$dependent_select_name}.onchange) { " .
+                "this.form.{$dependent_select_name}.onchange(); " .
+            "}";
+
+        $dependency_array = $this->get_select_dependency_array(
+            $value_caption_pairs,
+            $dependent_values_info,
+            $dependency_key_field_name,
+            $dependency_query_ex
+        );
+
+        $dependency_js = create_select_dependency_js(
+            $form_name,
+            $main_select_name,
+            $dependent_select_name,
+            $dependency_array
+        );
+
+        $this->page->assign(array(
+            "{$template_var}_input" => print_html_select(
+                $template_var, $value_caption_pairs, $value, $input_attrs
+            ),
+            "{$template_var}_dependency_js" => $dependency_js,
+        ));
+    }
+
+    function get_value_caption_pairs($values_info, $alt_values_info = null) {
+        $value_caption_pairs = $this->get_value_caption_pairs_from_source($values_info);
+        $value_caption_pairs = $this->expand_value_caption_pairs_with_begin_end(
+            $value_caption_pairs, $values_info["data"]
+        );
+        
+        if (!is_null($alt_values_info)) {
+            $values_info = $alt_values_info;
+        }
+        $value_caption_pairs = $this->expand_value_caption_pairs_with_nonset(
+            $value_caption_pairs, $values_info["data"]
+        );
+        return $value_caption_pairs;
+    }
+
+    function get_value_caption_pairs_from_source($values_info) {
+        switch ($values_info["source"]) {
+        case "array":
+            $value_caption_pairs = $values_info["data"]["array"];
+            break;
+        case "db_object":
+            $data_info = $values_info["data"];
+            
+            $obj_name = $data_info["obj_name"];
+            $values_field_name = get_param_value($data_info, "values_field_name", "id");
+            $captions_field_name = get_param_value($data_info, "captions_field_name", "name");
+            $query_ex = get_param_value($data_info, "query_ex", array());
+
+            $value_caption_pairs = $this->get_value_caption_pairs_from_db_object(
+                $obj_name, $values_field_name, $captions_field_name, $query_ex
+            );
+            break;
+        }
+        return $value_caption_pairs;
+    }
+
+    function get_value_caption_pairs_from_db_object(
+        $obj_name, $values_field_name, $captions_field_name, $query_ex
+    ) {
+        $objects = $this->fetch_db_objects_list($obj_name, $query_ex);
+        $value_caption_pairs = array();
+        foreach ($objects as $obj) {
+            $value_caption_pairs[] =
+                array($obj->{$values_field_name}, $obj->{$captions_field_name});
+        }
+        return $value_caption_pairs;
+    }
+
+    function expand_value_caption_pairs_with_begin_end(
+        $value_caption_pairs, $begin_end_values_info
+    ) {
+        if (isset($begin_end_values_info["begin_value_caption_pairs"])) {
+            $value_caption_pairs = array_merge(
+                $begin_end_values_info["begin_value_caption_pairs"],
+                $value_caption_pairs
+            );
+        }
+        if (isset($begin_end_values_info["end_value_caption_pairs"])) {
+            $value_caption_pairs = array_merge(
+                $value_caption_pairs,
+                $begin_end_values_info["end_value_caption_pairs"]
+            );
+        }
+        return $value_caption_pairs;
+    }
+
+    function expand_value_caption_pairs_with_nonset(
+        $value_caption_pairs, $nonset_values_info
+    ) {
+        if (isset($nonset_values_info["nonset_value_caption_pair"])) {
+            $value_caption_pairs = array_merge(
+                array($nonset_values_info["nonset_value_caption_pair"]),
+                $value_caption_pairs
+            );
+        }
+        return $value_caption_pairs;
+    }
+    
+    function get_select_dependency_array(
+        $main_select_value_caption_pairs,
+        $dependent_values_info,
+        $dependency_key_field_name,
+        $dependency_query_ex
+    ) {
+        $dependent_query_ex =
+            get_param_value($dependent_values_info["data"], "query_ex", array());
+
+        $query_ex = new SelectQuery();
+        $query_ex->expand($dependent_query_ex);
+        $query_ex->expand($dependency_query_ex);
+
+        $main_select_values =
+            get_values_from_value_caption_pairs($main_select_value_caption_pairs);
+        
+        if (isset($dependent_values_info["data"]["nonset_value_caption_pair"])) {
+            $dependent_select_nonset_value = get_value_from_value_caption_pair(
+                $dependent_values_info["data"]["nonset_value_caption_pair"]
+            );
+        } else {
+            $dependent_select_nonset_value = 0;
+        }
+
+        $dependency_array = array();
+        foreach ($main_select_values as $main_select_value) {
+            if ((string) $main_select_value == (string) $dependent_select_nonset_value) {
+                $dependency_array[] = array($dependent_select_nonset_value);
+                continue;
+            }
+
+            $final_query_ex = $query_ex;
+            $final_query_ex->expand(array(
+                "where" => "{$dependency_key_field_name} = {$main_select_value}",
+            ));
+            $dependent_values_info["data"]["query_ex"] = $final_query_ex;
+            
+            $dependent_select_value_caption_pairs =
+                $this->get_value_caption_pairs_from_source($dependent_values_info);
+            $dependent_select_value_caption_pairs =
+                $this->expand_value_caption_pairs_with_begin_end(
+                    $dependent_select_value_caption_pairs, $dependent_values_info["data"]
+                );
+            $dependent_select_value_caption_pairs =
+                $this->expand_value_caption_pairs_with_nonset(
+                    $dependent_select_value_caption_pairs, $dependent_values_info["data"]
+                );
+
+            $dependency_array[] =
+                get_values_from_value_caption_pairs($dependent_select_value_caption_pairs);
+        }
+        return $dependency_array;
     }
 //
     function get_message($name) {

@@ -17,26 +17,23 @@ class TestApp extends CustomApp {
             "pg_view_examples_in_context2" => $e,
             "pg_view_all_examples_as_objects" => $e,
 
-            "print_one_example" => $e,
+            "print_and_save_one_example" => $e,
         );
     }
 //
     function pg_index() {
         foreach (array_keys($this->actions) as $action) {
-            $this->page->assign(array(
-                "action_name" => get_html_safe_string($action),
-                "action_suburl" => "?action=" . urlencode($action),
-            ));
+            $this->print_varchar_value("action_name", $action);
+            $this->print_varchar_value(
+                "action_url", create_self_url(array("action" => $action))
+            );
             $this->page->parse_file("actions_list/list_item.html", "actions_list");
         }
         $this->page->parse_file("actions_list/list_items.html", "body");
     }
 
     function set_cookie() {
-        $this->create_self_redirect_response(array(
-            "action" => "check_cookie",
-        ));
-
+        $this->create_self_redirect_response(array("action" => "check_cookie"));
         $this->response->add_cookie(new Cookie("Cookie1", "&%$#@!Value1"));
     }
 
@@ -80,22 +77,21 @@ class TestApp extends CustomApp {
     }
 
     function pg_view_all_examples_as_objects() {
-        $examples = $this->fetch_db_objects_list("_example", array(
-            "order_by" => "created DESC",
-        ));
+        $examples_list =
+            $this->fetch_db_objects_list("_example", array("order_by" => "created DESC"));
         $this->print_many_objects_list(array(
-            "obj_name" => "_example",
+            "objects" => $examples_list,
             "templates_dir" => "_example/list_as_objects",
             "template_var" => "body",
         ));
     }
 
-    function print_one_example() {
+    function print_and_save_one_example() {
         $example = $this->fetch_db_object("_example", 1);
-        v($this->get_app_currency_with_sign_value($example->field_currency + 12345678.09));
-        v($example->print_values());
+        $example->print_values();
         $example->field_currency = 99999999.99;
         $example->save();
+        v($this->page->fillings);
         exit;
     }
 }
