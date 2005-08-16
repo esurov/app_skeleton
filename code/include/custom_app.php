@@ -3,6 +3,7 @@
 class CustomApp extends App {
     var $popup = false;
     var $report = false;
+    var $printable = false;
 
     function CustomApp($app_name, $tables) {
         parent::App($app_name, $tables);
@@ -11,10 +12,11 @@ class CustomApp extends App {
     function run_action($action_name = null, $action_params = array()) {
         $this->popup = (int) param("popup");
         $this->report = (int) param("report");
+        $this->printable = (int) param("printable");
 
-        if (!$this->report) {
+        if (!$this->report && !$this->printable) {
             $this->print_hidden_input_form_value("popup", $this->popup);
-            $this->print_varchar_value("popup_url_param", "&popup={$this->popup}");
+            $this->print_value("popup_url_param", "&popup={$this->popup}");
             $this->print_session_status_messages();
         }
         $this->print_lang_menu();
@@ -28,13 +30,11 @@ class CustomApp extends App {
 
     function create_html_document_body_content() {
         if ($this->report) {
-            $template_type = ($this->page->is_template_exist("report.html")) ?
-                "report" :
-                "page";
+            $template_type = ($this->is_file_exist("report.html")) ? "report" : "page";
+        } else if ($this->printable) {
+            $template_type = ($this->is_file_exist("printable.html")) ? "printable" : "page";
         } else if ($this->popup) {
-            $template_type = ($this->page->is_template_exist("popup.html")) ?
-                "popup" :
-                "page";
+            $template_type = ($this->is_file_exist("popup.html")) ? "popup" : "page";
         } else {
             $template_type = "page";
         }
@@ -74,6 +74,10 @@ class CustomApp extends App {
         $result = str_replace(".", "", $app_integer_value);
         $result = str_replace(",", "", $result);
         return (int) $result;
+    }
+
+    function get_currency_nonset_value_caption_pair() {
+        return array(0.0, $this->get_message("not_specified"));
     }
 }
 

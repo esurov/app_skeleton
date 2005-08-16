@@ -295,7 +295,8 @@ class DbObject {
 
             $width = null;
             $prec = null;
-            $input = null;
+            $input = get_param_value($field_info, "input", array());
+            $input["type_attrs"] = get_param_value($input, "type_attrs", array());
             switch ($field_type) {
             case "primary_key":
                 $initial_field_value = 0;
@@ -309,9 +310,7 @@ class DbObject {
             case "foreign_key":
                 $initial_field_value = 0;
                 $width = get_param_value($field_info, "width", 11);
-                $input = get_param_value($field_info, "input", array());
                 $input["type"] = get_param_value($input, "type", "text");
-                $input["type_attrs"] = get_param_value($input, "type_attrs", array());
                 $input["values"] = get_param_value($input, "values", null);
                 
                 $this->insert_index(array(
@@ -345,8 +344,7 @@ class DbObject {
                         " '{$field_name}' not specified!"
                     );
                 }
-                $input = get_param_value($field_info, "input", null);
-                if (is_null($input)) {
+                if (is_null(get_param_value($field_info, "input", null))) {
                     die(
                         "{$table_name}: 'input' for enum" .
                         " '{$field_name}' not specified!"
@@ -356,22 +354,16 @@ class DbObject {
             case "varchar":
                 $width = get_param_value($field_info, "width", 255);
                 $initial_field_value = get_param_value($field_info, "value", "");
-                $input = get_param_value($field_info, "input", array());
                 $input["type"] = get_param_value($input, "type", "text");
-                $default_input_attrs = array(
-                    "maxlength" => $width,
+                $input["type_attrs"]["maxlength"] = get_param_value(
+                    $input["type_attrs"], "maxlength", $width
                 );
-                $input["type_attrs"] = get_param_value($input, "type_attrs", $default_input_attrs);
                 break;
             case "text":
                 $initial_field_value = get_param_value($field_info, "value", "");
-                $input = get_param_value($field_info, "input", array());
                 $input["type"] = get_param_value($input, "type", "textarea");
-                $default_input_attrs = array(
-                    "cols" => 60,
-                    "rows" => 9,
-                );
-                $input["type_attrs"] = get_param_value($input, "type_attrs", $default_input_attrs);
+                $input["type_attrs"]["cols"] = get_param_value($input["type_attrs"], "cols", 60);
+                $input["type_attrs"]["rows"] = get_param_value($input["type_attrs"], "rows", 9);
                 break;
             case "blob":
                 $initial_field_value = get_param_value($field_info, "value", "");
@@ -1140,78 +1132,74 @@ class DbObject {
         if (is_null($param_value)) {
             return null;
         }
-        return $this->app->get_php_integer_value($param_value);
+        return $this->app->get_php_integer_value((string) $param_value);
     }
 
     function get_double_field_value($param_value) {
         if (is_null($param_value)) {
             return null;
         }
-        return $this->app->get_php_double_value($param_value);
+        return $this->app->get_php_double_value((string) $param_value);
     }
 
     function get_currency_field_value($param_value) {
         if (is_null($param_value)) {
             return null;
         }
-        return $this->app->get_php_double_value($param_value);
+        return $this->app->get_php_double_value((string) $param_value);
     }
 
     function get_boolean_field_value($param_value) {
-        if ((int) $param_value == 1) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return ((int) $param_value != 0) ? 1 : 0;
     }
 
     function get_enum_field_value($enum_value, $enum_value_caption_pairs) {
         if (is_null($enum_value)) {
             return null;
         }
-        return get_selected_value($enum_value_caption_pairs, $enum_value, $enum_value);
+        return get_actual_current_value($enum_value_caption_pairs, $enum_value);
     }
 
     function get_varchar_field_value($param_value) {
         if (is_null($param_value)) {
             return null;
         }
-        return $param_value;
+        return (string) $param_value;
     }
 
     function get_text_field_value($param_value) {
         if (is_null($param_value)) {
             return null;
         }
-        return convert_crlf2lf($param_value);
+        return convert_crlf2lf((string) $param_value);
     }
 
     function get_blob_field_value($param_value) {
         if (is_null($param_value)) {
             return null;
         }
-        return $param_value;
+        return (string) $param_value;
     }
 
     function get_datetime_field_value($app_datetime) {
         if (is_null($app_datetime)) {
             return null;
         }
-        return $this->app->get_db_datetime($app_datetime);
+        return $this->app->get_db_datetime((string) $app_datetime);
     }
 
     function get_date_field_value($app_date) {
         if (is_null($app_date)) {
             return null;
         }
-        return $this->app->get_db_date($app_date);
+        return $this->app->get_db_date((string) $app_date);
     }
     
     function get_time_field_value($app_time) {
         if (is_null($app_time)) {
             return null;
         }
-        return $this->app->get_db_time($app_time);
+        return $this->app->get_db_time((string) $app_time);
     }
 //
     function read_filters() {
@@ -1420,6 +1408,9 @@ class DbObject {
             if ($field_type == "blob") {
                 continue;
             }
+            $values_info = (isset($field_info["input"]["values"])) ?
+                $field_info["input"]["values"] :
+                array();
 
             $template_var = "{$this->table_name}_{$field_name}";
             $value = $this->{$field_name};
@@ -1438,15 +1429,26 @@ class DbObject {
                 $this->app->print_double_value($template_var, $value, $field_info["prec"]);
                 break;
             case "currency":
-                $this->app->print_currency_value($template_var, $value, $field_info["prec"]);
+                $values_data_info = get_param_value($values_info, "data", array());
+                $this->app->print_currency_value(
+                    $template_var,
+                    $value,
+                    $field_info["prec"],
+                    get_param_value($values_data_info, "sign", null),
+                    get_param_value($values_data_info, "sign_at_start", null),
+                    get_param_value($values_data_info, "nonset_value_caption_pair", null)
+                );
                 break;
             case "boolean":
-                $this->app->print_boolean_value($template_var, $value);
+                $values_data_info = get_param_value($values_info, "data", array());
+                $this->app->print_boolean_value(
+                    $template_var,
+                    $value,
+                    get_param_value($values_data_info, "value_caption_pairs", null)
+                );
                 break;
             case "enum":
-                $this->app->print_enum_value(
-                    $template_var, $value, $field_info["input"]["values"]["data"]["array"]
-                );
+                $this->app->print_enum_value($template_var, $value, $values_info["data"]["array"]);
                 break;
             case "varchar":
                 $this->app->print_varchar_value($template_var, $value);
@@ -1522,20 +1524,20 @@ class DbObject {
                 );
                 break;
             case "integer":
-                $this->app->print_integer_form_value($template_var, $value);
+                $this->app->print_integer_form_value($template_var, $value, $input_attrs);
                 break;
             case "double":
                 $this->app->print_double_form_value(
-                    $template_var, $value, $field_info["prec"]
+                    $template_var, $value, $field_info["prec"], $input_attrs
                 );
                 break;
             case "currency":
                 $this->app->print_currency_form_value(
-                    $template_var, $value, $field_info["prec"]
+                    $template_var, $value, $field_info["prec"], $input_attrs, $values_info
                 );
                 break;
             case "boolean":
-                $this->app->print_boolean_form_value($template_var, $value);
+                $this->app->print_boolean_form_value($template_var, $value, $input_attrs);
                 break;
             case "enum":
                 $this->app->print_enum_form_value(
@@ -1561,13 +1563,13 @@ class DbObject {
                 }
                 break;
             case "datetime":
-                $this->app->print_datetime_form_value($template_var, $value);
+                $this->app->print_datetime_form_value($template_var, $value, $input_attrs);
                 break;
             case "date":
-                $this->app->print_date_form_value($template_var, $value);
+                $this->app->print_date_form_value($template_var, $value, $input_attrs);
                 break;
             case "time":
-                $this->app->print_time_form_value($template_var, $value);
+                $this->app->print_time_form_value($template_var, $value, $input_attrs);
                 break;
             }
         }
@@ -1609,11 +1611,17 @@ class DbObject {
                 );
                 break;
             case "checkbox":
-                $this->app->print_checkbox_input_form_value($template_var, $filter_value);
+                $this->app->print_checkbox_input_form_value(
+                    $template_var, $filter_value, $filter_input_attrs
+                );
                 break;
             case "radio":
                 $this->app->print_radio_group_input_form_value(
-                    $template_var, $filter_value, $values_info, $alt_values_info
+                    $template_var,
+                    $filter_value,
+                    $filter_input_attrs,
+                    $values_info,
+                    $alt_values_info
                 );
                 break;
             case "select":
@@ -1873,7 +1881,7 @@ class DbObject {
                     $this->get_client_validate_condition_str($condition_info);
             }
         }
-        $this->page->assign(
+        $this->app->print_raw_value(
             "{$this->table_name}_client_validation_js",
             create_client_validation_js($client_validate_condition_strs)
         );
@@ -1907,7 +1915,10 @@ class DbObject {
         case "not_equal":
         case "zip":
         case "phone":
-        case "number":
+        case "number_integer":
+        case "number_double":
+        case "number_equal":
+        case "number_not_equal":
         case "number_greater":
         case "number_greater_equal":
         case "number_less":
@@ -2107,7 +2118,7 @@ class DbObject {
             "{$template_var}.html" : "{$template_var}_empty.html";
         
         $templates_dir = $this->print_params["templates_dir"];
-        $this->page->parse_file_new_if_exists(
+        $this->app->print_file_new_if_exists(
             "{$templates_dir}/{$filename}", "{$this->table_name}{$template_var}"
         );
     }

@@ -6,18 +6,24 @@ function v($obj) {
 
 function param($name) {
     if (isset($_GET[$name])) {
-        $res = $_GET[$name];
+        $param_value = $_GET[$name];
     } else if (isset($_POST[$name])) {
-        $res = $_POST[$name];
+        $param_value = $_POST[$name];
     } else {
         return null;
     }
-    
     if (get_magic_quotes_gpc()) {
-        $res = stripslashes($res);
+        if (is_array($param_value)) {
+            $param_values = array();
+            foreach ($param_value as $value) {
+                $param_values[] = stripslashes($value);
+            }
+            return $param_values;
+        } else {
+            return stripslashes($param_value);
+        }
     }
-
-    return $res;
+    return $param_value;
 }
 
 function param_cookie($name) {
@@ -178,10 +184,18 @@ function get_word_shortened_string($str, $max_length, $end_str = "...") {
 }
 
 // Print common HTML controls
-function print_html_input($type, $name, $value, $attrs = array()) {
+function print_raw_html_input($type, $name, $value, $attrs = array()) {
     $attrs_str = get_html_attrs_str($attrs);
+    return "<input type=\"{$type}\" name=\"{$name}\" value=\"{$value}\"{$attrs_str}>";
+}
+
+function print_html_input($type, $name, $value, $attrs = array()) {
     $value_safe = get_html_safe_string($value);
-    return "<input type=\"{$type}\" name=\"{$name}\" value=\"{$value_safe}\"{$attrs_str}>";
+    return print_raw_html_input($type, $name, $value_safe, $attrs);
+}
+
+function print_raw_html_hidden($name, $value) {
+    return print_raw_html_input("hidden", $name, $value);
 }
 
 function print_html_hidden($name, $value) {
@@ -190,17 +204,21 @@ function print_html_hidden($name, $value) {
 
 function print_html_checkbox($name, $value, $checked = null, $attrs = array()) {
     if (is_null($checked)) {
-        $value = (((int) $value) != 0) ? 1 : 0;
-        if ($value) {
+        if ((int) $value != 0) {
             $attrs["checked"] = null;
         }
     } else if ($checked) {
         $attrs["checked"] = null;
     }
-    return print_html_input("checkbox", $name, $value, $attrs);
+    return print_html_input("checkbox", $name, ((int) $value == 0) ? 1 : $value, $attrs);
 }
 
-function print_html_select($name, $value_caption_pairs, $current_value, $attrs = array()) {
+function print_html_select(
+    $name,
+    $value_caption_pairs,
+    $current_value,
+    $attrs = array()
+) {
     $attrs_str = get_html_attrs_str($attrs);
     $select_options = print_html_select_options($value_caption_pairs, $current_value);
     return
@@ -210,32 +228,32 @@ function print_html_select($name, $value_caption_pairs, $current_value, $attrs =
 }
 
 function print_html_select_options($value_caption_pairs, $current_value) {
-    if (count($value_caption_pairs) == 0) {
-        return "";
-    }
-
     if (is_array($current_value)) {
 //        $selected_value = get_multiple_selected_values(
 //            $value_caption_pairs, $current_values
 //        );
     } else {
-        $selected_value = get_selected_value(
-            $value_caption_pairs, $current_value, $current_value
-        );
+        $selected_value = get_actual_current_value($value_caption_pairs, $current_value);
     }
 
     $output = "";
     foreach ($value_caption_pairs as $value_caption_pair) {
         $value = get_value_from_value_caption_pair($value_caption_pair);
         $caption = get_caption_from_value_caption_pair($value_caption_pair);
-        $attrs = array();
-        if (
-            (!is_array($selected_value) && ((string) $value == (string) $selected_value)) ||
-            (is_array($selected_value) && in_array($value, $selected_value))
-        ) {
-            $attrs["selected"] = null;
+        
+        $option_attrs = array();
+        if (!is_null($selected_value)) {
+            if (is_array($selected_value)) {
+                if (in_array($value, $selected_value)) {
+                    $option_attrs["selected"] = null;
+                }
+            } else {
+                if ((string) $value == (string) $selected_value) {
+                    $option_attrs["selected"] = null;
+                }
+            }
         }
-        $output .= print_html_select_option($value, $caption, $attrs);
+        $output .= print_html_select_option($value, $caption, $option_attrs);
     }
     return $output;
 }
@@ -248,32 +266,29 @@ function print_html_select_option($value, $caption, $attrs = array()) {
 }
 
 function print_html_radio_group(
-    $name, $value_caption_pairs, $current_value, $default_value = null, $is_xhtml = false
+    $name,
+    $value_caption_pairs,
+    $current_value,
+    $attrs = array(),
+    $br_str = null,
+    $is_xhtml = false
 ) {
-    if (count($value_caption_pairs) == 0) {
-        return "";
+    $checked_value = get_actual_current_value($value_caption_pairs, $current_value);
+
+    if (is_null($br_str)) {
+        $br_str = ($is_xhtml) ? "<br />" : "<br>";
     }
-
-    if (is_null($default_value)) {
-        $default_value = $current_value;
-    }
-
-    $checked_value = get_selected_value(
-        $value_caption_pairs, $current_value, $default_value
-    );
-
     $output = "";
     foreach ($value_caption_pairs as $value_caption_pair) {
         $value = get_value_from_value_caption_pair($value_caption_pair);
         $caption = get_caption_from_value_caption_pair($value_caption_pair);
 
-        $attrs = array();
-        if ((string) $value == (string) $checked_value) {
-            $attrs["checked"] = null;
+        $radio_attrs = $attrs;
+        if (!is_null($checked_value) && ((string) $value == (string) $checked_value)) {
+            $radio_attrs["checked"] = null;
         }
-        $output .= print_html_radio($name, $value, $attrs);
-        $br_str = ($is_xhtml) ? "<br />\n" : "<br>\n";
-        $output .= get_html_safe_string($caption) . $br_str;
+        $output .= print_html_radio($name, $value, $radio_attrs);
+        $output .= get_html_safe_string($caption) . "{$br_str}\n";
     }
     return $output;
 }
@@ -291,16 +306,15 @@ function print_html_textarea($name, $value, $attrs = array()) {
 }
 
 //
-function get_selected_value($value_caption_pairs, $current_value, $default_value) {
+function get_actual_current_value($value_caption_pairs, $current_value) {
     $values = get_values_from_value_caption_pairs($value_caption_pairs);
-    if (in_array($current_value, $values)) {
-        $selected_value = $current_value;
-    } else if (in_array($default_value, $values)) {
-        $selected_value = $default_value;
+    if (is_null($current_value) || count($values) == 0) {
+        return null;
+    } else if (in_array($current_value, $values)) {
+        return $current_value;
     } else {
-        $selected_value = $values[0];
+        return $values[0];
     }
-    return $selected_value;
 }
 
 //function get_multiple_selected_values($value_caption_pairs, $current_values) {
@@ -353,6 +367,18 @@ function get_captions_from_value_caption_pairs($value_caption_pairs) {
         $values[] = get_caption_from_value_caption_pair($value_caption_pair);
     }
     return $captions;
+}
+
+function get_caption_by_value_from_value_caption_pairs($value_caption_pairs, $value) {
+    if (is_null($value)) {
+        return null;
+    }
+    foreach ($value_caption_pairs as $value_caption_pair) {
+        if ((string) get_value_from_value_caption_pair($value_caption_pair) == (string) $value) {
+            return get_caption_from_value_caption_pair($value_caption_pair);
+        }
+    }
+    return null;
 }
 
 //

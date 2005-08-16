@@ -27,9 +27,9 @@ class TestApp extends CustomApp {
             $this->print_varchar_value(
                 "action_url", create_self_url(array("action" => $action))
             );
-            $this->page->parse_file("actions_list/list_item.html", "actions_list");
+            $this->print_file("actions_list/list_item.html", "actions_list");
         }
-        $this->page->parse_file("actions_list/list_items.html", "body");
+        $this->print_file("actions_list/list_items.html", "body");
     }
 
     function set_cookie() {
@@ -38,7 +38,7 @@ class TestApp extends CustomApp {
     }
 
     function check_cookie() {
-        var_dump($_COOKIE);
+        v($_COOKIE);
         exit;
     }
 
@@ -80,6 +80,7 @@ class TestApp extends CustomApp {
         $examples_list =
             $this->fetch_db_objects_list("_example", array("order_by" => "created DESC"));
         $this->print_many_objects_list(array(
+            "obj_name" => "_example",
             "objects" => $examples_list,
             "templates_dir" => "_example/list_as_objects",
             "template_var" => "body",

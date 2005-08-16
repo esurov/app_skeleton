@@ -202,6 +202,16 @@ class Example extends CustomDbObject {
             "field" => "field_currency",
             "type" => "currency",
             "value" => 0.0,
+            "input" => array(
+                "values" => array(
+                    "data" => array(
+                        "sign" => "!super_currency_sign!",
+                        "sign_at_start" => false,
+                        "nonset_value_caption_pair" =>
+                            array(0.0, $this->get_message("not_specified")),
+                    ),
+                ),
+            ),
         ));
 
         $this->insert_field(array(
@@ -325,9 +335,9 @@ class Example extends CustomDbObject {
         parent::print_values($params);
 
         // This template variable is extension to default printed variables for all contexts
-        $this->page->assign(
+        $this->app->print_raw_value(
             "_example_field_double_decorated",
-            "!!" . $this->page->get_value("_example_field_double") . "!!"
+            "!!" . $this->page->get_filling_value("_example_field_double") . "!!"
         );
 
         // Context handling
@@ -350,7 +360,7 @@ class Example extends CustomDbObject {
             $row_parity = $this->print_params["row_parity"];
 
             // Add context-specific template variable
-            $this->print_varchar_value(
+            $this->app->print_varchar_value(
                 "_example_context1_specific_value",
                 "str1&{$row_number}<>{$row_parity}"
             );
@@ -358,7 +368,7 @@ class Example extends CustomDbObject {
 
         case "context2":
             // Add context-specific template variable
-            $this->print_boolean_value(
+            $this->app->print_boolean_value(
                 "_example_context2_specific_value",
                 1 - $this->field_boolean
             );

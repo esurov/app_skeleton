@@ -53,6 +53,7 @@ choose_one = Choose one:
 yes = Yes
 no = No
 other = Other
+not_specified = Not specified
 
 ["lang"]
 en = English

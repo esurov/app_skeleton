@@ -43,7 +43,7 @@ class App {
 
         $this->create_page_template();
         $this->html_charset = $this->config->get_value("html_charset");
-        $this->page->assign("html_charset", $this->html_charset);
+        $this->print_raw_value("html_charset", $this->html_charset);
 
         $this->create_pager();
 
@@ -116,9 +116,9 @@ class App {
 
     function init_lang_dependent_data() {
         foreach ($this->messages->params as $key => $value) {
-            $this->page->assign("str_{$key}", $value);
+            $this->print_raw_value("str_{$key}", $value);
         }
-        $this->page->assign("lang", $this->lang);
+        $this->print_raw_value("lang", $this->lang);
     }
 //
     function run() {
@@ -184,7 +184,7 @@ class App {
         $this->action_params = $action_params;
 
         $page_name = trim(param("page"));
-        $this->page->assign(array(
+        $this->print_values(array(
             "action" => $this->action,
             "page" => $page_name,
         ));
@@ -248,12 +248,12 @@ class App {
 //
     function create_html_document_response() {
         $content = $this->create_html_document_body_content();
-        $charset = $this->config->get_value("html_pages_charset");
+        $charset = $this->config->get_value("html_charset");
         $this->response = new HtmlDocumentResponse($content, $charset);
     }
 
     function create_html_document_body_content() {
-        return $this->page->parse_file($this->page_template_name);
+        return $this->print_file($this->page_template_name);
     }
 
     function create_access_denied_html_document_response() {
@@ -479,18 +479,39 @@ class App {
     }
 
     function get_app_currency_with_sign_value(
-        $php_double_value, $decimals = 2, $currency_sign = null, $sign_at_start = null
+        $php_double_value,
+        $decimals = 2,
+        $sign = null,
+        $sign_at_start = null,
+        $nonset_value_caption_pair = null
     ) {
-        if (is_null($currency_sign)) {
-            $currency_sign = $this->get_currency_sign();
+        if (is_null($sign)) {
+            $sign = $this->get_currency_sign();
         }
         if (is_null($sign_at_start)) {
             $sign_at_start = $this->is_currency_sign_at_start();
         }
-        $formatted_currency_value = $this->get_app_currency_value($php_double_value, $decimals);
-        return ($sign_at_start) ?
-            "{$currency_sign}{$formatted_currency_value}" :
-            "{$formatted_currency_value}{$currency_sign}";
+
+        if (is_null($nonset_value_caption_pair)) {
+            $nonset_value_caption_pair = $this->get_currency_nonset_value_caption_pair();
+        }
+
+        if (!is_null($nonset_value_caption_pair)) {
+            $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
+            $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
+            if ((double) $php_double_value == (double) $nonset_value) {
+                return $nonset_caption;
+            }
+        }
+        return $this->append_currency_sign(
+            $this->get_app_currency_value($php_double_value, $decimals),
+            $sign,
+            $sign_at_start
+        );
+    }
+
+    function append_currency_sign($str, $sign, $sign_at_start) {
+        return ($sign_at_start) ? "{$sign}{$str}" : "{$str}{$sign}";
     }
 
     function get_currency_sign() {
@@ -500,28 +521,66 @@ class App {
     function is_currency_sign_at_start() {
         return true;
     }
+
+    function get_currency_nonset_value_caption_pair() {
+        return null;
+    }
+//
+    function print_raw_value($template_var, $value) {
+        $this->page->set_filling_value($template_var, $value);
+    }
+
+    function print_raw_values($h) {
+        $this->page->set_filling_values($h);
+    }
+
+    function print_value($template_var, $value) {
+        $this->print_raw_value($template_var, get_html_safe_string($value));
+    }
+
+    function print_values($h) {
+        foreach ($h as $template_var => $value) {
+            $this->print_value($template_var, $value);
+        }
+    }
+//
+    function print_file($template_name, $append_to_name = null) {
+        return $this->page->parse_file($template_name, $append_to_name);
+    }
+
+    function print_file_new($template_name, $name = null) {
+        return $this->page->parse_file_new($template_name, $name);
+    }
+
+    function print_file_if_exists($template_name, $name = null) {
+        return $this->page->parse_file_if_exists($template_name, $name);
+    }
+
+    function print_file_new_if_exists($template_name, $name = null) {
+        return $this->page->parse_file_new_if_exists($template_name, $name);
+    }
+
+    function is_file_exist($template_name) {
+        return $this->page->is_template_exist($template_name);
+    }
 //
     function print_primary_key_value($template_var, $value) {
-        $this->page->assign(array(
-            "{$template_var}" => $value,
-        ));
+        $this->print_raw_value("{$template_var}", $value);
     }
 
     function print_foreign_key_value($template_var, $value) {
-        $this->page->assign(array(
-            "{$template_var}" => $value,
-        ));
+        $this->print_raw_value("{$template_var}", $value);
     }
 
     function print_integer_value($template_var, $value) {
-        $this->page->assign(array(
+        $this->print_raw_values(array(
             "{$template_var}" => $this->get_app_integer_value($value),
             "{$template_var}_orig" => $value,
         ));
     }
 
     function print_double_value($template_var, $value, $decimals) {
-        $this->page->assign(array(
+        $this->print_raw_values(array(
             "{$template_var}" => $this->get_app_double_value($value, $decimals),
             "{$template_var}_2" => $this->get_app_double_value($value, 2),
             "{$template_var}_5" => $this->get_app_double_value($value, 5),
@@ -529,82 +588,79 @@ class App {
         ));
     }
 
-    function print_currency_value($template_var, $value, $decimals) {
-        $this->page->assign(array(
-            "{$template_var}" => $this->get_app_currency_value($value, $decimals),
-            "{$template_var}_with_sign" =>
-                $this->get_app_currency_with_sign_value($value, $decimals),
+    function print_currency_value(
+        $template_var,
+        $value,
+        $decimals,
+        $sign = null,
+        $sign_at_start = null,
+        $nonset_value_caption_pair = null
+    ) {
+        $this->print_raw_values(array(
+            "{$template_var}" =>
+                $this->get_app_currency_with_sign_value(
+                    $value, $decimals, $sign, $sign_at_start, $nonset_value_caption_pair
+                ),
+            "{$template_var}_without_sign" =>
+                 $this->get_app_currency_value($value, $decimals),
             "{$template_var}_orig" => $value,
         ));
     }
 
-    function print_boolean_value($template_var, $value, $value_captions = null) {
-        if (is_null($value_captions)) {
-            $value_captions = array(
-                0 => $this->get_message("no"),
-                1 => $this->get_message("yes"),
+    function print_boolean_value($template_var, $value, $value_caption_pairs = null) {
+        if (is_null($value_caption_pairs)) {
+            $value_caption_pairs = array(
+                array(0, $this->get_message("no")),
+                array(1, $this->get_message("yes")),
             );
         }
-        $this->page->assign(array(
-            "{$template_var}" => $value_captions[$value],
-            "{$template_var}_orig" => $value,
-        ));
+        $caption = get_caption_by_value_from_value_caption_pairs(
+            $value_caption_pairs, ((int) $value != 0) ? 1 : 0
+        );
+        $this->print_value("{$template_var}", $caption);
+        $this->print_raw_value("{$template_var}_orig", $value);
     }
 
-    function print_enum_value($template_var, $enum_value, $enum_value_caption_pairs) {
-        $enum_caption = null;
-        foreach ($enum_value_caption_pairs as $enum_value_caption_pair) {
-            if ($enum_value == get_value_from_value_caption_pair($enum_value_caption_pair)) {
-                $enum_caption = get_caption_from_value_caption_pair($enum_value_caption_pair);
-                break;
-            }
-        }
-        if (is_null($enum_caption)) {
-            $enum_caption = get_caption_from_value_caption_pair($enum_value_caption_pairs[0]);
-        } 
-        $this->page->assign(array(
-            "{$template_var}" => $enum_caption,
-            "{$template_var}_orig" => $enum_value,
-        ));
+    function print_enum_value($template_var, $enum_value, $value_caption_pairs) {
+        $enum_value = get_actual_current_value($value_caption_pairs, $enum_value);
+        $enum_caption = get_caption_by_value_from_value_caption_pairs(
+            $value_caption_pairs, $enum_value
+        );
+        $this->print_value("{$template_var}", is_null($enum_caption) ? "" : $enum_caption);
+        $this->print_raw_value("{$template_var}_orig", $enum_value);
     }
 
     function print_varchar_value($template_var, $value) {
+        $this->print_value("{$template_var}", $value);
         $safe_value = get_html_safe_string($value);
-        $this->page->assign(array(
-            "{$template_var}" => $safe_value,
-            "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
-            "{$template_var}_orig" => $value,
-        ));
+        $this->print_raw_value("{$template_var}_nobr", str_replace(" ", "&nbsp;", $safe_value));
+        $this->print_raw_value("{$template_var}_orig", $value);
     }
 
     function print_text_value($template_var, $value) {
+        $this->print_varchar_value("{$template_var}", $value);
         $safe_value = get_html_safe_string($value);
-        $this->page->assign(array(
-            "{$template_var}" => $safe_value,
-            "{$template_var}_lf2br" => convert_lf2br($safe_value),
-            "{$template_var}_nobr" => str_replace(" ", "&nbsp;", $safe_value),
-            "{$template_var}_orig" => $value,
-        ));
+        $this->print_raw_value("{$template_var}_lf2br", convert_lf2br($safe_value));
     }
 
     function print_datetime_value($template_var, $db_datetime) {
-        $this->page->assign(array(
-            "{$template_var}" => get_html_safe_string($this->get_app_datetime($db_datetime)),
-            "{$template_var}_orig" => get_html_safe_string($db_datetime),
+        $this->print_values(array(
+            "{$template_var}" => $this->get_app_datetime($db_datetime),
+            "{$template_var}_orig" => $db_datetime,
         ));
     }
 
     function print_date_value($template_var, $db_date) {
-        $this->page->assign(array(
-            "{$template_var}" => get_html_safe_string($this->get_app_date($db_date)),
-            "{$template_var}_orig" => get_html_safe_string($db_date),
+        $this->print_values(array(
+            "{$template_var}" => $this->get_app_date($db_date),
+            "{$template_var}_orig" => $db_date,
         ));
     }
 
     function print_time_value($template_var, $db_time) {
-        $this->page->assign(array(
-            "{$template_var}" => get_html_safe_string($this->get_app_time($db_time)),
-            "{$template_var}_orig" => get_html_safe_string($db_time),
+        $this->print_values(array(
+            "{$template_var}" => $this->get_app_time($db_time),
+            "{$template_var}_orig" => $db_time,
         ));
     }
 //
@@ -625,18 +681,27 @@ class App {
 
         switch ($input_type) {
         case "text":
-            $this->print_text_input_form_value($template_var, $value, $input_attrs);
+            $printed_value =
+                $this->print_text_input_form_value($template_var, $value, $input_attrs);
             break;
         case "radio":
-            $this->print_radio_group_input_form_value($template_var, $value, $values_info);
+            $printed_value = $this->print_radio_group_input_form_value(
+                $template_var,
+                $value,
+                $input_attrs,
+                $values_info
+            );
             break;
         case "select":
-            $this->print_select_input_form_value(
-                $template_var, $value, $input_attrs, $values_info
+            $printed_value = $this->print_select_input_form_value(
+                $template_var,
+                $value,
+                $input_attrs,
+                $values_info
             );
             break;
         case "main_select":
-            $this->print_main_select_input_form_value(
+            $printed_value = $this->print_main_select_input_form_value(
                 $template_var,
                 $value,
                 $input_attrs,
@@ -646,36 +711,71 @@ class App {
                 $input_type_params["dependency_info"]
             );
             break;
+        default:
+            $printed_value = "";
         }
+
+        return $printed_value;
     }
 
-    function print_integer_form_value($template_var, $value) {
+    function print_integer_form_value($template_var, $value, $input_attrs) {
         $app_integer_value = $this->get_app_integer_value($value);
         $this->print_hidden_input_form_value($template_var, $app_integer_value);
-        $this->print_text_input_form_value(
-            $template_var, $app_integer_value, array("style" => "text-align: right;")
+        $printed_value = $this->print_text_input_form_value(
+            $template_var,
+            $app_integer_value,
+            array_merge(
+                array("class" => "integer"),
+                $input_attrs
+            )
         );
+        return $printed_value;
     }
     
-    function print_double_form_value($template_var, $value, $decimals) {
+    function print_double_form_value($template_var, $value, $decimals, $input_attrs) {
         $app_double_value = $this->get_app_double_value($value, $decimals);
         $this->print_hidden_input_form_value($template_var, $app_double_value);
-        $this->print_text_input_form_value(
-            $template_var, $app_double_value, array("style" => "text-align: right;")
+        return $this->print_text_input_form_value(
+            $template_var,
+            $app_double_value,
+            array_merge(
+                array("class" => "double"),
+                $input_attrs
+            )
         );
     }
 
-    function print_currency_form_value($template_var, $value, $decimals) {
+    function print_currency_form_value(
+        $template_var, $value, $decimals, $input_attrs, $values_info
+    ) {
+        $values_data_info = get_param_value($values_info, "data", array());
+        $sign = get_param_value($values_data_info, "sign", $this->get_currency_sign());
+        $sign_at_start =
+            get_param_value($values_data_info, "sign_at_start", $this->is_currency_sign_at_start());
         $app_currency_value = $this->get_app_currency_value($value, $decimals);
         $this->print_hidden_input_form_value($template_var, $app_currency_value);
-        $this->print_text_input_form_value(
-            $template_var, $app_currency_value, array("style" => "text-align: right;")
+
+        $printed_value = $this->print_text_input_form_value(
+            $template_var,
+            $app_currency_value,
+            array_merge(
+                array("class" => "currency"),
+                $input_attrs
+            )
         );
+        $this->print_raw_value(
+            "{$template_var}_input",
+            $this->append_currency_sign($printed_value, $sign, $sign_at_start)
+        );
+        $this->print_text_input_form_value(
+            "{$template_var}_without_sign", $app_currency_value, array("class" => "currency")
+        );
+        return $printed_value;
     }
 
-    function print_boolean_form_value($template_var, $value) {
+    function print_boolean_form_value($template_var, $value, $input_attrs) {
         $this->print_hidden_input_form_value($template_var, $value);
-        $this->print_checkbox_input_form_value($template_var, $value);
+        return $this->print_checkbox_input_form_value($template_var, $value, $input_attrs);
     }
 
     function print_enum_form_value(
@@ -685,14 +785,20 @@ class App {
 
         switch ($input_type) {
         case "radio":
-            $this->print_radio_group_input_form_value($template_var, $enum_value, $values_info);
-            break;
-        case "select":
-            $this->print_select_input_form_value(
+            $printed_value = $this->print_radio_group_input_form_value(
                 $template_var, $enum_value, $input_attrs, $values_info
             );
             break;
+        case "select":
+            $printed_value = $this->print_select_input_form_value(
+                $template_var, $enum_value, $input_attrs, $values_info
+            );
+            break;
+        default:
+            $printed_value = "";
         }
+
+        return $printed_value;
     }
 
     function print_varchar_form_value(
@@ -703,9 +809,14 @@ class App {
         switch ($input_type) {
         case "text":
         case "password":
-            $this->print_input_form_value($input_type, $template_var, $value, $input_attrs);
+            $printed_value =
+                $this->print_input_form_value($input_type, $template_var, $value, $input_attrs);
             break;
+        default:
+            $printed_value = "";
         }
+
+        return $printed_value;
     }
 
     function print_text_form_value(
@@ -715,91 +826,133 @@ class App {
         
         switch ($input_type) {
         case "textarea":
-            $this->print_textarea_input_form_value($template_var, $value, $input_attrs);
+            $printed_value =
+                $this->print_textarea_input_form_value($template_var, $value, $input_attrs);
             break;
+        default:
+            $printed_value = "";
         }
+
+        return $printed_value;
     }
 
     function print_multilingual_form_value($template_var, $value) {
         $lang_inputs_with_captions_str = "";
         foreach ($this->avail_langs as $lang) {
             $lang_str = $this->get_message($lang);
-            $lang_input = $this->page->get_value("{$template_var}_{$lang}_input");
+            $lang_input = $this->page->get_filling_value("{$template_var}_{$lang}_input");
             $lang_inputs_with_captions_str .=
                 "<tr>\n" .
                 "<th>{$lang_str}:</th>\n" .
                 "<td>{$lang_input}</td>\n" .
                 "</tr>\n";
         }
-        $this->page->assign(array(
-            "{$template_var}_input" =>
-                "<table>\n" .
-                $lang_inputs_with_captions_str .
-                "</table>\n",
+        $printed_value = 
+            "<table>\n" .
+            $lang_inputs_with_captions_str .
+            "</table>\n";
+        $this->print_raw_values(array(
+            "{$template_var}_input" => $printed_value,
             "{$template_var}_hidden" =>
-                $this->page->get_value("{$template_var}_{$this->lang}_hidden"),
+                $this->page->get_filling_value("{$template_var}_{$this->lang}_hidden"),
         ));
+        return $printed_value;
     }
 
-    function print_datetime_form_value($template_var, $db_datetime) {
+    function print_datetime_form_value($template_var, $db_datetime, $input_attrs) {
         $app_datetime = $this->get_app_datetime($db_datetime);
         $this->print_hidden_input_form_value($template_var, $app_datetime);
-        $this->print_text_input_form_value($template_var, $app_datetime);
+        return $this->print_text_input_form_value(
+            $template_var,
+            $app_datetime,
+            array_merge(
+                array("class" => "datetime"),
+                $input_attrs
+            )
+        );
     }
 
-    function print_date_form_value($template_var, $db_date) {
+    function print_date_form_value($template_var, $db_date, $input_attrs) {
         $app_date = $this->get_app_date($db_date);
         $this->print_hidden_input_form_value($template_var, $app_date);
-        $this->print_text_input_form_value($template_var, $app_date);
+        return $this->print_text_input_form_value(
+            $template_var,
+            $app_date,
+            array_merge(
+                array("class" => "date"),
+                $input_attrs
+            )
+        );
     }
 
-    function print_time_form_value($template_var, $db_time) {
+    function print_time_form_value($template_var, $db_time, $input_attrs) {
         $app_time = $this->get_app_time($db_time);
         $this->print_hidden_input_form_value($template_var, $app_time);
-        $this->print_text_input_form_value($template_var, $app_time);
+        return $this->print_text_input_form_value(
+            $template_var,
+            $app_time,
+            array_merge(
+                array("class" => "time"),
+                $input_attrs
+            )
+        );
     }
 //
+    function print_raw_input_form_value(
+        $input_type, $template_var, $value, $input_attrs = array()
+    ) {
+        $printed_value = print_raw_html_input($input_type, $template_var, $value, $input_attrs);
+        $this->print_raw_value("{$template_var}_input", $printed_value);
+        return $printed_value;
+    }
+
+    function print_raw_hidden_form_value($template_var, $value) {
+        return $this->print_raw_input_form_value("hidden", $template_var, $value);
+    }
+
     function print_input_form_value(
         $input_type, $template_var, $value, $input_attrs = array()
     ) {
-        $this->page->assign(
-            "{$template_var}_input",
-            print_html_input($input_type, $template_var, $value, $input_attrs)
-        );
+        $printed_value = print_html_input($input_type, $template_var, $value, $input_attrs);
+        $this->print_raw_value("{$template_var}_input", $printed_value);
+        return $printed_value;
     }
 
     function print_hidden_input_form_value($template_var, $value) {
-        $this->page->assign(
-            "{$template_var}_hidden",
-            print_html_hidden($template_var, $value)
-        );
+        $printed_value = print_html_hidden($template_var, $value);
+        $this->print_raw_value("{$template_var}_hidden", $printed_value);
+        return $printed_value;
     }
 
     function print_text_input_form_value($template_var, $value, $input_attrs = array()) {
-        $this->print_input_form_value("text", $template_var, $value, $input_attrs);
+        return $this->print_input_form_value("text", $template_var, $value, $input_attrs);
     }
 
     function print_textarea_input_form_value($template_var, $value, $input_attrs = array()) {
-        $this->page->assign(
-            "{$template_var}_input", print_html_textarea($template_var, $value, $input_attrs)
-        );
+        $printed_value = print_html_textarea($template_var, $value, $input_attrs);
+        $this->print_raw_value("{$template_var}_input", $printed_value);
+        return $printed_value;
     }
 
-    function print_checkbox_input_form_value($template_var, $value) {
-        $this->page->assign(
-            "{$template_var}_input", print_html_checkbox($template_var, $value)
-        );
+    function print_checkbox_input_form_value($template_var, $value, $input_attrs = array()) {
+        $printed_value = print_html_checkbox($template_var, $value, null, $input_attrs);
+        $this->print_raw_value("{$template_var}_input", $printed_value);
+        return $printed_value;
     }
 
     function print_radio_group_input_form_value(
-        $template_var, $value, $values_info, $alt_values_info = null
+        $template_var,
+        $value,
+        $input_attrs,
+        $values_info,
+        $alt_values_info = null
     ) {
         $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
 
-        $this->page->assign(
-            "{$template_var}_input",
-            print_html_radio_group($template_var, $value_caption_pairs, $value)
-        );
+        $printed_value =
+            print_html_radio_group($template_var, $value_caption_pairs, $value, $input_attrs);
+        $this->print_raw_value("{$template_var}_input", $printed_value);
+        return $printed_value;
     }
 
     function print_select_input_form_value(
@@ -811,10 +964,10 @@ class App {
     ) {
         $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
 
-        $this->page->assign(
-            "{$template_var}_input",
-            print_html_select($template_var, $value_caption_pairs, $value, $input_attrs)
-        );
+        $printed_value =
+            print_html_select($template_var, $value_caption_pairs, $value, $input_attrs);
+        $this->print_raw_value("{$template_var}_input", $printed_value);
+        return $printed_value;
     }
 
     function print_main_select_input_form_value(
@@ -854,12 +1007,13 @@ class App {
             $dependency_array
         );
 
-        $this->page->assign(array(
-            "{$template_var}_input" => print_html_select(
-                $template_var, $value_caption_pairs, $value, $input_attrs
-            ),
+        $printed_value =
+            print_html_select($template_var, $value_caption_pairs, $value, $input_attrs);
+        $this->print_raw_values(array(
+            "{$template_var}_input" => $printed_value,
             "{$template_var}_dependency_js" => $dependency_js,
         ));
+        return $printed_value;
     }
 
     function get_value_caption_pairs($values_info, $alt_values_info = null) {
@@ -994,8 +1148,16 @@ class App {
         return $dependency_array;
     }
 //
-    function get_message($name) {
-        return $this->messages->get_value($name);
+    function get_message($resource, $resource_params = null) {
+        $message_text = $this->messages->get_value($resource);
+        if (is_null($message_text)) {
+            return null;        
+        } else {
+            if (!is_null($resource_params)) {
+                $this->print_values($resource_params);
+            }
+            return $this->page->get_parsed_text($message_text);
+        }
     }
 
     function get_current_lang() {
@@ -1041,17 +1203,19 @@ class App {
 
     function pg_static() {
         $page_name = trim(param("page"));
-        $this->print_page_title("page_title_pg_static_{$page_name}");
-        $this->print_static_page($page_name);
+        if (preg_match('/^\w+$/i', $page_name)) {
+            $this->print_page_title("page_title_pg_static_{$page_name}");
+            $this->print_static_page($page_name);
+        }
     }
 
 //  Page contruction helper functions
     function print_static_page($page_name) {
         $page_path = "static/{$page_name}_{$this->lang}.html";
-        if (!$this->page->is_template_exist($page_path)) {
+        if (!$this->is_file_exist($page_path)) {
             $page_path = "static/{$page_name}.html";
         }
-        return $this->page->parse_file_if_exists($page_path, "body");
+        return $this->print_file_if_exists($page_path, "body");
     }
 
     function print_menu($menu_prefix = "", $menu_var = "menu") {
@@ -1063,7 +1227,7 @@ class App {
             $menu_items = explode(",", $menu_actions);
 
             $i = 0;
-            $this->page->assign("menu_items", "");
+            $this->print_raw_value("menu_items", "");
 
             foreach ($menu_items as $menu_action) {
                 $i++;
@@ -1085,7 +1249,7 @@ class App {
                     );
                 }
 
-                $this->page->assign(array(
+                $this->print_values(array(
                     "caption" => $caption,
                     "url" => $url,
                     "marker" => $menu_action,
@@ -1096,31 +1260,31 @@ class App {
                     $menu_action == $this->action . "_" . param("page")
                 ) {
                     $current_item_template_name = "_menu_{$menu_prefix}item_current.html";
-                    if ($this->page->is_template_exist($current_item_template_name)) {
-                        $this->page->parse_file($current_item_template_name, "menu_items");
+                    if ($this->is_file_exist($current_item_template_name)) {
+                        $this->print_file($current_item_template_name, "menu_items");
                     } else {
-                        $this->page->parse_file("_menu_item_current.html", "menu_items");
+                        $this->print_file("_menu_item_current.html", "menu_items");
                     }
                 } else {
                     $item_template_name = "_menu_{$menu_prefix}item.html";
-                    if ($this->page->is_template_exist($item_template_name)) {
-                        $this->page->parse_file($item_template_name, "menu_items");
+                    if ($this->is_file_exist($item_template_name)) {
+                        $this->print_file($item_template_name, "menu_items");
                     } else {
-                        $this->page->parse_file("_menu_item.html", "menu_items");
+                        $this->print_file("_menu_item.html", "menu_items");
                     }
                 }
                 if ($i != count($menu_items)) {
                     $delimiter_template_name = "_menu_{$menu_prefix}item_delimiter.html";
-                    if ($this->page->is_template_exist($delimiter_template_name)) {
-                        $this->page->parse_file($delimiter_template_name, "menu_items");
+                    if ($this->is_file_exist($delimiter_template_name)) {
+                        $this->print_file($delimiter_template_name, "menu_items");
                     } else {
-                        $this->page->parse_file("_menu_item_delimiter.html", "menu_items");
+                        $this->print_file("_menu_item_delimiter.html", "menu_items");
                     }
                 }
             }
         }
         
-        $this->page->parse_file_if_exists("_{$menu_var}.html", $menu_var);
+        $this->print_file_if_exists("_{$menu_var}.html", $menu_var);
     }
 
     function print_lang_menu() {
@@ -1128,26 +1292,26 @@ class App {
             return;
         }
         $avail_langs = $this->get_avail_langs();
-        $this->page->assign("lang_menu_items", "");
+        $this->print_raw_value("lang_menu_items", "");
         foreach ($avail_langs as $lang) {
             if ($lang == $this->lang) {
-                $this->page->assign(array(
+                $this->print_raw_values(array(
                     "current_lang_name" => $this->get_message($lang),
                     "current_lang_image_url" =>
                         $this->config->get_value("lang_image_current_url_{$lang}"),
                 ));
-                $this->page->parse_file("_lang_menu_item_current.html", "lang_menu_items");
+                $this->print_file("_lang_menu_item_current.html", "lang_menu_items");
             } else {
-                $this->page->assign(array(
+                $this->print_raw_values(array(
                     "new_lang" => $lang,
                     "new_lang_name" => $this->get_message($lang),
                     "new_lang_image_url" =>
                         $this->config->get_value("lang_image_url_{$lang}"),
                 ));
-                $this->page->parse_file("_lang_menu_item.html", "lang_menu_items");
+                $this->print_file("_lang_menu_item.html", "lang_menu_items");
             }
         }
-        $this->page->parse_file_new("_lang_menu.html", "lang_menu");
+        $this->print_file_new("_lang_menu.html", "lang_menu");
     }
 
 //  Object functions
@@ -1210,7 +1374,7 @@ class App {
             $extra_suburl_params
         );
 
-        $this->page->assign(array(
+        $this->print_raw_values(array(
             "action_suburl" => "?{$action_suburl}",
             "action_filters_suburl" => "?{$action_filters_suburl}",
             "action_filters_order_by_suburl" => "?{$action_filters_order_by_suburl}",
@@ -1244,7 +1408,7 @@ class App {
 
         if ($n > 0) {
             $pager_suburl = "?{$action_filters_order_by_suburl}";
-            $this->page->assign(array(
+            $this->print_raw_values(array(
                 "simple_nav_str" => $this->pager->get_simple_nav_str($pager_suburl),
                 "nav_str" => $this->pager->get_pages_nav_str($pager_suburl),
                 "total" => $obj->get_quantity_str($n),
@@ -1252,14 +1416,14 @@ class App {
         }
 
         if ($show_filter_form) {
-            $this->page->assign($filters_params);
+            $this->print_raw_values($filters_params);
             $obj->print_filter_form_values();
-            $this->page->parse_file_new(
+            $this->print_file_new(
                 "{$templates_dir}/filter_form.{$templates_ext}", "{$obj_name}_filter_form"
             );
         }
 
-        return $this->page->parse_file("{$templates_dir}/list.{$templates_ext}", $template_var);
+        return $this->print_file("{$templates_dir}/list.{$templates_ext}", $template_var);
     }
 //
     function print_many_objects_list($params) {
@@ -1289,13 +1453,13 @@ class App {
             $n = $res->get_num_rows();
         }
 
-        $this->print_custom_params_values($custom_params);
+        $this->print_custom_params($custom_params);
 
         $no_items_template_name = "{$templates_dir}/list_no_items.{$templates_ext}";
-        if ($n == 0 && $this->page->is_template_exist($no_items_template_name)) {
-            $this->page->parse_file_new($no_items_template_name, $template_var);
+        if ($n == 0 && $this->is_file_exist($no_items_template_name)) {
+            $this->print_file_new($no_items_template_name, $template_var);
         } else {
-            $this->page->assign("{$obj_name}_items", "");
+            $this->print_raw_value("{$obj_name}_items", "");
 
             for ($i = 0; $i < $n; $i++) {
                 if ($objects_passed) {
@@ -1316,19 +1480,19 @@ class App {
                      "custom_params" => $custom_params,
                 ));
 
-                $this->page->assign(array(
+                $this->print_raw_values(array(
                     "list_item_parity" => $parity,
                     "list_item_style" => ($parity == 0) ?
                         "list-item-even" :
                         "list-item-odd",
                 ));
 
-                $this->page->parse_file(
+                $this->print_file(
                     "{$templates_dir}/list_item.{$templates_ext}", "{$obj_name}_items"
                 );
             }
 
-            return $this->page->parse_file(
+            return $this->print_file(
                 "{$templates_dir}/list_items.{$templates_ext}", $template_var
             );
         }
@@ -1352,14 +1516,16 @@ class App {
         $template_var = get_param_value($params, "template_var", "body");
         $custom_params = get_param_value($params, "custom_params", array());
 
-        $this->print_custom_params_values($custom_params);
-        $obj->print_values(array(
+        $this->print_custom_params($custom_params);
+
+        $obj->print_form_values(array(
             "templates_dir" => $templates_dir,
             "context" => $context,
             "custom_params" => $custom_params,
         ));
-        $this->page->parse_file_new("{$templates_dir}/view_info.html", "{$obj_name}_info");
-        return $this->page->parse_file_new("{$templates_dir}/view.html", $template_var);
+        
+        $this->print_file_new("{$templates_dir}/view_info.html", "{$obj_name}_info");
+        return $this->print_file("{$templates_dir}/view.html", $template_var);
     }
 //
     function print_object_edit_page($params) {
@@ -1380,32 +1546,33 @@ class App {
         $template_var = get_param_value($params, "template_var", "body");
         $custom_params = get_param_value($params, "custom_params", array());
 
-        $this->print_custom_params_values($custom_params);
+        $this->print_custom_params($custom_params);
+
         $obj->print_form_values(array(
             "templates_dir" => $templates_dir,
             "context" => $context,
             "custom_params" => $custom_params,
         ));
-        $this->page->parse_file_new("{$templates_dir}/edit_form.html", "{$obj_name}_form");
         $this->print_object_edit_page_titles($obj);
-        return $this->page->parse_file_new("{$templates_dir}/edit.html", $template_var);
+        
+        $this->print_file_new("{$templates_dir}/edit_form.html", "{$obj_name}_form");
+        return $this->print_file("{$templates_dir}/edit.html", $template_var);
     }
 //
-    function print_custom_params_values($custom_params) {
+    function print_custom_params($custom_params) {
         foreach ($custom_params as $param_name => $param_value) {
-            $this->page->assign(
-                $this->get_custom_param_printable_values($param_name, $param_value)
-            );
+            $this->print_custom_param($param_name, $param_value);
         }
     }
-    
-    function get_custom_param_printable_values($param_name, $param_value) {
-        return array(
-            "{$param_name}" => get_html_safe_string($param_value),
-            "{$param_name}_orig" => $param_value,
-            "{$param_name}_suburl" => create_html_suburl(array($param_name => $param_value)),
-            "{$param_name}_hidden" => print_html_hidden($param_name, $param_value),
+
+    function print_custom_param($param_name, $param_value) {
+        $this->print_value("{$param_name}", $param_value);
+        $this->print_raw_value("{$param_name}_orig", $param_value);
+        $this->print_value(
+            "{$param_name}_suburl",
+            create_html_suburl(array($param_name => $param_value))
         );
+        $this->print_hidden_input_form_value($param_name, $param_value);
     }
 //
     function delete_object($params = array()) {
@@ -1421,9 +1588,9 @@ class App {
             $obj_name = $obj->table_name;
         }
 
-        $default_url = "?action=pg_view_" . $obj->get_plural_resource_name();
-        $error_url = get_param_value($params, "error_url", $default_url);
-        $success_url = get_param_value($params, "success_url", $default_url);
+        $default_url_params = array("action" => "pg_view_" . $obj->get_plural_resource_name());
+        $error_url_params = get_param_value($params, "error_url_params", $default_url_params);
+        $success_url_params = get_param_value($params, "success_url_params", $default_url_params);
         $cascade = get_param_value($params, "cascade", false);
 
         if ($cascade) {
@@ -1433,14 +1600,14 @@ class App {
             
             if (count($messages) != 0) {
                 $this->print_status_messages_cannot_delete_object($messages);
-                $this->create_redirect_response($error_url);
+                $this->create_self_redirect_response($error_url_params);
                 return;
             } else {
                 $obj->del();
             }
         }
         $this->print_status_message_object_deleted($obj);
-        $this->create_redirect_response($success_url);
+        $this->create_self_redirect_response($success_url_params);
     }
 //
 //  Page titles and status messages
@@ -1460,13 +1627,13 @@ class App {
     }
 
     function print_head_and_page_title($resource) {
-        $this->page->assign("page_title_resource", $resource);
+        $this->print_raw_value("page_title_resource", $resource);
         $this->print_page_title($resource);
         $this->print_head_page_title($resource);
     }
 
     function print_page_title($resource) {
-        $this->page->assign("page_title", $this->get_message($resource));
+        $this->print_raw_value("page_title", $this->get_message($resource));
     }
 
     function print_head_page_title($resource) {
@@ -1475,7 +1642,7 @@ class App {
             // If have no head_page_title use page_title instead
             $resource_text = $this->get_message($resource);
         }
-        $this->page->assign("head_page_title", $resource_text);
+        $this->print_raw_value("head_page_title", $resource_text);
     }
 
     function print_object_edit_page_titles($obj) {
@@ -1487,14 +1654,9 @@ class App {
     }
 
     function print_status_message($message) {
-        $msg_text_raw = $this->get_message($message->resource);
-        $this->page->assign($message->resource_params);
-        $this->page->assign(array(
-            "text" => "",
-            "type" => $message->type,
-        ));
-        $this->page->parse_text($msg_text_raw, "text");
-        return $this->page->parse_file("_status_message.html", "status_messages");
+        $status_message_text = $this->get_message($message->resource, $message->resource_params);
+        $this->print_raw_values(array("text" => $status_message_text, "type" => $message->type));
+        return $this->print_file("_status_message.html", "status_messages");
     }
 
     function print_status_messages($messages) {

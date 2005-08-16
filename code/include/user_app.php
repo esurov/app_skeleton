@@ -54,18 +54,14 @@ class UserApp extends CustomApp {
     }
 
     function pg_view_news_article() {
-        $this->print_object_view_page(array(
-            "obj_name" => "news_article",
-        ));
+        $this->print_object_view_page(array("obj_name" => "news_article"));
     }
 //
     function pg_contact_form() {
-        $this->page->parse_file(
-            "contact/form_notice_{$this->lang}.html", "contact_form_notice"
-        );
+        $this->print_file("contact/form_notice_{$this->lang}.html", "contact_form_notice");
         $contact = $this->create_db_object("contact");
         $contact->print_form_values();
-        $this->page->parse_file("contact/form.html", "body");
+        $this->print_file("contact/form.html", "body");
     }
 
     function process_contact_form() {
@@ -88,7 +84,7 @@ class UserApp extends CustomApp {
             $this->email_sender->FromName = $name_from;
             $this->email_sender->AddAddress($email_to, $name_to);
             $this->email_sender->Subject = $subject;
-            $this->email_sender->Body = $this->page->parse_file("email/contact.html");
+            $this->email_sender->Body = $this->print_file("email/contact.html");
             $this->email_sender->Send();
         }
         $this->add_session_status_message(new OkStatusMsg("contact_form_processed"));

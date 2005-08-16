@@ -39,20 +39,39 @@ h1 {
     font-weight: bold;
 }
 
-.wide input {
+.wide {
     width: 400px;
 }
 
-.mid-wide input {
+.mid-wide {
     width: 250px;
 }
 
-.date input {
+input.integer {
+    text-align: right;
+    width: 100px;
+}
+
+input.double {
+    text-align: right;
+    width: 100px;
+}
+
+input.currency {
+    text-align: right;
+    width: 100px;
+}
+
+input.date {
     width: 80px;
 }
 
-.currency input {
-    text-align: right;
+input.datetime {
+    width: 130px;
+}
+
+input.time {
+    width: 80px;
 }
 
 /* for lines 0, 2 ... */

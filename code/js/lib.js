@@ -1,27 +1,48 @@
-/**
- * Sets focus to given element.
- *
- * @access public
- * @param  object element
- */
+function a(obj) {
+    alert(obj);
+}
+
+function aa(obj) {
+    if (typeof(obj) == "object") {
+        objStr = typeof(obj) + '\n';
+        for (var i in obj) {
+            objStr += '.' + i + '=' + obj[i] + '\n';
+        }
+        a(objStr);
+    } else {
+        a(obj);
+    }
+}
+
 function focusElement(element) {
     if (element != null) {
         element.focus();
     }
 }
 
-/**
- * Sets focus to element given by its name in given form.
- *
- * @access public
- * @param  object form or string
- * @param  string
- */
 function focusFormElement(form, elementName) {
     if (typeof(form) == "string") {
         form = document.forms[form];
     }
     focusElement(form.elements[elementName]);
+}
+
+function selectElement(element) {
+    if (element != null) {
+        element.select();
+    }
+}
+
+function getFormElement(form, elementName) {
+    if (typeof(form) == "string") {
+        form = document.forms[form];
+    }
+    var elements = form.elements;
+    for (var j = 0; j < elements.length; j++) {
+        if (elements[j].name == elementName) {
+            return elements[j];
+        }
+    }
 }
 
 function getElementValue(element) {
@@ -30,12 +51,15 @@ function getElementValue(element) {
     }
     switch (element.type) {
     case 'radio':
-        elements = element.form.elements;
-        for (j = 0; j < elements.length; j++) {
-            if (elements[j].name == element.name) {
-                if (elements[j].checked) {
-                    return elements[j].value;
-                }
+        var elements = element.form.elements;
+        for (var j = 0; j < elements.length; j++) {
+            var currentElement = elements[j];
+            if (
+                currentElement.name == element.name &&
+                currentElement.type == 'radio' &&
+                currentElement.checked
+            ) {
+                return currentElement.value;
             }
         }
         break;
@@ -45,13 +69,17 @@ function getElementValue(element) {
     return null;
 }
 
+function getFormElementValue(form, elementName) {
+    return getElementValue(getFormElement(form, elementName));
+}
+
 function setElementValue(element, value) {
     if (element == null) {
         return;
     }
     switch (element.type) {
     case 'radio':
-        elements = element.form.elements;
+        var elements = element.form.elements;
         for (j = 0; j < elements.length; j++) {
             if (elements[j].name == element.name && elements[j].value == value) {
                 elements[j].checked = true;
@@ -65,25 +93,65 @@ function setElementValue(element, value) {
     return;
 }
 
+function displayElement(element) {
+    if (element != null) {
+        element.style.display = "inline";
+    }
+}
+
+function hideElement(element) {
+    if (element != null) {
+        element.style.display = "none";
+    }
+}
+
+function getElementVisibility(element) {
+    if (element == null) {
+        return null;
+    } else {
+        return element.style.display;
+    }
+}
+
+function toggleElementVisibility(element) {
+    if (getElementVisibility(element) == "none") {
+        displayElement(element);
+    } else {
+        hideElement(element);
+    }
+}
+
+function displayGroupElementById(elementIds, elementIdToDisplay) {
+    for (var i = 0; i < elementIds.length; i++) {
+        var element = document.getElementById(elementIds[i]);
+        if (elementIds[i] == elementIdToDisplay) {
+            displayElement(element);
+        } else {
+            hideElement(element);
+        }
+    }
+}
+
 function copyToClipboard(element) {
-    element.select();
+    selectElement(element);
     element.createTextRange().execCommand("Copy");
 }
 
-function openPopup(url, width, height, use_scroll) {
-    var corner_x = (screen.width - width) / 2;
-    var corner_y = (screen.height - height) / 2 - 32;
+function openPopup(url, width, height, useScroll) {
+    var cornerX = (screen.width - width) / 2;
+    var cornerY = (screen.height - height) / 2 - 32;
 
-    w = window.open(
+    var w = window.open(
         url,
         'popup',
         'width=' + width + ',height=' + height +
-        ',left=' + corner_x + ',top=' + corner_y +
-        ',scrollbars=' + use_scroll + ',resizable'
+        ',left=' + cornerX + ',top=' + cornerY +
+        ',scrollbars=' + useScroll + ',resizable'
     );
     if (w != null) {
         w.focus();
     }
+    return w;
 }
 
 function reloadParentWindow() {
@@ -93,30 +161,29 @@ function reloadParentWindow() {
 }
 
 function ifConfirmed(message_text) {
-    result = confirm(message_text);
-    event.returnValue = result;
-    return result;
+    return confirm(message_text);
 }
 
 function acceptChoice(formName, element1, value1, element2, value2) {
-    var element = eval("window.opener.document." + formName + "." + element1);
+    var element = window.opener.document.forms[formName].elements[element1];
     element.value = value1;
 
     // onchange is not fired automatically ;(
-    element.onchange(); 
+    if (element.onchange) {
+        element.onchange();
+    }
 
     if (element2 != null && value2 != null) {
-        var element = eval("window.opener.document." + formName + "." + element2);
+        var element = window.opener.document.forms[formName].elements[element2];
         element.value = value2;
     }
     window.opener.focus();
     window.close();
 }
 
-function getYear() {
+function getCurrentYear() {
     var d = new Date();
-    var year = d.getFullYear();
-    return year;
+    return d.getFullYear();
 }
 
 //
@@ -140,10 +207,10 @@ function Dependency(formName, mainSelectName, dependentSelectName, dependencyArr
 }
 
 function init() {
-    var form = eval('document.' + this.formName);
+    var form = document.forms[formName];
 
-    this.mainSelect = eval('form.' + this.mainSelectName);
-    this.dependentSelect = eval('form.' + this.dependentSelectName);
+    this.mainSelect = form.elements[this.mainSelectName];
+    this.dependentSelect = form.elements[this.dependentSelectName];
 
     var oldDependentSelectValue = getElementValue(this.dependentSelect);
 
@@ -156,7 +223,7 @@ function init() {
 }
 
 function storeMainSelectData() {
-    options = this.mainSelect.options;
+    var options = this.mainSelect.options;
     for (var i = 0; i < options.length; i++) {
         this.mainSelectValues[i] = options[i].value;
         this.mainSelectCaptions[i] = options[i].text;
@@ -164,7 +231,7 @@ function storeMainSelectData() {
 }
 
 function storeDependentSelectData() {
-    options = this.dependentSelect.options;
+    var options = this.dependentSelect.options;
     for (var i = 0; i < options.length; i++) {
         this.dependentSelectValues[i] = options[i].value;
         this.dependentSelectCaptions[i] = options[i].text;
@@ -233,7 +300,7 @@ function getSelectCaptionByValue(selectValuesArray, selectCaptionsArray, value) 
 }
 
 function getDependency(formName, mainName, dependentName) {
-    for (i = 0; i < dependencies.length; i++) {
+    for (var i = 0; i < dependencies.length; i++) {
         if (
             dependencies[i].formName == formName && 
             dependencies[i].mainSelectName == mainName && 
@@ -246,17 +313,17 @@ function getDependency(formName, mainName, dependentName) {
 }
 
 function updateDependentSelect(mainSelect, dependentSelectName) {
-    formName = mainSelect.form.name;
-    mainSelectName = mainSelect.name;
+    var formName = mainSelect.form.name;
+    var mainSelectName = mainSelect.name;
 
-    dependency = getDependency(formName, mainSelectName, dependentSelectName);
+    var dependency = getDependency(formName, mainSelectName, dependentSelectName);
     if (dependency != null) {
         dependency.update();
     }
 }
 
 function initDependencies() {
-    for (i = 0; i < dependencies.length; i++) {
+    for (var i = 0; i < dependencies.length; i++) {
         dependencies[i].init();
     }
 }
@@ -265,12 +332,13 @@ dependencies = new Array();
 
 //
 function validateForm(form, conditions) {
-    elements = form.elements;
-    for (i = 0; i < conditions.length; i++) {
-        validationErrorMsg = conditions[i].validate(form);
+    var elements = form.elements;
+    for (var i = 0; i < conditions.length; i++) {
+        var validationErrorMsg = conditions[i].validate(form);
         if (validationErrorMsg != null) {
             alert(validationErrorMsg.text);
             focusElement(validationErrorMsg.element);
+            selectElement(validationErrorMsg.element);
             return false;
         }
     }
@@ -285,9 +353,9 @@ function ValidateCondition(elementName, type, messageText, params, dependentCond
     this.dependentCondition = dependentCondition;
 
     this.validate = function (form) {
-        elements = form.elements;
-        for (j = 0; j < elements.length; j++) {
-            element = elements[j];
+        var elements = form.elements;
+        for (var j = 0; j < elements.length; j++) {
+            var element = elements[j];
             if (element.name == this.elementName) {
                 if (!this.validateElement(element)) {
                     if (this.messageText == null) {
@@ -303,10 +371,12 @@ function ValidateCondition(elementName, type, messageText, params, dependentCond
     }
 
     this.validateElement = function (element) {
-        value = getElementValue(element);
+        var result;
+        var value = getElementValue(element);
+        
         switch (this.type) {
         case 'regexp':
-            re = eval(params[0]);
+            var re = eval(params[0]);
             result = (value.match(re)) ? true : false;
             break;
         case 'empty':
@@ -330,20 +400,29 @@ function ValidateCondition(elementName, type, messageText, params, dependentCond
         case 'phone':
             result = (value.match(/^[0-9 \+\-\(\)]+$/)) ? true : false;
             break;
-        case 'number':
-            result = (value.match(/^\d+$/)) ? true : false;
+        case 'number_integer':
+            result = !isNaN(getJsInteger(value));
+            break;
+        case 'number_double':
+            result = !isNaN(getJsDouble(value));
+            break;
+        case 'number_equal':
+            result = (getJsDouble(value) == parseFloat(params[0]));
+            break;
+        case 'number_not_equal':
+            result = (getJsDouble(value) != parseFloat(params[0]));
             break;
         case 'number_greater':
-            result = (Number(value) > Number(params[0]));
+            result = (getJsDouble(value) > parseFloat(params[0]));
             break;
         case 'number_greater_equal':
-            result = (Number(value) >= Number(params[0]));
+            result = (getJsDouble(value) >= parseFloat(params[0]));
             break;
         case 'number_less':
-            result = (Number(value) < Number(params[0]));
+            result = (getJsDouble(value) < parseFloat(params[0]));
             break;
         case 'number_less_equal':
-            result = (Number(value) <= Number(params[0]));
+            result = (getJsDouble(value) <= parseFloat(params[0]));
             break;
         default:
             result = true;
@@ -360,6 +439,8 @@ function ValidationErrorMsg(text, element) {
 function onsubmitFormHandler(form) {
     if (form == null) {
         form = this;
+    } else if (form.target) {
+        form = form.target;
     }
     if (form.submit_btn) {
         form.submit_btn.disabled = true;
@@ -370,6 +451,10 @@ function onsubmitFormHandler(form) {
 function onsubmitValidateFormHandler(form) {
     if (form == null) {
         form = this;
+    } else if (form.currentTarget) {
+        form = form.currentTarget;
+    } else if (form.target) {
+        form = form.target;
     }
     if (validateForm(form, conditions)) {
         return onsubmitFormHandler(form);
@@ -378,38 +463,46 @@ function onsubmitValidateFormHandler(form) {
     }
 }
 
+function getJsDouble(appDoubleStr) {
+    var str = appDoubleStr.replace(/\./g, '');
+    str = str.replace(/\,/g, '.', str);
+    return parseFloat(str);
+}
+
+function getJsInteger(appIntegerStr) {
+    var str = appIntegerStr.replace(/\./g, '');
+    str = str.replace(/\,/g, '.', str);
+    return parseInt(str);
+}
+
 //        case 'url':
-//        if (!(
-//            value == 'http://www.' ||
-//            value == '' ||
-//            value.match(/^https?:\/\/([\w-]+\.)+[\w-]+(\/.*|)$/)
-//        )) {
-//        case 'date':
-//            if (value != '' && !isCorrectDate(value)) {
-//            }
-//            break;
-//        case 'currency':
-//            if (value != '' && !isCorrectCurrency(value)) {
-//            }
-//            break;
-//        case 'currency/date':
-//            if (value != '') {
-//                parts = value.split('/');
-//                if (parts.length != 4) {
-//                    fail(message_text, formName, elem);
-//                    return false;
-//                }
-//                price = parts[0];
-//                date = parts[1] + '/' + parts[2] + '/' + parts[3];
+//            result = true;
+//                case 'date':
+//                    if (value != '' && !isCorrectDate(value)) {
+//                    }
+//                    break;
+//                case 'currency':
+//                    if (value != '' && !isCorrectCurrency(value)) {
+//                    }
+//                    break;
+//                case 'currency/date':
+//                    if (value != '') {
+//                        parts = value.split('/');
+//                        if (parts.length != 4) {
+//                            fail(message_text, formName, elem);
+//                            return false;
+//                        }
+//                        price = parts[0];
+//                        date = parts[1] + '/' + parts[2] + '/' + parts[3];
 //
-//                if (!(
-//                    isCorrectCurrency(price) &&
-//                    isCorrectDate(date)
-//                )) {
-//                }
+//                        if (!(
+//                            isCorrectCurrency(price) &&
+//                            isCorrectDate(date)
+//                        )) {
+//                        }
+//                    }
+//                    break;
 //            }
-//            break;
-//        }
 //    }
 ///**
 // * Checks if given string is a correct date in format mm/dd/yyyy.
