@@ -1475,7 +1475,7 @@ class App {
                      "templates_dir" => $templates_dir,
                      "context" => $context,
                      "row" => $row,
-                     "row_number" => $i,
+                     "row_number" => $i + 1,
                      "row_parity" => $parity,
                      "custom_params" => $custom_params,
                 ));
