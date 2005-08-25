@@ -28,7 +28,7 @@ function focusFormElement(form, elementName) {
 }
 
 function selectElement(element) {
-    if (element != null) {
+    if (element != null && element.select) {
         element.select();
     }
 }

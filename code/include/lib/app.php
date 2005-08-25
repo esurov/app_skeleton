@@ -13,6 +13,7 @@ class App {
     var $messages;
     var $actions;
 
+    var $user;
     var $action;
     var $action_params;
     var $page_template_name;
@@ -60,12 +61,8 @@ class App {
 
         $action_params = array();
         
-        // One action defined, but nobody can access it:
-        $actions = array(
-            "pg_index" => array(
-                "valid_users" => array(),
-            ),
-        );
+        // One action defined, but nobody can access it
+        $actions = array("pg_index" => array("valid_users" => array()));
 
         $this->log->write("App", "App '{$this->app_name}' started", 3);
     }
@@ -122,51 +119,63 @@ class App {
     }
 //
     function run() {
+        // Create user used to run allowed actions only
         $this->create_current_user();
-        $this->create_action_name();
 
-        // Ensure that current user is allowed to run this action
-        // Check user permission level
-        $user_level = $this->get_user_access_level();
-        $valid_levels = $this->actions[$this->action]["valid_users"];
+        // Read action name
+        $this->action = trim(param("action"));
+        if ($this->action == "") {
+            $this->action = $this->get_default_action_name();
+        }
 
-        if (in_array($user_level, $valid_levels)) {
-            $this->run_action();
+        // Ensure that action name is valid
+        $this->log->write("App", "Validating action '{$this->action}'", 3);
+
+        if ($this->validate_action_name()) {
+            // Ensure that current user is allowed to run this action
+            // Validate user permission level
+            $user_level = $this->get_user_access_level();
+            $valid_levels = $this->actions[$this->action]["valid_users"];
+
+            if (in_array($user_level, $valid_levels)) {
+                $this->run_action();
+            } else {
+                $this->log->write(
+                    "App",
+                    "User level '{$user_level}' is denied to run action '{$this->action}'",
+                    1
+                );
+                $this->run_access_denied_action();
+            }
         } else {
+            $this->action = $this->get_default_action_name();
             $this->log->write(
-                "App",
-                "User level '{$user_level}' is denied to run action '{$this->action}'",
-                1
+                "App", "Invalid action! Will try default action '{$this->action}'", 3
             );
-            $this->run_access_denied_action();
+            if ($this->validate_action_name()) {
+                $this->run_invalid_action_name_action();
+            } else {
+                $this->log->write("App", "Action '{$this->action}' is invalid too!", 3);
+                die();
+            }
         }
 
         if (is_null($this->response)) {
             $this->create_html_document_response();
         }
+        
         $this->response->send();
     }
     
     function create_current_user() {
+        return null;
     }
 
-    function create_action_name() {
-        $action_name = trim(param("action"));
-        $this->log->write("App", "Validating action '{$action_name}'", 3);
-
-        // Ensure that action is valid:
-        if (!isset($this->actions[$action_name])) {
-            $action_name = $this->get_default_action_name();
-            $this->log->write("App", "Invalid action! Will run action '{$action_name}'", 1);
-            if (!isset($this->actions[$action_name])) {
-                $this->log->write("App", "Action '{$action_name}' is not valid!", 1);
-                die();
-            }
-        }
-        $this->action = $action_name;
+    function validate_action_name() {
+        return isset($this->actions[$this->action]);
     }
 
-    function get_default_action_name() {
+    function get_default_action_name($user = null) {
         return "pg_index";
     }
 
@@ -196,6 +205,10 @@ class App {
 
     function run_access_denied_action() {
         $this->create_access_denied_html_document_response();
+    }
+
+    function run_invalid_action_name_action() {
+        $this->create_self_redirect_response(array("action" => $this->action));
     }
 //
     function get_http_auth_user_access_level() {

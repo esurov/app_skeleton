@@ -21,7 +21,7 @@ class AdminApp extends CustomApp {
         );
     }
 //
-    function get_user_access_level() {
+    function get_user_access_level($user = null) {
         return $this->get_http_auth_user_access_level();
     }
 

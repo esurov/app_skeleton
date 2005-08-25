@@ -84,6 +84,9 @@ message_text = Messaggio
 sure_delete = Sei sicuro di voler cancellare l\'informazione?
 cannot_delete_record_because_it_has_links = Impossibile eliminare {%main_obj_name%} perché in relazione con {%dep_objs_data%}
 
+status_message_resource_access_denied = La pagina richiesta non può essere visualizzata. Prego effettuare l'accesso mediante login/password.
+status_message_logged_out = Logout effettuato con successo
+
 status_message_first_name_empty = Inserire il nome
 status_message_last_name_empty = Inserire il cognome
 status_message_email_empty = Inserire l'e-mail
