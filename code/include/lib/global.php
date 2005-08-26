@@ -224,7 +224,7 @@ function print_html_select(
     return
         "<select name=\"{$name}\"{$attrs_str}>\n" .
         "{$select_options}" .
-        "</select>\n";
+        "</select>";
 }
 
 function print_html_select_options($value_caption_pairs, $current_value) {
