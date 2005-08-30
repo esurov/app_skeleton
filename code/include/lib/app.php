@@ -1490,6 +1490,7 @@ class App {
                      "row" => $row,
                      "row_number" => $i + 1,
                      "row_parity" => $parity,
+                     "rows_count" => $n,
                      "custom_params" => $custom_params,
                 ));
 
