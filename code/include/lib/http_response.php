@@ -219,13 +219,15 @@ class PlainTextDocumentResponse extends BinaryContentResponse {
 
         parent::BinaryContentResponse($content, "plain/text");
 
-        if (is_null($filename)) {
-            $filename = "text_document.txt";
+        if (!is_null($filename)) {
+            if ($filename == "") {
+                $filename = "text_document.txt";
+            }
+            $this->add_content_disposition_header(
+                $filename,
+                ($open_inline) ? "inline" : "attachment"
+            );
         }
-        $this->add_content_disposition_header(
-            $filename,
-            ($open_inline) ? "inline" : "attachment"
-        );
     }
 }
 
@@ -235,13 +237,15 @@ class PdfDocumentResponse extends BinaryContentResponse {
         
         parent::BinaryContentResponse($content, "application/pdf");
 
-        if (is_null($filename)) {
-            $filename = "pdf_document.pdf";
+        if (!is_null($filename)) {
+            if ($filename == "") {
+                $filename = "pdf_document.pdf";
+            }
+            $this->add_content_disposition_header(
+                $filename,
+                ($open_inline) ? "inline" : "attachment"
+            );
         }
-        $this->add_content_disposition_header(
-            $filename,
-            ($open_inline) ? "inline" : "attachment"
-        );
     }
 }
 
