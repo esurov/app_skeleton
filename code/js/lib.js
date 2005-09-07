@@ -207,7 +207,7 @@ function Dependency(formName, mainSelectName, dependentSelectName, dependencyArr
 }
 
 function init() {
-    var form = document.forms[formName];
+    var form = document.forms[this.formName];
 
     this.mainSelect = form.elements[this.mainSelectName];
     this.dependentSelect = form.elements[this.dependentSelectName];

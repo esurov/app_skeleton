@@ -1507,9 +1507,8 @@ class DbObject {
                 } else {
                     $dependent_field_name = $dependency_info["field"];
                     $input_type_params = array(
+                        "dependent_select_name" => "{$this->table_name}_{$dependent_field_name}",
                         "dependency_info" => $dependency_info,
-                        "dependent_select_name" =>
-                            "{$this->table_name}_{$dependent_field_name}",
                         "dependent_values_info" =>
                             $this->fields[$dependent_field_name]["input"]["values"],
                     );
@@ -1648,16 +1647,15 @@ class DbObject {
                 $dependent_field_name = $dependency_info["field"];
                 $dependent_select_name =
                     "{$this->table_name}_{$dependent_field_name}_{$filter_relation}";
-                $dependent_values_info =
-                    $this->fields[$dependent_field_name]["input"]["values"];
+                $dependent_values_info = $this->fields[$dependent_field_name]["input"]["values"];
                 $this->app->print_main_select_input_form_value(
                     $template_var,
                     $filter_value,
                     $filter_input_attrs,
                     $values_info,
                     $dependent_select_name,
-                    $dependent_values_info,
                     $dependency_info,
+                    $dependent_values_info,
                     $alt_values_info
                 );
                 break;

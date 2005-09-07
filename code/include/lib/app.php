@@ -720,8 +720,8 @@ class App {
                 $input_attrs,
                 $values_info,
                 $input_type_params["dependent_select_name"],
-                $input_type_params["dependent_values_info"],
-                $input_type_params["dependency_info"]
+                $input_type_params["dependency_info"],
+                $input_type_params["dependent_values_info"]
             );
             break;
         default:

@@ -392,9 +392,7 @@ dependencies[dependencies.length] = new Dependency(
     '{$form_name}',
     '{$main_select_name}',
     '{$dependent_select_name}',
-    new Array(
-{$dependency_str}
-    )
+    new Array({$dependency_str})
 );
 </script>
 
