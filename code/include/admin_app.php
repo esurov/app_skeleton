@@ -92,17 +92,15 @@ class AdminApp extends CustomApp {
 
             $news_article->save();
             $this->print_status_message_object_updated($news_article_old);
-            $this->create_self_redirect_response(array(
-                "action" => "pg_view_news_articles"
-            ));
+            $this->create_self_redirect_response(array("action" => "pg_view_news_articles"));
         }
     }
 
     function delete_news_article() {
         $this->delete_object(array(
             "obj_name" => "news_article",
-            "success_url" => "?action=pg_view_news_articles",
-            "error_url" => "?action=pg_view_news_articles",
+            "success_url_params" => array("action" => "pg_view_news_articles"),
+            "error_url_params" => array("action" => "pg_view_news_articles"),
         ));
     }
 }

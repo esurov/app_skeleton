@@ -229,24 +229,13 @@ class App {
         $this->log->write("App", "Redirect to {$url}", 3);
     }
 
-    function create_self_redirect_response($suburl_params = array()) {
-        $extra_suburl_params = $this->get_app_extra_suburl_params();
-        $self_url = create_self_url(
-            $suburl_params + $extra_suburl_params
+    function create_self_redirect_response($suburl_params = array(), $protocol = "http") {
+        $this->create_redirect_response(
+            create_self_full_url(
+                $suburl_params + $this->get_app_extra_suburl_params(),
+                $protocol
+            )
         );
-        $this->create_redirect_response($self_url);
-    }
-
-    function create_self_full_redirect_response(
-        $suburl_params = array(),
-        $protocol = "http"
-    ) {
-        $extra_suburl_params = $this->get_app_extra_suburl_params();
-        $self_full_url = create_self_full_url(
-            $suburl_params + $extra_suburl_params,
-            $protocol
-        );
-        $this->create_redirect_response($self_full_url);
     }
 
     function get_app_extra_suburl_params() {
@@ -257,7 +246,6 @@ class App {
         $this->response = new BinaryContentResponse($content, "application/octet-stream");
         $this->response->add_content_disposition_header($filename);
     }
-
 //
     function create_html_document_response() {
         $content = $this->create_html_document_body_content();
