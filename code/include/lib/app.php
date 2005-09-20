@@ -1563,7 +1563,9 @@ class App {
 //
     function print_custom_params($custom_params) {
         foreach ($custom_params as $param_name => $param_value) {
-            $this->print_custom_param($param_name, $param_value);
+            if (is_scalar($param_value)) {
+                $this->print_custom_param($param_name, $param_value);
+            }
         }
     }
 

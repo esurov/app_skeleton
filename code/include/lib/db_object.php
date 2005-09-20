@@ -293,6 +293,7 @@ class DbObject {
                 die("{$table_name}: field type for '{$field_name}' not specified!");
             }
 
+            $default_index_type = null;
             $width = null;
             $prec = null;
             $input = get_param_value($field_info, "input", array());
@@ -301,22 +302,14 @@ class DbObject {
             case "primary_key":
                 $initial_field_value = 0;
                 $width = get_param_value($field_info, "width", 11);
-                
-                $this->insert_index(array(
-                    "type" => "primary_key",
-                    "fields" => $field_name,
-                ));
+                $default_index_type = "primary_key";
                 break;
             case "foreign_key":
                 $initial_field_value = 0;
                 $width = get_param_value($field_info, "width", 11);
                 $input["type"] = get_param_value($input, "type", "text");
                 $input["values"] = get_param_value($input, "values", null);
-                
-                $this->insert_index(array(
-                    "type" => "index",
-                    "fields" => $field_name,
-                ));
+                $default_index_type = "index";
                 break;
             case "integer":
                 $initial_field_value = get_param_value($field_info, "value", 0);
@@ -384,14 +377,11 @@ class DbObject {
             $attr = get_param_value($field_info, "attr", "");
             
             $create = ($multilingual) ?
-                false :
-                get_param_value($field_info, "create", $default_create);
-            $store = ($create && $field_name != $this->get_primary_key_name()) ?
-                get_param_value($field_info, "store", true) :
-                false;
-            $update = ($create && $field_name != $this->get_primary_key_name()) ?
-                get_param_value($field_info, "update", true) :
-                false;
+                false : get_param_value($field_info, "create", $default_create);
+            $store = (!$create || $field_type == "primary_key") ?
+                false : get_param_value($field_info, "store", true);
+            $update = (!$create || $field_type == "primary_key") ?
+                false : get_param_value($field_info, "update", true);
 
             $read = get_param_value($field_info, "read", true);
             $print = get_param_value($field_info, "print", true);
@@ -401,7 +391,7 @@ class DbObject {
                 $this->insert_join($join_info, $field_name);
             }
 
-            $index_type = get_param_value($field_info, "index", null);
+            $index_type = get_param_value($field_info, "index", $default_index_type);
             if ($create && !is_null($index_type)) {
                 $this->insert_index(array(
                     "type" => $index_type,
@@ -621,9 +611,7 @@ class DbObject {
         if ($field_type == "primary_key") {
             $attr = " AUTO_INCREMENT";
         } else {
-            $attr = ($field_info["attr"] == "") ?
-                "" :
-                " {$field_info['attr']}";
+            $attr = ($field_info["attr"] == "") ? "" : " {$field_info['attr']}";
         }
 
         return "{$field_name} {$type_expression}{$allow_null}{$default}{$attr}";
@@ -857,7 +845,18 @@ class DbObject {
 //        } else if (strtoupper($default) != $actual_default) {
 //            return true;
 //        }
-        
+
+        //Difference in attributes:
+        if ($field_info["type"] == "primary_key") {
+            $attr = "AUTO_INCREMENT";
+        } else {
+            $attr = ($field_info["attr"] == "") ? "" : strtoupper($field_info["attr"]);
+        }
+        $actual_attr = strtoupper($actual_field_info["Extra"]);
+        if ($attr != $actual_attr) {
+            return true;
+        }
+
         return false;
     }
 
