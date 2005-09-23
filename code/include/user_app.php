@@ -38,7 +38,7 @@ class UserApp extends CustomApp {
             "obj_name" => "news_article",
             "templates_dir" => "news_article/recent",
             "template_var" => "recent_news_articles",
-            "default_order_by" => array("created desc", "id desc"),
+            "default_order_by" => array("created DESC", "id DESC"),
             "query_ex" => array(
                 "limit" => "0, {$n_recent_news_articles}",
             ),
@@ -48,7 +48,7 @@ class UserApp extends CustomApp {
     function pg_view_news_articles() {
         $this->print_many_objects_list_page(array(
             "obj_name" => "news_article",
-            "default_order_by" => array("created asc", "id desc"),
+            "default_order_by" => array("created ASC", "id DESC"),
             "show_filter_form" => true,
         ));
     }

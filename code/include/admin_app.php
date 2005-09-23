@@ -36,7 +36,7 @@ class AdminApp extends CustomApp {
     function pg_view_news_articles() {
         $this->print_many_objects_list_page(array(
             "obj_name" => "news_article",
-            "default_order_by" => array("created desc", "id desc"),
+            "default_order_by" => array("created DESC", "id DESC"),
             "show_filter_form" => true,
         ));
     }
@@ -58,38 +58,11 @@ class AdminApp extends CustomApp {
 
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
-            $this->run_action("pg_edit_news_article", array(
-                "news_article" => $news_article,
-            ));
+            $this->run_action("pg_edit_news_article", array("news_article" => $news_article));
         } else {
             if (Image::was_uploaded()) {
-                $uploaded_file_info = $_FILES["image_file"];
-                $file_path = $uploaded_file_info["tmp_name"];
-                $filename = $uploaded_file_info["name"];
-                
-                $news_article_normal_image_width =
-                    $this->config->get_value("news_article_normal_image_width");
-                $news_article_normal_image_height =
-                    $this->config->get_value("news_article_normal_image_height");
-
-                $im = new ImageMagick();
-                $im->resize(
-                    $file_path,
-                    array(
-                        "width" => $news_article_normal_image_width,
-                        "height" => $news_article_normal_image_height,
-                    )
-                );
-                $image_new = Image::create_from_image_magick($im, $filename);
-                $im->cleanup();
-
-                $image = $news_article_old->fetch_image_without_content();
-                $image->init_from($image_new);
-                $image->save(false);
-
-                $news_article->image_id = $image->id;
+                $news_article->process_image_upload_and_imagemagick_resize();
             }
-
             $news_article->save();
             $this->print_status_message_object_updated($news_article_old);
             $this->create_self_redirect_response(array("action" => "pg_view_news_articles"));

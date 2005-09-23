@@ -1334,7 +1334,7 @@ class App {
         $template_var = get_param_value($params, "template_var", "body");
         $query = get_param_value($params, "query", $obj->get_select_query());
         $query_ex = get_param_value($params, "query_ex", array());
-        $default_order_by = get_param_value($params, "default_order_by", "id asc");
+        $default_order_by = get_param_value($params, "default_order_by", "id ASC");
         $show_filter_form = get_param_value($params, "show_filter_form", false);
         $custom_params = get_param_value($params, "custom_params", array());
 
@@ -1401,7 +1401,6 @@ class App {
             "query" => $query,
             "templates_dir" => $templates_dir,
             "templates_ext" => $templates_ext,
-            "template_var" => "{$obj_name}_list",
             "context" => $context,
             "objects" => $objects,
             "custom_params" => $custom_params,
@@ -1435,7 +1434,7 @@ class App {
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
         $templates_ext = get_param_value($params, "templates_ext", "html");
         $context = get_param_value($params, "context", "");
-        $template_var = get_param_value($params, "template_var", null);
+        $template_var = get_param_value($params, "template_var", "{$obj_name}_list");
         $custom_params = get_param_value($params, "custom_params", array());
 
         $objects = get_param_value($params, "objects", null);

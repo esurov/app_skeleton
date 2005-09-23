@@ -969,7 +969,7 @@ class DbObject {
         return "{$field_name}={$field_value_str}";
     }
 
-    function save($refetch_after_save = true) {
+    function save($refetch_after_save = false) {
         $was_definite = $this->is_definite();
 
         if ($was_definite) {
@@ -1351,8 +1351,13 @@ class DbObject {
             if (!in_array($order_by_field_name, $field_names)) {
                 continue;
             }
-            $order_by_direction = (isset($order_by_field_parts[1])) ?
-                $order_by_field_parts[1] : "asc";
+            $order_by_direction = "asc";
+            if (isset($order_by_field_parts[1])) {
+                $order_by_direction = strtolower($order_by_field_parts[1]);
+                if (!in_array($order_by_direction, array("asc", "desc"))) {
+                    $order_by_direction = "asc";
+                }
+            }
             $this->order_by[] = array(
                 "field_name" => $order_by_field_name,
                 "direction" => $order_by_direction,
@@ -1371,9 +1376,7 @@ class DbObject {
     function get_order_by_query_ex() {
         $order_by_sqls = array();
         foreach ($this->order_by as $order_by_info) {
-            $order_by_direction_sql = ($order_by_info["direction"] == "asc") ?
-                "ASC" :
-                "DESC";
+            $order_by_direction_sql = strtoupper($order_by_info["direction"]);
             $order_by_sqls[] = "{$order_by_info['field_name']} {$order_by_direction_sql}";
         }
         return array("order_by" => join(", ", $order_by_sqls));
@@ -2165,6 +2168,40 @@ class DbObject {
 //            }
 //        }
 //    }
+    function process_image_upload_and_imagemagick_resize(
+        $image_id_field_name = "image_id",
+        $input_name = "image_file",
+        $resize_info = null
+    ) {
+        $uploaded_file_info = $_FILES[$input_name];
+        $file_path = $uploaded_file_info["tmp_name"];
+        $filename = $uploaded_file_info["name"];
+        
+        if (is_null($resize_info)) {
+            $image_width = $this->config->get_value("{$this->table_name}_image_width");
+            $image_height = $this->config->get_value("{$this->table_name}_image_height");
+        } else {
+            $image_width = $resize_info["width"];
+            $image_height = $resize_info["height"];
+        }
+
+        $im = new ImageMagick();
+        $im->resize(
+            $file_path,
+            array(
+                "width" => $image_width,
+                "height" => $image_height,
+            )
+        );
+        $image_new = Image::create_from_image_magick($im, $filename);
+        $im->cleanup();
+
+        $image = $this->fetch_image_without_content($image_id_field_name);
+        $image->init_from($image_new);
+        $image->save();
+
+        $this->set_field_value($image_id_field_name, $image->id);
+    }
 }
 
 ?>
