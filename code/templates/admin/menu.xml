@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<menu
+    name="admin_menu"
+    template="_menu.html"
+    item_template="_menu_item.html"
+    item_current_template="_menu_item_current.html"
+    item_delimiter_template="_menu_item_delimiter.html"
+>
+    <menu_item name="index" url="?">
+        <actions>
+            <action name="pg_index" />
+        </actions>
+    </menu_item>
+    <menu_item name="news_articles" url="?action=pg_view_news_articles">
+        <actions>
+            <action name="pg_view_news_articles" />
+            <action name="pg_edit_news_article" />
+        </actions>
+    </menu_item>
+    <menu_item name="app" url="./" item_template="_menu_item_app.html">
+        <actions>
+            <action name="" />
+        </actions>
+    </menu_item>
+</menu>

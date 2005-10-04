@@ -42,9 +42,11 @@ class Pager {
     }
 
 
-    function get_pages_nav_str($url_str) {
+    function print_nav_str($suburl_params) {
         // Create navigation links
         $nav_str = $this->app->get_message("pager_pages_title") . " \n";
+
+        $suburl_params_str = create_html_suburl($suburl_params);
 
         $p = (int) ceil($this->n_total_rows / $this->n_rows_per_page);
         $cp = $this->offset / $this->n_rows_per_page + 1;
@@ -64,7 +66,8 @@ class Pager {
                     $i + 1 == $p
                 ) {
                     $nav_str .=
-                        "[<a href=\"{$url_str}&amp;offset={$cur_offset}\">{$cur_page}</a>]\n";
+                        "[<a href=\"?{$suburl_params_str}&amp;offset={$cur_offset}\">" .
+                        "{$cur_page}</a>]\n";
                 }
             }
         }
@@ -73,23 +76,27 @@ class Pager {
     }
 
 
-    function get_simple_nav_str($url_str) {
+    function print_simple_nav_str($suburl_params) {
         // Create simplified navigation links (previous page and next page).
         $simple_nav_str = "";
+
+        $suburl_params_str = create_html_suburl($suburl_params);
 
         $prev_offset = $this->offset - $this->n_rows_per_page;
         $next_offset = $this->offset + $this->n_rows_per_page;
 
         if ($prev_offset >= 0) {
+            $prev_page_str = $this->app->get_message("pager_previous_page");
             $simple_nav_str .=
-                "<a href=\"{$url_str}&amp;offset={$prev_offset}\">" .
-                "&lt;&lt;&nbsp;Previous&nbsp;results</a>&nbsp;&nbsp;&nbsp;\n";
+                "<a href=\"{$suburl_params_str}&amp;offset={$prev_offset}\">" .
+                "&lt;&lt;&nbsp;{$prev_page_str}</a>&nbsp;&nbsp;&nbsp;\n";
         }
         
         if ($next_offset < $this->n_total_rows) {
+            $next_page_str = $this->app->get_message("pager_next_page");
             $simple_nav_str .=
-                "<a href=\"{$url_str}&amp;offset={$next_offset}\">" .
-                "Next&nbsp;results&nbsp;&gt;&gt;</a>\n";
+                "<a href=\"{$suburl_params_str}&amp;offset={$next_offset}\">" .
+                "{$next_page_str}&nbsp;&gt;&gt;</a>\n";
         }
 
         return $simple_nav_str;

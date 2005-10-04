@@ -191,16 +191,23 @@ class App {
             $this->action = $action_name;
         }
         $this->action_params = $action_params;
+        $page_name = get_param_value($action_params, "page", trim(param("page")));
 
-        $page_name = trim(param("page"));
+        $action_func_name = $this->action;
+        $action_name_expanded = ($page_name == "") ?
+            $this->action : $this->action . "_" . $page_name;
+        
         $this->print_values(array(
-            "action" => $this->action,
+            "action" => $action_func_name,
+            "action_expanded" => $action_name_expanded,
             "page" => $page_name,
         ));
-        $this->print_page_titles($page_name);
+        $this->action = $action_name_expanded;
+
+        $this->print_page_titles();
         
-        $this->log->write("App", "Running action '{$this->action}'", 3);
-        $this->{$this->action}();  // NB! Variable function
+        $this->log->write("App", "Running action '{$action_func_name}'", 3);
+        $this->{$action_func_name}();  // NB! Variable function
     }
 
     function run_access_denied_action() {
@@ -248,9 +255,9 @@ class App {
     }
 //
     function create_html_document_response() {
-        $content = $this->create_html_document_body_content();
-        $charset = $this->config->get_value("html_charset");
-        $this->response = new HtmlDocumentResponse($content, $charset);
+        $this->response = new HtmlDocumentResponse(
+            $this->create_html_document_body_content(), $this->html_charset
+        );
     }
 
     function create_html_document_body_content() {
@@ -258,7 +265,7 @@ class App {
     }
 
     function create_access_denied_html_document_response() {
-        $this->page_template_name = "access_denied.html";
+        $this->page_template_name = "page_access_denied.html";
         $this->create_html_document_response();
     }
 
@@ -542,6 +549,19 @@ class App {
     function print_values($h) {
         foreach ($h as $template_var => $value) {
             $this->print_value($template_var, $value);
+        }
+    }
+
+    function print_suburl_value($template_var, $h) {
+        if (!is_array($h)) {
+            $h = array($template_var => $h);
+        }
+        $this->print_raw_value("{$template_var}_suburl", create_html_suburl($h));
+    }
+
+    function print_suburl_values($h) {
+        foreach ($h as $template_var => $value) {
+            $this->print_suburl_value($template_var, $value);
         }
     }
 //
@@ -1189,105 +1209,53 @@ class App {
 
 //  Common actions
     function change_lang() {
-        $this->set_current_lang(param("new_lang"));
-        $cur_action = param("cur_action");
-        $cur_page = param("cur_page");
-        $url = "";
-        if (!is_null($cur_action)) {
-            $url .= "?action={$cur_action}";
+        $this->set_current_lang(trim(param("new_lang")));
+        $cur_action = trim(param("cur_action"));
+        $cur_page = trim(param("cur_page"));
+        
+        $suburl_params = array();
+        if ($cur_action != "") {
+            $suburl_params["action"] = $cur_action;
         }
-        if (!is_null($cur_page)) {
-            $url .= "&page={$cur_page}";
+        if ($cur_page != "") {
+            $suburl_params["page"] = $cur_page;
         }
-        $this->create_redirect_response($url);
+        $this->create_self_redirect_response($suburl_params);
     }
 
     function pg_static() {
         $page_name = trim(param("page"));
         if (preg_match('/^\w+$/i', $page_name)) {
-            $this->print_page_title("page_title_pg_static_{$page_name}");
             $this->print_static_page($page_name);
         }
     }
 
 //  Page contruction helper functions
     function print_static_page($page_name) {
-        $page_path = "static/{$page_name}_{$this->lang}.html";
-        if (!$this->is_file_exist($page_path)) {
-            $page_path = "static/{$page_name}.html";
-        }
-        return $this->print_file_if_exists($page_path, "body");
+        $this->print_static_file($page_name, "body");
     }
 
-    function print_menu($menu_prefix = "", $menu_var = "menu") {
-        $menu_actions = $this->config->get_value("{$this->app_name}_menu_{$menu_prefix}actions");
-        if (is_null($menu_actions)) {
-            $menu_actions = $this->config->get_value("{$this->app_name}_menu_actions");
+    function print_static_file($file_name, $template_var) {
+        $file_path = "static/{$file_name}_{$this->lang}.html";
+        if (!$this->is_file_exist($file_path)) {
+            $file_path = "static/{$file_name}.html";
         }
-        if (!is_null($menu_actions)) {
-            $menu_items = explode(",", $menu_actions);
-
-            $i = 0;
-            $this->print_raw_value("menu_items", "");
-
-            foreach ($menu_items as $menu_action) {
-                $i++;
-                $caption = $this->get_message(
-                    "{$this->app_name}_menu_{$menu_prefix}item_{$menu_action}"
-                );
-                if (is_null($caption)) {
-                    $caption = $this->get_message(
-                        "{$this->app_name}_menu_item_{$menu_action}"
-                    );
-                }
-
-                $url = $this->config->get_value(
-                    "{$this->app_name}_menu_{$menu_prefix}action_{$menu_action}"
-                );
-                if (is_null($url)) {
-                    $url = $this->config->get_value(
-                        "{$this->app_name}_menu_action_{$menu_action}"
-                    );
-                }
-
-                $this->print_values(array(
-                    "caption" => $caption,
-                    "url" => $url,
-                    "marker" => $menu_action,
-                ));
-
-                if (
-                    $menu_action == $this->action ||
-                    $menu_action == $this->action . "_" . param("page")
-                ) {
-                    $current_item_template_name = "_menu_{$menu_prefix}item_current.html";
-                    if ($this->is_file_exist($current_item_template_name)) {
-                        $this->print_file($current_item_template_name, "menu_items");
-                    } else {
-                        $this->print_file("_menu_item_current.html", "menu_items");
-                    }
-                } else {
-                    $item_template_name = "_menu_{$menu_prefix}item.html";
-                    if ($this->is_file_exist($item_template_name)) {
-                        $this->print_file($item_template_name, "menu_items");
-                    } else {
-                        $this->print_file("_menu_item.html", "menu_items");
-                    }
-                }
-                if ($i != count($menu_items)) {
-                    $delimiter_template_name = "_menu_{$menu_prefix}item_delimiter.html";
-                    if ($this->is_file_exist($delimiter_template_name)) {
-                        $this->print_file($delimiter_template_name, "menu_items");
-                    } else {
-                        $this->print_file("_menu_item_delimiter.html", "menu_items");
-                    }
-                }
-            }
-        }
-        
-        $this->print_file_if_exists("_{$menu_var}.html", $menu_var);
+        return $this->print_file_if_exists($file_path, $template_var);
     }
-
+//
+    function print_menu($templates_dir = null, $template_var = "menu") {
+        if (is_null($templates_dir)) {
+            $templates_dir = ".";
+        }
+        $menu = new Menu($this);
+        $menu->parse($menu->load_file("{$templates_dir}/menu.xml"));
+        $menu->print_menu(array(
+            "templates_dir" => "{$templates_dir}",
+            "template_var" => $template_var,
+            "current_action" => $this->action,
+        ));
+    }
+//
     function print_lang_menu() {
         if (!$this->print_lang_menu) {
             return;
@@ -1354,31 +1322,28 @@ class App {
         $action_suburl_param = array("action" => $this->action);
         $extra_suburl_params = $this->get_app_extra_suburl_params();
 
-        $action_suburl = create_html_suburl(
+        $action_suburl_params =
             $action_suburl_param +
             $custom_params +
-            $extra_suburl_params
-        );
+            $extra_suburl_params;
                
-        $action_filters_suburl = create_html_suburl(
+        $action_filters_suburl_params =
             $action_suburl_param +
             $filters_params +
             $custom_params +
-            $extra_suburl_params
-        );
+            $extra_suburl_params;
 
-        $action_filters_order_by_suburl = create_html_suburl(
+        $action_filters_order_by_suburl_params =
             $action_suburl_param +
             $filters_params +
             $order_by_params +
             $custom_params +
-            $extra_suburl_params
-        );
+            $extra_suburl_params;
 
-        $this->print_raw_values(array(
-            "action_suburl" => "?{$action_suburl}",
-            "action_filters_suburl" => "?{$action_filters_suburl}",
-            "action_filters_order_by_suburl" => "?{$action_filters_order_by_suburl}",
+        $this->print_suburl_values(array(
+            "action" => $action_suburl_params,
+            "action_filters" => $action_filters_suburl_params,
+            "action_filters_order_by" => $action_filters_order_by_suburl_params,
         ));
 
         $n = $this->db->get_select_query_num_rows($query);
@@ -1407,16 +1372,12 @@ class App {
         ));
 
         if ($n > 0) {
-            $pager_suburl = "?{$action_filters_order_by_suburl}";
-            $this->print_raw_values(array(
-                "simple_nav_str" => $this->pager->get_simple_nav_str($pager_suburl),
-                "nav_str" => $this->pager->get_pages_nav_str($pager_suburl),
-                "total" => $obj->get_quantity_str($n),
-            ));
+            $this->pager->print_nav_str($action_filters_order_by_suburl_params);
+            $this->print_value("total", $obj->get_quantity_str($n));
         }
 
         if ($show_filter_form) {
-            $this->print_raw_values($filters_params);
+            $this->print_values($filters_params);
             $obj->print_filter_form_values();
             $this->print_file_new(
                 "{$templates_dir}/filter_form.{$templates_ext}", "{$obj_name}_filter_form"
@@ -1614,19 +1575,12 @@ class App {
     }
 //
 //  Page titles and status messages
-    function print_page_titles($page_name = "") {
-        $this->print_head_and_page_title(
-            $this->create_page_title_resource($page_name)
-        );
+    function print_page_titles() {
+        $this->print_head_and_page_title($this->create_page_title_resource());
     }
 
-    function create_page_title_resource($page_name = "") {
-        if ($page_name == "") {
-            $resource = "page_title_{$this->action}";
-        } else {
-            $resource = "page_title_{$this->action}_{$page_name}";
-        }
-        return $resource;
+    function create_page_title_resource() {
+        return "page_title_{$this->action}";
     }
 
     function print_head_and_page_title($resource) {

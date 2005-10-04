@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<menu
+    name="setup_menu"
+    template="_menu.html"
+>
+</menu>

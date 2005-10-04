@@ -16,7 +16,7 @@ class CustomApp extends App {
 
         if (!$this->report && !$this->printable) {
             $this->print_hidden_input_form_value("popup", $this->popup);
-            $this->print_value("popup_url_param", "&popup={$this->popup}");
+            $this->print_suburl_value("popup", $this->popup);
             $this->print_session_status_messages();
         }
         $this->print_lang_menu();

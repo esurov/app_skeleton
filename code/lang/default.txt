@@ -17,6 +17,11 @@ page_title_pg_view_news_article = Visualizza notizia
 page_title_pg_edit_news_article_new = Aggiungi notizia
 page_title_pg_edit_news_article = Modifica notizia
 
+["menu items"]
+admin_menu_item_index = Home
+admin_menu_item_news_articles = Notizie
+admin_menu_item_app = App
+
 ["status messages (admin area)"]
 news_article_added = Aggiunta nuova notizia
 news_article_updated = Notizia è stata modificata

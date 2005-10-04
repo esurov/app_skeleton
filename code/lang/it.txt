@@ -14,11 +14,11 @@ page_title_pg_static_sample_page1 = SamplePage1
 page_title_pg_static_sample_page2 = SamplePage2
 
 ["menu items"]
-user_menu_item_pg_index = Home
-user_menu_item_pg_news = News
-user_menu_item_pg_contact_form = Contatti
-user_menu_item_pg_static_sample_page1 = SamplePage1
-user_menu_item_pg_static_sample_page2 = SamplePage2
+user_menu_item_index = Home
+user_menu_item_news = News
+user_menu_item_contact_form = Contatti
+user_menu_item_static_sample_page1 = SamplePage1
+user_menu_item_static_sample_page2 = SamplePage2
 
 ["operation names"]
 link_view = Visualizza

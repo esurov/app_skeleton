@@ -113,7 +113,7 @@ class Template {
     }
 
     function is_template_exist($template_name) {
-        return file_exists("{$this->templates_dir}/{$template_name}");
+        return is_file("{$this->templates_dir}/{$template_name}");
     }
 }
 

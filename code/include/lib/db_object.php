@@ -72,7 +72,7 @@ class DbObject {
     }
 
     function get_quantity_str($n) {
-        return("{$n}&nbsp;" . (
+        return("{$n} " . (
             ($n == 1) ?
             $this->get_singular_name() :
             $this->get_plural_name()

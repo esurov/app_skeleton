@@ -2,26 +2,27 @@
 
 class XML {
 
-    var $parser;
+    var $app;
 
-    function XML() {
+    function XML(&$app) {
+        $this->app =& $app;
     }
 
-    // Parse given XML data.
-    // All initialisation code code goes here, not to constructor (!)
+    // Parse given XML data
+    // All initialization code code goes here, not to constructor (!)
     function parse($xml_data_str) {
 
-        // Create parser:
-        $parser = xml_parser_create();
+        // Create parser
+        $parser = xml_parser_create($this->app->html_charset);
         xml_set_object($parser, &$this);
         xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, false);
         xml_set_element_handler($parser, "tag_open", "tag_close");
         xml_set_character_data_handler($parser, "cdata");
 
-        // Do parse:
+        // Do parse
         xml_parse($parser, $xml_data_str);
 
-        // Destroy parser:
+        // Destroy parser
         xml_parser_free($parser);
     }
 
@@ -37,6 +38,6 @@ class XML {
         // Must be redefined in derived class
     }
 
-} // class XML
+}
 
 ?>
