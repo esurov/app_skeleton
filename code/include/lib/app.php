@@ -1243,16 +1243,19 @@ class App {
         return $this->print_file_if_exists($file_path, $template_var);
     }
 //
-    function print_menu($templates_dir = null, $template_var = "menu") {
+    function print_menu($templates_dir = null, $template_var = "menu", $current_action = null) {
         if (is_null($templates_dir)) {
             $templates_dir = ".";
+        }
+        if (is_null($current_action)) {
+            $current_action = $this->action;
         }
         $menu = new Menu($this);
         $menu->parse($menu->load_file("{$templates_dir}/menu.xml"));
         $menu->print_menu(array(
             "templates_dir" => "{$templates_dir}",
             "template_var" => $template_var,
-            "current_action" => $this->action,
+            "current_action" => $current_action,
         ));
     }
 //

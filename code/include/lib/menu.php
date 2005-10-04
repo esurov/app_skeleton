@@ -31,7 +31,11 @@ class Menu extends XML {
             break;
         case "menu_item":
             $this->last_item_name = $attributes["name"];
-            $this->items[$this->last_item_name] = array("url" => $attributes["url"]);
+            $is_html_str = get_param_value($attributes, "is_html", "false");
+            $this->items[$this->last_item_name] = array(
+                "url" => $attributes["url"],
+                "is_html" => ($is_html_str == "true") ? true : false,
+            );
 
             $item_template_name =
                 get_param_value($attributes, "item_template", null);
@@ -83,9 +87,14 @@ class Menu extends XML {
             }
             $this->app->print_values(array(
                 "name" => $item_name,
-                "caption" => $caption,
                 "url" => $item_info["url"],
             ));
+
+            if ($item_info["is_html"]) {
+                $this->app->print_raw_value("caption", $caption);
+            } else {
+                $this->app->print_value("caption", $caption);
+            }
 
             $item_actions = $item_info["actions"];
             if (in_array($current_action, $item_actions)) {
