@@ -29,23 +29,20 @@ class CustomApp extends App {
     }
 
     function create_html_document_body_content() {
-        if ($this->report) {
-            $template_type = ($this->is_file_exist("report.html")) ? "report" : "page";
-        } else if ($this->printable) {
-            $template_type = ($this->is_file_exist("printable.html")) ? "printable" : "page";
-        } else if ($this->popup) {
-            $template_type = ($this->is_file_exist("popup.html")) ? "popup" : "page";
-        } else {
-            $template_type = "page";
-        }
-
-        if ($template_type == "page") {
-            $this->print_menu();
-        } else {
-            $this->page_template_name = "{$template_type}.html";
-        }
-        
+        $this->print_menu();
         return parent::create_html_document_body_content();
+    }
+
+    function create_html_page_template_name() {
+        if ($this->popup && $this->is_file_exist("page_popup.html")) {
+            $this->page_template_name = "page_popup.html";
+        } else if ($this->report && $this->is_file_exist("page_report.html")) {
+            $this->page_template_name = "page_report.html";
+        } else if ($this->printable && $this->is_file_exist("page_printable.html")) {
+            $this->page_template_name = "page_printable.html";
+        } else {
+            parent::create_html_page_template_name();
+        }
     }
 
     function get_app_extra_suburl_params() {

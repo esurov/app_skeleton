@@ -96,7 +96,7 @@ class App {
     function create_page_template() {
         $print_template_name = $this->config->get_value("print_template_name");
         $this->page = new Template("templates/{$this->app_name}", $print_template_name);
-        $this->page_template_name = "page.html";
+        $this->page_template_name = "";
     }
 
     function create_pager() {
@@ -255,6 +255,7 @@ class App {
     }
 //
     function create_html_document_response() {
+        $this->create_html_page_template_name();
         $this->response = new HtmlDocumentResponse(
             $this->create_html_document_body_content(), $this->html_charset
         );
@@ -262,6 +263,12 @@ class App {
 
     function create_html_document_body_content() {
         return $this->print_file($this->page_template_name);
+    }
+
+    function create_html_page_template_name() {
+        if ($this->page_template_name == "") {
+            $this->page_template_name = "page.html";
+        }
     }
 
     function create_access_denied_html_document_response() {
@@ -552,16 +559,16 @@ class App {
         }
     }
 
-    function print_suburl_value($template_var, $h) {
-        if (!is_array($h)) {
-            $h = array($template_var => $h);
+    function print_suburl_value($template_var, $suburl_params) {
+        if (!is_array($suburl_params)) {
+            $suburl_params = array($template_var => $suburl_params);
         }
-        $this->print_raw_value("{$template_var}_suburl", create_html_suburl($h));
+        $this->print_value("{$template_var}_suburl", create_suburl($suburl_params));
     }
 
-    function print_suburl_values($h) {
-        foreach ($h as $template_var => $value) {
-            $this->print_suburl_value($template_var, $value);
+    function print_suburl_values($suburls_info) {
+        foreach ($suburls_info as $template_var => $suburl_params) {
+            $this->print_suburl_value($template_var, $suburl_params);
         }
     }
 //
@@ -1535,10 +1542,7 @@ class App {
     function print_custom_param($param_name, $param_value) {
         $this->print_value("{$param_name}", $param_value);
         $this->print_raw_value("{$param_name}_orig", $param_value);
-        $this->print_value(
-            "{$param_name}_suburl",
-            create_html_suburl(array($param_name => $param_value))
-        );
+        $this->print_suburl_value($param_name, $param_value);
         $this->print_hidden_input_form_value($param_name, $param_value);
     }
 //
@@ -1592,8 +1596,16 @@ class App {
         $this->print_head_page_title($resource);
     }
 
-    function print_page_title($resource) {
-        $this->print_raw_value("page_title", $this->get_message($resource));
+    function print_page_title($resource, $is_html = false) {
+        $page_title_text = $this->get_message($resource);
+        if (!is_null($page_title_text)) {
+            if ($is_html) {
+                $this->print_raw_value("page_title_text", $page_title_text);
+            } else {
+                $this->print_value("page_title_text", $page_title_text);
+            }
+        }
+        $this->print_file_new_if_exists("_page_title.html", "page_title");
     }
 
     function print_head_page_title($resource) {

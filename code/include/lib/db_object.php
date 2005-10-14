@@ -1207,9 +1207,7 @@ class DbObject {
             $filter_relation = $filter_info["relation"];
             
             $param_value = param("{$this->table_name}_{$filter_name}_{$filter_relation}");
-            if (is_null($param_value)) {
-                $this->filters[$i]["value"] = $this->get_nonset_filter_value($filter_info);
-            } else {
+            if (!is_null($param_value)) {
                 $this->filters[$i]["value"] = $param_value;
             }
         }
@@ -2180,9 +2178,11 @@ class DbObject {
         if (is_null($resize_info)) {
             $image_width = $this->config->get_value("{$this->table_name}_image_width");
             $image_height = $this->config->get_value("{$this->table_name}_image_height");
+            $is_thumbnail = 0;
         } else {
             $image_width = $resize_info["width"];
             $image_height = $resize_info["height"];
+            $is_thumbnail = get_param_value($resize_info, "is_thumbnail", 0);
         }
 
         $im = new ImageMagick();
@@ -2198,6 +2198,9 @@ class DbObject {
 
         $image = $this->fetch_image_without_content($image_id_field_name);
         $image->init_from($image_new);
+        if (!$image->is_definite()) {
+            $image->is_thumbnail = $is_thumbnail;
+        }
         $image->save();
 
         $this->set_field_value($image_id_field_name, $image->id);

@@ -5,7 +5,6 @@ news_articles = news articles
 ["page and head titles"]
 app_head_title = !!AppSkeleton
 page_title_access_denied = Access denied!
-page_title_pg_index =
 head_page_title_pg_index = Home
 page_title_view_news_articles = News
 page_title_view_news_article = View news article

@@ -4,6 +4,11 @@ function v($obj) {
     var_dump($obj);
 }
 
+function vx($obj) {
+    v($obj);
+    exit;
+}
+
 function param($name) {
     if (isset($_GET[$name])) {
         $param_value = $_GET[$name];
@@ -34,7 +39,7 @@ function params() {
     return array_merge($_POST, $_GET);
 }
 
-function create_suburl($ampersand, $params) {
+function create_suburl($params, $params_delimiter = "&") {
     $pairs = array();
     foreach ($params as $name => $value) {
         if (is_array($value)) {
@@ -45,11 +50,11 @@ function create_suburl($ampersand, $params) {
             $pairs[] = urlencode($name) . "=" . urlencode($value);
         }
     }
-    return join($ampersand, $pairs);
+    return join($params_delimiter, $pairs);
 }
 
 function create_self_url($params) {
-    $params_suburl = create_http_suburl($params);
+    $params_suburl = create_suburl($params);
     $self_suburl = $_SERVER["SCRIPT_NAME"];
     return "{$self_suburl}?{$params_suburl}";
 }
@@ -58,14 +63,6 @@ function create_self_full_url($params, $protocol = "http") {
     $host = $_SERVER["HTTP_HOST"];
     $self_url = create_self_url($params);
     return "{$protocol}://{$host}{$self_url}";
-}
-
-function create_http_suburl($params) {
-    return create_suburl("&", $params);
-}
-
-function create_html_suburl($params) {
-    return create_suburl("&amp;", $params);
 }
 
 function if_null($variable, $value) {

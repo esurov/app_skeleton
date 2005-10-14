@@ -46,7 +46,7 @@ class Pager {
         // Create navigation links
         $nav_str = $this->app->get_message("pager_pages_title") . " \n";
 
-        $suburl_params_str = create_html_suburl($suburl_params);
+        $suburl_params_str = create_suburl($suburl_params, "&amp;");
 
         $p = (int) ceil($this->n_total_rows / $this->n_rows_per_page);
         $cp = $this->offset / $this->n_rows_per_page + 1;
@@ -71,8 +71,8 @@ class Pager {
                 }
             }
         }
-
-        return $nav_str;
+        
+        $this->app->print_raw_value("nav_str", $nav_str);
     }
 
 
@@ -80,7 +80,7 @@ class Pager {
         // Create simplified navigation links (previous page and next page).
         $simple_nav_str = "";
 
-        $suburl_params_str = create_html_suburl($suburl_params);
+        $suburl_params_str = create_suburl($suburl_params, "&amp;");
 
         $prev_offset = $this->offset - $this->n_rows_per_page;
         $next_offset = $this->offset + $this->n_rows_per_page;
@@ -99,7 +99,7 @@ class Pager {
                 "{$next_page_str}&nbsp;&gt;&gt;</a>\n";
         }
 
-        return $simple_nav_str;
+        $this->app->print_raw_value("simple_nav_str", $simple_nav_str);
     }
 }
 

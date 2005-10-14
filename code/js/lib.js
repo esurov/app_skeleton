@@ -137,13 +137,17 @@ function copyToClipboard(element) {
     element.createTextRange().execCommand("Copy");
 }
 
-function openPopup(url, width, height, useScroll) {
+function openPopup(url, width, height, useScroll, windowName) {
     var cornerX = (screen.width - width) / 2;
     var cornerY = (screen.height - height) / 2 - 32;
+    
+    if (windowName == null) {
+        windowName = 'popup';
+    }
 
     var w = window.open(
         url,
-        'popup',
+        windowName,
         'width=' + width + ',height=' + height +
         ',left=' + cornerX + ',top=' + cornerY +
         ',scrollbars=' + useScroll + ',resizable'
@@ -475,6 +479,12 @@ function getJsInteger(appIntegerStr) {
     return parseInt(str);
 }
 
+function closeWindow() {
+    window.close();
+    if (window.opener) {
+        window.opener.focus();
+    }
+}
 //        case 'url':
 //            result = true;
 //                case 'date':
