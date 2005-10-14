@@ -59,7 +59,6 @@ class UserApp extends CustomApp {
     }
 //
     function pg_contact_form() {
-        $this->print_file("contact/form_notice_{$this->lang}.html", "contact_form_notice");
         $contact = $this->create_db_object("contact");
         $contact->print_form_values();
         $this->print_file("contact/form.html", "body");

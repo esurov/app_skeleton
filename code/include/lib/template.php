@@ -55,6 +55,11 @@ class Template {
             'isset($this->fillings["$1"]) ? $this->fillings["$1"] : ""',
             $raw_text
         );
+        $parsed_text = preg_replace(
+            '/{{(.*?)}}/e',
+            '$this->parse_file("$1")',
+            $parsed_text
+        );
         if (!is_null(($append_to_name))) {
             $this->append_to_filling_value($append_to_name, $parsed_text);
         }
