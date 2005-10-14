@@ -25,7 +25,9 @@ class App {
     var $db;
     var $tables;
 
-    var $print_lang_menu;
+    var $popup = false;
+    var $report = false;
+    var $printable = false;
 
     var $lang;
     var $dlang;
@@ -35,8 +37,6 @@ class App {
         $this->app_name = $app_name;
         $this->tables = $tables;
         $this->response = null;
-
-        $this->print_lang_menu = false;
 
         $this->create_config();
         $this->create_logger();
@@ -102,6 +102,10 @@ class App {
     function create_pager() {
         $n_rows_per_page = $this->config->get_value("{$this->app_name}_rows_per_page", 20);
         $this->pager = new Pager($this, $n_rows_per_page);
+    }
+
+    function drop_pager() {
+        $this->pager->n_rows_per_page = 10000;
     }
 
     function create_email_sender() {
@@ -184,8 +188,10 @@ class App {
         // for previously created user by function create_current_user()
         return "everyone";
     }
-
+//
     function run_action($action_name = null, $action_params = array()) {
+        $this->on_before_run_action();
+
         // Run action and return its response
         if (!is_null($action_name)) {
             $this->action = $action_name;
@@ -208,8 +214,27 @@ class App {
         
         $this->log->write("App", "Running action '{$action_func_name}'", 3);
         $this->{$action_func_name}();  // NB! Variable function
+
+        $this->on_after_run_action();
     }
 
+    function on_before_run_action() {
+        $this->popup = (int) param("popup");
+        $this->report = (int) param("report");
+        $this->printable = (int) param("printable");
+
+        $this->print_custom_param("popup", $this->popup);
+        $this->print_custom_param("report", $this->report);
+        $this->print_custom_param("printable", $this->printable);
+
+        if (!$this->report && !$this->printable) {
+            $this->print_session_status_messages();
+        }
+    }
+
+    function on_after_run_action() {
+    }
+//
     function run_access_denied_action() {
         $this->create_access_denied_html_document_response();
     }
@@ -246,7 +271,11 @@ class App {
     }
 
     function get_app_extra_suburl_params() {
-        return array();
+        $params = array();
+        if ($this->popup != 0) {
+            $params["popup"] = $this->popup;
+        }
+        return $params;
     }
 //
     function create_binary_content_response($content, $filename) {
@@ -262,11 +291,18 @@ class App {
     }
 
     function create_html_document_body_content() {
+        $this->print_menu();
         return $this->print_file($this->page_template_name);
     }
 
     function create_html_page_template_name() {
-        if ($this->page_template_name == "") {
+        if ($this->popup && $this->is_file_exist("page_popup.html")) {
+            $this->page_template_name = "page_popup.html";
+        } else if ($this->report && $this->is_file_exist("page_report.html")) {
+            $this->page_template_name = "page_report.html";
+        } else if ($this->printable && $this->is_file_exist("page_printable.html")) {
+            $this->page_template_name = "page_printable.html";
+        } else if ($this->page_template_name == "") {
             $this->page_template_name = "page.html";
         }
     }
@@ -1267,9 +1303,6 @@ class App {
     }
 //
     function print_lang_menu() {
-        if (!$this->print_lang_menu) {
-            return;
-        }
         $avail_langs = $this->get_avail_langs();
         $this->print_raw_value("lang_menu_items", "");
         foreach ($avail_langs as $lang) {
