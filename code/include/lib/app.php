@@ -167,7 +167,7 @@ class App {
         if (is_null($this->response)) {
             $this->create_html_document_response();
         }
-        
+
         $this->response->send();
     }
     

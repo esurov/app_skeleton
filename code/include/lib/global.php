@@ -9,6 +9,86 @@ function vx($obj) {
     exit;
 }
 
+function tx() {
+    $backtrace_info_array = debug_backtrace();
+    echo get_backtrace_str($backtrace_info_array);
+    exit;
+}
+
+function get_backtrace_str($backtrace_info_array) {
+    $trace_body = "";
+    array_shift($backtrace_info_array);
+    foreach ($backtrace_info_array as $backtrace_item) {
+        $full_function_name_safe_str = htmlspecialchars(
+            get_full_function_name_str($backtrace_item)
+        );
+        $function_args_safe_str = htmlspecialchars(
+            get_backtrace_function_args_str($backtrace_item)
+        );
+        
+        $file_safe_str = htmlspecialchars($backtrace_item["file"]);
+        $line_num_safe_str = htmlspecialchars($backtrace_item["line"]);
+
+        $trace_body .= <<<TRACE_ITEM
+<b>{$full_function_name_safe_str}($function_args_safe_str)</b>
+({$file_safe_str}:&nbsp;<b>{$line_num_safe_str}</b>)<br>
+TRACE_ITEM;
+    }
+    return <<<TRACE_HEADER
+<b>Function call backtrace:</b>
+<div style="margin-top: 10px;">{$trace_body}</div>
+TRACE_HEADER;
+}
+
+function get_full_function_name_str($backtrace_item) {
+    $class_name = (isset($backtrace_item["class"])) ? $backtrace_item["class"] : "";
+    $function_name = (isset($backtrace_item["function"])) ? $backtrace_item["function"] : "";
+    $call_type = (isset($backtrace_item["type"])) ? $backtrace_item["type"] : "";
+    return ($call_type == "") ?
+        $function_name : "{$class_name}{$call_type}{$function_name}";
+}
+
+function get_backtrace_function_args_str($backtrace_item) {
+    $args = (isset($backtrace_item["args"])) ? $backtrace_item["args"] : array();
+
+    $args_str = "";
+    foreach ($args as $arg) {
+        if ($args_str != "") {
+            $args_str .= ", ";
+        }
+        switch (gettype($arg)) {
+        case "integer":
+        case "double":
+            $args_str .= $arg;
+            break;
+        case "boolean":
+            $args_str .= $arg ? "true" : "false";
+            break;
+        case "string":
+            if (strlen($arg) > 64) {
+                $arg = substr($arg, 0, 64) . "...";
+            }
+            $args_str .= "\"$arg\"";
+            break;
+        case "array":
+            $args_str .= "array({count=" . count($arg) ."})";
+            break;
+        case "object":
+            $args_str .= "object(" . get_class($arg) . ")";
+            break;
+        case "resource":
+            $args_str .= "resource(" . strstr($arg, "#") . ")";
+            break;
+        case "NULL":
+            $args_str .= "null";
+            break;
+        default:
+            $args_str .= "UNKNOWN!";
+        }
+    }
+    return $args_str;
+}
+
 function param($name) {
     if (isset($_GET[$name])) {
         $param_value = $_GET[$name];
@@ -32,7 +112,7 @@ function param($name) {
 }
 
 function param_cookie($name) {
-    return isset($_COOKIE[$name]) ? $_COOKIE[$name] : '';
+    return isset($_COOKIE[$name]) ? $_COOKIE[$name] : "";
 }
 
 function params() {
