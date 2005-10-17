@@ -76,9 +76,7 @@ class Image extends CustomDbObject {
     }
 //
     function was_uploaded($input_name = "image_file") {
-        return
-            isset($_FILES[$input_name]) &&
-            $_FILES[$input_name]["error"] != UPLOAD_ERR_NO_FILE;
+        return isset($_FILES[$input_name]) && $_FILES[$input_name]["error"] == UPLOAD_ERR_OK;
     }
 
     function read_uploaded_content($input_name) {
