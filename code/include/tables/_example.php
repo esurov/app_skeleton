@@ -325,9 +325,12 @@ class Example extends CustomDbObject {
         ));
     }
 //
-    function update($fields = null) {
+    function update(
+        $fields_names_to_update = null,
+        $fields_names_to_not_update = null
+    ) {
         $this->updated = $this->app->get_db_now_datetime();
-        parent::update($fields);
+        parent::update($fields_names_to_update, $fields_names_to_not_update);
     }
 //
 
