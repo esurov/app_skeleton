@@ -1461,7 +1461,7 @@ class App {
 
         $no_items_template_name = "{$templates_dir}/list_no_items.{$templates_ext}";
         if ($n == 0 && $this->is_file_exist($no_items_template_name)) {
-            $this->print_file_new($no_items_template_name, $template_var);
+            $this->print_file($no_items_template_name, $template_var);
         } else {
             $this->print_raw_value("{$obj_name}_items", "");
 
