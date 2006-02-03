@@ -1278,7 +1278,7 @@ class App {
         $this->print_static_file($page_name, "body");
     }
 
-    function print_static_file($file_name, $template_var) {
+    function print_static_file($file_name, $template_var = null) {
         $file_path = "static/{$file_name}_{$this->lang}.html";
         if (!$this->is_file_exist($file_path)) {
             $file_path = "static/{$file_name}.html";
