@@ -708,6 +708,11 @@ function get_gmt_str_from_timestamp($timestamp) {
     return "{$gmt_str} GMT";
 }
 
+function get_gmt_str_from_if_modified_since($if_modified_since_str) {
+    $strs = explode(";", $if_modified_since_str);
+    return $strs[0];
+}
+
 if (!function_exists("file_put_contents")) {
 
 function file_put_contents($filename, $content, $should_append = false) {

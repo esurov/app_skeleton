@@ -1749,7 +1749,8 @@ class App {
         $image = $this->read_id_fetch_db_object("image");
         if ($image->is_definite()) {
             $cached_gmt_str = (isset($_SERVER["HTTP_IF_MODIFIED_SINCE"])) ?
-                $_SERVER["HTTP_IF_MODIFIED_SINCE"] : null;
+                get_gmt_str_from_if_modified_since($_SERVER["HTTP_IF_MODIFIED_SINCE"]) :
+                null;
             $this->response = new ImageResponse($image, $cached_gmt_str);
         } else {
             $this->response = new HttpResponse();
