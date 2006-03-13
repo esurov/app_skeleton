@@ -464,7 +464,7 @@ function create_select_dependency_js(
 ) {
     $dependency_str = create_select_dependency_str($dependency_array);
     return <<<JS
-<script>
+<script language="JavaScript" type="text/javascript">
 dependencies[dependencies.length] = new Dependency(
     '{$form_name}',
     '{$main_select_name}',
@@ -491,7 +491,7 @@ JS;
 function create_client_validation_js($client_validate_condition_strs) {
     $client_validate_conditions_str = join(",\n", $client_validate_condition_strs);
     return <<<JS
-<script>
+<script language="JavaScript" type="text/javascript">
 conditions = new Array(
 {$client_validate_conditions_str}
 );
