@@ -8,6 +8,5 @@ php_value session.cache_limiter none
 Options -Indexes
 
 <Files ~ "(CVS|Entries|Repository|Root)$">
-    Order allow,deny
     Deny from all
 </Files>
