@@ -1,1 +1,1 @@
-ctags --php-types=+fc --fields=+n -f .tags -R ..\src\*
+ctags --php-types=+fc --fields=+n -f .tags -R ..\code\include\*
