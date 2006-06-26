@@ -7,6 +7,6 @@ php_value session.cache_limiter none
 
 Options -Indexes
 
-<Files ~ "(CVS|Entries|Repository|Root)$">
+<FilesMatch "^(\.svn|entries)$">
     Deny from all
-</Files>
+</FilesMatch>
