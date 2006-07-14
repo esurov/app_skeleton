@@ -105,4 +105,5 @@ contact_form_processed = I suoi dati sono stati registrati. Grazie!
 pager_pages_title = Pagine:
 filter_by = Filtra per
 no_records_found = Non sono stati trovati dati
+no_image = No immagine
 recent_news = Ultime novità
