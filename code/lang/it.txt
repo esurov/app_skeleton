@@ -97,7 +97,7 @@ status_message_country_empty = Inserire la nazione
 status_message_city_empty = Inserire la città
 status_message_phone_empty = Inserire il nr. di telefono
 status_message_phone_bad = Nr. di telefono non valido
-status_message_message_text_empty = Inserire il messagio
+status_message_message_text_empty = Inserire il messaggio
 
 contact_form_processed = I suoi dati sono stati registrati. Grazie!
 
