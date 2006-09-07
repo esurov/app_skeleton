@@ -1,6 +1,7 @@
 <?php
 
 class CustomApp extends App {
+
     function CustomApp($app_name, $tables) {
         parent::App($app_name, $tables);
     }

@@ -1,14 +1,8 @@
-["db object names"]
-news_article = news article
-news_articles = news articles
-
-["page and head titles"]
+["general page and head titles"]
 app_head_title = !!AppSkeleton
 page_title_access_denied = Access denied!
+
 head_page_title_pg_index = Home
-page_title_view_news_articles = News
-page_title_view_news_article = View news article
-page_title_pg_contact_form = Contact form
 page_title_pg_static_sample_page1 = SamplePage1
 page_title_pg_static_sample_page2 = SamplePage2
 
@@ -30,12 +24,11 @@ link_delete = Delete
 link_delete_short = Del
 link_select = Select
 link_back = Back
+link_send = Send
 link_save = Save
 link_filter = Filter
-link_send = Send
 link_show = Show
 link_show_all = Show all
-link_view_all_news = View all news
 link_login = Login
 link_logout = Logout
 link_signup = Signup
@@ -44,6 +37,14 @@ link_unconfirm = Undo confirm
 link_deactivate = Deactivate
 link_activate = Activate
 link_proceed = Proceed
+link_move_up = Up
+link_move_down = Down
+link_move_left = Left
+link_move_right = Right
+link_accept = Accept
+link_reject = Reject
+
+link_view_all_news = View all news
 
 ["parts of controls"]
 any = Any
@@ -51,6 +52,7 @@ all = All
 choose_one = Choose one:
 yes = Yes
 no = No
+no = None
 other = Other
 not_specified = Not specified
 
@@ -65,22 +67,44 @@ date = Date
 title = Title
 body = Body
 text = Text
+notes = Notes
 current_image = Current image
-image = Image
+upload_new_image = Upload new image
+current_file = Current file
+upload_new_file = Upload new file
 first_name = First Name
 last_name = Last Name
+login = Login
+password = Password
+role = Role
+is_active = Active?
 company_name = Company
-position = Position
+company_type = Type
+company_position = Position
+piva = VAT No.
+codice_fiscale = Fiscal code
 email = E-mail
-zip = ZIP
-city = City
+website = Website
 country = Country
+province = Province
+city = City
 address = Address
+zip = ZIP
 phone = Phone
+phone_short = Tel.
 fax = Fax
 message_text = Message
+keywords = Keywords
+bank_name = Bank
+bank_office_name = Branch
+status = Status
 
-["status and popup messages"]
+["status/popup messages and parts of page"]
+["common"]
+pager_pages_title = Pages:
+filter_by = Filter by
+no_records_found = No records found
+
 sure_delete = Are you sure you want to delete record?
 cannot_delete_record_because_it_has_links = Cannot delete {%main_obj_name%} because it has links to {%dep_objs_data%}
 
@@ -99,11 +123,16 @@ status_message_phone_empty = Please input contact phone
 status_message_phone_bad = Bad phone number format
 status_message_message_text_empty = Input message
 
-contact_form_processed = Your contact info was processed. Thank you!
-
-["parts of page"]
-pager_pages_title = Pages:
-filter_by = Filter by
-no_records_found = No records found
 no_image = No image uploaded
+no_file = No file uploaded
 recent_news = Recent news
+
+["news_articles"]
+page_title_view_news_articles = News
+page_title_view_news_article = View news article
+news_article = news article
+news_articles = news articles
+
+["contact_form"]
+page_title_pg_contact_form = Contact form
+contact_form_processed = Your contact info was processed. Thank you!

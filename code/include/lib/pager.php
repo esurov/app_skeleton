@@ -36,6 +36,10 @@ class Pager {
         $this->offset = $offset;
     }
 
+    function get_suburl_params() {
+        return array("offset" => $this->offset);
+    }
+
     function get_limit_clause() {
         // Return LIMIT clause
         return "{$this->offset}, {$this->n_rows_per_page}";

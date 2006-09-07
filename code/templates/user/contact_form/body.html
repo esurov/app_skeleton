@@ -1,0 +1,53 @@
+<form action="?" method="post" name="form">
+<input type="hidden" name="action" value="process_contact_form">
+
+<table>
+<tr>
+    <th align="right">{%str_first_name%}: *</th>
+    <td>{%contact_info_first_name_input%}</td>
+
+    <th align="right">{%str_last_name%}: *</th>
+    <td>{%contact_info_last_name_input%}</td>
+</tr>
+
+<tr>
+    <th align="right">{%str_email%}: *</th>
+    <td>{%contact_info_email_input%}</td>
+    <th align="right">{%str_company_name%}:</th>
+    <td>{%contact_info_company_name_input%}</td>
+</tr>
+
+<tr>
+    <th align="right">{%str_city%}:</th>
+    <td>{%contact_info_city_input%}</td>
+    <th align="right">{%str_address%}:</th>
+    <td>{%contact_info_address_input%}</td>
+</tr>
+
+<tr>
+    <th align="right">{%str_phone%}:</th>
+    <td>{%contact_info_phone_input%}</td>
+
+    <th align="right">{%str_fax%}:</th>
+    <td>{%contact_info_fax_input%}</td>
+</tr>
+
+<tr>
+    <th align="right">{%str_message_text%}: *</th>
+    <td colspan="3">{%contact_info_message_text_input%}</td>
+</tr>
+
+<tr>
+    <td colspan="4" align="center">
+        <input name="submit_btn" type="submit" value="{%str_link_send%}">
+    </td>
+</tr>
+</table>
+
+</form>
+
+<script language="JavaScript" type="text/javascript">focusFormElement('form', 'contact_info_first_name');</script>
+
+{%contact_info_client_validation_js%}
+
+{{contact_form/_notice_{%lang%}.html}}

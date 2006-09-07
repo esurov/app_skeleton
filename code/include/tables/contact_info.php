@@ -1,8 +1,9 @@
 <?php
 
-class Contact extends CustomDbObject {
-    function Contact() {
-        parent::CustomDbObject("contact");
+class ContactInfo extends CustomDbObject {
+
+    function ContactInfo() {
+        parent::CustomDbObject("contact_info");
 
         $this->insert_field(array(
             "field" => "id",
@@ -100,6 +101,7 @@ class Contact extends CustomDbObject {
             ),
         );
     }
+
 }
 
 ?>

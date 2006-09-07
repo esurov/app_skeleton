@@ -7,13 +7,13 @@ class Logger {
     var $truncate_always;
     var $filename;
     var $debug_level;
-    var $max_file_size;
+    var $max_filesize;
 
     function Logger() {
         $this->set_truncate_always(false);
         $this->set_filename("log/app.log");
         $this->set_debug_level(1);
-        $this->set_max_file_size(1048576);
+        $this->set_max_filesize(1048576);
     }
 //
     function set_truncate_always($new_truncate_always) {
@@ -36,10 +36,10 @@ class Logger {
         $this->debug_level = $new_debug_level;
     }
 
-    function set_max_file_size($new_max_file_size) {
-        $max_file_size = $new_max_file_size;
-        if ($new_max_file_size > 0) {
-            $this->max_file_size = $new_max_file_size;
+    function set_max_filesize($new_max_filesize) {
+        $max_filesize = $new_max_filesize;
+        if ($new_max_filesize > 0) {
+            $this->max_filesize = $new_max_filesize;
         }
     }
 //
@@ -59,8 +59,8 @@ class Logger {
         flock($f, LOCK_EX);  // lock
 
         $file_stats = fstat($f);
-        $file_size = $file_stats["size"];
-        if ($file_size > $this->max_file_size) {
+        $filesize = $file_stats["size"];
+        if ($filesize > $this->max_filesize) {
             ftruncate($f, 0);
         }
 

@@ -78,22 +78,18 @@ class Image extends CustomDbObject {
         );
     }
 //
-    function was_uploaded($input_name = "image_file") {
-        return isset($_FILES[$input_name]) && $_FILES[$input_name]["error"] == UPLOAD_ERR_OK;
-    }
-
-    function read_uploaded_content($input_name) {
-        $uploaded_file_info = $_FILES[$input_name];
+    function read_uploaded_info($input_name) {
+        $uploaded_file_info = get_uploaded_file_info($input_name);
 
         $this->filename = $uploaded_file_info["name"];
         $this->filesize = $uploaded_file_info["size"];
         $this->type = $uploaded_file_info["type"];
 
         $filename = $uploaded_file_info["tmp_name"];
-        $image = getimagesize($filename);
+        $image_size_info = getimagesize($filename);
 
-        $this->width = $image[0];
-        $this->height = $image[1];
+        $this->width = $image_size_info[0];
+        $this->height = $image_size_info[1];
 
         $this->content = file_get_contents($filename);
     }
@@ -112,15 +108,20 @@ class Image extends CustomDbObject {
     }
 
     function create_from_image_magick($image_magick, $filename) {
-        $image = new Image();
-        $image->width = $image_magick->get_width();
-        $image->height = $image_magick->get_height();
+        $image = $this->create_db_object("image");
+
         $image->filename = $filename;
         $image->filesize = $image_magick->get_filesize();
         $image->type = $image_magick->get_mime_type();
+
+        $image->width = $image_magick->get_width();
+        $image->height = $image_magick->get_height();
+
         $image->content = $image_magick->get_content();
+        
         return $image;
     }
+
 }
 
 ?>

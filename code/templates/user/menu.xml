@@ -7,29 +7,29 @@
     item_delimiter_template="_menu_item_delimiter.html"
 >
     <menu_item name="index" url="?">
-        <actions>
-            <action name="pg_index" />
-        </actions>
+        <contexts>
+            <context name="pg_index" />
+        </contexts>
     </menu_item>
     <menu_item name="news" url="?action=pg_view_news_articles">
-        <actions>
-            <action name="pg_view_news_articles" />
-            <action name="pg_view_news_article" />
-        </actions>
+        <contexts>
+            <context name="pg_view_news_articles" />
+            <context name="pg_view_news_article" />
+        </contexts>
     </menu_item>
     <menu_item name="contact_form" url="?action=pg_contact_form">
-        <actions>
-            <action name="pg_contact_form" />
-        </actions>
+        <contexts>
+            <context name="pg_contact_form" />
+        </contexts>
     </menu_item>
     <menu_item name="static_sample_page1" url="?action=pg_static&amp;page=sample_page1">
-        <actions>
-            <action name="pg_static_sample_page1" />
-        </actions>
+        <contexts>
+            <context name="pg_static_sample_page1" />
+        </contexts>
     </menu_item>
     <menu_item name="static_sample_page2" url="?action=pg_static&amp;page=sample_page2">
-        <actions>
-            <action name="pg_static_sample_page2" />
-        </actions>
+        <contexts>
+            <context name="pg_static_sample_page2" />
+        </contexts>
     </menu_item>
 </menu>

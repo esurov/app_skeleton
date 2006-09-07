@@ -108,12 +108,13 @@ class Db {
         // Return number of rows in SelectQuery object
         $count_query = $query;
         $count_query->order_by = "";
-        if ($count_query->group_by == "") {
+        if ($query->group_by == "") {
             $count_query->select = "COUNT(*) AS n_rows";
             $res = $this->run_select_query($count_query);
             $row = $res->fetch();
             $n = (int) $row["n_rows"];
         } else {
+            $count_query->select = "NULL";
             $res = $this->run_select_query($count_query);
             $n = $res->get_num_rows();
         }

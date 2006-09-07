@@ -7,19 +7,19 @@
     item_delimiter_template="_menu_item_delimiter.html"
 >
     <menu_item name="index" url="?">
-        <actions>
-            <action name="pg_index" />
-        </actions>
+        <contexts>
+            <context name="pg_index" />
+        </contexts>
     </menu_item>
     <menu_item name="news_articles" url="?action=pg_view_news_articles">
-        <actions>
-            <action name="pg_view_news_articles" />
-            <action name="pg_edit_news_article" />
-        </actions>
+        <contexts>
+            <context name="pg_view_news_articles" />
+            <context name="pg_edit_news_article" />
+        </contexts>
     </menu_item>
     <menu_item name="app" url="./" item_template="_menu_item_app.html">
-        <actions>
-            <action name="" />
-        </actions>
+        <contexts>
+            <context name="" />
+        </contexts>
     </menu_item>
 </menu>

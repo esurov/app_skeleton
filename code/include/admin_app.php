@@ -1,6 +1,7 @@
 <?php
 
 class AdminApp extends CustomApp {
+
     function AdminApp($tables) {
         parent::CustomApp("admin", $tables);
 
@@ -11,6 +12,7 @@ class AdminApp extends CustomApp {
         $this->actions = array(
             "pg_static" => $u,
             "get_image" => $u,
+            "get_file" => $u,
 
             "pg_index" => $u,
 
@@ -36,6 +38,7 @@ class AdminApp extends CustomApp {
     function pg_view_news_articles() {
         $this->print_many_objects_list_page(array(
             "obj_name" => "news_article",
+            "templates_dir" => "news_articles",
             "default_order_by" => array("created DESC", "id DESC"),
             "show_filter_form" => true,
         ));
@@ -46,6 +49,7 @@ class AdminApp extends CustomApp {
         $this->print_object_edit_page(array(
             "obj" => $news_article,
             "obj_name" => "news_article",
+            "templates_dir" => "news_article_edit",
         ));
     }
 
@@ -60,9 +64,20 @@ class AdminApp extends CustomApp {
             $this->print_status_messages($messages);
             $this->run_action("pg_edit_news_article", array("news_article" => $news_article));
         } else {
-            if (Image::was_uploaded()) {
-                $news_article->process_image_upload_and_imagemagick_resize();
+            if (was_file_uploaded("image_file")) {
+                $news_article->process_image_upload_and_imagemagick_resize(
+                    "image_id",
+                    "image_file",
+                    array(
+                        "width" => $this->config->get_value("news_article_image_width"),
+                        "height" => $this->config->get_value("news_article_image_height"),
+                    )
+                );
             }
+            if (was_file_uploaded("file")) {
+                $news_article->process_file_upload("file_id", "file");
+            }
+
             $news_article->save();
             $this->print_status_message_object_updated($news_article_old);
             $this->create_self_redirect_response(array("action" => "pg_view_news_articles"));
@@ -76,6 +91,7 @@ class AdminApp extends CustomApp {
             "error_url_params" => array("action" => "pg_view_news_articles"),
         ));
     }
+
 }
 
 ?>

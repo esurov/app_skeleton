@@ -12,18 +12,19 @@ initial_data_inserted = Initial data have been inserted!
 admin_auth_realm = !!AppSkeleton area di amministrazione
 admin_area_head_title = !!AppSkeleton area di amministrazione
 
-page_title_pg_view_news_articles = Visualizza notizie
-page_title_pg_view_news_article = Visualizza notizia
-page_title_pg_edit_news_article_new = Aggiungi notizia
-page_title_pg_edit_news_article = Modifica notizia
-
 ["menu items"]
 admin_menu_item_index = Home
 admin_menu_item_news_articles = Notizie
 admin_menu_item_app = App
 
-["status messages (admin area)"]
+["news_articles"]
+page_title_pg_view_news_articles = Visualizza notizie
+page_title_pg_view_news_article = Visualizza notizia
+page_title_pg_edit_news_article_new = Aggiungi notizia
+page_title_pg_edit_news_article = Modifica notizia
 news_article_added = Aggiunta nuova notizia
 news_article_updated = Notizia è stata modificata
 news_article_deleted = Notizia è stata eliminata
 news_article_title_empty = Titolo assente
+news_article_file_bad = Prego caricare file valido
+news_article_file_size_limit_reached = La dimensione del file caricato supera i 2 Mb

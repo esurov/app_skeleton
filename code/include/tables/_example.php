@@ -16,7 +16,6 @@
 // "read" - field should be read from cgi by read()
 // "store" - field should be stored to DB by store()
 // "update" - field should be updated to DB by update()
-// "print" - field should be updated to DB by update()
 
 // "value" - initial value of the field when db_object created
 // "multilingual" - is field multilingual (has additional fields for all languages)
@@ -28,11 +27,11 @@
 // "read" - default is true for current table fields and false for another
 // "store" - field should be stored to DB by store()
 // "update" - field should be updated to DB by update()
-// "print" - field should be updated to DB by update()
 // "value" - default one will be used, its value depends on field type
 // "input" - default one will be used
 
 class Example extends CustomDbObject {
+
     function Example() {
         parent::CustomDbObject("_example");
 
@@ -359,13 +358,13 @@ class Example extends CustomDbObject {
             // May be used to access expanded query special or calculated fields
             // which have no physical equivalents in DB
             $row = $this->print_params["row"];
-            $row_number = $this->print_params["row_number"];
-            $row_parity = $this->print_params["row_parity"];
+            $list_item_number = $this->print_params["list_item_number"];
+            $list_item_parity = $this->print_params["list_item_parity"];
 
             // Add context-specific template variable
             $this->app->print_varchar_value(
                 "_example_context1_specific_value",
-                "str1&{$row_number}<>{$row_parity}"
+                "str1&{$list_item_number}<>{$list_item_parity}"
             );
             break;
 
@@ -378,6 +377,7 @@ class Example extends CustomDbObject {
             break;
         }
     }
+
 }
 
 ?>

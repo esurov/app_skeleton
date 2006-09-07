@@ -96,6 +96,6 @@ class Config {
         fclose($f);
     }
 
-}  // class Config
+}
 
 ?>

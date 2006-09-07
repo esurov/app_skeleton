@@ -2,11 +2,10 @@
 
 class Session {
     function &get_param($name) {
-        if (Session::has_param($name)) {
-            return $_SESSION[$name];
-        } else {
-            return "";
+        if (!Session::has_param($name)) {
+            Session::set_param($name, "");
         }
+        return $_SESSION[$name];
     }
 
     function set_param($name, $value) {
@@ -86,10 +85,12 @@ class SessionLoginState {
         $idle_time_elapsed = time() - $this->state_params["time_updated"];
         $total_time_elapsed = time() - $this->state_params["time_created"];
 
-        $is_expired_by_idle_timeout =
-            $idle_time_elapsed > $this->state_params["idle_timeout"];
-        $is_expired_by_max_timeout =
-            $total_time_elapsed > $this->state_params["max_timeout"];
+        $idle_timeout = $this->state_params["idle_timeout"];
+        $max_timeout = $this->state_params["max_timeout"];
+
+        $is_expired_by_idle_timeout = ($idle_timeout != 0 && $idle_time_elapsed > $idle_timeout);
+        $is_expired_by_max_timeout = ($max_timeout != 0 && $total_time_elapsed > $max_timeout);
+                
         $is_expired = ($is_expired_by_idle_timeout || $is_expired_by_max_timeout);
 
         if (!$is_expired) {

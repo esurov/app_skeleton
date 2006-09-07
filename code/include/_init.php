@@ -7,6 +7,8 @@ $__tmp_saved_app_dir = getcwd();
 
 chdir(dirname(__FILE__));
 
+define("TABLES_DIR", getcwd() . "/tables");
+
 require_once("lib/_init.php");
 
 require_once("global.php");
@@ -16,13 +18,10 @@ require_once("custom_app.php");
 $tables = array(
     "_example" => "Example",
     "image" => "Image",
+    "file" => "File",
     "news_article" => "NewsArticle",
-    "contact" => "Contact",
+    "contact_info" => "ContactInfo",
 );
-
-foreach (array_keys($tables) as $table_name) {
-    require_once("tables/{$table_name}.php");
-}
 
 chdir($__tmp_saved_app_dir);
 

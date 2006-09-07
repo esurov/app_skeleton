@@ -21,17 +21,20 @@ class DbResult {
             mysql_fetch_row($this->resource) :
             mysql_fetch_assoc($this->resource);
 
-        if (is_array($row)) {
-            $field_value_pairs = array();
-            foreach ($row as $field => $value) {
-                $value = get_shortened_string($value, 300);
-                $field_value_pairs[] = "{$field}='{$value}'";
+        // Logger optimization
+        if ($this->log->debug_level == 8) {
+            if (is_array($row)) {
+                $field_value_pairs = array();
+                foreach ($row as $field => $value) {
+                    $value = get_shortened_string($value, 300);
+                    $field_value_pairs[] = "{$field}='{$value}'";
+                }
+                $log_str = join(", ", $field_value_pairs);
+            } else {
+                $log_str = "no rows left";
             }
-            $log_str = join(", ", $field_value_pairs);
-        } else {
-            $log_str = "no rows left";
+            $this->log->write("DbResult", "fetch(): {$log_str}", 8);
         }
-        $this->log->write("DbResult", "fetch(): {$log_str}", 8);
         return $row;
     }
 }

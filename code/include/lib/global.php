@@ -119,7 +119,7 @@ function params() {
     return array_merge($_POST, $_GET);
 }
 
-function create_suburl($params, $params_delimiter = "&") {
+function create_suburl($params = array(), $params_delimiter = "&") {
     $pairs = array();
     foreach ($params as $name => $value) {
         if (is_array($value)) {
@@ -133,13 +133,17 @@ function create_suburl($params, $params_delimiter = "&") {
     return join($params_delimiter, $pairs);
 }
 
-function create_self_url($params) {
+function create_self_url($params = array()) {
     $params_suburl = create_suburl($params);
     $self_suburl = $_SERVER["SCRIPT_NAME"];
-    return "{$self_suburl}?{$params_suburl}";
+    if (count($params) == 0) {
+        return $self_suburl;            
+    } else {
+        return "{$self_suburl}?{$params_suburl}";
+    }
 }
 
-function create_self_full_url($params, $protocol = "http") {
+function create_self_full_url($params = array(), $protocol = "http") {
     $host = $_SERVER["HTTP_HOST"];
     $self_url = create_self_url($params);
     return "{$protocol}://{$host}{$self_url}";
@@ -201,6 +205,24 @@ function convert_crlf2lf($str) {
     return preg_replace('/(\r\n)|\r|\n/m', "\n", $str);
 }
 
+function transliterate_western_europian_to_ascii($str) {
+    $western_europian = array();
+    for ($i = 128; $i <= 255; $i++) {
+        $western_europian[] = chr($i);
+    }
+    $transliteration = array(
+        "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?",
+        "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?",
+        "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?",
+        "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?", "?",
+        "A`", "A'", "?", "?", "?", "?", "?", "C", "E`", "E'", "?", "?", "I`", "I'", "?", "?",
+        "?", "?", "O`", "O'", "?", "?", "?", "?", "?", "U`", "U'", "?", "?", "?", "?", "SS",
+        "a`", "a'", "?", "?", "?", "?", "?", "c", "e`", "e'", "?", "?", "i`", "i'", "?", "?",
+        "?", "?", "o`", "o'", "?", "?", "?", "?", "?", "u`", "u'", "?", "?", "?", "?", "?",
+    );
+    return str_replace($western_europian, $transliteration, $str);
+}
+
 function get_html_safe_string($unsafe_str) {
     return htmlspecialchars($unsafe_str);
 }
@@ -238,7 +260,7 @@ function lqw($str, $prefix_str = "", $suffix_str = "") {
     return quote_string("{$prefix_str}{$str}{$suffix_str}");
 }
 
-function get_shortened_string($str, $max_length, $end_str = "...") {
+function get_shortened_string($str, $max_length, $end_str = "") {
     if (strlen($str) > $max_length) {
         $str = substr($str, 0, $max_length);
         return "{$str}{$end_str}";
@@ -247,7 +269,7 @@ function get_shortened_string($str, $max_length, $end_str = "...") {
     }
 }
 
-function get_word_shortened_string($str, $max_length, $end_str = "...") {
+function get_word_shortened_string($str, $max_length, $end_str = "") {
     if (strlen($str) > $max_length) {
         $str = substr($str, 0, $max_length);
         $n = strrpos($str, " ");
@@ -538,7 +560,6 @@ JS;
 //
 function parse_date_by_format($format, $value) {
     $regexp = create_date_regexp_by_format($format);
-    $date_parts_unordered = array();
 
     $date_parts = array(
         "year" => 0,
@@ -555,22 +576,38 @@ function parse_date_by_format($format, $value) {
             $format_char = $format{$i};
             switch ($format_char) {
             case "y":
-                $date_parts["year"] = $date_parts_unordered[$p++];
+                $date_parts["year"] = (int) $date_parts_unordered[$p++];
                 break;
             case "m":
-                $date_parts["month"] = $date_parts_unordered[$p++];
+                $date_parts["month"] = (int) $date_parts_unordered[$p++];
                 break;
             case "d":
-                $date_parts["day"] = $date_parts_unordered[$p++];
+                $date_parts["day"] = (int) $date_parts_unordered[$p++];
                 break;
             case "h":
-                $date_parts["hour"] = $date_parts_unordered[$p++];
+                $date_parts["hour"] = (int) $date_parts_unordered[$p++];
+                break;
+            case "H":
+                $date_parts["hour"] = (int) $date_parts_unordered[$p++];
                 break;
             case "i":
-                $date_parts["minute"] = $date_parts_unordered[$p++];
+                $date_parts["minute"] = (int) $date_parts_unordered[$p++];
                 break;
             case "s":
-                $date_parts["second"] = $date_parts_unordered[$p++];
+                $date_parts["second"] = (int) $date_parts_unordered[$p++];
+                break;
+            case "t":
+                $hour = $date_parts["hour"];
+                $am_pm_str = strtoupper($date_parts_unordered[$p++]);
+                if ($am_pm_str == "PM") {
+                    if ($hour != 12) {
+                        $hour += 12;
+                    }    
+                } else {
+                    if ($hour == 12) {
+                        $hour = 0;
+                    }    
+                }
                 break;
             }
         }
@@ -613,11 +650,17 @@ function create_date_regexp_by_format($format) {
         case "h":
             $res .= '(\d{1,2})';
             break;
+        case "H":
+            $res .= '(\d{1,2})';
+            break;
         case "i":
             $res .= '(\d{1,2})';
             break;
         case "s":
             $res .= '(\d{1,2})';
+            break;
+        case "t":
+            $res .= '(AM|PM)?';
             break;
         case ".":
             $res .= '\.';
@@ -632,11 +675,12 @@ function create_date_regexp_by_format($format) {
             $res .= $format_char;
         }
     }
-    $res .= "/";
+    $res .= "/i";
     return $res;
 }
 
 function create_date_by_format($format, $date_parts, $date_if_unknown) {
+    $am_pm_str = "";
     $res = "";
     $format_len = strlen($format);
     for ($i = 0; $i < $format_len; $i++) {
@@ -654,11 +698,27 @@ function create_date_by_format($format, $date_parts, $date_if_unknown) {
         case "h":
             $res .= sprintf("%02d", $date_parts["hour"]);
             break;
+        case "H":
+            $hour = $date_parts["hour"];
+            if ($hour <= 12) {
+                $am_pm_str = "AM";
+            } else {
+                $hour -= 12;
+                $am_pm_str = "PM";
+            }
+            if ($hour == 0) {
+                $hour = 12;
+            }
+            $res .= sprintf("%02d", $hour);
+            break;
         case "i":
             $res .= sprintf("%02d", $date_parts["minute"]);
             break;
         case "s":
             $res .= sprintf("%02d", $date_parts["second"]);
+            break;
+        case "t":
+            $res .= sprintf("%s", $am_pm_str);
             break;
         default:
             $res .= $format_char;
@@ -668,9 +728,9 @@ function create_date_by_format($format, $date_parts, $date_if_unknown) {
         $date_parts["year"] == 0 &&
         $date_parts["month"] == 0 &&
         $date_parts["day"] == 0 &&
-        $date_parts["hour"] == 0 &&
-        $date_parts["minute"] == 0 &&
-        $date_parts["second"] == 0
+        (isset($date_parts["hour"]) && $date_parts["hour"] == 0) &&
+        (isset($date_parts["minute"]) && $date_parts["minute"] == 0) &&
+        (isset($date_parts["second"]) && $date_parts["second"] == 0)
     ) {
         return $date_if_unknown;
     } else {
@@ -725,6 +785,36 @@ function file_put_contents($filename, $content, $should_append = false) {
     return ($result !== false);
 }
 
+}
+
+function get_uploaded_file_info($input_name) {
+    return $_FILES[$input_name];
+}
+
+function was_file_uploaded($input_name) {
+    return isset($_FILES[$input_name]) && ($_FILES[$input_name]["error"] == UPLOAD_ERR_OK);
+}
+
+function get_file_extension($filename) {
+    $pos = strrpos($filename, ".");
+    return ($pos === false) ? "" : (string) substr($filename, $pos + 1);
+}
+
+function get_formatted_filesize_str($filesize) {
+    $kb = 1024;
+    $mb = 1024 * $kb;
+    $gb = 1024 * $mb;
+
+    if ($filesize < $kb) {
+        $str = "{$filesize} " . ($filesize == 1 ? "byte" : "bytes");
+    } else if ($filesize < $mb) {
+        $str = number_format($filesize / $kb, 2) . " Kb";
+    } else if ($filesize < $gb) {
+        $str = number_format($filesize / $mb, 2) . " Mb";
+    } else {
+        $str = number_format($filesize / $gb, 2) . " Gb";
+    }
+    return $str;
 }
 
 ?>

@@ -109,8 +109,9 @@ class HttpResponse {
     }
 
     function add_content_disposition_header($filename, $disposition_type = "attachment") {
+        $filename_safe = rawurlencode($filename);
         $this->add_header(new HttpHeader(
-            "Content-Disposition", "{$disposition_type}; filename=\"{$filename}\""
+            "Content-Disposition", "{$disposition_type}; filename=\"{$filename_safe}\""
         ));
     }
 
@@ -268,6 +269,20 @@ class ImageResponse extends BinaryContentResponse {
             ));
             $this->add_last_modified_header($updated_gmt_str);
         }
+    }
+}
+
+class FileResponse extends BinaryContentResponse {
+    
+    function FileResponse($file, $open_inline) {
+        parent::BinaryContentResponse($file->content, $file->type, $file->filesize, false);
+
+        $this->add_content_disposition_header(
+            $file->filename,
+            $open_inline ? "inline" : "attachment"
+        );
+        $updated_gmt_str = $file->get_updated_as_gmt_str();
+        $this->add_last_modified_header($updated_gmt_str);
     }
 }
 

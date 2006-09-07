@@ -1,15 +1,8 @@
-["db object names"]
-news_article = notizia
-news_articles = notizie
-
-["page and head titles"]
+["general page and head titles"]
 app_head_title = !!AppSkeleton
 page_title_access_denied = Accesso non autorizzato!
-page_title_pg_index =
+
 head_page_title_pg_index = Home
-page_title_view_news_articles = News
-page_title_view_news_article = Visualizza notizia
-page_title_pg_contact_form = Contatti
 page_title_pg_static_sample_page1 = SamplePage1
 page_title_pg_static_sample_page2 = SamplePage2
 
@@ -20,7 +13,7 @@ user_menu_item_contact_form = Contatti
 user_menu_item_static_sample_page1 = SamplePage1
 user_menu_item_static_sample_page2 = SamplePage2
 
-["operation names"]
+["link captions"]
 link_view = Visualizza
 link_view_short = Vis
 link_edit = Modifica
@@ -32,11 +25,10 @@ link_delete_short = Canc
 link_select = Seleziona
 link_back = Indietro
 link_send = Invia
-link_filter = Filtra
 link_save = Salva
+link_filter = Filtra
 link_show = Invio
 link_show_all = Mostra Tutto
-link_view_all_news = Tutte le News
 link_login = Login
 link_logout = Logout
 link_signup = Iscriviti
@@ -45,12 +37,22 @@ link_unconfirm = Rimuovi conferma
 link_deactivate = Disattiva
 link_activate = Activate
 link_proceed = Procedi
+link_move_up = Su
+link_move_down = Giù
+link_move_left = Sinistro
+link_move_right = Destro
+link_accept = Accetta
+link_reject = Rifiuta
+
+link_view_all_news = Tutte le News
 
 ["parts of controls"]
 any = Qualsiasi
+all = Tutti
 choose_one = Selezionare:
 yes = Sì
 no = No
+no = None
 other = Altro
 not_specified = Non specificato
 
@@ -65,22 +67,44 @@ date = Data
 title = Titolo
 body = Corpo
 text = Testo
-current_image = Immagine attuale
-image = Immagine
+notes = Note
+current_image = Immagine corrente
+upload_new_image = Carica nuova immagine
+current_file = File corrente
+upload_new_file = Carica nuovo file
 first_name = Nome
 last_name = Cognome
-company_name = Azienda
-position = Ruolo aziendale
+login = Login
+password = Password
+role = Ruolo
+is_active = Attivo?
+company_name = Ragione Sociale
+company_type = Forma Societaria
+company_position = Ruolo aziendale
+piva = Partità IVA
+codice_fiscale = Codice Fiscale
 email = E-mail
-zip = CAP
-city = Città
+website = Sito Web
 country = Nazione
+province = Provincia
+city = Città
 address = Indirizzo
+zip = CAP
 phone = Telefono
+phone_short = Tel.
 fax = Fax
 message_text = Messaggio
+keywords = Parole Chiavi
+bank_name = Banca
+bank_office_name = Filiale
+status = Stato
 
-["status and popup messages"]
+["status/popup messages and parts of page"]
+["common"]
+pager_pages_title = Pagine:
+filter_by = Filtra per
+no_records_found = Non sono stati trovati dati
+
 sure_delete = Sei sicuro di voler cancellare l\'informazione?
 cannot_delete_record_because_it_has_links = Impossibile eliminare {%main_obj_name%} perché in relazione con {%dep_objs_data%}
 
@@ -99,11 +123,16 @@ status_message_phone_empty = Inserire il nr. di telefono
 status_message_phone_bad = Nr. di telefono non valido
 status_message_message_text_empty = Inserire il messaggio
 
-contact_form_processed = I suoi dati sono stati registrati. Grazie!
-
-["parts of page"]
-pager_pages_title = Pagine:
-filter_by = Filtra per
-no_records_found = Non sono stati trovati dati
 no_image = No immagine
+no_file = No file
 recent_news = Ultime novità
+
+["news_articles"]
+page_title_view_news_articles = News
+page_title_view_news_article = Visualizza notizia
+news_article = notizia
+news_articles = notizie
+
+["contact_form"]
+page_title_pg_contact_form = Contatti
+contact_form_processed = I suoi dati sono stati registrati. Grazie!

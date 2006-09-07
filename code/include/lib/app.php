@@ -25,9 +25,9 @@ class App {
     var $db;
     var $tables;
 
-    var $popup = false;
-    var $report = false;
-    var $printable = false;
+    var $popup = 0;
+    var $report = 0;
+    var $printable = 0;
 
     var $lang;
     var $dlang;
@@ -75,7 +75,7 @@ class App {
     function create_logger() {
         $this->log = new Logger();
         $this->log->set_debug_level($this->config->get_value("log_debug_level", 1));
-        $this->log->set_max_file_size($this->config->get_value("log_max_file_size"));
+        $this->log->set_max_filesize($this->config->get_value("log_max_filesize"));
         $this->log->set_truncate_always($this->config->get_value("log_truncate_always", 0));
     }
 
@@ -186,7 +186,7 @@ class App {
     function get_user_access_level($user = null) {
         // Return user access level (string) for selecting allowed actions
         // for previously created user by function create_current_user()
-        return "everyone";
+        return "guest";
     }
 //
     function run_action($action_name = null, $action_params = array()) {
@@ -246,7 +246,7 @@ class App {
     function get_http_auth_user_access_level() {
         $login = $this->config->get_value("admin_login");
         $password = $this->config->get_value("admin_password");
-        return ($this->is_valid_http_auth_user($login, $password)) ? "user" : "everyone";
+        return ($this->is_valid_http_auth_user($login, $password)) ? "user" : "guest";
     }
 
     function is_valid_http_auth_user($login, $password) {
@@ -296,14 +296,26 @@ class App {
     }
 
     function create_html_page_template_name() {
-        if ($this->popup && $this->is_file_exist("page_popup.html")) {
-            $this->page_template_name = "page_popup.html";
-        } else if ($this->report && $this->is_file_exist("page_report.html")) {
-            $this->page_template_name = "page_report.html";
-        } else if ($this->printable && $this->is_file_exist("page_printable.html")) {
-            $this->page_template_name = "page_printable.html";
-        } else if ($this->page_template_name == "") {
-            $this->page_template_name = "page.html";
+        if ($this->page_template_name == "") {
+            if ($this->popup != 0) {
+                $popup_page_template_name = "page_popup.html";
+                if ($this->is_file_exist($popup_page_template_name)) {
+                    $this->page_template_name = $popup_page_template_name;
+                }
+            } else if ($this->report != 0) {
+                $report_page_template_name = "page_report.html";
+                if ($this->is_file_exist($report_page_template_name)) {
+                    $this->page_template_name = $report_page_template_name;
+                }
+            } else if ($this->printable != 0) {
+                $printable_page_template_name = "page_printable.html";
+                if ($this->is_file_exist($printable_page_template_name)) {
+                    $this->page_template_name = $printable_page_template_name;
+                }
+            }
+            if ($this->page_template_name == "") {
+                $this->page_template_name = "page.html";
+            }
         }
     }
 
@@ -345,9 +357,12 @@ class App {
             return null;
         }
         $obj_class_name = $this->tables[$obj_name];
+        if (!class_exists($obj_class_name)) {
+            require_once(TABLES_DIR . "/{$obj_name}.php");
+        }
         return new $obj_class_name();
     }
-
+//
     function fetch_db_object(
         $obj_name,
         $id,
@@ -382,6 +397,15 @@ class App {
             $objects[] = $obj;
         }
         return $objects;
+    }
+
+    function fetch_rows_list($query) {
+        $res = $this->db->run_select_query($query);
+        $rows = array();
+        while ($row = $res->fetch()) {
+            $rows[] = $row;
+        }
+        return $rows;
     }
 
     function read_id_fetch_db_object(
@@ -477,18 +501,30 @@ class App {
         );
     }
 //    
-    function get_db_now_datetime() {
-        $date_parts = get_date_parts_from_timestamp(time());
+    function get_db_datetime_from_timestamp($ts) {
+        $date_parts = get_date_parts_from_timestamp($ts);
         return create_date_by_format(
-            $this->get_db_datetime_format(), $date_parts, ""
+            $this->get_db_datetime_format(),
+            $date_parts,
+            ""
         );
     }
 
-    function get_db_now_date() {
-        $date_parts = get_date_parts_from_timestamp(time());
+    function get_db_date_from_timestamp($ts) {
+        $date_parts = get_date_parts_from_timestamp($ts);
         return create_date_by_format(
-            $this->get_db_date_format(), $date_parts, ""
+            $this->get_db_date_format(),
+            $date_parts,
+            ""
         );
+    }
+
+    function get_db_now_datetime() {
+        return $this->get_db_datetime_from_timestamp(time());
+    }
+
+    function get_db_now_date() {
+        return $this->get_db_date_from_timestamp(time());
     }
 //
     function get_timestamp_from_db_datetime($db_datetime) {
@@ -549,9 +585,8 @@ class App {
 
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
-            $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
             if ((double) $php_double_value == (double) $nonset_value) {
-                return $nonset_caption;
+                return get_caption_from_value_caption_pair($nonset_value_caption_pair);
             }
         }
         return $this->append_currency_sign(
@@ -636,19 +671,58 @@ class App {
         $this->print_raw_value("{$template_var}", $value);
     }
 
-    function print_integer_value($template_var, $value) {
+    function print_integer_value(
+        $template_var,
+        $value,
+        $nonset_value_caption_pair = null
+    ) {
+        $value_with_nonset = $value;
+        $value_formatted = $this->get_app_integer_value($value);
+        if (!is_null($nonset_value_caption_pair)) {
+            $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
+            if ((int) $value == (int) $nonset_value) {
+                $nonset_caption = get_html_safe_string(
+                    get_caption_from_value_caption_pair($nonset_value_caption_pair)
+                );
+                $value_with_nonset = $nonset_caption;
+                $value_formatted = $nonset_caption;
+            }
+        }
         $this->print_raw_values(array(
-            "{$template_var}" => $this->get_app_integer_value($value),
+            "{$template_var}" => $value_formatted,
             "{$template_var}_orig" => $value,
+            "{$template_var}_orig_with_nonset" => $value_with_nonset,
         ));
     }
 
-    function print_double_value($template_var, $value, $decimals) {
+    function print_double_value(
+        $template_var,
+        $value,
+        $decimals,
+        $nonset_value_caption_pair = null
+    ) {
+        $value_with_nonset = $value;
+        $value_formatted = $this->get_app_double_value($value, $decimals);
+        $value_formatted_2 = $this->get_app_double_value($value, 2);
+        $value_formatted_5 = $this->get_app_double_value($value, 5);
+        if (!is_null($nonset_value_caption_pair)) {
+            $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
+            if ((double) $value == (double) $nonset_value) {
+                $nonset_caption = get_html_safe_string(
+                    get_caption_from_value_caption_pair($nonset_value_caption_pair)
+                );
+                $value_with_nonset = $nonset_caption;
+                $value_formatted = $nonset_caption;
+                $value_formatted_2 = $nonset_caption;
+                $value_formatted_5 = $nonset_caption;
+            }
+        }
         $this->print_raw_values(array(
-            "{$template_var}" => $this->get_app_double_value($value, $decimals),
-            "{$template_var}_2" => $this->get_app_double_value($value, 2),
-            "{$template_var}_5" => $this->get_app_double_value($value, 5),
+            "{$template_var}" => $value_formatted,
+            "{$template_var}_2" => $value_formatted_2,
+            "{$template_var}_5" => $value_formatted_5,
             "{$template_var}_orig" => $value,
+            "{$template_var}_orig_with_nonset" => $value_with_nonset,
         ));
     }
 
@@ -660,14 +734,30 @@ class App {
         $sign_at_start = null,
         $nonset_value_caption_pair = null
     ) {
+        $value_with_nonset = $value;
+        $value_formatted = $this->get_app_currency_with_sign_value(
+            $value,
+            $decimals,
+            $sign,
+            $sign_at_start,
+            $nonset_value_caption_pair
+        );
+        $value_formatted_without_sign = $this->get_app_currency_value($value, $decimals);
+        if (!is_null($nonset_value_caption_pair)) {
+            $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
+            if ((double) $value == (double) $nonset_value) {
+                $nonset_caption = get_html_safe_string(
+                    get_caption_from_value_caption_pair($nonset_value_caption_pair)
+                );
+                $value_with_nonset = $nonset_caption;
+                $value_formatted_without_sign = $nonset_caption;
+            }
+        }
         $this->print_raw_values(array(
-            "{$template_var}" =>
-                $this->get_app_currency_with_sign_value(
-                    $value, $decimals, $sign, $sign_at_start, $nonset_value_caption_pair
-                ),
-            "{$template_var}_without_sign" =>
-                 $this->get_app_currency_value($value, $decimals),
+            "{$template_var}" => $value_formatted,
+            "{$template_var}_without_sign" => $value_formatted_without_sign,
             "{$template_var}_orig" => $value,
+            "{$template_var}_orig_with_nonset" => $value_with_nonset,
         ));
     }
 
@@ -690,14 +780,15 @@ class App {
         $enum_caption = get_caption_by_value_from_value_caption_pairs(
             $value_caption_pairs, $enum_value
         );
-        $this->print_value("{$template_var}", is_null($enum_caption) ? "" : $enum_caption);
+        $enum_caption = is_null($enum_caption) ? "" : $enum_caption;
+        $this->print_value("{$template_var}", $enum_caption);
+        $this->print_raw_value("{$template_var}_caption_orig", $enum_caption);
         $this->print_raw_value("{$template_var}_orig", $enum_value);
     }
 
     function print_varchar_value($template_var, $value) {
         $this->print_value("{$template_var}", $value);
         $safe_value = get_html_safe_string($value);
-        $this->print_raw_value("{$template_var}_nobr", str_replace(" ", "&nbsp;", $safe_value));
         $this->print_raw_value("{$template_var}_orig", $value);
     }
 
@@ -782,26 +873,54 @@ class App {
         return $printed_value;
     }
 
-    function print_integer_form_value($template_var, $value, $input_attrs) {
-        $app_integer_value = $this->get_app_integer_value($value);
-        $this->print_hidden_input_form_value($template_var, $app_integer_value);
-        $printed_value = $this->print_text_input_form_value(
+    function print_integer_form_value(
+        $template_var,
+        $value,
+        $input_attrs,
+        $nonset_value_caption_pair = null
+    ) {
+        $value_formatted = $this->get_app_integer_value($value);
+        $this->print_hidden_input_form_value($template_var, $value_formatted);
+
+        if (!is_null($nonset_value_caption_pair)) {
+            $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
+            if ((int) $value == (int) $nonset_value) {
+                $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
+                $value_formatted = $nonset_caption;
+            }
+        }
+        
+        return $this->print_text_input_form_value(
             $template_var,
-            $app_integer_value,
+            $value_formatted,
             array_merge(
                 array("class" => "integer"),
                 $input_attrs
             )
         );
-        return $printed_value;
     }
     
-    function print_double_form_value($template_var, $value, $decimals, $input_attrs) {
-        $app_double_value = $this->get_app_double_value($value, $decimals);
-        $this->print_hidden_input_form_value($template_var, $app_double_value);
+    function print_double_form_value(
+        $template_var,
+        $value,
+        $decimals,
+        $input_attrs,
+        $nonset_value_caption_pair = null
+    ) {
+        $value_formatted = $this->get_app_double_value($value, $decimals);
+        $this->print_hidden_input_form_value($template_var, $value_formatted);
+        
+        if (!is_null($nonset_value_caption_pair)) {
+            $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
+            if ((double) $value == (double) $nonset_value) {
+                $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
+                $value_formatted = $nonset_caption;
+            }
+        }
+
         return $this->print_text_input_form_value(
             $template_var,
-            $app_double_value,
+            $value_formatted,
             array_merge(
                 array("class" => "double"),
                 $input_attrs
@@ -810,18 +929,26 @@ class App {
     }
 
     function print_currency_form_value(
-        $template_var, $value, $decimals, $input_attrs, $values_info
+        $template_var,
+        $value,
+        $decimals,
+        $input_attrs,
+        $values_info
     ) {
         $values_data_info = get_param_value($values_info, "data", array());
         $sign = get_param_value($values_data_info, "sign", $this->get_currency_sign());
-        $sign_at_start =
-            get_param_value($values_data_info, "sign_at_start", $this->is_currency_sign_at_start());
-        $app_currency_value = $this->get_app_currency_value($value, $decimals);
-        $this->print_hidden_input_form_value($template_var, $app_currency_value);
+        $sign_at_start = get_param_value(
+            $values_data_info,
+            "sign_at_start",
+            $this->is_currency_sign_at_start()
+        );
 
+        $value_formatted_without_sign = $this->get_app_currency_value($value, $decimals);
+        $this->print_hidden_input_form_value($template_var, $value_formatted_without_sign);
+        
         $printed_value = $this->print_text_input_form_value(
             $template_var,
-            $app_currency_value,
+            $value_formatted_without_sign,
             array_merge(
                 array("class" => "currency"),
                 $input_attrs
@@ -832,18 +959,31 @@ class App {
             $this->append_currency_sign($printed_value, $sign, $sign_at_start)
         );
         $this->print_text_input_form_value(
-            "{$template_var}_without_sign", $app_currency_value, array("class" => "currency")
+            "{$template_var}_without_sign",
+            $value_formatted_without_sign,
+            array_merge(
+                array("class" => "currency"),
+                $input_attrs
+            )
         );
         return $printed_value;
     }
 
-    function print_boolean_form_value($template_var, $value, $input_attrs) {
+    function print_boolean_form_value(
+        $template_var,
+        $value,
+        $input_attrs
+    ) {
         $this->print_hidden_input_form_value($template_var, $value);
         return $this->print_checkbox_input_form_value($template_var, $value, $input_attrs);
     }
 
     function print_enum_form_value(
-        $template_var, $enum_value, $input_type, $input_attrs, $values_info
+        $template_var,
+        $enum_value,
+        $input_type,
+        $input_attrs,
+        $values_info
     ) {
         $this->print_hidden_input_form_value($template_var, $enum_value);
 
@@ -866,7 +1006,10 @@ class App {
     }
 
     function print_varchar_form_value(
-        $template_var, $value, $input_type, $input_attrs
+        $template_var,
+        $value,
+        $input_type,
+        $input_attrs
     ) {
         $this->print_hidden_input_form_value($template_var, $value);
         
@@ -884,7 +1027,10 @@ class App {
     }
 
     function print_text_form_value(
-        $template_var, $value, $input_type, $input_attrs
+        $template_var,
+        $value,
+        $input_type,
+        $input_attrs
     ) {
         $this->print_hidden_input_form_value($template_var, $value);
         
@@ -963,7 +1109,10 @@ class App {
     }
 //
     function print_raw_input_form_value(
-        $input_type, $template_var, $value, $input_attrs = array()
+        $input_type,
+        $template_var,
+        $value,
+        $input_attrs = array()
     ) {
         $printed_value = print_raw_html_input($input_type, $template_var, $value, $input_attrs);
         $this->print_raw_value("{$template_var}_input", $printed_value);
@@ -975,7 +1124,10 @@ class App {
     }
 
     function print_input_form_value(
-        $input_type, $template_var, $value, $input_attrs = array()
+        $input_type,
+        $template_var,
+        $value,
+        $input_attrs = array()
     ) {
         $printed_value = print_html_input($input_type, $template_var, $value, $input_attrs);
         $this->print_raw_value("{$template_var}_input", $printed_value);
@@ -1109,7 +1261,23 @@ class App {
             $query_ex = get_param_value($data_info, "query_ex", array());
 
             $value_caption_pairs = $this->get_value_caption_pairs_from_db_object(
-                $obj_name, $values_field_name, $captions_field_name, $query_ex
+                $obj_name,
+                $values_field_name,
+                $captions_field_name,
+                $query_ex
+            );
+            break;
+        case "query":
+            $data_info = $values_info["data"];
+            
+            $query = $data_info["query"];
+            $values_field_name = get_param_value($data_info, "values_field_name", "id");
+            $captions_field_name = get_param_value($data_info, "captions_field_name", "name");
+
+            $value_caption_pairs = $this->get_value_caption_pairs_from_query(
+                $query,
+                $values_field_name,
+                $captions_field_name
             );
             break;
         }
@@ -1117,7 +1285,10 @@ class App {
     }
 
     function get_value_caption_pairs_from_db_object(
-        $obj_name, $values_field_name, $captions_field_name, $query_ex
+        $obj_name,
+        $values_field_name,
+        $captions_field_name,
+        $query_ex
     ) {
         $objects = $this->fetch_db_objects_list($obj_name, $query_ex);
         $value_caption_pairs = array();
@@ -1128,8 +1299,23 @@ class App {
         return $value_caption_pairs;
     }
 
+    function get_value_caption_pairs_from_query(
+        $query,
+        $values_field_name,
+        $captions_field_name
+    ) {
+        $rows = $this->fetch_rows_list($query);
+        $value_caption_pairs = array();
+        foreach ($rows as $row) {
+            $value_caption_pairs[] =
+                array($row[$values_field_name], $row[$captions_field_name]);
+        }
+        return $value_caption_pairs;
+    }
+
     function expand_value_caption_pairs_with_begin_end(
-        $value_caption_pairs, $begin_end_values_info
+        $value_caption_pairs,
+        $begin_end_values_info
     ) {
         if (isset($begin_end_values_info["begin_value_caption_pairs"])) {
             $value_caption_pairs = array_merge(
@@ -1147,7 +1333,8 @@ class App {
     }
 
     function expand_value_caption_pairs_with_nonset(
-        $value_caption_pairs, $nonset_values_info
+        $value_caption_pairs,
+        $nonset_values_info
     ) {
         if (isset($nonset_values_info["nonset_value_caption_pair"])) {
             $value_caption_pairs = array_merge(
@@ -1278,28 +1465,33 @@ class App {
         $this->print_static_file($page_name, "body");
     }
 
-    function print_static_file($file_name, $template_var = null) {
-        $file_path = "static/{$file_name}_{$this->lang}.html";
+    function print_static_file($filename, $template_var) {
+        $file_path = "static/{$filename}_{$this->lang}.html";
         if (!$this->is_file_exist($file_path)) {
-            $file_path = "static/{$file_name}.html";
+            $file_path = "static/{$filename}.html";
         }
         return $this->print_file_if_exists($file_path, $template_var);
     }
 //
-    function print_menu($templates_dir = null, $template_var = "menu", $current_action = null) {
+    function print_menu($params = array()) {
+        $templates_dir = get_param_value($params, "templates_dir", null);
         if (is_null($templates_dir)) {
-            $templates_dir = ".";
+            $params["templates_dir"] = ".";
         }
-        if (is_null($current_action)) {
-            $current_action = $this->action;
+        $template_var = get_param_value($params, "template_var", null);
+        if (is_null($template_var)) {
+            $params["template_var"] = "menu";
         }
+        $context = get_param_value($params, "context", null);
+        if (is_null($context)) {
+            $params["context"] = $this->action;
+        }
+        $xml_filename = get_param_value($params, "xml_filename", "menu.xml");
+
         $menu = new Menu($this);
-        $menu->parse($menu->load_file("{$templates_dir}/menu.xml"));
-        $menu->print_menu(array(
-            "templates_dir" => "{$templates_dir}",
-            "template_var" => $template_var,
-            "current_action" => $current_action,
-        ));
+        $menu->parse($menu->load_file("{$templates_dir}/{$xml_filename}"));
+        
+        return $menu->print_menu($params);
     }
 //
     function print_lang_menu() {
@@ -1347,6 +1539,11 @@ class App {
         $query_ex = get_param_value($params, "query_ex", array());
         $default_order_by = get_param_value($params, "default_order_by", "id ASC");
         $show_filter_form = get_param_value($params, "show_filter_form", false);
+        $filter_form_template_name = get_param_value(
+            $params,
+            "filter_form_template_name",
+            "filter_form.html"
+        );
         $custom_params = get_param_value($params, "custom_params", array());
 
         $query->expand($query_ex);
@@ -1423,11 +1620,12 @@ class App {
             $this->print_values($filters_params);
             $obj->print_filter_form_values();
             $this->print_file_new(
-                "{$templates_dir}/filter_form.{$templates_ext}", "{$obj_name}_filter_form"
+                "{$templates_dir}/{$filter_form_template_name}",
+                "{$obj_name}_filter_form"
             );
         }
 
-        return $this->print_file("{$templates_dir}/list.{$templates_ext}", $template_var);
+        return $this->print_file("{$templates_dir}/body.{$templates_ext}", $template_var);
     }
 //
     function print_many_objects_list($params) {
@@ -1474,31 +1672,36 @@ class App {
                     $obj->fetch_row($row);
                 }
 
-                $parity = $i % 2;
+                $list_item_parity = $i % 2;
+                $list_item_class = ($list_item_parity == 0) ?
+                    "list-item-even" :
+                    "list-item-odd";
+
+                $this->print_raw_values(array(
+                    "list_item_parity" => $list_item_parity,
+                    "list_item_class" => $list_item_class,
+                ));
+
                 $obj->print_values(array(
                      "templates_dir" => $templates_dir,
                      "context" => $context,
-                     "row" => $row,
-                     "row_number" => $i + 1,
-                     "row_parity" => $parity,
-                     "rows_count" => $n,
+                     "list_item_number" => $i + 1,
+                     "list_item_parity" => $list_item_parity,
+                     "list_item_class" => $list_item_class,
+                     "list_items_count" => $n,
                      "custom_params" => $custom_params,
-                ));
-
-                $this->print_raw_values(array(
-                    "list_item_parity" => $parity,
-                    "list_item_style" => ($parity == 0) ?
-                        "list-item-even" :
-                        "list-item-odd",
+                     "row" => $row,
                 ));
 
                 $this->print_file(
-                    "{$templates_dir}/list_item.{$templates_ext}", "{$obj_name}_items"
+                    "{$templates_dir}/list_item.{$templates_ext}",
+                    "{$obj_name}_items"
                 );
             }
 
             return $this->print_file(
-                "{$templates_dir}/list_items.{$templates_ext}", $template_var
+                "{$templates_dir}/list_items.{$templates_ext}",
+                $template_var
             );
         }
     }
@@ -1529,8 +1732,8 @@ class App {
             "custom_params" => $custom_params,
         ));
         
-        $this->print_file_new("{$templates_dir}/view_info.html", "{$obj_name}_info");
-        return $this->print_file("{$templates_dir}/view.html", $template_var);
+        $this->print_file_new("{$templates_dir}/info.html", "{$obj_name}_info");
+        return $this->print_file("{$templates_dir}/body.html", $template_var);
     }
 //
     function print_object_edit_page($params) {
@@ -1560,8 +1763,8 @@ class App {
         ));
         $this->print_object_edit_page_titles($obj);
         
-        $this->print_file_new("{$templates_dir}/edit_form.html", "{$obj_name}_form");
-        return $this->print_file("{$templates_dir}/edit.html", $template_var);
+        $this->print_file_new("{$templates_dir}/form.html", "{$obj_name}_form");
+        return $this->print_file("{$templates_dir}/body.html", $template_var);
     }
 //
     function print_custom_params($custom_params) {
@@ -1614,6 +1817,22 @@ class App {
         $this->create_self_redirect_response($success_url_params);
     }
 //
+    function move_db_object($obj, $move_to, $where_str = "1") {
+        if (!$obj->is_definite()) {
+            return;
+        }
+        $neighbor_obj = $obj->fetch_neighbor_db_object($move_to, $where_str);
+        if (is_null($neighbor_obj)) {
+            return;
+        }
+        $tmp_position = $obj->position;
+        $obj->position = $neighbor_obj->position;
+        $neighbor_obj->position = $tmp_position;
+
+        $obj->update(array("position"));
+        $neighbor_obj->update(array("position"));
+    }
+//
 //  Page titles and status messages
     function print_page_titles() {
         $this->print_head_and_page_title($this->create_page_title_resource());
@@ -1637,8 +1856,8 @@ class App {
             } else {
                 $this->print_value("page_title_text", $page_title_text);
             }
+            $this->print_file_new_if_exists("_page_title.html", "page_title");
         }
-        $this->print_file_new_if_exists("_page_title.html", "page_title");
     }
 
     function print_head_page_title($resource) {
@@ -1647,7 +1866,9 @@ class App {
             // If have no head_page_title use page_title instead
             $resource_text = $this->get_message($resource);
         }
-        $this->print_raw_value("head_page_title", $resource_text);
+        if (!is_null($resource_text)) {
+            $this->print_raw_value("head_page_title", $resource_text);
+        }
     }
 
     function print_object_edit_page_titles($obj) {
@@ -1757,6 +1978,60 @@ class App {
             $this->response->add_header(new HttpHeader("HTTP/1.0 404 Not Found"));
         }
     }
+
+    function delete_obj_image(
+        $obj,
+        $image_id_field_name = "image_id",
+        $delete_thumbnail = true
+    ) {
+        if ($obj->is_definite() && $obj->is_field_exist($image_id_field_name)) {
+            $field_names_to_update = array($image_id_field_name);
+
+            $obj->del_image($image_id_field_name);
+            $obj->{$image_id_field_name} = 0;
+
+            $thumbnail_image_id_field_name = "thumbnail_{$image_id_field_name}";
+            if ($delete_thumbnail && $obj->is_field_exist($thumbnail_image_id_field_name)) {
+                $field_names_to_update[] = $thumbnail_image_id_field_name;
+
+                $obj->del_image($thumbnail_image_id_field_name);
+                $obj->{$thumbnail_image_id_field_name} = 0;
+            }
+
+            $obj->update($field_names_to_update);
+        }
+    }
+//
+    function get_file() {
+        $open_inline = (int) param("show");
+
+        $file = $this->read_id_fetch_db_object("file");
+        if ($file->is_definite()) {
+            $this->response = new FileResponse($file, $open_inline);
+        } else {
+            $this->response = new HttpResponse();
+            $this->response->add_header(new HttpHeader("HTTP/1.0 404 Not Found"));
+        }
+    }
+//
+    function send_email(
+        $email_from,
+        $name_from,
+        $email_to,
+        $name_to,
+        $subject,
+        $email_template_path
+    ) {
+        $this->email_sender->From = $email_from;
+        $this->email_sender->Sender = $email_from;
+        $this->email_sender->FromName = trim($name_from);
+        $this->email_sender->ClearAllRecipients();
+        $this->email_sender->AddAddress($email_to, trim($name_to));
+        $this->email_sender->Subject = $subject;
+        $this->email_sender->Body = $this->print_file($email_template_path);
+        $this->email_sender->Send();
+    }
+
 }
 
 ?>

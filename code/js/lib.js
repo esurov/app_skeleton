@@ -15,7 +15,12 @@ function aa(obj) {
 }
 
 function focusElement(element) {
-    if (element != null) {
+    if (
+        element != null &&
+        element.focus &&
+        element.type != 'hidden' &&
+        !element.disabled
+    ) {
         element.focus();
     }
 }
@@ -28,7 +33,11 @@ function focusFormElement(form, elementName) {
 }
 
 function selectElement(element) {
-    if (element != null && element.select) {
+    if (
+        element != null &&
+        element.select &&
+        element.type != 'hidden'
+    ) {
         element.select();
     }
 }
@@ -43,6 +52,7 @@ function getFormElement(form, elementName) {
             return elements[j];
         }
     }
+    return null;
 }
 
 function getElementValue(element) {
@@ -132,6 +142,25 @@ function displayGroupElementById(elementIds, elementIdToDisplay) {
     }
 }
 
+function checkFormCheckboxes(form, checkboxName, shouldCheck) {
+    if (typeof(form) == "string") {
+        form = document.forms[form];
+    }
+
+    var elements = form.elements;
+    for (var i = 0; i < elements.length; i++) {
+        if (elements[i].name == checkboxName) {
+            elements[i].checked = shouldCheck;
+        }
+    }
+}
+
+function doFormSubmit(form, elementName, elementValue) {
+    var element = getFormElement(form, elementName);
+    element.value = elementValue;
+    element.form.submit();
+}
+
 function copyToClipboard(element) {
     selectElement(element);
     element.createTextRange().execCommand("Copy");
@@ -168,18 +197,18 @@ function ifConfirmed(message_text) {
     return confirm(message_text);
 }
 
-function acceptChoice(formName, element1, value1, element2, value2) {
-    var element = window.opener.document.forms[formName].elements[element1];
-    element.value = value1;
+function acceptChoice(formName, element1Name, value1, element2Name, value2) {
+    var element1 = window.opener.document.forms[formName].elements[element1Name];
+    element1.value = value1;
 
-    // onchange is not fired automatically ;(
-    if (element.onchange) {
-        element.onchange();
+    if (element2Name != null && value2 != null) {
+        var element2 = window.opener.document.forms[formName].elements[element2Name];
+        element2.value = value2;
     }
 
-    if (element2 != null && value2 != null) {
-        var element = window.opener.document.forms[formName].elements[element2];
-        element.value = value2;
+    // onchange is not fired automatically ;(
+    if (element1.onchange) {
+        element1.onchange();
     }
     window.opener.focus();
     window.close();
