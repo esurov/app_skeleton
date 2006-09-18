@@ -52,7 +52,7 @@ all = All
 choose_one = Choose one:
 yes = Yes
 no = No
-no = None
+none = None
 other = Other
 not_specified = Not specified
 
