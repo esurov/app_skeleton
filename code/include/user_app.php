@@ -4,8 +4,6 @@ class UserApp extends CustomApp {
     function UserApp($tables) {
         parent::CustomApp("user", $tables);
 
-        $this->print_lang_menu = true;
-
         $e = array("valid_users" => array("guest"));
 
         $this->actions = array(
