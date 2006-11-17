@@ -792,7 +792,10 @@ function get_uploaded_file_info($input_name) {
 }
 
 function was_file_uploaded($input_name) {
-    return isset($_FILES[$input_name]) && ($_FILES[$input_name]["error"] == UPLOAD_ERR_OK);
+    return isset($_FILES[$input_name]) &&
+        ($_FILES[$input_name]["error"] == UPLOAD_ERR_OK) &&
+        isset($_FILES[$input_name]["size"]) &&
+        ($_FILES[$input_name]["size"] > 0);
 }
 
 function get_file_extension($filename) {
