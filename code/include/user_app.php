@@ -25,10 +25,16 @@ class UserApp extends CustomApp {
     function pg_access_denied() {
         $this->create_self_redirect_response();
     }
+
+    function on_before_run_action() {
+        parent::on_before_run_action();
+        
+        $this->print_lang_menu();
+    }
+
 //
     function pg_index() {
         $templates_dir = "index";
-        $this->print_lang_menu();
         $this->print_recent_news_article_list(
             "{$templates_dir}/recent_news_article_list",
             "recent_news_article_list"

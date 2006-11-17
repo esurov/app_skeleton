@@ -190,8 +190,6 @@ class App {
     }
 //
     function run_action($action_name = null, $action_params = array()) {
-        $this->on_before_run_action();
-
         // Run action and return its response
         if (!is_null($action_name)) {
             $this->action = $action_name;
@@ -212,6 +210,8 @@ class App {
 
         $this->print_page_titles();
         
+        $this->on_before_run_action();
+
         $this->log->write("App", "Running action '{$action_func_name}'", 3);
         $this->{$action_func_name}();  // NB! Variable function
 
