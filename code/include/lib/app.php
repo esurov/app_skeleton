@@ -7,9 +7,6 @@ class App {
     var $page;
     var $html_charset;
 
-    // E-mail messages sender
-    var $email_sender;
-
     var $messages;
     var $actions;
 
@@ -57,7 +54,6 @@ class App {
         $this->messages->read("lang/{$this->lang}.txt");
 
         $this->init_lang_dependent_data();
-        $this->create_email_sender();
 
         $action_params = array();
         
@@ -109,10 +105,16 @@ class App {
     }
 
     function create_email_sender() {
-        $this->email_sender = new PHPMailer();
-        $this->email_sender->IsSendmail();
-        $this->email_sender->IsHTML(true);
-        $this->email_sender->CharSet = $this->html_charset;
+        $email_sender = new PHPMailer();
+        $email_sender->IsSendmail();
+        $email_sender->IsHTML($this->config->get_value("email_is_html"));
+        $email_sender->CharSet = $this->config->get_value("email_charset");
+        return $email_sender;
+    }
+
+    function get_actual_email_to($email_to) {
+        return $this->config->get_value("email_debug_mode") ?
+            $email_to : $this->config->get_value("admin_email_to");
     }
 
     function init_lang_dependent_data() {
@@ -2040,24 +2042,6 @@ class App {
             $this->response = new HttpResponse();
             $this->response->add_header(new HttpHeader("HTTP/1.0 404 Not Found"));
         }
-    }
-//
-    function send_email(
-        $email_from,
-        $name_from,
-        $email_to,
-        $name_to,
-        $subject,
-        $email_template_path
-    ) {
-        $this->email_sender->From = $email_from;
-        $this->email_sender->Sender = $email_from;
-        $this->email_sender->FromName = trim($name_from);
-        $this->email_sender->ClearAllRecipients();
-        $this->email_sender->AddAddress($email_to, trim($name_to));
-        $this->email_sender->Subject = $subject;
-        $this->email_sender->Body = $this->print_file($email_template_path);
-        $this->email_sender->Send();
     }
 
 }

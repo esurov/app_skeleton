@@ -80,19 +80,30 @@ class UserApp extends CustomApp {
     function process_contact_form() {
         $contact_info = $this->create_db_object("contact_info");
         $contact_info->read();
-        if (is_value_not_empty($contact_info->email)) {
-            $contact_info->print_values();
-            $this->send_email(
-                $contact_info->email,
-                trim("{$contact_info->first_name} {$contact_info->last_name}"),
-                $this->config->get_value("contact_form_email_to"),
-                $this->config->get_value("contact_form_name_to"),
-                $this->config->get_value("email_contact_form_processed_subject"),
-                "contact_form/email.html"
-            );
-        }
+        
+        $this->send_email_contact_form_processed_to_admin($contact_info);
+        
         $this->add_session_status_message(new OkStatusMsg("contact_form_processed"));
         $this->create_self_redirect_response(array("action" => "pg_contact_form"));
+    }
+
+    function send_email_contact_form_processed_to_admin($contact_info) {
+        $email_from = $contact_info->email;
+        $name_from = "{$contact_info->first_name} {$contact_info->last_name}";
+        $email_to = $this->get_actual_email_to($this->config->get_value("contact_form_email_to"));
+        $name_to = $this->config->get_value("contact_form_name_to");
+        $subject = $this->config->get_value("email_contact_form_processed_subject");
+        $contact_info->print_values();
+        $body = $this->print_file("contact_form/email.html");
+
+        $email_sender = $this->create_email_sender();
+        $email_sender->From = $email_from;
+        $email_sender->Sender = $email_from;
+        $email_sender->FromName = trim($name_from);
+        $email_sender->AddAddress($email_to, trim($name_to));
+        $email_sender->Subject = $subject;
+        $email_sender->Body = $body;
+        $email_sender->Send();
     }
 
 }
