@@ -369,15 +369,12 @@ function print_html_radio_group(
     $value_caption_pairs,
     $current_value,
     $attrs = array(),
-    $br_str = null,
-    $is_xhtml = false
+    $delimiter = ""
 ) {
     $checked_value = get_actual_current_value($value_caption_pairs, $current_value);
 
-    if (is_null($br_str)) {
-        $br_str = ($is_xhtml) ? "<br />" : "<br>";
-    }
     $output = "";
+    $delimiter_str = "";
     foreach ($value_caption_pairs as $value_caption_pair) {
         $value = get_value_from_value_caption_pair($value_caption_pair);
         $caption = get_caption_from_value_caption_pair($value_caption_pair);
@@ -386,8 +383,10 @@ function print_html_radio_group(
         if (!is_null($checked_value) && ((string) $value == (string) $checked_value)) {
             $radio_attrs["checked"] = null;
         }
+        $output .= $delimiter_str;
         $output .= print_html_radio($name, $value, $radio_attrs);
-        $output .= get_html_safe_string($caption) . "{$br_str}\n";
+        $output .= get_html_safe_string($caption);
+        $delimiter_str = $delimiter;
     }
     return $output;
 }
@@ -818,6 +817,33 @@ function get_formatted_filesize_str($filesize) {
         $str = number_format($filesize / $gb, 2) . " Gb";
     }
     return $str;
+}
+
+function read_and_parse_csv_file($filepath, $separator = ";") {
+    $f = fopen($filepath, "r");
+    if (!$f) {
+        return false;
+    }
+    $lines = array();
+    while (!feof($f)) {
+        $line = trim(fgets($f, 1024));
+        $line_values = preg_split('/\s*' . $separator . '\s*/', $line);
+        $lines[] = $line_values;
+    }
+    fclose($f);
+    return $lines;
+}
+
+if (!function_exists("file_put_contents")) {
+function file_put_contents($filename, $data, $file_append = false) {
+    $fp = fopen($filename, (!$file_append ? 'w+' : 'a+'));
+    if (!$fp) {
+        trigger_error('file_put_contents cannot write in file.', E_USER_ERROR);
+        return;
+    }
+    fputs($fp, $data);
+    fclose($fp);
+}
 }
 
 ?>

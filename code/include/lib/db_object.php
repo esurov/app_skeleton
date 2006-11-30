@@ -555,6 +555,15 @@ class DbObject {
         $this->filters[] = $filter_info;
     }
 
+    function get_filter_by_name($filter_name) {
+        foreach ($this->filters as $filter_info) {
+            if ($filter_info["name"] == $filter_name) {
+                return $filter_info;
+            }
+        }
+        return null;
+    }
+
     function get_nonset_filter_value($filter_info) {
         if (isset($filter_info["input"]["values"]["data"]["nonset_value_caption_pair"])) {
             $nonset_value_caption_pair =
@@ -1292,37 +1301,59 @@ class DbObject {
                 break;
             }
                 
-            switch ($filter_info["relation"]) {
-            case "less":
-                $wheres[] = "{$field_select} <= " . qw($db_value);
-                break;
-            case "greater":
-                $wheres[] = "{$field_select} >= " . qw($db_value);
-                break;
+            $relation_name = $filter_info["relation"];
+            switch ($relation_name) {
             case "equal":
-                $wheres[] = "{$field_select} = " . qw($db_value);
+            case "less":
+            case "less_equal":
+            case "greater":
+            case "greater_equal":
+                $relation_sign = $this->get_relation_sign_by_name($relation_name);
+                $db_value_quoted = qw($db_value);
+                if (is_array($field_select)) {
+                    $field_selects = $field_select;
+                } else {
+                    $field_selects = array($field_select);
+                }
+                $subwheres_or = array();
+                foreach ($field_selects as $field_select) {
+                    $subwheres_or[] = "{$field_select} {$relation_sign} {$db_value_quoted}";
+                }
+                $wheres[] = "(" . join(" OR ", $subwheres_or) . ")";
                 break;
             case "like":
-                $wheres[] = "{$field_select} LIKE " . lqw($db_value, "%", "%");
-                break;
             case "like_many":
+                if ($relation_name == "like") {
+                    $keywords = array($db_value);
+                } else {
                 $keywords = preg_split('/[\s,]+/', $db_value);
+                }
                 if (count($keywords) != 0) {
-                    $subwheres = array();
-                    foreach ($keywords as $keyword) {
-                        $subwheres[] = "{$field_select} LIKE " . lqw($keyword, "%", "%");
+                    if (is_array($field_select)) {
+                        $field_selects = $field_select;
+                    } else {
+                        $field_selects = array($field_select);
                     }
-                    $wheres[] = "(" . join(" AND ", $subwheres) . ")";
+                    $subwheres_and = array();
+                    foreach ($keywords as $keyword) {
+                        $db_value_lquoted = lqw($keyword, "%", "%");
+                        $subwheres_or = array();
+                        foreach ($field_selects as $field_select) {
+                            $subwheres_or[] = "{$field_select} LIKE {$db_value_lquoted}";
+                    }
+                        $subwheres_and[] = "(" . join(" OR ", $subwheres_or) . ")";
+                    }
+                    $wheres[] = "(" . join(" AND ", $subwheres_and) . ")";
                 }
                 break;
             case "having_equal":
-                $havings[] = "({$field_select} = " . qw($db_value) . ")";
-                break;
             case "having_less":
-                $havings[] = "({$field_select} <= " . qw($db_value) . ")";
-                break;
+            case "having_less_equal":
             case "having_greater":
-                $havings[] = "({$field_select} >= " . qw($db_value) . ")";
+            case "having_greater_equal":
+                $relation_sign = $this->get_relation_sign_by_name($relation_name);
+                $db_value_quoted = qw($db_value);
+                $havings[] = "({$field_select} {$relation_sign} {$db_value_quoted})";
                 break;
             }
         }
@@ -1330,6 +1361,34 @@ class DbObject {
             "where" => join(" AND ", $wheres),
             "having" => join(" AND ", $havings),
         );
+    }
+
+    function get_relation_sign_by_name($relation_name) {
+        switch ($relation_name) {
+        case "equal":
+        case "having_equal":
+            $relation_sign = "=";
+            break;
+        case "less":
+        case "having_less":
+            $relation_sign = "<";
+            break;
+        case "less_equal":
+        case "having_less_equal":
+            $relation_sign = "<=";
+            break;
+        case "greater":
+        case "having_greater":
+            $relation_sign = ">";
+            break;
+        case "greater_equal":
+        case "having_greater_equal":
+            $relation_sign = ">=";
+            break;
+        default:
+            $relation_sign = "";
+        }
+        return $relation_sign;
     }
 
     function get_filters_params() {
@@ -1743,9 +1802,11 @@ class DbObject {
 
         $values_info = null;
         $alt_values_info = null;
+        $values_source = null;
         if (isset($filter_info["input"]["values"])) {
             $values_info = $filter_info["input"]["values"];
-            if ($values_info["source"] == "field") {
+            $values_source = $values_info["source"];
+            if ($values_source == "field") {
                 $alt_values_info = $values_info;
                 $values_info = $this->fields[$filter_name]["input"]["values"];
             }
@@ -1758,12 +1819,16 @@ class DbObject {
         switch ($filter_input_type) {
         case "text":
             $this->app->print_text_input_form_value(
-                $template_var, $filter_value, $filter_input_attrs
+                $template_var,
+                $filter_value,
+                $filter_input_attrs
             );
             break;
         case "checkbox":
             $this->app->print_checkbox_input_form_value(
-                $template_var, $filter_value, $filter_input_attrs
+                $template_var,
+                $filter_value,
+                $filter_input_attrs
             );
             break;
         case "radio":
@@ -1796,10 +1861,18 @@ class DbObject {
             break;
         case "main_select":
             $dependency_info = $values_info["dependency"];
+            if ($values_source == "field") {
             $dependent_field_name = $dependency_info["field"];
-            $dependent_select_name =
-                "{$this->table_name}_{$dependent_field_name}_{$filter_relation}";
+                $dependent_filter_name = $dependent_field_name;
             $dependent_values_info = $this->fields[$dependent_field_name]["input"]["values"];
+            } else {
+                $dependent_filter_name = $dependency_info["filter"];
+                $dependent_filter_info = $this->get_filter_by_name($dependent_filter_name);
+                $dependent_values_info = $dependent_filter_info["input"]["values"];
+            }
+
+            $dependent_select_name =
+                "{$this->table_name}_{$dependent_filter_name}_{$filter_relation}";
             $this->app->print_main_select_input_form_value(
                 $template_var,
                 $filter_value,

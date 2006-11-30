@@ -164,7 +164,10 @@ class BinaryContentResponse extends HttpResponse {
     var $content;
 
     function BinaryContentResponse(
-        $content, $mime_type = null, $content_length = null, $no_cache = true
+        $content,
+        $mime_type = null,
+        $content_length = null,
+        $no_cache = true
     ) {
         parent::HttpResponse();
 
@@ -236,7 +239,7 @@ class PdfDocumentResponse extends BinaryContentResponse {
     
     function PdfDocumentResponse($content, $filename, $open_inline) {
         
-        parent::BinaryContentResponse($content, "application/pdf");
+        parent::BinaryContentResponse($content, "application/pdf", null, false);
 
         if (!is_null($filename)) {
             if ($filename == "") {

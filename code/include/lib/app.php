@@ -836,8 +836,11 @@ class App {
 
         switch ($input_type) {
         case "text":
-            $printed_value =
-                $this->print_text_input_form_value($template_var, $value, $input_attrs);
+            $printed_value = $this->print_text_input_form_value(
+                $template_var,
+                $value,
+                $input_attrs
+            );
             break;
         case "radio":
             $printed_value = $this->print_radio_group_input_form_value(
@@ -990,12 +993,18 @@ class App {
         switch ($input_type) {
         case "radio":
             $printed_value = $this->print_radio_group_input_form_value(
-                $template_var, $enum_value, $input_attrs, $values_info
+                $template_var,
+                $enum_value,
+                $input_attrs,
+                $values_info
             );
             break;
         case "select":
             $printed_value = $this->print_select_input_form_value(
-                $template_var, $enum_value, $input_attrs, $values_info
+                $template_var,
+                $enum_value,
+                $input_attrs,
+                $values_info
             );
             break;
         default:
@@ -1016,8 +1025,12 @@ class App {
         switch ($input_type) {
         case "text":
         case "password":
-            $printed_value =
-                $this->print_input_form_value($input_type, $template_var, $value, $input_attrs);
+            $printed_value = $this->print_input_form_value(
+                $input_type,
+                $template_var,
+                $value,
+                $input_attrs
+            );
             break;
         default:
             $printed_value = "";
@@ -1036,8 +1049,11 @@ class App {
         
         switch ($input_type) {
         case "textarea":
-            $printed_value =
-                $this->print_textarea_input_form_value($template_var, $value, $input_attrs);
+            $printed_value = $this->print_textarea_input_form_value(
+                $template_var,
+                $value,
+                $input_attrs
+            );
             break;
         default:
             $printed_value = "";
@@ -1165,8 +1181,16 @@ class App {
     ) {
         $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
 
-        $printed_value =
-            print_html_radio_group($template_var, $value_caption_pairs, $value, $input_attrs);
+        $values_data_info = get_param_value($values_info, "data", array());
+        $delimiter = get_param_value($values_data_info, "delimiter", "");
+
+        $printed_value = print_html_radio_group(
+            $template_var,
+            $value_caption_pairs,
+            $value,
+            $input_attrs,
+            $delimiter
+        );
         $this->print_raw_value("{$template_var}_input", $printed_value);
         return $printed_value;
     }
@@ -1180,8 +1204,12 @@ class App {
     ) {
         $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
 
-        $printed_value =
-            print_html_select($template_var, $value_caption_pairs, $value, $input_attrs);
+        $printed_value = print_html_select(
+            $template_var,
+            $value_caption_pairs,
+            $value,
+            $input_attrs
+        );
         $this->print_raw_value("{$template_var}_input", $printed_value);
         return $printed_value;
     }
@@ -1726,7 +1754,7 @@ class App {
 
         $this->print_custom_params($custom_params);
 
-        $obj->print_form_values(array(
+        $obj->print_values(array(
             "templates_dir" => $templates_dir,
             "context" => $context,
             "custom_params" => $custom_params,
@@ -1776,7 +1804,7 @@ class App {
     }
 
     function print_custom_param($param_name, $param_value) {
-        $this->print_value("{$param_name}", $param_value);
+        $this->print_value($param_name, $param_value);
         $this->print_raw_value("{$param_name}_orig", $param_value);
         $this->print_suburl_value($param_name, $param_value);
         $this->print_hidden_input_form_value($param_name, $param_value);
