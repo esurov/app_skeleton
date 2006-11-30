@@ -1,6 +1,7 @@
 <?php
 
 class DbResult {
+
     // result of the last query
     var $resource;
     var $log;
@@ -37,6 +38,7 @@ class DbResult {
         }
         return $row;
     }
+
 }
 
 ?>

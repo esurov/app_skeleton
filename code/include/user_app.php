@@ -1,6 +1,7 @@
 <?php
 
 class UserApp extends CustomApp {
+
     function UserApp($tables) {
         parent::CustomApp("user", $tables);
 

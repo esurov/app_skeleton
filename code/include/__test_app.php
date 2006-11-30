@@ -1,10 +1,11 @@
 <?php
 
 class TestApp extends CustomApp {
+
     function TestApp($tables) {
         parent::CustomApp("test", $tables);
 
-        $e = array("valid_users" => array("everyone"));
+        $e = array("valid_users" => array("guest"));
 
         $this->actions = array(
             "pg_index" => $e,
@@ -12,6 +13,7 @@ class TestApp extends CustomApp {
             "set_cookie" => $e,
             "check_cookie" => $e,
             "get_news_articles_xml" => $e,
+            "get_news_articles_with_new_field_xml" => $e,
 
             "pg_view_examples_in_context1" => $e,
             "pg_view_examples_in_context2" => $e,
@@ -54,6 +56,24 @@ class TestApp extends CustomApp {
         $this->create_xml_document_response($xml_content);
     }
 
+    function get_news_articles_with_new_field_xml() {
+        $news_article = $this->create_db_object("news_article");
+        $news_article->insert_field(array(
+            "field" => "new_field",
+            "type" => "integer",
+            "select" => "RAND(1000) * 1000",
+        ));
+        $xml_content = $this->print_many_objects_list(array(
+            "obj" => $news_article,
+            "templates_dir" => "news_article/xml",
+            "templates_ext" => "xml",
+            "query_ex" => array(
+                "order_by" => "created DESC, id DESC"
+            ),
+        ));
+        $this->create_xml_document_response($xml_content);
+    }
+
 //  Context usage example
 //  Print list with specific to context1 template variables
     function pg_view_examples_in_context1() {
@@ -77,11 +97,13 @@ class TestApp extends CustomApp {
     }
 
     function pg_view_all_examples_as_objects() {
-        $examples_list =
-            $this->fetch_db_objects_list("_example", array("order_by" => "created DESC"));
+        $examples = $this->fetch_db_objects_list(
+            "_example",
+            array("order_by" => "created DESC")
+        );
         $this->print_many_objects_list(array(
             "obj_name" => "_example",
-            "objects" => $examples_list,
+            "objects" => $examples,
             "templates_dir" => "_example/list_as_objects",
             "template_var" => "body",
         ));
@@ -95,6 +117,7 @@ class TestApp extends CustomApp {
         v($this->page->fillings);
         exit;
     }
+
 }
 
 ?>

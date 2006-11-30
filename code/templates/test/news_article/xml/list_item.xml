@@ -4,4 +4,5 @@
     title="{%news_article_title%}"
     body="{%news_article_body%}"
     image_id="{%news_article_image_id%}"
+    new_field="{%news_article_new_field%}"
 />

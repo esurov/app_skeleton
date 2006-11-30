@@ -2336,14 +2336,14 @@ class DbObject {
     }
 
     function fetch_db_object(
-        $obj_name,
+        $obj,
         $id,
         $where_str = "1",
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
         return $this->app->fetch_db_object(
-            $obj_name,
+            $obj,
             $id,
             $where_str,
             $field_names_to_select,
@@ -2352,13 +2352,13 @@ class DbObject {
     }
 
     function fetch_db_objects_list(
-        $obj_name,
+        $obj,
         $query_ex,
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
         return $this->app->fetch_db_objects_list(
-            $obj_name,
+            $obj,
             $query_ex,
             $field_names_to_select,
             $field_names_to_not_select

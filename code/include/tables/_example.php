@@ -339,7 +339,7 @@ class Example extends CustomDbObject {
         // This template variable is extension to default printed variables for all contexts
         $this->app->print_raw_value(
             "_example_field_double_decorated",
-            "!!" . $this->page->get_filling_value("_example_field_double") . "!!"
+            "!!" . $this->app->page->get_filling_value("_example_field_double") . "!!"
         );
 
         // Context handling

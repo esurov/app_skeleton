@@ -89,6 +89,7 @@ class Logger {
             fclose($f);
         }
     }
+
 }
 
 ?>

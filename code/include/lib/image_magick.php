@@ -215,6 +215,7 @@ class ImageMagick {
         }
         return "-crop \"{$cropped_width}x{$cropped_height}{$crop_offset_x}{$crop_offset_y}\"";
     }
+
 }
 
 ?>

@@ -1,6 +1,7 @@
 <?php
 
 class Menu extends XML {
+
     var $name = "";
     var $template_name = "";
     var $item_template_name = "";

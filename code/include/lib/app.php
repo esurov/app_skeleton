@@ -1,6 +1,7 @@
 <?php
 
 class App {
+
     var $app_name;
 
     // Html page template
@@ -356,7 +357,7 @@ class App {
                 "App",
                 "Cannot find and instantiate db_object child class for '{$obj_name}'!"
             );
-            return null;
+            die();
         }
         $obj_class_name = $this->tables[$obj_name];
         if (!class_exists($obj_class_name)) {
@@ -366,16 +367,21 @@ class App {
     }
 //
     function fetch_db_object(
-        $obj_name,
+        $obj,
         $id,
         $where_str = "1",
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        $obj = $this->create_db_object($obj_name);
+        // If object is given by its name then create instance here
+        // If no then instance should be created outside this function
+        // and could be expanded with new fields (using insert_field())
+        if (is_string($obj)) {
+            $obj = $this->create_db_object($obj);
+        }
         if ($id != 0) {
             $obj->fetch(
-                "{$obj_name}.id = {$id} AND {$where_str}",
+                "{$obj->table_name}.id = {$id} AND {$where_str}",
                 $field_names_to_select,
                 $field_names_to_not_select
             );
@@ -384,14 +390,18 @@ class App {
     }
 
     function fetch_db_objects_list(
-        $obj_name,
+        $obj,
         $query_ex,
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        $obj = $this->create_db_object($obj_name);
+        if (is_string($obj)) {
+            $obj = $this->create_db_object($obj);
+        }
         $res = $obj->run_expanded_select_query(
-            $query_ex, $field_names_to_select, $field_names_to_not_select
+            $query_ex,
+            $field_names_to_select,
+            $field_names_to_not_select
         );
         $objects = array();
         while ($row = $res->fetch()) {
@@ -1659,9 +1669,16 @@ class App {
     }
 //
     function print_many_objects_list($params) {
+        $obj = get_param_value($params, "obj", null);
         $obj_name = get_param_value($params, "obj_name", null);
-        if (is_null($obj_name)) {
-            die("No obj_name in print_many_objects_list()");
+        if (is_null($obj)) {
+            if (is_null($obj_name)) {
+                die("No obj_name in print_many_objects_list()");
+            } else {
+                $obj = $this->create_db_object($obj_name);
+            }
+        } else {
+            $obj_name = $obj->table_name;
         }
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
         $templates_ext = get_param_value($params, "templates_ext", "html");
@@ -1675,8 +1692,6 @@ class App {
         if ($objects_passed) {
             $n = count($objects);
         } else {
-            $obj = $this->create_db_object($obj_name);
-
             $query = get_param_value($params, "query", $obj->get_select_query());
             $query_ex = get_param_value($params, "query_ex", array());
             

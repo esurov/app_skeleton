@@ -1,6 +1,7 @@
 <?php
 
 class Pager {
+
     // Simple class for page splitting
     var $n_rows_per_page;
     var $n_total_rows;
@@ -105,6 +106,7 @@ class Pager {
 
         $this->app->print_raw_value("simple_nav_str", $simple_nav_str);
     }
+
 }
 
 ?>
