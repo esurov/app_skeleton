@@ -1278,7 +1278,8 @@ class DbObject {
                     array($filter_value, ""),
                 );
                 $db_value = $this->get_enum_field_value(
-                    $filter_value, $default_enum_value_caption_pairs
+                    $filter_value,
+                    $default_enum_value_caption_pairs
                 );
                 break;
             case "varchar":
@@ -1862,9 +1863,9 @@ class DbObject {
         case "main_select":
             $dependency_info = $values_info["dependency"];
             if ($values_source == "field") {
-            $dependent_field_name = $dependency_info["field"];
+                $dependent_field_name = $dependency_info["field"];
                 $dependent_filter_name = $dependent_field_name;
-            $dependent_values_info = $this->fields[$dependent_field_name]["input"]["values"];
+                $dependent_values_info = $this->fields[$dependent_field_name]["input"]["values"];
             } else {
                 $dependent_filter_name = $dependency_info["filter"];
                 $dependent_filter_info = $this->get_filter_by_name($dependent_filter_name);
@@ -1925,7 +1926,9 @@ class DbObject {
         } else {
             $message_resource = get_param_value($condition_info, "message", null);
             $message_resource_params = get_param_value(
-                $condition_info, "message_params", array()
+                $condition_info,
+                "message_params",
+                array()
             );
             if (!is_null($message_resource)) {
                 $messages[] = new ErrorStatusMsg($message_resource, $message_resource_params);
@@ -2235,7 +2238,8 @@ class DbObject {
         $field_names_to_not_select = null
     ) {
         $field_names = $this->get_field_names(
-            $field_names_to_select, $field_names_to_not_select
+            $field_names_to_select,
+            $field_names_to_not_select
         );
 
         $comma = "";
@@ -2260,7 +2264,8 @@ class DbObject {
         $field_names_to_not_select = null
     ) {
         $query = $this->get_select_query(
-            $field_names_to_select, $field_names_to_not_select
+            $field_names_to_select,
+            $field_names_to_not_select
         );
         $query->expand($query_ex);
         return $query;
@@ -2273,7 +2278,9 @@ class DbObject {
     ) {
         return $this->run_select_query(
             $this->get_expanded_select_query(
-                $query_ex, $field_names_to_select, $field_names_to_not_select
+                $query_ex,
+                $field_names_to_select,
+                $field_names_to_not_select
             )
         );
     }

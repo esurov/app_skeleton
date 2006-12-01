@@ -469,48 +469,28 @@ class App {
     }
 
     function get_app_date($db_date, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format(
-            $this->get_db_date_format(), $db_date
-        );
-        return create_date_by_format(
-            $this->get_app_date_format(), $date_parts, $date_if_unknown
-        );
+        $date_parts = parse_date_by_format($this->get_db_date_format(), $db_date);
+        return create_date_by_format($this->get_app_date_format(), $date_parts, $date_if_unknown);
     }
 
     function get_app_time($db_time, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format(
-            $this->get_db_time_format(), $db_time
-        );
-        return create_date_by_format(
-            $this->get_app_time_format(), $date_parts, $date_if_unknown
-        );
+        $date_parts = parse_date_by_format($this->get_db_time_format(), $db_time);
+        return create_date_by_format($this->get_app_time_format(), $date_parts, $date_if_unknown);
     }
 
     function get_db_datetime($app_datetime, $date_if_unknown = "0000-00-00 00:00:00") {
-        $date_parts = parse_date_by_format(
-            $this->get_app_datetime_format(), $app_datetime
-        );
-        return create_date_by_format(
-            $this->get_db_datetime_format(), $date_parts, $date_if_unknown
-        );
+        $date_parts = parse_date_by_format($this->get_app_datetime_format(), $app_datetime);
+        return create_date_by_format($this->get_db_datetime_format(), $date_parts, $date_if_unknown);
     }
 
     function get_db_date($app_date, $date_if_unknown = "0000-00-00") {
-        $date_parts = parse_date_by_format(
-            $this->get_app_date_format(), $app_date
-        );
-        return create_date_by_format(
-            $this->get_db_date_format(), $date_parts, $date_if_unknown
-        );
+        $date_parts = parse_date_by_format($this->get_app_date_format(), $app_date);
+        return create_date_by_format($this->get_db_date_format(), $date_parts, $date_if_unknown);
     }
 
     function get_db_time($app_time, $date_if_unknown = "00:00:00") {
-        $date_parts = parse_date_by_format(
-            $this->get_app_time_format(), $app_time
-        );
-        return create_date_by_format(
-            $this->get_db_time_format(), $date_parts, $date_if_unknown
-        );
+        $date_parts = parse_date_by_format($this->get_app_time_format(), $app_time);
+        return create_date_by_format($this->get_db_time_format(), $date_parts, $date_if_unknown);
     }
 //    
     function get_db_datetime_from_timestamp($ts) {
@@ -542,7 +522,8 @@ class App {
     function get_timestamp_from_db_datetime($db_datetime) {
         return get_timestamp_from_date_parts(
             parse_date_by_format(
-                $this->get_db_datetime_format(), $db_datetime
+                $this->get_db_datetime_format(),
+                $db_datetime
             )
         );
     }
@@ -550,7 +531,8 @@ class App {
     function get_timestamp_from_db_date($db_date) {
         return get_timestamp_from_date_parts(
             parse_date_by_format(
-                $this->get_db_date_format(), $db_date
+                $this->get_db_date_format(),
+                $db_date
             )
         );
     }
@@ -781,7 +763,8 @@ class App {
             );
         }
         $caption = get_caption_by_value_from_value_caption_pairs(
-            $value_caption_pairs, ((int) $value != 0) ? 1 : 0
+            $value_caption_pairs,
+            ((int) $value != 0) ? 1 : 0
         );
         $this->print_value("{$template_var}", $caption);
         $this->print_raw_value("{$template_var}_orig", $value);
@@ -790,7 +773,8 @@ class App {
     function print_enum_value($template_var, $enum_value, $value_caption_pairs) {
         $enum_value = get_actual_current_value($value_caption_pairs, $enum_value);
         $enum_caption = get_caption_by_value_from_value_caption_pairs(
-            $value_caption_pairs, $enum_value
+            $value_caption_pairs,
+            $enum_value
         );
         $enum_caption = is_null($enum_caption) ? "" : $enum_caption;
         $this->print_value("{$template_var}", $enum_caption);
@@ -1275,14 +1259,16 @@ class App {
     function get_value_caption_pairs($values_info, $alt_values_info = null) {
         $value_caption_pairs = $this->get_value_caption_pairs_from_source($values_info);
         $value_caption_pairs = $this->expand_value_caption_pairs_with_begin_end(
-            $value_caption_pairs, $values_info["data"]
+            $value_caption_pairs,
+            $values_info["data"]
         );
         
         if (!is_null($alt_values_info)) {
             $values_info = $alt_values_info;
         }
         $value_caption_pairs = $this->expand_value_caption_pairs_with_nonset(
-            $value_caption_pairs, $values_info["data"]
+            $value_caption_pairs,
+            $values_info["data"]
         );
         return $value_caption_pairs;
     }
@@ -1391,8 +1377,11 @@ class App {
         $dependency_key_field_name,
         $dependency_query_ex
     ) {
-        $dependent_query_ex =
-            get_param_value($dependent_values_info["data"], "query_ex", array());
+        $dependent_query_ex = get_param_value(
+            $dependent_values_info["data"],
+            "query_ex",
+            array()
+        );
 
         $query_ex = new SelectQuery();
         $query_ex->expand($dependent_query_ex);
@@ -1642,6 +1631,7 @@ class App {
         }
 
         $this->print_many_objects_list(array(
+            "obj" => $obj,
             "obj_name" => $obj_name,
             "query" => $query,
             "templates_dir" => $templates_dir,
@@ -1665,7 +1655,7 @@ class App {
             );
         }
 
-        return $this->print_file("{$templates_dir}/body.{$templates_ext}", $template_var);
+        return $this->print_file("{$templates_dir}/list.{$templates_ext}", $template_var);
     }
 //
     function print_many_objects_list($params) {
@@ -1673,7 +1663,7 @@ class App {
         $obj_name = get_param_value($params, "obj_name", null);
         if (is_null($obj)) {
             if (is_null($obj_name)) {
-                die("No obj_name in print_many_objects_list()");
+                die("No obj or obj_name in print_many_objects_list()");
             } else {
                 $obj = $this->create_db_object($obj_name);
             }
@@ -1777,8 +1767,8 @@ class App {
             "custom_params" => $custom_params,
         ));
         
-        $this->print_file_new("{$templates_dir}/info.html", "{$obj_name}_info");
-        return $this->print_file("{$templates_dir}/body.html", $template_var);
+        $this->print_file_new("{$templates_dir}/view_info.html", "{$obj_name}_info");
+        return $this->print_file("{$templates_dir}/view.html", $template_var);
     }
 //
     function print_object_edit_page($params) {
@@ -1808,8 +1798,8 @@ class App {
         ));
         $this->print_object_edit_page_titles($obj);
         
-        $this->print_file_new("{$templates_dir}/form.html", "{$obj_name}_form");
-        return $this->print_file("{$templates_dir}/body.html", $template_var);
+        $this->print_file_new("{$templates_dir}/edit_form.html", "{$obj_name}_form");
+        return $this->print_file("{$templates_dir}/edit.html", $template_var);
     }
 //
     function print_custom_params($custom_params) {
