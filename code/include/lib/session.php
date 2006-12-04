@@ -1,7 +1,6 @@
 <?php
 
 class Session {
-
     function &get_param($name) {
         if (!Session::has_param($name)) {
             Session::set_param($name, "");
@@ -29,10 +28,11 @@ class Session {
 
     function &get_login_state() {
         if (Session::has_param("login_state")) {
-            return Session::get_param("login_state");        
+            $login_state =& Session::get_param("login_state");        
         } else {
-            return null;
+            $login_state = null;
         }
+        return $login_state;
     }
 
     function create_login_state($idle_timeout, $max_timeout, $login_id) {
@@ -67,7 +67,6 @@ class Session {
         Session::unset_param("auto_login_get_vars");
         Session::unset_param("auto_login_post_vars");
     }
-
 }
 
 class SessionLoginState {
