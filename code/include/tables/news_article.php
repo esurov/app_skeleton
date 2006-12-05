@@ -56,7 +56,12 @@ class NewsArticle extends CustomDbObject {
 //
         $this->insert_filter(array(
             "name" => "full_text",
-            "relation" => "like",
+            "relation" => "like_many",
+            "type" => "text",
+            "select" => array(
+                "news_article.title_{$this->lang}",
+                "news_article.body_{$this->lang}",
+            ),
         ));
     }
 //
