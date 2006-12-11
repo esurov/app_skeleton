@@ -2,10 +2,10 @@
 
 class XML {
 
-    var $app;
+    var $charset;
 
-    function XML(&$app) {
-        $this->app =& $app;
+    function XML($charset = "") {
+        $this->charset = $charset;
     }
 
     // Parse given XML data
@@ -13,7 +13,7 @@ class XML {
     function parse($xml_data_str) {
 
         // Create parser
-        $parser = xml_parser_create($this->app->html_charset);
+        $parser = xml_parser_create($this->charset);
         xml_set_object($parser, &$this);
         xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, false);
         xml_set_element_handler($parser, "tag_open", "tag_close");

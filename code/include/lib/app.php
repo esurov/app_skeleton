@@ -974,7 +974,7 @@ class App {
         $input_attrs
     ) {
         $this->print_hidden_input_form_value($template_var, $value);
-        return $this->print_checkbox_input_form_value($template_var, $value, $input_attrs);
+        return $this->print_checkbox_input_form_value($template_var, $value, null, $input_attrs);
     }
 
     function print_enum_form_value(
@@ -1162,8 +1162,13 @@ class App {
         return $printed_value;
     }
 
-    function print_checkbox_input_form_value($template_var, $value, $input_attrs = array()) {
-        $printed_value = print_html_checkbox($template_var, $value, null, $input_attrs);
+    function print_checkbox_input_form_value(
+        $template_var,
+        $value,
+        $checked = null,
+        $input_attrs = array()
+    ) {
+        $printed_value = print_html_checkbox($template_var, $value, $checked, $input_attrs);
         $this->print_raw_value("{$template_var}_input", $printed_value);
         return $printed_value;
     }
@@ -1503,24 +1508,16 @@ class App {
     }
 //
     function print_menu($params = array()) {
-        $templates_dir = get_param_value($params, "templates_dir", null);
-        if (is_null($templates_dir)) {
-            $params["templates_dir"] = ".";
-        }
-        $template_var = get_param_value($params, "template_var", null);
-        if (is_null($template_var)) {
-            $params["template_var"] = "menu";
-        }
-        $context = get_param_value($params, "context", null);
-        if (is_null($context)) {
-            $params["context"] = $this->action;
-        }
-        $xml_filename = get_param_value($params, "xml_filename", "menu.xml");
+        $menu = $this->create_menu();
+        $menu->templates_dir = get_param_value($params, "templates_dir", "_menu");
+        $menu->template_var = get_param_value($params, "template_var", "menu");
+        $menu->load_from_xml(get_param_value($params, "xml_filename", "menu.xml"));
+        $menu->select_items_by_context(get_param_value($params, "context", $this->action));
+        $menu->print_values();
+    }
 
-        $menu = new Menu($this);
-        $menu->parse($menu->load_file("{$templates_dir}/{$xml_filename}"));
-        
-        return $menu->print_menu($params);
+    function create_menu() {
+        return new Menu($this);
     }
 //
     function print_lang_menu() {

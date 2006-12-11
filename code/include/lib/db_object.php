@@ -1829,6 +1829,7 @@ class DbObject {
             $this->app->print_checkbox_input_form_value(
                 $template_var,
                 $filter_value,
+                null,
                 $filter_input_attrs
             );
             break;

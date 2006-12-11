@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Optional attributes with default values for <menu>:
+    item_delimiter_template=""
+    item_has_sub_menu_template=""
+    print_delimiter_before_selected_item="true"
+    print_delimiter_after_selected_item="true"
+
+    Optional attributes with default values for <menu_item>:
+    item_template=owner_menu->item_template
+    item_current_template=owner_menu->item_current_template
+    is_html="false"
+    contexts=""
+-->
+<menu
+    name="user_menu"
+    template="menu.html"
+    item_template="menu_item.html"
+    item_selected_template="menu_item_selected.html"
+    item_delimiter_template="menu_item_delimiter.html"
+    item_has_sub_menu_template="menu_item_has_sub_menu.html"
+>
+    <menu_item
+        name="index"
+        url="?"
+        contexts="pg_index"
+    />
+    <menu_item
+        name="news"
+        url="?action=pg_view_news_articles"
+        contexts="pg_view_news_articles, pg_view_news_article"
+    />
+    <menu_item
+        name="contact_form"
+        url="?action=pg_contact_form"
+        contexts="pg_contact_form"
+    />
+    <menu_item
+        name="sample_static_pages"
+        url="?action=pg_static&amp;page=sample_page1"
+    >
+        <menu
+            name="user_sub_menu"
+            template="sub_menu.html"
+            item_template="sub_menu_item.html"
+            item_selected_template="sub_menu_item_selected.html"
+            item_delimiter_template="sub_menu_item_delimiter.html"
+            item_has_sub_menu_template="menu_item_has_sub_menu.html"
+        >
+            <menu_item
+                name="sample_static_page1"
+                url="?action=pg_static&amp;page=sample_page1"
+                contexts="pg_static_sample_page1"
+            />
+            <menu_item
+                name="sample_static_page2"
+                url="?action=pg_static&amp;page=sample_page2"
+                contexts="pg_static_sample_page2"
+            />
+            <menu_item
+                name="sample_popup"
+                url="javascript:void(openPopup('?action=pg_static&amp;page=sample_page1&amp;popup=1', 600, 500, 'yes', ''));"
+            />
+            <menu_item
+                name="sample_new_window"
+                item_template="sub_menu_item_sample_new_window.html"
+                url="?action=pg_static&amp;page=sample_page1"
+            />
+            <menu_item
+                name="sample_static_pages2"
+                url="?action=pg_static&amp;page=sample_page2_1"
+            >
+                <menu
+                    name="user_sub_sub_menu"
+                    template="sub_sub_menu.html"
+                    item_template="sub_sub_menu_item.html"
+                    item_selected_template="sub_sub_menu_item_selected.html"
+                    item_delimiter_template="sub_sub_menu_item_delimiter.html"
+                    item_has_sub_menu_template="menu_item_has_sub_menu.html"
+                >
+                    <menu_item
+                        name="sample_static_page2_1"
+                        url="?action=pg_static&amp;page=sample_page2_1"
+                        contexts="pg_static_sample_page2_1"
+                    />
+                    <menu_item
+                        name="sample_static_page2_2"
+                        url="?action=pg_static&amp;page=sample_page2_2"
+                        contexts="pg_static_sample_page2_2"
+                    />
+                </menu>
+            </menu_item>
+        </menu>
+    </menu_item>
+</menu>

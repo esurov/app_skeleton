@@ -1,166 +1,279 @@
 <?php
 
-class Menu extends XML {
+class Menu {
+    
+    var $app;
 
-    var $name = "";
-    var $template_name = "";
-    var $item_template_name = "";
-    var $item_current_template_name = "";
+    var $templates_dir;
+    var $template_var;
+
+    var $name;
+    var $template_name;
+    var $item_template_name;
+    var $item_selected_template_name;
     var $item_delimiter_template_name = "";
-    var $print_delitimiter_before_current_item = true;
-    var $print_delitimiter_after_current_item = true;
+    var $item_has_sub_menu_template_name = "";
+    var $print_delimiter_before_selected_item = true;
+    var $print_delimiter_after_selected_item = true;
 
     var $items = array();
 
-    var $last_item_name = "";
+    var $parent_menu = null;
 
     function Menu(&$app) {
-        parent::XML($app);
+        $this->app =& $app;
     }
 
-    function tag_open($parser, $tag, $attributes) {
-        parent::tag_open($parser, $tag, $attributes);
-
-        switch($tag) {
-        case "menu":
-            $this->name = $attributes["name"];
-            $this->template_name = $attributes["template"];
-            $this->item_template_name =
-                get_param_value($attributes, "item_template", "");
-            $this->item_current_template_name =
-                get_param_value($attributes, "item_current_template", "");
-            $this->item_delimiter_template_name =
-                get_param_value($attributes, "item_delimiter_template", "");
-            $print_delitimiter_before_current_item_str =
-                get_param_value($attributes, "print_delitimiter_before_current_item", "true");
-            $this->print_delitimiter_before_current_item =
-                ($print_delitimiter_before_current_item_str == "true") ? true : false;
-            $print_delitimiter_after_current_item_str =
-                get_param_value($attributes, "print_delitimiter_after_current_item", "true");
-            $this->print_delitimiter_after_current_item =
-                ($print_delitimiter_after_current_item_str == "true") ? true : false;
-            break;
-        case "menu_item":
-            $this->last_item_name = $attributes["name"];
-            $is_html_str = get_param_value($attributes, "is_html", "false");
-            $this->items[$this->last_item_name] = array(
-                "url" => $attributes["url"],
-                "is_html" => ($is_html_str == "true") ? true : false,
-            );
-
-            $item_template_name =
-                get_param_value($attributes, "item_template", null);
-            if (!is_null($item_template_name)) {
-                $this->items[$this->last_item_name]["item_template"] = $item_template_name;
-            }
-            $item_current_template_name =
-                get_param_value($attributes, "item_current_template", null);
-            if (!is_null($item_current_template_name)) {
-                $this->items[$this->last_item_name]["item_current_template"] = 
-                    $item_current_template_name;
-            }
-            break;
-        case "contexts":
-            $this->items[$this->last_item_name]["contexts"] = array();
-            break;
-        case "context":
-            $this->items[$this->last_item_name]["contexts"][] = $attributes["name"];
-            break;
-        }
-    }
-
-    function cdata($parser, $cdata) {
-    }
-
-    function tag_close($parser, $tag) {
+    function add_item(&$item) {
+        $this->items[] =& $item;
     }
 //
-    function load_file($xml_file_path) {
+    function load_from_xml($xml_file_name) {
         $old_print_template_name = $this->app->page->print_template_name;
         $this->app->page->print_template_name = false;
-        $xml_file_content = $this->app->print_file_if_exists($xml_file_path);
+        $xml_file_content = $this->app->print_file_if_exists(
+            "{$this->templates_dir}/{$xml_file_name}"
+        );
         $this->app->page->print_template_name = $old_print_template_name;
-        return $xml_file_content;
+
+        $menu_xml = new MenuXml($this->app->html_charset);
+        $menu_xml->menu =& $this;
+        $menu_xml->parse($xml_file_content);
+    }
+//
+    function print_values() {
+        $this->print_menu_items($this);
     }
 
-    function print_menu($params = array()) {
-        $templates_dir = get_param_value($params, "templates_dir", ".");
-        $template_var = get_param_value($params, "template_var", null);
-        $context = get_param_value($params, "context", null);
+    function print_menu_items(&$menu) {
+        $this->app->print_raw_value("{$menu->template_var}_items", "");
 
-        $this->app->print_raw_value("menu_items", "");
-
-        $item_names = array_keys($this->items);
-        $item_infos = array_values($this->items);
-
-        $i = 0;
-        $n = count($this->items);
+        $n = count($menu->items);
         for ($i = 0; $i < $n; $i++) {
-            $item_name = $item_names[$i];
-            $item_info = $item_infos[$i];
+            $menu_item =& $menu->items[$i];
         
-            $caption = get_param_value($item_info, "caption", null);
+            if ($menu_item->is_selected) {
+                if ($menu_item->has_sub_menu()) {
+                    $this->print_menu_items($menu_item->sub_menu);
+                }
+                $item_template_name = $menu_item->item_selected_template_name;
+            } else {
+                $item_template_name = $menu_item->item_template_name;
+            }
+            $caption = $menu_item->caption;
             if (is_null($caption)) {
-                $caption_resource = "{$this->name}_item_{$item_name}";
+                $caption_resource = "{$menu->name}_item_{$menu_item->name}";
                 $caption = $this->app->get_message($caption_resource);
                 if (is_null($caption)) {
                     die("Cannot find resource '{$caption_resource}' for menu item!");
                 }
             }
             $this->app->print_values(array(
-                "name" => $item_name,
-                "url" => $item_info["url"],
+                "name" => $menu_item->name,
+                "url" => $menu_item->url,
             ));
 
-            if ($item_info["is_html"]) {
+            if ($menu_item->is_html) {
                 $this->app->print_raw_value("caption", $caption);
             } else {
                 $this->app->print_value("caption", $caption);
             }
 
-            $is_item_current = $this->is_item_current(
-                $context, $item_info["contexts"]
-            );
-            if ($is_item_current) {
-                $item_template_name = get_param_value(
-                    $item_info, "item_current_template", $this->item_current_template_name
+            if ($menu_item->has_sub_menu() && $menu->item_has_sub_menu_template_name != "") {
+                $this->app->print_file_new(
+                    "{$menu->templates_dir}/{$menu->item_has_sub_menu_template_name}",
+                    "has_sub_menu"
                 );
             } else {
-                $item_template_name = get_param_value(
-                    $item_info, "item_template", $this->item_template_name
-                );
+                $this->app->print_raw_value("has_sub_menu", "");
             }
-            $this->app->print_file("{$templates_dir}/{$item_template_name}", "menu_items");
             
+            $this->app->print_file(
+                "{$menu->templates_dir}/{$item_template_name}",
+                "{$menu->template_var}_items"
+            );
+
             if ($i != $n - 1) {
-                $is_next_item_current = $this->is_item_current(
-                    $context, $item_infos[$i + 1]["contexts"]
-                );
-                if ($is_next_item_current) {
-                    $print_delimiter = $this->print_delitimiter_before_current_item;
-                } else if ($is_item_current) {
-                    $print_delimiter = $this->print_delitimiter_after_current_item;
+                if ($menu->items[$i + 1]->is_selected) {
+                    $print_delimiter = $menu->print_delimiter_before_selected_item;
+                } else if ($menu_item->is_selected) {
+                    $print_delimiter = $menu->print_delimiter_after_selected_item;
                 } else {
                     $print_delimiter = true;
                 }
                 
-                if ($print_delimiter) {
-                    $item_delimiter_template_name = get_param_value(
-                        $item_info, "item_delimiter_template", $this->item_delimiter_template_name
-                    );
+                if ($print_delimiter && $menu->item_delimiter_template_name != "") {
                     $this->app->print_file(
-                        "{$templates_dir}/{$item_delimiter_template_name}", "menu_items"
+                        "{$menu->templates_dir}/{$menu->item_delimiter_template_name}",
+                        "{$menu->template_var}_items"
                     );
                 }
             }
         }
-        return $this->app->print_file_new_if_exists(
-            "{$templates_dir}/{$this->template_name}", $template_var
+        
+        $this->app->print_file_new_if_exists(
+            "{$menu->templates_dir}/{$menu->template_name}",
+            $menu->template_var
         );
     }
 
-    function is_item_current($context, $contexts) {
-        return in_array($context, $contexts);
+    function select_items_by_context($context) {
+        $n = count($this->items);
+        for ($i = 0; $i < $n; $i++) {
+            $menu_item =& $this->items[$i];
+            if ($menu_item->has_context($context)) {
+                $menu_item->is_selected = true;
+            }
+            if ($menu_item->has_sub_menu()) {
+                $menu_item->sub_menu->select_items_by_context($context);
+            }
+        }
+    }
+
+}
+
+class MenuItem {
+    
+    var $name;
+    var $caption = null;
+    var $url;
+    var $is_html;
+    var $item_template_name;
+    var $item_selected_template_name;
+    var $contexts;
+
+    var $sub_menu = null;
+
+    var $is_selected = false;
+
+    function has_sub_menu() {
+        return !is_null($this->sub_menu);
+    }
+
+    function has_context($context) {
+        if (in_array($context, $this->contexts)) {
+            return true;
+        }
+        if ($this->has_sub_menu()) {
+            $n = count($this->sub_menu->items);
+            for ($i = 0; $i < $n; $i++) {
+                $menu_item =& $this->sub_menu->items[$i];
+                if ($menu_item->has_context($context)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+}
+
+class MenuXml extends XML {
+
+    var $menu = null;
+    var $current_menu = null;
+    var $current_menu_item = null;
+
+    function MenuXml($charset) {
+        parent::XML($charset);
+    }
+
+    function tag_open($parser, $tag, $attributes) {
+        parent::tag_open($parser, $tag, $attributes);
+
+        switch ($tag) {
+        case "menu":
+            if (is_null($this->current_menu)) {
+                $this->current_menu =& $this->menu;
+                $menu =& $this->menu;
+            } else {
+                $menu = new Menu($this->current_menu->app);
+                $menu->parent_menu =& $this->current_menu;
+                $menu->templates_dir = $menu->parent_menu->templates_dir;
+                $menu->template_var = "sub_{$menu->parent_menu->template_var}";
+
+                $this->current_menu =& $menu;
+                $this->current_menu_item->sub_menu =& $menu;
+            }
+
+            $menu->name = $attributes["name"];
+            $menu->template_name = $attributes["template"];
+            $menu->item_template_name = get_param_value(
+                $attributes,
+                "item_template",
+                ""
+            );
+            $menu->item_selected_template_name = get_param_value(
+                $attributes,
+                "item_selected_template",
+                ""
+            );
+            $menu->item_delimiter_template_name = get_param_value(
+                $attributes,
+                "item_delimiter_template",
+                ""
+            );
+            $menu->item_has_sub_menu_template_name = get_param_value(
+                $attributes,
+                "item_has_sub_menu_template",
+                ""
+            );
+            $print_delimiter_before_selected_item_str = get_param_value(
+                $attributes,
+                "print_delimiter_before_selected_item",
+                "true"
+            );
+            $menu->print_delimiter_before_selected_item =
+                ($print_delimiter_before_selected_item_str == "true") ? true : false;
+            $print_delimiter_after_selected_item_str = get_param_value(
+                $attributes,
+                "print_delimiter_after_selected_item",
+                "true"
+            );
+            $menu->print_delimiter_after_selected_item =
+                ($print_delimiter_after_selected_item_str == "true") ? true : false;
+            break;
+        case "menu_item":
+            $menu_item = new MenuItem();
+
+            $menu_item->name = $attributes["name"];
+            $menu_item->url = $attributes["url"];
+
+            $is_html_str = get_param_value($attributes, "is_html", "false");
+            $menu_item->is_html = ($is_html_str == "true") ? true : false;
+
+            $menu_item->item_template_name = get_param_value(
+                $attributes,
+                "item_template",
+                $this->current_menu->item_template_name
+            );
+            $menu_item->item_selected_template_name = get_param_value(
+                $attributes,
+                "item_selected_template",
+                $this->current_menu->item_selected_template_name
+            );
+
+            $contexts = get_param_value($attributes, "contexts", "");
+            $menu_item->contexts = preg_split('/[\s,]+/', $contexts);
+
+            $this->current_menu->add_item($menu_item);
+            
+            $this->current_menu_item =& $menu_item;
+            break;
+        }
+    }
+
+    function tag_close($parser, $tag) {
+        parent::tag_close($parser, $tag);
+
+        switch ($tag) {
+        case "menu":
+            $this->current_menu =& $this->current_menu->parent_menu;
+            break;
+        }
+    }
+
+    function cdata($parser, $cdata) {
     }
 
 }

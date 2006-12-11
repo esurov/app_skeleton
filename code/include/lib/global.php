@@ -309,7 +309,7 @@ function print_html_checkbox($name, $value, $checked = null, $attrs = array()) {
     } else if ($checked) {
         $attrs["checked"] = null;
     }
-    return print_html_input("checkbox", $name, ((int) $value == 0) ? 1 : $value, $attrs);
+    return print_html_input("checkbox", $name, $value, $attrs);
 }
 
 function print_html_select(

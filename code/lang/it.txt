@@ -3,15 +3,24 @@ app_head_title = !!AppSkeleton
 page_title_access_denied = Accesso non autorizzato!
 
 head_page_title_pg_index = Home
-page_title_pg_static_sample_page1 = SamplePage1
-page_title_pg_static_sample_page2 = SamplePage2
+page_title_pg_static_sample_page1 = SampleStaticPage1
+page_title_pg_static_sample_page2 = SampleStaticPage2
+page_title_pg_static_sample_page2_1 = SampleStaticPage2_1
+page_title_pg_static_sample_page2_2 = SampleStaticPage2_2
 
 ["menu items"]
 user_menu_item_index = Home
 user_menu_item_news = News
 user_menu_item_contact_form = Contatti
-user_menu_item_static_sample_page1 = SamplePage1
-user_menu_item_static_sample_page2 = SamplePage2
+
+user_menu_item_sample_static_pages = SampleStaticPages
+user_sub_menu_item_sample_static_page1 = SampleStaticPage1
+user_sub_menu_item_sample_static_page2 = SampleStaticPage2
+user_sub_menu_item_sample_popup = SamplePopup
+user_sub_menu_item_sample_new_window = SampleNewWindow
+user_sub_menu_item_sample_static_pages2 = SampleStaticPages2
+user_sub_sub_menu_item_sample_static_page2_1 = SampleStaticPage2_1
+user_sub_sub_menu_item_sample_static_page2_2 = SampleStaticPage2_2
 
 ["link captions"]
 link_view = Visualizza
