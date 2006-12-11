@@ -7,13 +7,11 @@ class Config {
 
     var $params;
 
-
     function Config() {
         // Constructor.
 
         $this->params = array();
     }
-
 
     function get_value($name, $default_value = null) {
         // Return value of the given parameter.
@@ -38,9 +36,7 @@ class Config {
         }
     }
 
-
-    function read_file($filename)
-    {
+    function read_file($filename) {
         // Read configuration file, parse it and store all data in hash.
 
         if (!file_exists($filename)) {
@@ -75,7 +71,6 @@ class Config {
         flock($f, LOCK_UN);
         fclose($f);
     }
-
 
     function write($filename) {
         // Write all data from array into configuration file.

@@ -32,7 +32,6 @@ class UserApp extends CustomApp {
         
         $this->print_lang_menu();
     }
-
 //
     function pg_index() {
         $templates_dir = "index";

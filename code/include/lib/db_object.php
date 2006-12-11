@@ -28,7 +28,7 @@ class DbObject {
         global $app;
 
         if (!isset($app)) {
-            die("No app found in DbObject()!\n");
+            die("No app found in DbObject()!");
         }
 
         $this->app =& $app;
@@ -68,11 +68,8 @@ class DbObject {
     }
 
     function get_quantity_str($n) {
-        return("{$n} " . (
-            ($n == 1) ?
-            $this->get_singular_name() :
-            $this->get_plural_name()
-        ));
+        $quantity_str = ($n == 1) ? $this->get_singular_name() : $this->get_plural_name();
+        return("{$n} {$quantity_str}");
     }
 //
     function get_primary_key_name() {
@@ -196,17 +193,14 @@ class DbObject {
     function expand_multilingual_field_names($field_names, $multilingual_field_names) {
         $expanded_field_names = $field_names;
         foreach ($multilingual_field_names as $multilingual_field_name) {
-            $full_field_names =
-                $this->get_full_field_names_for_multilingual_field_name($multilingual_field_name);
+            $full_field_names = $this->get_full_field_names_for_multilingual_field_name(
+                $multilingual_field_name
+            );
             foreach ($full_field_names as $full_field_name) {
-                unset_array_value_if_exists(
-                    $full_field_name, $expanded_field_names
-                );
+                unset_array_value_if_exists($full_field_name, $expanded_field_names);
                 $expanded_field_names[] = $full_field_name;
             }
-            unset_array_value_if_exists(
-                $multilingual_field_name, $expanded_field_names
-            );
+            unset_array_value_if_exists($multilingual_field_name, $expanded_field_names);
             $expanded_field_names[] = $multilingual_field_name;
         }
         return $expanded_field_names;
@@ -232,7 +226,7 @@ class DbObject {
         $field_array_index = count($this->fields);
         $field_name = get_param_value($field_info, "field", null);
         if (is_null($field_name)) {
-            die("{$this->table_name}: field name not specified for field {$field_array_index}!");
+            die("{$this->table_name}: field name is not specified for field {$field_array_index}!");
         }
         $field_name_alias = get_param_value($field_info, "field_alias", null);
 
@@ -350,7 +344,9 @@ class DbObject {
                 $initial_field_value = get_param_value($field_info, "value", "");
                 $input["type"] = get_param_value($input, "type", "text");
                 $input["type_attrs"]["maxlength"] = get_param_value(
-                    $input["type_attrs"], "maxlength", $width
+                    $input["type_attrs"],
+                    "maxlength",
+                    $width
                 );
                 break;
             case "text":
@@ -378,11 +374,14 @@ class DbObject {
             $attr = get_param_value($field_info, "attr", "");
             
             $create = ($multilingual) ?
-                false : get_param_value($field_info, "create", $default_create);
+                false :
+                get_param_value($field_info, "create", $default_create);
             $store = (!$create || $field_type == "primary_key") ?
-                false : get_param_value($field_info, "store", true);
+                false :
+                get_param_value($field_info, "store", true);
             $update = (!$create || $field_type == "primary_key") ?
-                false : get_param_value($field_info, "update", true);
+                false :
+                get_param_value($field_info, "update", true);
 
             $read = get_param_value($field_info, "read", true);
 
@@ -536,7 +535,9 @@ class DbObject {
             }
         } else {
             $join_table_field_name = get_param_value(
-                $join_info, "field", $this->get_primary_key_name()
+                $join_info,
+                "field",
+                $this->get_primary_key_name()
             );
             $join_condition =
                 "{$this->table_name}.{$field_name} = " .
@@ -604,7 +605,7 @@ class DbObject {
         foreach (array_keys($this->indexes) as $index_name) {
             $expressions[] = $this->get_create_index_expression($index_name);
         }
-        return implode(", ", $expressions);
+        return join(", ", $expressions);
     }
 
     function get_create_field_expression($field_name) {
@@ -734,23 +735,22 @@ class DbObject {
                     $new_field_name = "{$field_name}_{$lang}";
                     if (in_array($new_field_name, $actual_field_names)) {
                         if ($this->is_field_differ_from_actual_field(
-                            $new_field_name, $actual_fields_info[$new_field_name])
+                            $new_field_name,
+                            $actual_fields_info[$new_field_name])
                         ) {
-                            $create_expression =
-                                $this->get_create_field_expression($new_field_name);
+                            $create_expression = $this->get_create_field_expression($new_field_name);
                             $expressions[] = "MODIFY COLUMN {$create_expression}";
                         }
                         unset_array_value_if_exists($new_field_name, $field_names_to_drop);
                     } else {
                         if (in_array($field_name, $actual_field_names) && $lang == $this->dlang) {
-                            $create_expression =
-                                $this->get_create_field_expression($new_field_name);
+                            $create_expression = $this->get_create_field_expression($new_field_name);
                             $expressions[] = "CHANGE COLUMN {$field_name} {$create_expression}";
                         } else {
                             $after_field_str = ($last_field_name == "") ?
-                                " FIRST" : " AFTER {$last_field_name}";
-                            $create_expression =
-                                $this->get_create_field_expression($new_field_name);
+                                " FIRST" :
+                                " AFTER {$last_field_name}";
+                            $create_expression = $this->get_create_field_expression($new_field_name);
                             $expressions[] = "ADD COLUMN {$create_expression}{$after_field_str}";
                         }
                     }
@@ -762,8 +762,9 @@ class DbObject {
                         $field_names_to_drop[] = $field_name;
                     } else {
                         if ($this->is_field_differ_from_actual_field(
-                            $field_name, $actual_fields_info[$field_name])
-                        ) {
+                            $field_name,
+                            $actual_fields_info[$field_name]
+                        )) {
                             $create_expression = $this->get_create_field_expression($field_name);
                             $expressions[] = "MODIFY COLUMN {$create_expression}";
                         }
@@ -775,13 +776,13 @@ class DbObject {
                     }
                     $old_field_name = "{$field_name}_{$this->dlang}";
                     if (in_array($old_field_name, $actual_field_names)) {
-                        $create_expression =
-                            $this->get_create_field_expression($field_name);
+                        $create_expression = $this->get_create_field_expression($field_name);
                         $expressions[] = "CHANGE COLUMN {$old_field_name} {$create_expression}";
                         unset_array_value_if_exists($old_field_name, $field_names_to_drop);
                     } else {               
                         $after_field_str = ($last_field_name == "") ?
-                            " FIRST" : " AFTER {$last_field_name}";
+                            " FIRST" :
+                            " AFTER {$last_field_name}";
                         $create_expression = $this->get_create_field_expression($field_name);
                         $expressions[] = "ADD COLUMN {$create_expression}{$after_field_str}";
                     }
@@ -824,10 +825,8 @@ class DbObject {
         $field_info = $this->fields[$field_name];
 
         // Difference in type:
-        $type_expression =
-            strtoupper($this->get_create_field_type_expression($field_name));
-        $actual_type_expression =
-            strtoupper($actual_field_info["Type"]);
+        $type_expression = strtoupper($this->get_create_field_type_expression($field_name));
+        $actual_type_expression = strtoupper($actual_field_info["Type"]);
         if ($type_expression != $actual_type_expression) {
             return true;
         }
@@ -1050,9 +1049,7 @@ class DbObject {
             $template_var_prefix = $this->table_name;
         }
 
-        $field_names = $this->get_field_names(
-            $field_names_to_read, $field_names_to_not_read
-        );
+        $field_names = $this->get_field_names($field_names_to_read, $field_names_to_not_read);
 
         $use_read_flag = is_null($field_names_to_read);
 
@@ -1084,15 +1081,14 @@ class DbObject {
                 break;
             case "enum":
                 $field_value = $this->get_enum_field_value(
-                    $param_value, $field_info["input"]["values"]["data"]["array"]
+                    $param_value,
+                    $field_info["input"]["values"]["data"]["array"]
                 );
                 break;
             case "varchar":
                 if ($this->is_field_multilingual($field_name)) {
-                    $default_lang_field_value =
-                        $this->{"{$field_name}_{$this->dlang}"};
-                    $current_lang_field_value = 
-                        $this->{"{$field_name}_{$this->lang}"};
+                    $default_lang_field_value = $this->{"{$field_name}_{$this->dlang}"};
+                    $current_lang_field_value = $this->{"{$field_name}_{$this->lang}"};
                     $field_value = ($current_lang_field_value == "") ?
                         $default_lang_field_value :
                         $current_lang_field_value;
@@ -1102,10 +1098,8 @@ class DbObject {
                 break;
             case "text":
                 if ($this->is_field_multilingual($field_name)) {
-                    $default_lang_field_value =
-                        $this->{"{$field_name}_{$this->dlang}"};
-                    $current_lang_field_value = 
-                        $this->{"{$field_name}_{$this->lang}"};
+                    $default_lang_field_value = $this->{"{$field_name}_{$this->dlang}"};
+                    $current_lang_field_value = $this->{"{$field_name}_{$this->lang}"};
                     $field_value = ($current_lang_field_value == "") ?
                         $default_lang_field_value :
                         $current_lang_field_value;
@@ -1274,9 +1268,7 @@ class DbObject {
                 $db_value = $this->get_boolean_field_value($filter_value);
                 break;
             case "enum":
-                $default_enum_value_caption_pairs = array(
-                    array($filter_value, ""),
-                );
+                $default_enum_value_caption_pairs = array(array($filter_value, ""));
                 $db_value = $this->get_enum_field_value(
                     $filter_value,
                     $default_enum_value_caption_pairs
@@ -1900,8 +1892,10 @@ class DbObject {
 
     function validate($old_obj = null, $context = "", $context_params = array()) {
         $conditions = $this->get_validate_conditions($context, $context_params);
-        $field_names_to_validate =
-            $this->get_validate_context_field_names($context, $context_params);
+        $field_names_to_validate = $this->get_validate_context_field_names(
+            $context,
+            $context_params
+        );
 
         $messages = array();
         foreach ($conditions as $condition_info) {
@@ -1992,7 +1986,8 @@ class DbObject {
         if ($this->is_field_multilingual($field_name)) {
             foreach ($this->avail_langs as $lang) {
                 $field_names = $this->get_field_names_with_lang_subst(
-                    array($field_name), $lang
+                    array($field_name),
+                    $lang
                 );
                 if (!$this->validate_empty_condition($field_names[0])) {
                     return false;
@@ -2008,7 +2003,8 @@ class DbObject {
         if ($this->is_field_multilingual($field_name)) {
             foreach ($this->avail_langs as $lang) {
                 $field_names = $this->get_field_names_with_lang_subst(
-                    array($field_name), $lang
+                    array($field_name),
+                    $lang
                 );
                 if (!$this->validate_not_empty_condition($field_names[0])) {
                     return false;
@@ -2035,8 +2031,10 @@ class DbObject {
                         
         if ($this->has_multilingual_fields($field_names)) {
             foreach ($this->avail_langs as $lang) {
-                $field_names_to_validate =
-                    $this->get_field_names_with_lang_subst($field_names, $lang);
+                $field_names_to_validate = $this->get_field_names_with_lang_subst(
+                    $field_names,
+                    $lang
+                );
                 if (!$this->validate_unique_condition($field_names_to_validate, $old_obj)) {
                     return false;
                 }
@@ -2075,8 +2073,7 @@ class DbObject {
         $where_expressions = array();
         foreach ($field_names as $field_name) {
             $field_info = $this->fields[$field_name];
-            $where_expressions[] =
-                "{$field_info['select']} = " . qw($this->{$field_name});
+            $where_expressions[] = "{$field_info['select']} = " . qw($this->{$field_name});
         }
         return join(" AND ", $where_expressions);
     }
@@ -2123,12 +2120,15 @@ class DbObject {
             
             if ($this->is_field_multilingual($field_name)) {
                 foreach ($this->avail_langs as $lang) {
-                    $client_validate_condition_strs[] =
-                        $this->get_client_validate_condition_str($condition_info, $lang);
+                    $client_validate_condition_strs[] = $this->get_client_validate_condition_str(
+                        $condition_info,
+                        $lang
+                    );
                 }
             } else {
-                $client_validate_condition_str =
-                    $this->get_client_validate_condition_str($condition_info);
+                $client_validate_condition_str = $this->get_client_validate_condition_str(
+                    $condition_info
+                );
                 if (!is_null($client_validate_condition_str)) {
                     $client_validate_condition_strs[] = $client_validate_condition_str;
                 }
@@ -2143,7 +2143,8 @@ class DbObject {
     function get_client_validate_condition_str($condition_info, $lang = null) {
         $dependent_condition_info = get_param_value($condition_info, "dependency", null);
         $dependent_validate_condition_str = (is_null($dependent_condition_info)) ?
-            null : $this->get_client_validate_condition_str($dependent_condition_info, $lang);
+            null :
+            $this->get_client_validate_condition_str($dependent_condition_info, $lang);
 
         $field_name = $condition_info["field"];
         if (!is_null($lang)) {
@@ -2389,11 +2390,13 @@ class DbObject {
         $image->print_values();
         
         $filename = ($image->is_definite()) ?
-            "{$template_var}.html" : "{$template_var}_empty.html";
+            "{$template_var}.html" :
+            "{$template_var}_empty.html";
         
         $templates_dir = $this->print_params["templates_dir"];
         $this->app->print_file_new_if_exists(
-            "{$templates_dir}/{$filename}", "{$this->table_name}{$template_var}"
+            "{$templates_dir}/{$filename}",
+            "{$this->table_name}{$template_var}"
         );
     }
 
@@ -2474,11 +2477,13 @@ class DbObject {
         $file->print_values();
         
         $filename = ($file->is_definite()) ?
-            "{$template_var}.html" : "{$template_var}_empty.html";
+            "{$template_var}.html" :
+            "{$template_var}_empty.html";
         
         $templates_dir = $this->print_params["templates_dir"];
         $this->app->print_file_new_if_exists(
-            "{$templates_dir}/{$filename}", "{$this->table_name}{$template_var}"
+            "{$templates_dir}/{$filename}",
+            "{$this->table_name}{$template_var}"
         );
     }
 

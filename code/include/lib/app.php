@@ -115,7 +115,8 @@ class App {
 
     function get_actual_email_to($email_to) {
         return $this->config->get_value("email_debug_mode") ?
-            $email_to : $this->config->get_value("admin_email_to");
+            $email_to :
+            $this->config->get_value("admin_email_to");
     }
 
     function init_lang_dependent_data() {
@@ -157,7 +158,9 @@ class App {
         } else {
             $this->action = $this->get_default_action_name();
             $this->log->write(
-                "App", "Invalid action! Will try default action '{$this->action}'", 3
+                "App",
+                "Invalid action! Will try default action '{$this->action}'",
+                3
             );
             if ($this->validate_action_name()) {
                 $this->run_invalid_action_name_action();
@@ -202,7 +205,8 @@ class App {
 
         $action_func_name = $this->action;
         $action_name_expanded = ($page_name == "") ?
-            $this->action : $this->action . "_" . $page_name;
+            $this->action :
+            $this->action . "_" . $page_name;
         
         $this->print_values(array(
             "action" => $action_func_name,
@@ -289,7 +293,8 @@ class App {
     function create_html_document_response() {
         $this->create_html_page_template_name();
         $this->response = new HtmlDocumentResponse(
-            $this->create_html_document_body_content(), $this->html_charset
+            $this->create_html_document_body_content(),
+            $this->html_charset
         );
     }
 
@@ -340,13 +345,17 @@ class App {
     }
 
     function create_plain_text_document_response(
-        $content, $filename = null, $open_inline = true
+        $content,
+        $filename = null,
+        $open_inline = true
     ) {
         $this->response = new PlainTextDocumentResponse($content, $filename, $open_inline);
     }
 
     function create_pdf_document_response(
-        $content, $filename = null, $open_inline = true
+        $content,
+        $filename = null,
+        $open_inline = true
     ) {
         $this->response = new PdfDocumentResponse($content, $filename, $open_inline);
     }
@@ -460,37 +469,57 @@ class App {
     }
 //
     function get_app_datetime($db_datetime, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format(
-            $this->get_db_datetime_format(), $db_datetime
-        );
+        $date_parts = parse_date_by_format($this->get_db_datetime_format(), $db_datetime);
         return create_date_by_format(
-            $this->get_app_datetime_format(), $date_parts, $date_if_unknown
+            $this->get_app_datetime_format(),
+            $date_parts,
+            $date_if_unknown
         );
     }
 
     function get_app_date($db_date, $date_if_unknown = "") {
         $date_parts = parse_date_by_format($this->get_db_date_format(), $db_date);
-        return create_date_by_format($this->get_app_date_format(), $date_parts, $date_if_unknown);
+        return create_date_by_format(
+            $this->get_app_date_format(),
+            $date_parts,
+            $date_if_unknown
+        );
     }
 
     function get_app_time($db_time, $date_if_unknown = "") {
         $date_parts = parse_date_by_format($this->get_db_time_format(), $db_time);
-        return create_date_by_format($this->get_app_time_format(), $date_parts, $date_if_unknown);
+        return create_date_by_format(
+            $this->get_app_time_format(),
+            $date_parts,
+            $date_if_unknown
+        );
     }
 
     function get_db_datetime($app_datetime, $date_if_unknown = "0000-00-00 00:00:00") {
         $date_parts = parse_date_by_format($this->get_app_datetime_format(), $app_datetime);
-        return create_date_by_format($this->get_db_datetime_format(), $date_parts, $date_if_unknown);
+        return create_date_by_format(
+            $this->get_db_datetime_format(),
+            $date_parts,
+            $date_if_unknown
+        );
     }
 
     function get_db_date($app_date, $date_if_unknown = "0000-00-00") {
         $date_parts = parse_date_by_format($this->get_app_date_format(), $app_date);
-        return create_date_by_format($this->get_db_date_format(), $date_parts, $date_if_unknown);
+        return create_date_by_format(
+            $this->get_db_date_format(),
+            $date_parts,
+            $date_if_unknown
+        );
     }
 
     function get_db_time($app_time, $date_if_unknown = "00:00:00") {
         $date_parts = parse_date_by_format($this->get_app_time_format(), $app_time);
-        return create_date_by_format($this->get_db_time_format(), $date_parts, $date_if_unknown);
+        return create_date_by_format(
+            $this->get_db_time_format(),
+            $date_parts,
+            $date_if_unknown
+        );
     }
 //    
     function get_db_datetime_from_timestamp($ts) {
@@ -521,19 +550,13 @@ class App {
 //
     function get_timestamp_from_db_datetime($db_datetime) {
         return get_timestamp_from_date_parts(
-            parse_date_by_format(
-                $this->get_db_datetime_format(),
-                $db_datetime
-            )
+            parse_date_by_format($this->get_db_datetime_format(), $db_datetime)
         );
     }
 //
     function get_timestamp_from_db_date($db_date) {
         return get_timestamp_from_date_parts(
-            parse_date_by_format(
-                $this->get_db_date_format(),
-                $db_date
-            )
+            parse_date_by_format($this->get_db_date_format(), $db_date)
         );
     }
 //
@@ -1252,8 +1275,12 @@ class App {
             $dependency_array
         );
 
-        $printed_value =
-            print_html_select($template_var, $value_caption_pairs, $value, $input_attrs);
+        $printed_value = print_html_select(
+            $template_var,
+            $value_caption_pairs,
+            $value,
+            $input_attrs
+        );
         $this->print_raw_values(array(
             "{$template_var}_input" => $printed_value,
             "{$template_var}_dependency_js" => $dependency_js,
@@ -1324,8 +1351,7 @@ class App {
         $objects = $this->fetch_db_objects_list($obj_name, $query_ex);
         $value_caption_pairs = array();
         foreach ($objects as $obj) {
-            $value_caption_pairs[] =
-                array($obj->{$values_field_name}, $obj->{$captions_field_name});
+            $value_caption_pairs[] = array($obj->{$values_field_name}, $obj->{$captions_field_name});
         }
         return $value_caption_pairs;
     }
@@ -1338,8 +1364,7 @@ class App {
         $rows = $this->fetch_rows_list($query);
         $value_caption_pairs = array();
         foreach ($rows as $row) {
-            $value_caption_pairs[] =
-                array($row[$values_field_name], $row[$captions_field_name]);
+            $value_caption_pairs[] = array($row[$values_field_name], $row[$captions_field_name]);
         }
         return $value_caption_pairs;
     }
@@ -1392,8 +1417,7 @@ class App {
         $query_ex->expand($dependent_query_ex);
         $query_ex->expand($dependency_query_ex);
 
-        $main_select_values =
-            get_values_from_value_caption_pairs($main_select_value_caption_pairs);
+        $main_select_values = get_values_from_value_caption_pairs($main_select_value_caption_pairs);
         
         if (isset($dependent_values_info["data"]["nonset_value_caption_pair"])) {
             $dependent_select_nonset_value = get_value_from_value_caption_pair(
@@ -1416,19 +1440,21 @@ class App {
             ));
             $dependent_values_info["data"]["query_ex"] = $final_query_ex;
             
-            $dependent_select_value_caption_pairs =
-                $this->get_value_caption_pairs_from_source($dependent_values_info);
-            $dependent_select_value_caption_pairs =
-                $this->expand_value_caption_pairs_with_begin_end(
-                    $dependent_select_value_caption_pairs, $dependent_values_info["data"]
-                );
-            $dependent_select_value_caption_pairs =
-                $this->expand_value_caption_pairs_with_nonset(
-                    $dependent_select_value_caption_pairs, $dependent_values_info["data"]
-                );
+            $dependent_select_value_caption_pairs = $this->get_value_caption_pairs_from_source(
+                $dependent_values_info
+            );
+            $dependent_select_value_caption_pairs = $this->expand_value_caption_pairs_with_begin_end(
+                $dependent_select_value_caption_pairs,
+                $dependent_values_info["data"]
+            );
+            $dependent_select_value_caption_pairs = $this->expand_value_caption_pairs_with_nonset(
+                $dependent_select_value_caption_pairs,
+                $dependent_values_info["data"]
+            );
 
-            $dependency_array[] =
-                get_values_from_value_caption_pairs($dependent_select_value_caption_pairs);
+            $dependency_array[] = get_values_from_value_caption_pairs(
+                $dependent_select_value_caption_pairs
+            );
         }
         return $dependency_array;
     }
@@ -1535,8 +1561,7 @@ class App {
                 $this->print_raw_values(array(
                     "new_lang" => $lang,
                     "new_lang_name" => $this->get_message($lang),
-                    "new_lang_image_url" =>
-                        $this->config->get_value("lang_image_url_{$lang}"),
+                    "new_lang_image_url" => $this->config->get_value("lang_image_url_{$lang}"),
                 ));
                 $this->print_file("_lang_menu_item.html", "lang_menu_items");
             }
@@ -1925,21 +1950,15 @@ class App {
 
     function print_status_message_object_updated($obj) {
         $action_done = ($obj->is_definite()) ? "updated" : "added";
-        $this->add_session_status_message(
-            new OkStatusMsg("{$obj->table_name}_{$action_done}")
-        );
+        $this->add_session_status_message(new OkStatusMsg("{$obj->table_name}_{$action_done}"));
     }
         
     function print_status_message_object_deleted($obj) {
-        $this->add_session_status_message(
-            new OkStatusMsg("{$obj->table_name}_deleted")
-        );
+        $this->add_session_status_message(new OkStatusMsg("{$obj->table_name}_deleted"));
     }
 
     function print_session_status_messages() {
-        $this->print_status_messages(
-            $this->get_and_delete_session_status_messages()
-        );
+        $this->print_status_messages($this->get_and_delete_session_status_messages());
     }
 
     function print_status_messages_cannot_delete_object($messages) {

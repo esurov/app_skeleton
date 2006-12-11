@@ -1,6 +1,7 @@
 <?php
 
 class Session {
+
     function &get_param($name) {
         if (!Session::has_param($name)) {
             Session::set_param($name, "");
@@ -67,6 +68,7 @@ class Session {
         Session::unset_param("auto_login_get_vars");
         Session::unset_param("auto_login_post_vars");
     }
+
 }
 
 class SessionLoginState {

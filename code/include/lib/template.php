@@ -1,8 +1,8 @@
 <?php
 
-// Templates parser and manager
 class Template {
 
+    // Templates parser and manager
     var $templates_dir;
     var $parsed_files;
     var $fillings;

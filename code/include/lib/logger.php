@@ -3,7 +3,6 @@
 class Logger {
 
     // Logger with 'debug level' support.
-
     var $truncate_always;
     var $filename;
     var $debug_level;

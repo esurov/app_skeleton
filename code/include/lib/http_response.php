@@ -18,6 +18,7 @@ class HttpHeader {
     function send() {
         header($this->get_string());
     }
+
 }
 
 class Cookie {
@@ -54,6 +55,7 @@ class Cookie {
             $this->secure
         );
     }    
+
 }
 
 class HttpResponse {
@@ -148,6 +150,7 @@ class HttpResponse {
     function send_body() {
         echo $this->get_body();
     }
+
 }
 
 class RedirectResponse extends HttpResponse {
@@ -157,6 +160,7 @@ class RedirectResponse extends HttpResponse {
 
         $this->add_redirect_header($url);
     }
+
 }
 
 class BinaryContentResponse extends HttpResponse {
@@ -199,6 +203,7 @@ class BinaryContentResponse extends HttpResponse {
             return $this->content;
         }
     }
+
 }
 
 class HtmlDocumentResponse extends BinaryContentResponse {
@@ -208,6 +213,7 @@ class HtmlDocumentResponse extends BinaryContentResponse {
 
         $this->add_content_type_header("text/html", $charset);
     }
+
 }
 
 class XmlDocumentResponse extends BinaryContentResponse {
@@ -215,6 +221,7 @@ class XmlDocumentResponse extends BinaryContentResponse {
     function XmlDocumentResponse($content) {
         parent::BinaryContentResponse($content, "text/xml");
     }
+
 }
 
 class PlainTextDocumentResponse extends BinaryContentResponse {
@@ -233,6 +240,7 @@ class PlainTextDocumentResponse extends BinaryContentResponse {
             );
         }
     }
+
 }
 
 class PdfDocumentResponse extends BinaryContentResponse {
@@ -251,14 +259,14 @@ class PdfDocumentResponse extends BinaryContentResponse {
             );
         }
     }
+
 }
 
 class ImageResponse extends BinaryContentResponse {
     
     function ImageResponse($image, $cached_gmt_str) {
         $updated_gmt_str = $image->get_updated_as_gmt_str();
-        $content = ($updated_gmt_str == $cached_gmt_str) ?
-            null : $image->content;
+        $content = ($updated_gmt_str == $cached_gmt_str) ? null : $image->content;
         
         parent::BinaryContentResponse($content, $image->type, $image->filesize, false);
 
@@ -273,6 +281,7 @@ class ImageResponse extends BinaryContentResponse {
             $this->add_last_modified_header($updated_gmt_str);
         }
     }
+
 }
 
 class FileResponse extends BinaryContentResponse {
@@ -287,6 +296,7 @@ class FileResponse extends BinaryContentResponse {
         $updated_gmt_str = $file->get_updated_as_gmt_str();
         $this->add_last_modified_header($updated_gmt_str);
     }
+
 }
 
 ?>

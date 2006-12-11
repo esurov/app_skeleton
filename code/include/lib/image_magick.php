@@ -99,7 +99,8 @@ class ImageMagick {
             $src_file_path,
             array(
                 $this->create_resize_subcmdline(
-                    $dst_image_params["width"], $dst_image_params["height"]
+                    $dst_image_params["width"],
+                    $dst_image_params["height"]
                 ),
                 $extra_cmdline,
             )
@@ -146,10 +147,14 @@ class ImageMagick {
             $src_file_path,
             array(
                 $this->create_crop_subcmdline(
-                    $resized_width, $resized_height, $crop_offset_x, $crop_offset_y
+                    $resized_width,
+                    $resized_height,
+                    $crop_offset_x,
+                    $crop_offset_y
                 ),
                 $this->create_resize_subcmdline(
-                    $dst_width, $dst_height
+                    $dst_width,
+                    $dst_height
                 ),
                 $extra_cmdline
             )

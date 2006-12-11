@@ -19,12 +19,8 @@ function get_backtrace_str($backtrace_info_array) {
     $trace_body = "";
     array_shift($backtrace_info_array);
     foreach ($backtrace_info_array as $backtrace_item) {
-        $full_function_name_safe_str = htmlspecialchars(
-            get_full_function_name_str($backtrace_item)
-        );
-        $function_args_safe_str = htmlspecialchars(
-            get_backtrace_function_args_str($backtrace_item)
-        );
+        $full_function_name_safe_str = htmlspecialchars(get_full_function_name_str($backtrace_item));
+        $function_args_safe_str = htmlspecialchars(get_backtrace_function_args_str($backtrace_item));
         
         $file_safe_str = htmlspecialchars($backtrace_item["file"]);
         $line_num_safe_str = htmlspecialchars($backtrace_item["line"]);
@@ -44,8 +40,7 @@ function get_full_function_name_str($backtrace_item) {
     $class_name = (isset($backtrace_item["class"])) ? $backtrace_item["class"] : "";
     $function_name = (isset($backtrace_item["function"])) ? $backtrace_item["function"] : "";
     $call_type = (isset($backtrace_item["type"])) ? $backtrace_item["type"] : "";
-    return ($call_type == "") ?
-        $function_name : "{$class_name}{$call_type}{$function_name}";
+    return ($call_type == "") ? $function_name : "{$class_name}{$call_type}{$function_name}";
 }
 
 function get_backtrace_function_args_str($backtrace_item) {
@@ -186,9 +181,7 @@ function is_value_email($value) {
 }
 
 //
-function format_double_value(
-    $double_value, $decimals, $dec_point, $thousands_sep
-) {
+function format_double_value($double_value, $decimals, $dec_point, $thousands_sep) {
     return number_format($double_value, $decimals, $dec_point, $thousands_sep);
 }
 
@@ -301,7 +294,12 @@ function print_html_hidden($name, $value) {
     return print_html_input("hidden", $name, $value);
 }
 
-function print_html_checkbox($name, $value, $checked = null, $attrs = array()) {
+function print_html_checkbox(
+    $name,
+    $value,
+    $checked = null,
+    $attrs = array()
+) {
     if (is_null($checked)) {
         if ((int) $value != 0) {
             $attrs["checked"] = null;
@@ -481,7 +479,10 @@ function get_caption_by_value_from_value_caption_pairs($value_caption_pairs, $va
 
 //
 function create_select_dependency_js(
-    $form_name, $main_select_name, $dependent_select_name, $dependency_array
+    $form_name,
+    $main_select_name,
+    $dependent_select_name,
+    $dependency_array
 ) {
     $dependency_str = create_select_dependency_str($dependency_array);
     return <<<JS
@@ -526,7 +527,8 @@ function create_client_validate_condition_str(
     $input_name, $condition_type, $message_text, $param, $dependent_validate_condition_str
 ) {
     $message_text_param = (is_null($message_text)) ?
-        "null" : quote_string(get_js_safe_string($message_text));
+        "null" :
+        quote_string(get_js_safe_string($message_text));
 
     $params_safe = array();
     if (!is_null($param)) {

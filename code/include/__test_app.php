@@ -27,7 +27,8 @@ class TestApp extends CustomApp {
         foreach (array_keys($this->actions) as $action) {
             $this->print_varchar_value("action_name", $action);
             $this->print_varchar_value(
-                "action_url", create_self_url(array("action" => $action))
+                "action_url",
+                create_self_url(array("action" => $action))
             );
             $this->print_file("actions_list/list_item.html", "actions_list");
         }

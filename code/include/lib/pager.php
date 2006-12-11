@@ -46,7 +46,6 @@ class Pager {
         return "{$this->offset}, {$this->n_rows_per_page}";
     }
 
-
     function print_nav_str($suburl_params) {
         // Create navigation links
         $nav_str = $this->app->get_message("pager_pages_title") . " \n";
@@ -79,7 +78,6 @@ class Pager {
         
         $this->app->print_raw_value("nav_str", $nav_str);
     }
-
 
     function print_simple_nav_str($suburl_params) {
         // Create simplified navigation links (previous page and next page).
