@@ -400,7 +400,8 @@ function ValidateCondition(elementName, type, messageText, params, dependentCond
             }    
         }
         return (this.dependentCondition == null) ?
-            null : this.dependentCondition.validate(form);
+            null :
+            this.dependentCondition.validate(form);
     }
 
     this.validateElement = function (element) {
@@ -434,10 +435,10 @@ function ValidateCondition(elementName, type, messageText, params, dependentCond
             result = (value.match(/^[0-9 \+\-\(\)]+$/)) ? true : false;
             break;
         case 'number_integer':
-            result = !isNaN(getJsInteger(value));
+            result = isInteger(value);
             break;
         case 'number_double':
-            result = !isNaN(getJsDouble(value));
+            result = isDouble(value);
             break;
         case 'number_equal':
             result = (getJsDouble(value) == parseFloat(params[0]));
@@ -496,16 +497,65 @@ function onsubmitValidateFormHandler(form) {
     }
 }
 
-function getJsDouble(appDoubleStr) {
-    var str = appDoubleStr.replace(/\./g, '');
-    str = str.replace(/\,/g, '.', str);
-    return parseFloat(str);
+// Number formatting for integer (decimals = 0) and currency (decimals = 2) numbers
+function formatNumber(num, decimals, decPoint, thousandsSep) {
+    if (isNaN(num)) {
+        num = 0;
+    }
+    var sign = (num == (num = Math.abs(num)));
+    num = Math.floor(num * 100 + 0.50000000001);
+    var dec = num % 100;
+    num = Math.floor(num / 100).toString();
+    if (decimals == 2 ) {
+        if (dec < 10) {
+            dec = '0' + dec;
+        }
+    } else {
+        dec = '';
+    }
+    for (var i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++) {
+        num = num.substring(0, num.length - (4 * i + 3)) + thousandsSep +
+            num.substring(num.length - (4 * i + 3));
+    }
+    return ((sign) ? '' : '-') + num + decPoint + dec;
+}
+
+function getJsIntegerStr(appIntegerStr) {
+    var str = appIntegerStr.replace(/\./g, '');
+    return str.replace(/\,/g, '.', str);
 }
 
 function getJsInteger(appIntegerStr) {
-    var str = appIntegerStr.replace(/\./g, '');
-    str = str.replace(/\,/g, '.', str);
-    return parseInt(str);
+    return parseInt(getJsIntegerStr(appIntegerStr));
+}
+
+function isInteger(appIntegerStr) {
+    return !isNaN(getJsIntegerStr(appIntegerStr));
+}
+
+function getJsDoubleStr(appDoubleStr) {
+    var str = appDoubleStr.replace(/\./g, '');
+    return str.replace(/\,/g, '.', str);
+}
+
+function getJsDouble(appDoubleStr) {
+    return parseFloat(getJsDoubleStr(appDoubleStr));
+}
+
+function isDouble(appDoubleStr) {
+    return !isNaN(getJsDoubleStr(appDoubleStr));
+}
+
+function getAppInteger(jsInteger) {
+    return formatNumber(jsInteger, 0, '', '.');
+}
+
+function getAppDouble(jsDouble) {
+    return formatNumber(jsDouble, 2, ',', '.');
+}
+
+function getAppCurrency(jsDouble) {
+    return formatNumber(jsDouble, 2, ',', '.');
 }
 
 function closeWindow() {
