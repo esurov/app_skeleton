@@ -1572,19 +1572,19 @@ class App {
 //  Object functions
     function print_many_objects_list_page($params = array()) {
         $obj = get_param_value($params, "obj", null);
-        $obj_name = get_param_value($params, "obj_name", null);
         if (is_null($obj)) {
-            if (is_null($obj_name)) {
-                die("No obj or obj_name in print_many_objects_list_page()");
-            } else {
-                $obj = $this->create_db_object($obj_name);
-            }
+            die("No obj in print_many_objects_list_page()");
+        }
+        if (is_string($obj)) {
+            $obj_name = $obj;
+            $obj = $this->create_db_object($obj_name);
         } else {
             $obj_name = $obj->table_name;
         }
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
         $templates_ext = get_param_value($params, "templates_ext", "html");
         $context = get_param_value($params, "context", "");
+        $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
         $template_var = get_param_value($params, "template_var", "body");
         $query = get_param_value($params, "query", $obj->get_select_query());
         $query_ex = get_param_value($params, "query_ex", array());
@@ -1654,10 +1654,10 @@ class App {
 
         $this->print_many_objects_list(array(
             "obj" => $obj,
-            "obj_name" => $obj_name,
             "query" => $query,
             "templates_dir" => $templates_dir,
             "templates_ext" => $templates_ext,
+            "template_var_prefix" => $template_var_prefix,
             "context" => $context,
             "objects" => $objects,
             "custom_params" => $custom_params,
@@ -1681,25 +1681,40 @@ class App {
     }
 //
     function print_many_objects_list($params) {
-        $obj = get_param_value($params, "obj", null);
-        $obj_name = get_param_value($params, "obj_name", null);
-        if (is_null($obj)) {
-            if (is_null($obj_name)) {
-                die("No obj or obj_name in print_many_objects_list()");
-            } else {
-                $obj = $this->create_db_object($obj_name);
-            }
-        } else {
-            $obj_name = $obj->table_name;
-        }
-        $templates_dir = get_param_value($params, "templates_dir", $obj_name);
-        $templates_ext = get_param_value($params, "templates_ext", "html");
-        $context = get_param_value($params, "context", "");
-        $template_var = get_param_value($params, "template_var", "{$obj_name}_list");
-        $custom_params = get_param_value($params, "custom_params", array());
-
         $objects = get_param_value($params, "objects", null);
         $objects_passed = !is_null($objects);
+
+        if ($objects_passed) {
+            $n = count($objects);
+            if ($n == 0) {
+                $template_var_prefix = "";
+                $templates_dir = get_param_value($params, "templates_dir", "");
+            } else {
+                $obj_name = $objects[0]->table_name;
+                $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
+                $templates_dir = get_param_value($params, "templates_dir", $obj_name);
+            }
+            
+        } else {
+            $obj = get_param_value($params, "obj", null);
+            if (is_null($obj)) {
+                die("No obj in print_many_objects_list()");
+            } else {
+                if (is_string($obj)) {
+                    $obj_name = $obj;
+                    $obj = $this->create_db_object($obj_name);
+                } else {
+                    $obj_name = $obj->table_name;
+                }
+                $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
+                $templates_dir = get_param_value($params, "templates_dir", $obj_name);
+            }
+        }
+
+        $templates_ext = get_param_value($params, "templates_ext", "html");
+        $context = get_param_value($params, "context", "");
+        $template_var = get_param_value($params, "template_var", "{$template_var_prefix}_list");
+        $custom_params = get_param_value($params, "custom_params", array());
 
         if ($objects_passed) {
             $n = count($objects);
@@ -1718,7 +1733,7 @@ class App {
         if ($n == 0 && $this->is_file_exist($no_items_template_name)) {
             return $this->print_file($no_items_template_name, $template_var);
         } else {
-            $this->print_raw_value("{$obj_name}_items", "");
+            $this->print_raw_value("{$template_var_prefix}_items", "");
 
             for ($i = 0; $i < $n; $i++) {
                 if ($objects_passed) {
@@ -1741,6 +1756,7 @@ class App {
 
                 $obj->print_values(array(
                      "templates_dir" => $templates_dir,
+                     "template_var_prefix" => $template_var_prefix,
                      "context" => $context,
                      "list_item_number" => $i + 1,
                      "list_item_parity" => $list_item_parity,
@@ -1752,7 +1768,7 @@ class App {
 
                 $this->print_file(
                     "{$templates_dir}/list_item.{$templates_ext}",
-                    "{$obj_name}_items"
+                    "{$template_var_prefix}_items"
                 );
             }
 
@@ -1766,49 +1782,40 @@ class App {
     function print_object_view_page($params) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
-            $obj_name = get_param_value($params, "obj_name", null);
-            if (!is_null($obj_name)) {
-                $obj = $this->read_id_fetch_db_object($obj_name);
-            } else {
-                die("No obj or obj_name in print_object_view_page()");
-            }
-        } else {
-            $obj_name = $obj->table_name;
+            die("No obj in print_object_view_page()");
         }
-
+        $obj_name = $obj->table_name;
+        
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
-        $context = get_param_value($params, "context", "");
+        $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
         $template_var = get_param_value($params, "template_var", "body");
+        $context = get_param_value($params, "context", "");
         $custom_params = get_param_value($params, "custom_params", array());
 
         $this->print_custom_params($custom_params);
 
         $obj->print_values(array(
             "templates_dir" => $templates_dir,
+            "template_var_prefix" => $template_var_prefix,
             "context" => $context,
             "custom_params" => $custom_params,
         ));
         
-        $this->print_file_new("{$templates_dir}/view_info.html", "{$obj_name}_info");
+        $this->print_file_new("{$templates_dir}/view_info.html", "{$template_var_prefix}_info");
         return $this->print_file("{$templates_dir}/view.html", $template_var);
     }
 //
     function print_object_edit_page($params) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
-            $obj_name = get_param_value($params, "obj_name", null);
-            if (!is_null($obj_name)) {
-                $obj = $this->read_id_fetch_db_object($obj_name);
-            } else {
-                die("No obj or obj_name in print_object_edit_page()");
-            }
-        } else {
-            $obj_name = $obj->table_name;
+            die("No obj in print_object_edit_page()");
         }
+        $obj_name = $obj->table_name;
 
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
-        $context = get_param_value($params, "context", "");
+        $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
         $template_var = get_param_value($params, "template_var", "body");
+        $context = get_param_value($params, "context", "");
         $custom_params = get_param_value($params, "custom_params", array());
 
         $this->print_custom_params($custom_params);

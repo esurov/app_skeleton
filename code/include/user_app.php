@@ -45,7 +45,7 @@ class UserApp extends CustomApp {
     function print_recent_news_article_list($templates_dir, $template_var) {
         $n_recent_news_articles = $this->config->get_value("recent_news_articles_number");
         $this->print_many_objects_list(array(
-            "obj_name" => "news_article",
+            "obj" => "news_article",
             "templates_dir" => $templates_dir,
             "template_var" => $template_var,
             "query_ex" => array(
@@ -57,7 +57,7 @@ class UserApp extends CustomApp {
 //
     function pg_view_news_articles() {
         $this->print_many_objects_list_page(array(
-            "obj_name" => "news_article",
+            "obj" => "news_article",
             "templates_dir" => "news_articles",
             "default_order_by" => array("created DESC", "id DESC"),
             "show_filter_form" => true,
@@ -65,8 +65,9 @@ class UserApp extends CustomApp {
     }
 
     function pg_view_news_article() {
+        $news_article = $this->read_id_fetch_db_object("news_article");
         $this->print_object_view_page(array(
-            "obj_name" => "news_article",
+            "obj" => $news_article,
             "templates_dir" => "news_article_view",
         ));
     }

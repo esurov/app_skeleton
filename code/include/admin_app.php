@@ -37,7 +37,7 @@ class AdminApp extends CustomApp {
 //
     function pg_view_news_articles() {
         $this->print_many_objects_list_page(array(
-            "obj_name" => "news_article",
+            "obj" => "news_article",
             "templates_dir" => "news_articles",
             "default_order_by" => array("created DESC", "id DESC"),
             "show_filter_form" => true,
@@ -46,9 +46,11 @@ class AdminApp extends CustomApp {
 
     function pg_edit_news_article() {
         $news_article = get_param_value($this->action_params, "news_article", null);
+        if (is_null($news_article)) {
+            $news_article = $this->read_id_fetch_db_object("news_article");
+        }
         $this->print_object_edit_page(array(
             "obj" => $news_article,
-            "obj_name" => "news_article",
             "templates_dir" => "news_article_edit",
         ));
     }
