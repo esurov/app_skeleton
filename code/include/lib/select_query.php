@@ -1,6 +1,6 @@
 <?php
 
-class SelectQuery {
+class SelectQueryEx {
 
     var $distinct;
     var $select;
@@ -10,7 +10,7 @@ class SelectQuery {
     var $order_by;
     var $limit;
 
-    function SelectQuery($q = array()) {
+    function SelectQueryEx($q = array()) {
         $this->distinct = isset($q["distinct"]) ? $q["distinct"] : false;
         $this->select   = isset($q["select"  ]) ? $q["select"  ] : "";
         $this->from     = isset($q["from"    ]) ? $q["from"    ] : "";
@@ -21,22 +21,11 @@ class SelectQuery {
         $this->limit    = isset($q["limit"   ]) ? $q["limit"   ] : "";
     }
 
-    function get_string() {
-        // Return complete query string assembled from clauses
-        $distinct_str = ($this->distinct) ? "DISTINCT " : "";
-        return
-            "SELECT {$distinct_str}{$this->select} " .
-            "FROM {$this->from}" .
-            ($this->where    ? " WHERE {$this->where}"       : "") .
-            ($this->group_by ? " GROUP BY {$this->group_by}" : "") .
-            ($this->having   ? " HAVING {$this->having}"     : "") .
-            ($this->order_by ? " ORDER BY {$this->order_by}" : "") .
-            ($this->limit    ? " LIMIT {$this->limit}"       : "");
-    }
-
+    // Expand select query sql clauses
     function expand($query_ex) {
-        // Add more statements to the clauses using given array or SelectQuery object
         if (is_array($query_ex)) {
+
+            // Expand from array with keys-clauses
             if (isset($query_ex["distinct"])) {
                 $this->distinct = $query_ex["distinct"];
             }
@@ -93,6 +82,8 @@ class SelectQuery {
                 $this->limit = $query_ex["limit"];
             }
         } else {
+
+            // Expand from SelectQueryEx object
             $this->distinct = $query_ex->distinct;
             if (!empty($query_ex->select)) {
                 if (empty($this->select)) {
@@ -144,6 +135,27 @@ class SelectQuery {
                 $this->limit = $query_ex->limit;
             }
         }
+    }
+
+}
+
+class SelectQuery extends SelectQueryEx {
+
+    function SelectQuery($q = array()) {
+        parent::SelectQueryEx($q);
+    }
+
+    // Return complete query string assembled from clauses
+    function get_string() {
+        $distinct_str = ($this->distinct) ? "DISTINCT " : "";
+        return
+            "SELECT {$distinct_str}{$this->select} " .
+            "FROM {$this->from}" .
+            ($this->where    ? " WHERE {$this->where}"       : "") .
+            ($this->group_by ? " GROUP BY {$this->group_by}" : "") .
+            ($this->having   ? " HAVING {$this->having}"     : "") .
+            ($this->order_by ? " ORDER BY {$this->order_by}" : "") .
+            ($this->limit    ? " LIMIT {$this->limit}"       : "");
     }
 
 }

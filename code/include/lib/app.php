@@ -1413,7 +1413,7 @@ class App {
             array()
         );
 
-        $query_ex = new SelectQuery();
+        $query_ex = new SelectQueryEx();
         $query_ex->expand($dependent_query_ex);
         $query_ex->expand($dependency_query_ex);
 
@@ -1687,7 +1687,7 @@ class App {
         if ($objects_passed) {
             $n = count($objects);
             if ($n == 0) {
-                $template_var_prefix = "";
+                $template_var_prefix = get_param_value($params, "template_var_prefix", "");
                 $templates_dir = get_param_value($params, "templates_dir", "");
             } else {
                 $obj_name = $objects[0]->table_name;

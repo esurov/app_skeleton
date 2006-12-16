@@ -1227,12 +1227,23 @@ class DbObject {
     }
 
     function get_filters_query_ex() {
-        $wheres = array();
-        $havings = array();
+        $filters_query_ex = new SelectQueryEx();
         foreach ($this->filters as $filter_info) {
-            // If filter has its own field type and select - use them
-            // (useful for filters on expanded resultsets)
-            // else take it from corresponding field with the same name
+            $filters_query_ex->expand($this->get_filter_query_ex($filter_info));
+        }
+        return $filters_query_ex;
+    }
+
+    function get_filter_query_ex($filter_info) {
+        $filter_query_ex = array();
+
+        $filter_value = $filter_info["value"];
+        $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
+        if ((string) $filter_value != (string) $nonset_filter_value) {
+
+            // If filter has its own field 'type' and 'select' - use them
+            // (useful for custom filters or filters for expanded resultsets)
+            // else take them from corresponding field with the same name
             $filter_name = $filter_info["name"];
             if (isset($filter_info["type"])) {
                 $field_info = array();
@@ -1244,12 +1255,6 @@ class DbObject {
                 $field_select = $field_info["select"];
             }
             
-            $filter_value = $filter_info["value"];
-            $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
-            if ((string) $filter_value == (string) $nonset_filter_value) {
-                continue;
-            }
-
             switch ($field_type) {
             case "primary_key":
             case "foreign_key":
@@ -1312,14 +1317,14 @@ class DbObject {
                 foreach ($field_selects as $field_select) {
                     $subwheres_or[] = "{$field_select} {$relation_sign} {$db_value_quoted}";
                 }
-                $wheres[] = "(" . join(" OR ", $subwheres_or) . ")";
+                $filter_query_ex["where"] = "(" . join(" OR ", $subwheres_or) . ")";
                 break;
             case "like":
             case "like_many":
                 if ($relation_name == "like") {
                     $keywords = array($db_value);
                 } else {
-                $keywords = preg_split('/[\s,]+/', $db_value);
+                    $keywords = preg_split('/[\s,]+/', $db_value);
                 }
                 if (count($keywords) != 0) {
                     if (is_array($field_select)) {
@@ -1336,7 +1341,7 @@ class DbObject {
                     }
                         $subwheres_and[] = "(" . join(" OR ", $subwheres_or) . ")";
                     }
-                    $wheres[] = "(" . join(" AND ", $subwheres_and) . ")";
+                    $filter_query_ex["where"] = "(" . join(" AND ", $subwheres_and) . ")";
                 }
                 break;
             case "having_equal":
@@ -1346,14 +1351,13 @@ class DbObject {
             case "having_greater_equal":
                 $relation_sign = $this->get_relation_sign_by_name($relation_name);
                 $db_value_quoted = qw($db_value);
-                $havings[] = "({$field_select} {$relation_sign} {$db_value_quoted})";
+                $filter_query_ex["having"] =
+                    "({$field_select} {$relation_sign} {$db_value_quoted})";
                 break;
             }
         }
-        return array(
-            "where" => join(" AND ", $wheres),
-            "having" => join(" AND ", $havings),
-        );
+
+        return $filter_query_ex;
     }
 
     function get_relation_sign_by_name($relation_name) {
