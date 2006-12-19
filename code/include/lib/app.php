@@ -115,8 +115,8 @@ class App {
 
     function get_actual_email_to($email_to) {
         return $this->config->get_value("email_debug_mode") ?
-            $email_to :
-            $this->config->get_value("admin_email_to");
+            $this->config->get_value("admin_email_to") :
+            $email_to;
     }
 
     function init_lang_dependent_data() {
