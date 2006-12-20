@@ -2,8 +2,8 @@
 
 class TestApp extends CustomApp {
 
-    function TestApp($tables) {
-        parent::CustomApp("test", $tables);
+    function TestApp() {
+        parent::CustomApp("test");
 
         $e = array("valid_users" => array("guest"));
 
@@ -20,6 +20,8 @@ class TestApp extends CustomApp {
             "pg_view_all_examples_as_objects" => $e,
 
             "print_and_save_one_example" => $e,
+
+            "pg_view_component" => $e,
         );
     }
 //
@@ -114,8 +116,18 @@ class TestApp extends CustomApp {
         $example->print_values();
         $example->field_currency = 99999999.99;
         $example->save();
-        v($this->page->fillings);
-        exit;
+        vx($this->page->fillings);
+    }
+//
+    function pg_view_component() {
+        $templates_dir = "component_view";
+
+        $component = $this->create_component("component_example2");
+        $component->templates_dir = "{$templates_dir}/component_example2";
+        $component->template_var = "component_example2";
+        $component->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
     }
 
 }

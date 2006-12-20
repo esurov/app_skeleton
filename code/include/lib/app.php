@@ -31,9 +31,13 @@ class App {
     var $dlang;
     var $avail_langs;
 
-    function App($app_name, $tables) {
+    function App($app_name) {
+        global $tables, $components;
+
         $this->app_name = $app_name;
         $this->tables = $tables;
+        $this->components = $components;
+
         $this->response = null;
 
         $this->create_config();
@@ -103,20 +107,6 @@ class App {
 
     function drop_pager() {
         $this->pager->n_rows_per_page = 10000;
-    }
-
-    function create_email_sender() {
-        $email_sender = new PHPMailer();
-        $email_sender->IsSendmail();
-        $email_sender->IsHTML($this->config->get_value("email_is_html"));
-        $email_sender->CharSet = $this->config->get_value("email_charset");
-        return $email_sender;
-    }
-
-    function get_actual_email_to($email_to) {
-        return $this->config->get_value("email_debug_mode") ?
-            $this->config->get_value("admin_email_to") :
-            $email_to;
     }
 
     function init_lang_dependent_data() {
@@ -340,6 +330,11 @@ class App {
         ));
     }
 //
+    function create_not_found_response() {
+        $this->response = new HttpResponse();
+        $this->response->add_header(new HttpHeader("HTTP/1.0 404 Not Found"));
+    }
+//
     function create_xml_document_response($content) {
         $this->response = new XmlDocumentResponse($content);
     }
@@ -361,16 +356,16 @@ class App {
     }
 //
     function create_db_object($obj_name) {
-        if (!isset($this->tables[$obj_name])) {
+        $obj_class_name = get_param_value($this->tables, $obj_name, null);
+        if (is_null($obj_class_name)) {
             $this->log->write(
                 "App",
                 "Cannot find and instantiate db_object child class for '{$obj_name}'!"
             );
             die();
         }
-        $obj_class_name = $this->tables[$obj_name];
         if (!class_exists($obj_class_name)) {
-            require_once(TABLES_DIR . "/{$obj_name}.php");
+            require_once(_APP_TABLES_DIR . "/{$obj_name}.php");
         }
         return new $obj_class_name();
     }
@@ -2032,8 +2027,7 @@ class App {
                 null;
             $this->response = new ImageResponse($image, $cached_gmt_str);
         } else {
-            $this->response = new HttpResponse();
-            $this->response->add_header(new HttpHeader("HTTP/1.0 404 Not Found"));
+            $this->create_not_found_response();
         }
     }
 
@@ -2067,9 +2061,85 @@ class App {
         if ($file->is_definite()) {
             $this->response = new FileResponse($file, $open_inline);
         } else {
-            $this->response = new HttpResponse();
-            $this->response->add_header(new HttpHeader("HTTP/1.0 404 Not Found"));
+            $this->create_not_found_response();
         }
+    }
+//
+    function load_component($component_name) {
+        $component_info = $this->components["components_info"][$component_name];
+
+        $was_loaded = false;
+        $required_components = get_param_value($component_info, "required_components", array());
+        foreach ($required_components as $required_component) {
+            if (!$this->load_component($required_component)) {
+                return $was_loaded;
+            }
+        }
+
+        foreach ($this->components["dirs"] as $component_dir) {
+            $component_file_name = $component_info["file_name"];
+            $component_full_file_name = "{$component_dir}/{$component_file_name}";
+            if (is_file($component_full_file_name)) {
+                require_once($component_full_file_name);
+                $was_loaded = true;
+                break;
+            }
+        }
+        return $was_loaded;
+    }
+
+    function &create_component($component_name) {
+        $component_info = get_param_value(
+            $this->components["components_info"],
+            $component_name,
+            null
+        );
+        if (is_null($component_info)) {
+            $this->log->write(
+                "App",
+                "Cannot find component info for '{$component_name}'!"
+            );
+            die();
+        }
+        $component_class_name = $component_info["class_name"];
+        if (!class_exists($component_class_name)) {
+            if (!$this->load_component($component_name)) {
+                $this->log->write(
+                    "App",
+                    "Cannot load and instantiate component '{$component_name}'!"
+                );
+                die();
+            }
+        }
+        $need_app = get_param_value($component_info, "need_app", true);
+        $component =& new $component_class_name();
+        if ($need_app) {
+            $component->app =& $this;
+        }
+        return $component;
+    }
+//
+    function &create_email_sender() {
+        $email_sender =& $this->create_component("email_sender");
+        $email_sender->IsSendmail();
+        $email_sender->IsHTML($this->config->get_value("email_is_html"));
+        $email_sender->CharSet = $this->config->get_value("email_charset");
+        return $email_sender;
+    }
+
+    function get_actual_email_to($email_to) {
+        return $this->config->get_value("email_debug_mode") ?
+            $this->config->get_value("admin_email_to") :
+            $email_to;
+    }
+//
+    function &create_image_magick() {
+        $im =& $this->create_component("image_magick");
+        $im->set_image_magick_path($this->config->get_value("image_magick_path"));
+        $im->app_name = $this->db->table_prefix;
+        $im->create_dst_file();
+        $im->set_dst_file_ext();
+        return $im;
     }
 
 }

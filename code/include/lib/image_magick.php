@@ -11,22 +11,22 @@ class ImageMagick {
     var $dst_quality = "85";
 
     var $verbose = false;
-
-    function ImageMagick($image_magick_path = "", $app_name = "") {
-        $this->app_name = $app_name;
+//
+    function set_image_magick_path($image_magick_path) {
         $this->image_magick_path = $image_magick_path;
         if ($this->image_magick_path != "") {
             $this->image_magick_path .= "/";
         }
-        $this->create_dst_file();
-        $this->set_dst_file_ext($this->get_default_dst_file_ext());
     }
 
     function create_dst_file() {
         $this->dst_file_path = tempnam("", "imagemagick_{$this->app_name}");
     }
 
-    function set_dst_file_ext($ext) {
+    function set_dst_file_ext($ext = null) {
+        if (is_null($ext)) {
+            $ext = $this->get_default_dst_file_ext();
+        }
         $new_dst_file_path = "{$this->dst_file_path}.{$ext}";
         if (@rename($this->dst_file_path, $new_dst_file_path)) {
             $this->dst_file_path = $new_dst_file_path;

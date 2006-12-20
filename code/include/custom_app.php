@@ -2,8 +2,8 @@
 
 class CustomApp extends App {
 
-    function CustomApp($app_name, $tables) {
-        parent::App($app_name, $tables);
+    function CustomApp($app_name) {
+        parent::App($app_name);
     }
 
     function get_app_double_value($php_double_value, $decimals) {

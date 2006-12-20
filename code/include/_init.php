@@ -5,9 +5,10 @@ error_reporting(E_ALL);
 
 $__tmp_saved_app_dir = getcwd();
 
-chdir(dirname(__FILE__));
+define("_APP_DIR", dirname(__FILE__));
+define("_APP_TABLES_DIR", _APP_DIR . "/tables");
 
-define("TABLES_DIR", getcwd() . "/tables");
+chdir(_APP_DIR);
 
 require_once("lib/_init.php");
 
@@ -22,6 +23,8 @@ $tables = array(
     "news_article" => "NewsArticle",
     "contact_info" => "ContactInfo",
 );
+
+require_once("_init_components.php");
 
 chdir($__tmp_saved_app_dir);
 

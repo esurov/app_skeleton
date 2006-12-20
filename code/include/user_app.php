@@ -2,8 +2,8 @@
 
 class UserApp extends CustomApp {
 
-    function UserApp($tables) {
-        parent::CustomApp("user", $tables);
+    function UserApp() {
+        parent::CustomApp("user");
 
         $e = array("valid_users" => array("guest"));
 

@@ -2,7 +2,9 @@
 
 $__tmp_saved_lib_dir = getcwd();
 
-chdir(dirname(__FILE__));
+define("_APP_LIB_DIR", dirname(__FILE__));
+
+chdir(_APP_LIB_DIR);
 
 require_once("global.php");
 
@@ -22,8 +24,7 @@ require_once("pager.php");
 require_once("status_msg.php");
 require_once("menu.php");
 
-require_once("phpmailer.php");
-require_once("image_magick.php");
+require_once("_init_components.php");
 
 require_once("app.php");
 

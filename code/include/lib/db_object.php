@@ -2442,9 +2442,8 @@ class DbObject {
             $is_thumbnail = get_param_value($resize_info, "is_thumbnail", 0);
             $resize_func_name = get_param_value($resize_info, "resize_func", "crop_and_resize");
         }
-        
-        $im_path = $this->app->config->get_value("image_magick_path");
-        $im = new ImageMagick($im_path, $this->db->table_prefix);
+
+        $im =& $this->app->create_image_magick();
         $im->{$resize_func_name}(
             $file_path,
             array(

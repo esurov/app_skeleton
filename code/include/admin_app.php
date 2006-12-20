@@ -2,8 +2,8 @@
 
 class AdminApp extends CustomApp {
 
-    function AdminApp($tables) {
-        parent::CustomApp("admin", $tables);
+    function AdminApp() {
+        parent::CustomApp("admin");
 
         $this->set_current_lang($this->dlang);
 
