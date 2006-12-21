@@ -60,8 +60,6 @@ class App {
 
         $this->init_lang_dependent_data();
 
-        $action_params = array();
-        
         // One action defined, but nobody can access it
         $actions = array("pg_index" => array("valid_users" => array()));
 
@@ -83,7 +81,6 @@ class App {
     function create_db() {
         $sql_config = new Config();
         $sql_config->read("config/sql.cfg");
-
         $sql_params = array(
             "host"     => $sql_config->get_value("host"),
             "database" => $sql_config->get_value("database"),
@@ -91,7 +88,9 @@ class App {
             "password" => $sql_config->get_value("password"),
             "table_prefix" => $sql_config->get_value("table_prefix"),
         );
+
         $this->db = new Db($sql_params, $this->log);
+        $this->db->connect();
     }
 
     function create_page_template() {
@@ -191,12 +190,12 @@ class App {
             $this->action = $action_name;
         }
         $this->action_params = $action_params;
-        $page_name = get_param_value($action_params, "page", trim(param("page")));
+        $page_name = trim(get_param_value($action_params, "page", param("page")));
 
         $action_func_name = $this->action;
         $action_name_expanded = ($page_name == "") ?
             $this->action :
-            $this->action . "_" . $page_name;
+            "{$this->action}_{$page_name}";
         
         $this->print_values(array(
             "action" => $action_func_name,

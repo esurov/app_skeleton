@@ -2,22 +2,24 @@
 
 class Db {
 
+    var $log;
+
     // MySQL connection.
     var $connection_info;
     var $connection;
     var $table_prefix;
 
-    var $log;
-
     function Db($connection_info, &$log) {
         $this->connection_info = $connection_info;
-        $host = $connection_info["host"];
-        $database = $connection_info["database"];
-        $username = $connection_info["username"];
-        $password = $connection_info["password"];
-
         $this->table_prefix = $connection_info["table_prefix"];
         $this->log =& $log;
+    }
+
+    function connect() {
+        $host = $this->connection_info["host"];
+        $database = $this->connection_info["database"];
+        $username = $this->connection_info["username"];
+        $password = $this->connection_info["password"];
 
         $this->connection = mysql_pconnect($host, $username, $password);
         if ($this->connection === false) {
