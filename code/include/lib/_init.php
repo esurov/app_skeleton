@@ -12,7 +12,6 @@ require_once("session.php");
 require_once("config.php");
 require_once("template.php");
 require_once("logger.php");
-require_once("xml.php");
 
 require_once("db.php");
 require_once("select_query.php");
@@ -22,7 +21,6 @@ require_once("db_object.php");
 require_once("http_response.php");
 require_once("pager.php");
 require_once("status_msg.php");
-require_once("menu.php");
 
 require_once("_init_components.php");
 

@@ -19,11 +19,7 @@ class Menu {
     var $items = array();
 
     var $parent_menu = null;
-
-    function Menu(&$app) {
-        $this->app =& $app;
-    }
-
+//
     function add_item(&$item) {
         $this->items[] =& $item;
     }

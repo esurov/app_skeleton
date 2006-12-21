@@ -1528,16 +1528,19 @@ class App {
     }
 //
     function print_menu($params = array()) {
-        $menu = $this->create_menu();
+        $menu =& $this->create_menu();
+        
         $menu->templates_dir = get_param_value($params, "templates_dir", "_menu");
         $menu->template_var = get_param_value($params, "template_var", "menu");
+        
         $menu->load_from_xml(get_param_value($params, "xml_filename", "menu.xml"));
         $menu->select_items_by_context(get_param_value($params, "context", $this->action));
+        
         $menu->print_values();
     }
 
-    function create_menu() {
-        return new Menu($this);
+    function &create_menu() {
+        return $this->create_component("menu");
     }
 //
     function print_lang_menu() {
