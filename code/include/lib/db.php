@@ -2,17 +2,20 @@
 
 class Db {
 
+    var $app;
     var $log;
 
-    // MySQL connection.
+    // MySQL connection
     var $connection_info;
     var $connection;
     var $table_prefix;
 
-    function Db($connection_info, &$log) {
+    function Db(&$app, $connection_info) {
+        $this->app =& $app;
+        $this->log =& $this->app->log;
+
         $this->connection_info = $connection_info;
         $this->table_prefix = $connection_info["table_prefix"];
-        $this->log =& $log;
     }
 
     function connect() {
@@ -23,12 +26,10 @@ class Db {
 
         $this->connection = mysql_pconnect($host, $username, $password);
         if ($this->connection === false) {
-            $this->log->write(
+            $this->app->process_fatal_error(
                 "Db",
-                "Cannot connect to MySQL server!",
-                0
+                "Cannot connect to MySQL server '{$host} as {$username}'!"
             );
-            die();
         }
         $this->log->write(
             "Db",
@@ -38,12 +39,10 @@ class Db {
 
         if (!mysql_select_db($database, $this->connection)) {
             $err = mysql_error($this->connection);
-            $this->log->write(
+            $this->app->process_fatal_error(
                 "Db",
-                "Cannot select database '{$database}' -- {$err}",
-                0
+                "Cannot select database '{$database}' -- {$err}"
             );
-            die();
         }
 
         $this->log->write(
@@ -61,44 +60,47 @@ class Db {
         return "{$this->table_prefix}{$table_name}";
     }
 
+    // Run MySQL query
     function run_query($query_str) {
-        // Run MySQL query.
-        // Return result.
-
         // Handling table name templates
         $query_str = preg_replace(
-            "/{%(.*?)_table%}/e",
-            " \$this->table_prefix . '$1' ",
+            '/{%(.*?)_table%}/',
+            "{$this->table_prefix}\$1",
             $query_str
         );
 
-        // Write query to log file:
-        $qs = preg_replace('/\s+/', " ", $query_str);
-        $this->log->write("Db", "Running query \"$qs\"", 2);
+        // Write query to log file
+        $this->log->write(
+            "Db",
+            "Running MySQL query:\n{$query_str}",
+            2
+        );
 
-        // Read time (before starting query):
+        // Read time (before starting query)
         list($usec, $sec) = explode(" ", microtime());
         $t0 = (float)$sec + (float)$usec;
 
-        // Run query:
+        // Run query
         $resource = mysql_query($query_str, $this->connection);
         if ($resource === false) {
-            $this->log->write(
+            $err_no = mysql_errno($this->connection);
+            $err = mysql_error($this->connection);
+            $this->app->process_fatal_error(
                 "Db",
-                "MySQL error: #" . mysql_errno($this->connection) . ": " .
-                mysql_error($this->connection), 0);
-            die();
+                "MySQL error: #{$err_no}: {$err}"
+            );
         }
 
-        // Read time (after query is finished):
+        // Read time (after query is finished)
         list($usec, $sec) = explode(" ", microtime());
         $t1 = ((float)$sec + (float)$usec);
 
-        // Write query result and timing to log file:
+        // Write query result and timing to log file
         $t_str = number_format(($t1 - $t0), 6);
         $n = $this->get_num_affected_rows();
-        $this->log->write("Db", "Query result: $n rows (in $t_str sec)", 2);
+        $this->log->write("Db", "Query result: {$n} rows (in $t_str sec)", 2);
 
+        // Return result
         return new DbResult($resource, $this->log);
     }
 

@@ -149,13 +149,13 @@ class SelectQuery extends SelectQueryEx {
     function get_string() {
         $distinct_str = ($this->distinct) ? "DISTINCT " : "";
         return
-            "SELECT {$distinct_str}{$this->select} " .
-            "FROM {$this->from}" .
-            ($this->where    ? " WHERE {$this->where}"       : "") .
-            ($this->group_by ? " GROUP BY {$this->group_by}" : "") .
-            ($this->having   ? " HAVING {$this->having}"     : "") .
-            ($this->order_by ? " ORDER BY {$this->order_by}" : "") .
-            ($this->limit    ? " LIMIT {$this->limit}"       : "");
+            "SELECT {$distinct_str}{$this->select}" .
+            "\nFROM {$this->from}" .
+            ($this->where    ? "\nWHERE {$this->where}"       : "") .
+            ($this->group_by ? "\nGROUP BY {$this->group_by}" : "") .
+            ($this->having   ? "\nHAVING {$this->having}"     : "") .
+            ($this->order_by ? "\nORDER BY {$this->order_by}" : "") .
+            ($this->limit    ? "\nLIMIT {$this->limit}"       : "");
     }
 
 }

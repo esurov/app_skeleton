@@ -42,7 +42,7 @@ class Logger {
         }
     }
 //
-    function write($class_name, $message, $debug_level = 1) {
+    function write($class_name, $message, $debug_level) {
         // Write $class_name and $message to log file,
         // if debug level is high enough.
 

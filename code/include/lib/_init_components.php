@@ -16,6 +16,10 @@ $components = array(
             "file_name" => "menu.php",
             "required_components" => array("xml"),
         ),
+        "lang_menu" => array(
+            "class_name" => "LangMenu",
+            "file_name" => "lang_menu.php",
+        ),
         "email_sender" => array(
             "class_name" => "PHPMailer",
             "file_name" => "phpmailer.php",

@@ -78,6 +78,16 @@ class App {
         $this->log->set_truncate_always($this->config->get_value("log_truncate_always", 0));
     }
 
+    function process_fatal_error($class_name, $message) {
+        $this->log->write($class_name, "FATAL ERROR: {$message}", 1);
+        if ($this->log->debug_level == 8) {
+            $message = "[{$class_name}] {$message}";
+        } else {
+            $message = "";
+        }
+        die($message);
+    }
+
     function create_db() {
         $sql_config = new Config();
         $sql_config->read("config/sql.cfg");
@@ -89,7 +99,7 @@ class App {
             "table_prefix" => $sql_config->get_value("table_prefix"),
         );
 
-        $this->db = new Db($sql_params, $this->log);
+        $this->db = new Db($this, $sql_params);
         $this->db->connect();
     }
 
@@ -154,8 +164,10 @@ class App {
             if ($this->validate_action_name()) {
                 $this->run_invalid_action_name_action();
             } else {
-                $this->log->write("App", "Action '{$this->action}' is invalid too!", 3);
-                die();
+                $this->process_fatal_error(
+                    "App",
+                    "Default action '{$this->action}' is invalid!"
+                );
             }
         }
 
@@ -357,11 +369,10 @@ class App {
     function create_db_object($obj_name) {
         $obj_class_name = get_param_value($this->tables, $obj_name, null);
         if (is_null($obj_class_name)) {
-            $this->log->write(
+            $this->process_fatal_error(
                 "App",
                 "Cannot find and instantiate db_object child class for '{$obj_name}'!"
             );
-            die();
         }
         if (!class_exists($obj_class_name)) {
             require_once(_APP_TABLES_DIR . "/{$obj_name}.php");
@@ -1543,34 +1554,30 @@ class App {
         return $this->create_component("menu");
     }
 //
-    function print_lang_menu() {
-        $avail_langs = $this->get_avail_langs();
-        $this->print_raw_value("lang_menu_items", "");
-        foreach ($avail_langs as $lang) {
-            if ($lang == $this->lang) {
-                $this->print_raw_values(array(
-                    "current_lang_name" => $this->get_message($lang),
-                    "current_lang_image_url" =>
-                        $this->config->get_value("lang_image_current_url_{$lang}"),
-                ));
-                $this->print_file("_lang_menu_item_current.html", "lang_menu_items");
-            } else {
-                $this->print_raw_values(array(
-                    "new_lang" => $lang,
-                    "new_lang_name" => $this->get_message($lang),
-                    "new_lang_image_url" => $this->config->get_value("lang_image_url_{$lang}"),
-                ));
-                $this->print_file("_lang_menu_item.html", "lang_menu_items");
-            }
-        }
-        $this->print_file_new("_lang_menu.html", "lang_menu");
+    function print_lang_menu($params = array()) {
+        $lang_menu =& $this->create_lang_menu();
+
+        $lang_menu->templates_dir = get_param_value($params, "templates_dir", "_lang_menu");
+        $lang_menu->template_var = get_param_value($params, "template_var", "lang_menu");
+
+        $lang_menu->avail_langs = $this->get_avail_langs();
+        $lang_menu->current_lang = $this->lang;
+
+        $lang_menu->print_values();
+    }
+
+    function &create_lang_menu() {
+        return $this->create_component("lang_menu");
     }
 
 //  Object functions
     function print_many_objects_list_page($params = array()) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
-            die("No obj in print_many_objects_list_page()");
+            $this->process_fatal_error(
+                "App",
+                "No obj in App::print_many_objects_list_page()"
+            );
         }
         if (is_string($obj)) {
             $obj_name = $obj;
@@ -1695,7 +1702,10 @@ class App {
         } else {
             $obj = get_param_value($params, "obj", null);
             if (is_null($obj)) {
-                die("No obj in print_many_objects_list()");
+                $this->process_fatal_error(
+                    "App",
+                    "No obj in App::print_many_objects_list()"
+                );
             } else {
                 if (is_string($obj)) {
                     $obj_name = $obj;
@@ -1779,7 +1789,10 @@ class App {
     function print_object_view_page($params) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
-            die("No obj in print_object_view_page()");
+            $this->process_fatal_error(
+                "App",
+                "No obj in App::print_object_view_page()"
+            );
         }
         $obj_name = $obj->table_name;
         
@@ -1805,7 +1818,10 @@ class App {
     function print_object_edit_page($params) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
-            die("No obj in print_object_edit_page()");
+            $this->process_fatal_error(
+                "App",
+                "No obj in App::print_object_edit_page()"
+            );
         }
         $obj_name = $obj->table_name;
 
@@ -1846,14 +1862,10 @@ class App {
     function delete_object($params = array()) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
-            $obj_name = get_param_value($params, "obj_name", null);
-            if (!is_null($obj_name)) {
-                $obj = $this->read_id_fetch_db_object($obj_name);
-            } else {
-                die("No obj or obj_name in delete_object()");
-            }
-        } else {
-            $obj_name = $obj->table_name;
+            $this->process_fatal_error(
+                "App",
+                "No obj in App::delete_object()"
+            );
         }
 
         $default_url_params = array("action" => "pg_view_" . $obj->get_plural_resource_name());
@@ -2097,20 +2109,18 @@ class App {
             null
         );
         if (is_null($component_info)) {
-            $this->log->write(
+            $this->process_fatal_error(
                 "App",
                 "Cannot find component info for '{$component_name}'!"
             );
-            die();
         }
         $component_class_name = $component_info["class_name"];
         if (!class_exists($component_class_name)) {
             if (!$this->load_component($component_name)) {
-                $this->log->write(
+                $this->process_fatal_error(
                     "App",
                     "Cannot load and instantiate component '{$component_name}'!"
                 );
-                die();
             }
         }
         $need_app = get_param_value($component_info, "need_app", true);

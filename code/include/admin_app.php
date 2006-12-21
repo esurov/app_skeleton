@@ -87,8 +87,9 @@ class AdminApp extends CustomApp {
     }
 
     function delete_news_article() {
+        $news_article = $this->read_id_fetch_db_object("news_article");
         $this->delete_object(array(
-            "obj_name" => "news_article",
+            "obj" => $news_article,
             "success_url_params" => array("action" => "pg_view_news_articles"),
             "error_url_params" => array("action" => "pg_view_news_articles"),
         ));

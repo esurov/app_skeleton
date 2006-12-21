@@ -524,7 +524,11 @@ JS;
 }
 
 function create_client_validate_condition_str(
-    $input_name, $condition_type, $message_text, $param, $dependent_validate_condition_str
+    $input_name,
+    $condition_type,
+    $message_text,
+    $param,
+    $dependent_validate_condition_str
 ) {
     $message_text_param = (is_null($message_text)) ?
         "null" :

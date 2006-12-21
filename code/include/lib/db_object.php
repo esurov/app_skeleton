@@ -226,7 +226,10 @@ class DbObject {
         $field_array_index = count($this->fields);
         $field_name = get_param_value($field_info, "field", null);
         if (is_null($field_name)) {
-            die("{$this->table_name}: field name is not specified for field {$field_array_index}!");
+            $this->app->process_fatal_error(
+                "DbObject",
+                "{$this->table_name}: field name is not specified for field {$field_array_index}!"
+            );
         }
         $field_name_alias = get_param_value($field_info, "field_alias", null);
 
@@ -263,7 +266,10 @@ class DbObject {
             } else {
                 // case of alias to real field from current table
                 if (!isset($this->fields[$field_name])) {
-                    die("{$table_name}: cannot find field '{$field_name}'");
+                    $this->app->process_fatal_error(
+                        "DbObject",
+                        "{$table_name}: cannot find field '{$field_name}'"
+                    );
                 }
                 $field_info = $this->fields[$field_name];
                 $table_name_alias = if_null($table_name_alias, $table_name);
@@ -285,7 +291,10 @@ class DbObject {
 
             $field_type = get_param_value($field_info, "type", null);
             if (is_null($field_type)) {
-                die("{$table_name}: field type for '{$field_name}' not specified!");
+                $this->app->process_fatal_error(
+                    "DbObject",
+                    "{$table_name}: field type for '{$field_name}' not specified!"
+                );
             }
 
             $default_index_type = null;
@@ -327,15 +336,16 @@ class DbObject {
             case "enum":
                 $initial_field_value = get_param_value($field_info, "value", null);
                 if (is_null($initial_field_value)) {
-                    die(
+                    $this->app->process_fatal_error(
+                        "DbObject",
                         "{$table_name}: initial field 'value' for enum" .
-                        " '{$field_name}' not specified!"
+                            " '{$field_name}' not specified!"
                     );
                 }
                 if (is_null(get_param_value($field_info, "input", null))) {
-                    die(
-                        "{$table_name}: 'input' for enum" .
-                        " '{$field_name}' not specified!"
+                    $this->app->process_fatal_error(
+                        "DbObject",
+                        "{$table_name}: 'input' for enum '{$field_name}' not specified!"
                     );
                 }
                 break;
@@ -368,7 +378,10 @@ class DbObject {
                 $initial_field_value = get_param_value($field_info, "value", "00:00:00");
                 break;
             default:
-                die("{$table_name}: unknown type '{$field_type}' for field '{$field_name}'");
+                $this->app->process_fatal_error(
+                    "DbObject",
+                    "{$table_name}: unknown type '{$field_type}' for field '{$field_name}'"
+                );
             }
 
             $attr = get_param_value($field_info, "attr", "");
@@ -401,13 +414,17 @@ class DbObject {
             // insert info for field from another table
             $obj = $this->create_db_object($table_name);
             if (is_null($obj)) {
-                die("{$this->table_name}: cannot find joined '{$table_name}'!");
+                $this->app->process_fatal_error(
+                    "DbObject",
+                    "{$this->table_name}: cannot find joined '{$table_name}'!"
+                );
             }
 
             if (!isset($obj->fields[$field_name])) {
-                die(
+                $this->app->process_fatal_error(
+                    "DbObject",
                     "{$this->table_name}: cannot find field " .
-                    "'{$field_name}' in joined '{$table_name}'!"
+                        "'{$field_name}' in joined '{$table_name}'!"
                 );
             }
 
@@ -519,19 +536,28 @@ class DbObject {
             $join_type_str = "RIGHT";
             break;
         default:
-            die("{$this->table_name}: bad join type '{$join_type}'!");
+            $this->app->process_fatal_error(
+                "DbObject",
+                "{$this->table_name}: bad join type '{$join_type}'!"
+            );
         }
         
         $join_table_name = get_param_value($join_info, "table", null);
         if (is_null($join_table_name)) {
-            die("{$this->table_name}: table name not specified in join!");
+            $this->app->process_fatal_error(
+                "DbObject",
+                "{$this->table_name}: table name not specified in join!"
+            );
         }
         $join_table_name_alias = get_param_value($join_info, "table_alias", $join_table_name);
 
         if (is_null($field_name)) {
             $join_condition = get_param_value($join_info, "condition", null);
             if (is_null($join_condition)) {
-                die("{$this->table_name}: condition expression not specified in join!");
+                $this->app->process_fatal_error(
+                    "DbObject",
+                    "{$this->table_name}: condition expression not specified in join!"
+                );
             }
         } else {
             $join_table_field_name = get_param_value(
@@ -675,7 +701,10 @@ class DbObject {
             $type_expression = "TIME";
             break;
         default:
-            die("{$this->table_name}: unknown field type '{$field_type}'!");
+            $this->app->process_fatal_error(
+                "DbObject",
+                "{$this->table_name}: unknown field type '{$field_type}'!"
+            );
         }
         
         return $type_expression;
@@ -700,7 +729,10 @@ class DbObject {
             $expression = "FULLTEXT {$index_name} ({$index_field_names_str})";
             break;
         default:
-            die("{$this->table_name}: unknown index type '{$index_type}'!");
+            $this->app->process_fatal_error(
+                "DbObject",
+                "{$this->table_name}: unknown index type '{$index_type}'!"
+            );
         }
         
         return $expression;
