@@ -180,6 +180,10 @@ function is_value_email($value) {
     return preg_match('/.+@.+\..+/', $value);
 }
 
+function is_php_number($value) {
+    return (preg_match('/^\s*[-+]?(?:[0-9]*\.)?[0-9]*\s*$/', $value));
+}
+
 //
 function format_double_value($double_value, $decimals, $dec_point, $thousands_sep) {
     return number_format($double_value, $decimals, $dec_point, $thousands_sep);
