@@ -1525,7 +1525,7 @@ class App {
         }
     }
 
-//  Page contruction helper functions
+//  Page construction helper functions
     function print_static_page($page_name) {
         $this->print_static_file($page_name, "body");
     }
@@ -2102,7 +2102,7 @@ class App {
         return $was_loaded;
     }
 
-    function &create_component($component_name) {
+    function &create_component($component_name, $component_params = null) {
         $component_info = get_param_value(
             $this->components["components_info"],
             $component_name,
@@ -2127,6 +2127,9 @@ class App {
         $component =& new $component_class_name();
         if ($need_app) {
             $component->app =& $this;
+        }
+        if (!is_null($component_params) && method_exists($component, "init")) {
+            $component->init($component_params);
         }
         return $component;
     }

@@ -105,7 +105,6 @@ class Template {
         if ($this->is_template_exist($template_name)) {
             return $this->parse_file($template_name, $name);    
         } else {
-            $this->set_filling_value($name, "");
             return "";
         }
     }

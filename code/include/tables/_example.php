@@ -354,10 +354,7 @@ class Example extends CustomDbObject {
             $param1_value = $this->print_params["custom_params"]["param1"];
             $param2_value = $this->print_params["custom_params"]["param2"];
 
-            // Access to original fetched resultset row, its number in the list and parity
-            // May be used to access expanded query special or calculated fields
-            // which have no physical equivalents in DB
-            $row = $this->print_params["row"];
+            // Access to item number in the list and its parity
             $list_item_number = $this->print_params["list_item_number"];
             $list_item_parity = $this->print_params["list_item_parity"];
 

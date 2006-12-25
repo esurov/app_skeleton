@@ -1506,7 +1506,6 @@ class DbObject {
         $this->init_print_param($params, "list_item_class", "");
         $this->init_print_param($params, "list_items_count", 0);
         $this->init_print_param($params, "custom_params", array());
-        $this->init_print_param($params, "row", array());
     }
 
     function print_values($params = array()) {

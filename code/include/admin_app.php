@@ -35,14 +35,46 @@ class AdminApp extends CustomApp {
         $this->print_static_page("index");
     }
 //
+//    function pg_view_news_articles() {
+//        $this->print_many_objects_list_page(array(
+//            "obj" => "news_article",
+//            "templates_dir" => "news_articles",
+//            "default_order_by" => array("created DESC", "id DESC"),
+//            "show_filter_form" => true,
+//        ));
+//    }
+
     function pg_view_news_articles() {
-        $this->print_many_objects_list_page(array(
-            "obj" => "news_article",
-            "templates_dir" => "news_articles",
-            "default_order_by" => array("created DESC", "id DESC"),
-            "show_filter_form" => true,
-        ));
+        $templates_dir = "news_articles";
+
+        $list =& $this->create_component(
+            "objects_paged_list",
+            array(
+                "obj" => "news_article",
+                "templates_dir" => "{$templates_dir}/news_articles_paged_list",
+                "template_var" => "paged_news_articles",
+                "default_order_by" => array("created DESC", "id DESC"),
+                "show_filter_form" => true,
+            )
+        );
+        $list->print_values();
+        
+        $this->print_file("{$templates_dir}/body.html");
+
+//
+//        $templates_dir = "news_articles";
+//
+//        $this->print_many_objects_list_page(array(
+//            "obj" => "news_article",
+//            "templates_dir" => "{$templates_dir}/paged_news_articles",
+//            "template_var" => "paged_news_articles",
+//            "default_order_by" => array("created DESC", "id DESC"),
+//            "show_filter_form" => true,
+//        ));
+        
+//        $this->print_file("{$templates_dir}/body.html");
     }
+//////////
 
     function pg_edit_news_article() {
         $news_article = get_param_value($this->action_params, "news_article", null);

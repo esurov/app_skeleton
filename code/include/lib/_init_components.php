@@ -6,6 +6,18 @@ $components = array(
         _APP_LIB_DIR . "/components",
     ),
     "components_info" => array(
+        "objects_list" => array(
+            "class_name" => "ObjectsList",
+            "file_name" => "objects_list.php",
+        ),
+        "query_objects_list" => array(
+            "class_name" => "QueryObjectsList",
+            "file_name" => "objects_list.php",
+        ),
+//        "objects_paged_query_list" => array(
+//            "class_name" => "ObjectsPagedQueryList",
+//            "file_name" => "objects_list.php",
+//        ),
         "xml" => array(
             "class_name" => "Xml",
             "file_name" => "xml.php",

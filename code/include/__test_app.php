@@ -22,6 +22,7 @@ class TestApp extends CustomApp {
             "print_and_save_one_example" => $e,
 
             "pg_view_component" => $e,
+            "pg_view_news_articles" => $e,
         );
     }
 //
