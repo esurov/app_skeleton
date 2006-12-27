@@ -45,8 +45,8 @@ class UserApp extends CustomApp {
                     "order_by" => "created DESC, id DESC",
                     "limit" => "0, {$n_recent_news_articles}",
                 ),
-                "templates_dir" => "{$templates_dir}/recent_news_articles_list",
-                "template_var" => "recent_news_articles_list",
+                "templates_dir" => "{$templates_dir}/recent_news_articles",
+                "template_var" => "recent_news_articles",
             )
         );
         $recent_news_articles_list->print_values();

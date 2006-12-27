@@ -15,32 +15,70 @@ class _ObjectsList {
     var $_n_objects;
 
     function init($params) {
-        $this->_n_objects = $this->get_num_objects();
+        $this->_n_objects = $this->_get_num_objects();
 
-        $obj_name = $this->get_obj_name();
-        $this->template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
-        $this->templates_dir = get_param_value($params, "templates_dir", $obj_name);
-        $this->templates_ext = get_param_value($params, "templates_ext", "html");
-        $this->context = get_param_value($params, "context", "");
+        $this->templates_dir = get_param_value($params, "templates_dir", null);
+        if (is_null($this->templates_dir)) {
+            $this->app->process_fatal_error(
+                "_ObjectsList",
+                "No 'templates_dir' in _ObjectsList::init()"
+            );
+        }
+        $this->template_var_prefix = get_param_value(
+            $params,
+            "template_var_prefix",
+            $this->_get_default_template_var_prefix()
+        );
         $this->template_var = get_param_value(
             $params,
             "template_var",
             "{$this->template_var_prefix}_list"
         );
+        $this->templates_ext = get_param_value($params, "templates_ext", "html");
+        $this->context = get_param_value($params, "context", "");
         $this->custom_params = get_param_value($params, "custom_params", array());
     }
+//
+    function &_fetch_object() {
+        $obj = false;
+        return $obj;
+    }
 
+    function _get_num_objects() {
+        return null;
+    }
+
+    function _get_default_template_var_prefix() {
+        return null;
+    }
+//
     function print_values() {
         $this->app->print_custom_params($this->custom_params);
 
+        $this->_print_body();
+
+    }
+
+    function _print_body() {
+        $this->_print_list();
+        return $this->app->print_file(
+            "{$this->templates_dir}/list.{$this->templates_ext}",
+            $this->template_var
+        );
+    }
+
+    function _print_list() {
         $no_items_template_name = "{$this->templates_dir}/list_no_items.{$this->templates_ext}";
         if ($this->_n_objects == 0 && $this->app->is_file_exist($no_items_template_name)) {
-            return $this->app->print_file($no_items_template_name, $this->template_var);
+            return $this->app->print_file(
+                $no_items_template_name,
+                "{$this->template_var_prefix}_list"
+            );
         } else {
             $this->app->print_raw_value("{$this->template_var_prefix}_items", "");
 
             $i = 0;
-            while ($obj =& $this->fetch_object()) {
+            while ($obj =& $this->_fetch_object()) {
                 $list_item_parity = $i % 2;
                 $list_item_class = ($list_item_parity == 0) ?
                     "list-item-even" :
@@ -79,22 +117,9 @@ class _ObjectsList {
 
             return $this->app->print_file(
                 "{$this->templates_dir}/list_items.{$this->templates_ext}",
-                $this->template_var
+                "{$this->template_var_prefix}_list"
             );
         }
-    }
-
-    function &fetch_object() {
-        $obj = false;
-        return $obj;
-    }
-
-    function get_num_objects() {
-        return null;
-    }
-
-    function get_obj_name() {
-        return null;
     }
 
 }
@@ -110,15 +135,15 @@ class ObjectsList extends _ObjectsList {
         if (is_null($this->objects)) {
             $this->app->process_fatal_error(
                 "ObjectsList",
-                "No objects in ObjectsList::init()"
+                "No 'objects' in ObjectsList::init()"
             );
         }
         $this->_obj_idx = 0;
 
         parent::init($params);
     }
-
-    function &fetch_object() {
+//
+    function &_fetch_object() {
         if ($this->_obj_idx == $this->_n_objects) {
             $obj = false;
         } else {
@@ -127,11 +152,11 @@ class ObjectsList extends _ObjectsList {
         return $obj;
     }
 
-    function get_num_objects() {
+    function _get_num_objects() {
         return count($this->objects);
     }
 
-    function get_obj_name() {
+    function _get_default_template_var_prefix() {
         return ($this->_n_objects == 0) ? "" : $this->objects[0]->table_name;
     }
 
@@ -146,8 +171,8 @@ class QueryObjectsList extends _ObjectsList {
         $this->obj = get_param_value($params, "obj", null);
         if (is_null($this->obj)) {
             $this->app->process_fatal_error(
-                "ObjectsQueryList",
-                "No obj in ObjectsQueryList::init()"
+                "QueryObjectsList",
+                "No 'obj' in QueryObjectsList::init()"
             );
         }
         $query = get_param_value($params, "query", $this->obj->get_select_query());
@@ -158,8 +183,8 @@ class QueryObjectsList extends _ObjectsList {
 
         parent::init($params);
     }
-
-    function &fetch_object() {
+//
+    function &_fetch_object() {
         if ($row = $this->res->fetch()) {
             $this->obj->fetch_row($row);
             $obj =& $this->obj;
@@ -169,11 +194,11 @@ class QueryObjectsList extends _ObjectsList {
         return $obj;
     }
 
-    function get_num_objects() {
+    function _get_num_objects() {
         return $this->res->get_num_rows();
     }
 
-    function get_obj_name() {
+    function _get_default_template_var_prefix() {
         return $this->obj->table_name;
     }
 

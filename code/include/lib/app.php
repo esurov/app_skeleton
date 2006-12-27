@@ -1576,7 +1576,7 @@ class App {
         if (is_null($obj)) {
             $this->process_fatal_error(
                 "App",
-                "No obj in App::print_many_objects_list_page()"
+                "No 'obj' in App::print_many_objects_list_page()"
             );
         }
         if (is_string($obj)) {
@@ -1704,7 +1704,7 @@ class App {
             if (is_null($obj)) {
                 $this->process_fatal_error(
                     "App",
-                    "No obj in App::print_many_objects_list()"
+                    "No 'obj' in App::print_many_objects_list()"
                 );
             } else {
                 if (is_string($obj)) {
@@ -1791,7 +1791,7 @@ class App {
         if (is_null($obj)) {
             $this->process_fatal_error(
                 "App",
-                "No obj in App::print_object_view_page()"
+                "No 'obj' in App::print_object_view_page()"
             );
         }
         $obj_name = $obj->table_name;
@@ -1820,7 +1820,7 @@ class App {
         if (is_null($obj)) {
             $this->process_fatal_error(
                 "App",
-                "No obj in App::print_object_edit_page()"
+                "No 'obj' in App::print_object_edit_page()"
             );
         }
         $obj_name = $obj->table_name;
@@ -1864,7 +1864,7 @@ class App {
         if (is_null($obj)) {
             $this->process_fatal_error(
                 "App",
-                "No obj in App::delete_object()"
+                "No 'obj' in App::delete_object()"
             );
         }
 
