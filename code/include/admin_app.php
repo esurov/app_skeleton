@@ -47,7 +47,7 @@ class AdminApp extends CustomApp {
     function pg_view_news_articles() {
         $templates_dir = "news_articles";
 
-        $list =& $this->create_component(
+        $list = $this->create_component(
             "objects_paged_list",
             array(
                 "obj" => "news_article",

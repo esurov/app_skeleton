@@ -1550,12 +1550,12 @@ class App {
         $menu->print_values();
     }
 
-    function &create_menu() {
+    function create_menu() {
         return $this->create_component("menu");
     }
 //
     function print_lang_menu($params = array()) {
-        $lang_menu =& $this->create_lang_menu();
+        $lang_menu = $this->create_lang_menu();
 
         $lang_menu->templates_dir = get_param_value($params, "templates_dir", "_lang_menu");
         $lang_menu->template_var = get_param_value($params, "template_var", "lang_menu");
@@ -1566,7 +1566,7 @@ class App {
         $lang_menu->print_values();
     }
 
-    function &create_lang_menu() {
+    function create_lang_menu() {
         return $this->create_component("lang_menu");
     }
 
@@ -2102,7 +2102,7 @@ class App {
         return $was_loaded;
     }
 
-    function &create_component($component_name, $component_params = null) {
+    function create_component($component_name, $component_params = null) {
         $component_info = get_param_value(
             $this->components["components_info"],
             $component_name,
@@ -2124,7 +2124,7 @@ class App {
             }
         }
         $need_app = get_param_value($component_info, "need_app", true);
-        $component =& new $component_class_name();
+        $component = new $component_class_name();
         if ($need_app) {
             $component->app =& $this;
         }
@@ -2134,8 +2134,8 @@ class App {
         return $component;
     }
 //
-    function &create_email_sender() {
-        $email_sender =& $this->create_component("email_sender");
+    function create_email_sender() {
+        $email_sender = $this->create_component("email_sender");
         $email_sender->IsSendmail();
         $email_sender->IsHTML($this->config->get_value("email_is_html"));
         $email_sender->CharSet = $this->config->get_value("email_charset");
@@ -2148,8 +2148,8 @@ class App {
             $email_to;
     }
 //
-    function &create_image_magick() {
-        $im =& $this->create_component("image_magick");
+    function create_image_magick() {
+        $im = $this->create_component("image_magick");
         $im->set_image_magick_path($this->config->get_value("image_magick_path"));
         $im->app_name = $this->db->table_prefix;
         $im->create_dst_file();

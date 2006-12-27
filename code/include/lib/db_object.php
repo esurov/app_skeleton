@@ -2474,7 +2474,7 @@ class DbObject {
             $resize_func_name = get_param_value($resize_info, "resize_func", "crop_and_resize");
         }
 
-        $im =& $this->app->create_image_magick();
+        $im = $this->app->create_image_magick();
         $im->{$resize_func_name}(
             $file_path,
             array(

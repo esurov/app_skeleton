@@ -37,7 +37,7 @@ class UserApp extends CustomApp {
         $templates_dir = "index";
 
         $n_recent_news_articles = $this->config->get_value("recent_news_articles_number");
-        $recent_news_articles_list =& $this->create_component(
+        $recent_news_articles_list = $this->create_component(
             "query_objects_list",
             array(
                 "obj" => $this->create_db_object("news_article"),
