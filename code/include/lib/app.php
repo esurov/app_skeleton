@@ -48,8 +48,6 @@ class App {
         $this->html_charset = $this->config->get_value("html_charset");
         $this->print_raw_value("html_charset", $this->html_charset);
 
-        $this->create_pager();
-
         $this->avail_langs = $this->get_avail_langs();
         $this->dlang = $this->config->get_value("default_language");
         $this->lang = $this->get_current_lang();
@@ -85,7 +83,7 @@ class App {
         } else {
             $message = "";
         }
-        die($message);
+        trigger_error($message, E_USER_ERROR);
     }
 
     function create_db() {
@@ -107,15 +105,6 @@ class App {
         $print_template_name = $this->config->get_value("print_template_name");
         $this->page = new Template("templates/{$this->app_name}", $print_template_name);
         $this->page_template_name = "";
-    }
-
-    function create_pager() {
-        $n_rows_per_page = $this->config->get_value("{$this->app_name}_rows_per_page", 20);
-        $this->pager = new Pager($this, $n_rows_per_page);
-    }
-
-    function drop_pager() {
-        $this->pager->n_rows_per_page = 10000;
     }
 
     function init_lang_dependent_data() {
@@ -649,19 +638,6 @@ class App {
     function print_values($h) {
         foreach ($h as $template_var => $value) {
             $this->print_value($template_var, $value);
-        }
-    }
-
-    function print_suburl_value($template_var, $suburl_params) {
-        if (!is_array($suburl_params)) {
-            $suburl_params = array($template_var => $suburl_params);
-        }
-        $this->print_value("{$template_var}_suburl", create_suburl($suburl_params));
-    }
-
-    function print_suburl_values($suburls_info) {
-        foreach ($suburls_info as $template_var => $suburl_params) {
-            $this->print_suburl_value($template_var, $suburl_params);
         }
     }
 //
@@ -1571,221 +1547,6 @@ class App {
     }
 
 //  Object functions
-    function print_many_objects_list_page($params = array()) {
-        $obj = get_param_value($params, "obj", null);
-        if (is_null($obj)) {
-            $this->process_fatal_error(
-                "App",
-                "No 'obj' in App::print_many_objects_list_page()"
-            );
-        }
-        if (is_string($obj)) {
-            $obj_name = $obj;
-            $obj = $this->create_db_object($obj_name);
-        } else {
-            $obj_name = $obj->table_name;
-        }
-        $templates_dir = get_param_value($params, "templates_dir", $obj_name);
-        $templates_ext = get_param_value($params, "templates_ext", "html");
-        $context = get_param_value($params, "context", "");
-        $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
-        $template_var = get_param_value($params, "template_var", "body");
-        $query = get_param_value($params, "query", $obj->get_select_query());
-        $query_ex = get_param_value($params, "query_ex", array());
-        $default_order_by = get_param_value($params, "default_order_by", "id ASC");
-        $show_filter_form = get_param_value($params, "show_filter_form", false);
-        $filter_form_template_name = get_param_value(
-            $params,
-            "filter_form_template_name",
-            "filter_form.html"
-        );
-        $custom_params = get_param_value($params, "custom_params", array());
-
-        $query->expand($query_ex);
-
-        // Apply filters to query
-        $obj->read_filters();
-        $filters_params = $obj->get_filters_params();
-        $query->expand($obj->get_filters_query_ex());
-
-        // Apply ordering to query
-        $obj->read_order_by($default_order_by);
-        $order_by_params = $obj->get_order_by_params();
-        $query->expand($obj->get_order_by_query_ex());
-        
-        // Make sub-URLs with all necessary parameters stored
-        $action_suburl_param = array("action" => $this->action);
-        $extra_suburl_params = $this->get_app_extra_suburl_params();
-
-        $action_suburl_params =
-            $action_suburl_param +
-            $custom_params +
-            $extra_suburl_params;
-               
-        $action_filters_suburl_params =
-            $action_suburl_param +
-            $filters_params +
-            $custom_params +
-            $extra_suburl_params;
-
-        $action_filters_order_by_suburl_params =
-            $action_suburl_param +
-            $filters_params +
-            $order_by_params +
-            $custom_params +
-            $extra_suburl_params;
-
-        $this->print_suburl_values(array(
-            "action" => $action_suburl_params,
-            "action_filters" => $action_filters_suburl_params,
-            "action_filters_order_by" => $action_filters_order_by_suburl_params,
-        ));
-
-        $n = $this->db->get_select_query_num_rows($query);
-
-        if ($n == 0) {
-            $objects = array(); // use empty objects list
-        } else {
-            $this->pager->set_total_rows($n);
-            $this->pager->read();
-            if ($query->limit == "") {
-                $query->expand(array(
-                    "limit" => $this->pager->get_limit_clause(),
-                ));
-            }
-            $objects = null; // use constructed query to get objects list
-        }
-
-        $this->print_many_objects_list(array(
-            "obj" => $obj,
-            "query" => $query,
-            "templates_dir" => $templates_dir,
-            "templates_ext" => $templates_ext,
-            "template_var_prefix" => $template_var_prefix,
-            "context" => $context,
-            "objects" => $objects,
-            "custom_params" => $custom_params,
-        ));
-
-        if ($n > 0) {
-            $this->pager->print_nav_str($action_filters_order_by_suburl_params);
-            $this->print_value("total", $obj->get_quantity_str($n));
-        }
-
-        if ($show_filter_form) {
-            $this->print_values($filters_params);
-            $obj->print_filter_form_values();
-            $this->print_file_new(
-                "{$templates_dir}/{$filter_form_template_name}",
-                "{$obj_name}_filter_form"
-            );
-        }
-
-        return $this->print_file("{$templates_dir}/list.{$templates_ext}", $template_var);
-    }
-//
-    function print_many_objects_list($params) {
-        $objects = get_param_value($params, "objects", null);
-        $objects_passed = !is_null($objects);
-
-        if ($objects_passed) {
-            $n = count($objects);
-            if ($n == 0) {
-                $template_var_prefix = get_param_value($params, "template_var_prefix", "");
-                $templates_dir = get_param_value($params, "templates_dir", "");
-            } else {
-                $obj_name = $objects[0]->table_name;
-                $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
-                $templates_dir = get_param_value($params, "templates_dir", $obj_name);
-            }
-            
-        } else {
-            $obj = get_param_value($params, "obj", null);
-            if (is_null($obj)) {
-                $this->process_fatal_error(
-                    "App",
-                    "No 'obj' in App::print_many_objects_list()"
-                );
-            } else {
-                if (is_string($obj)) {
-                    $obj_name = $obj;
-                    $obj = $this->create_db_object($obj_name);
-                } else {
-                    $obj_name = $obj->table_name;
-                }
-                $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
-                $templates_dir = get_param_value($params, "templates_dir", $obj_name);
-            }
-        }
-
-        $templates_ext = get_param_value($params, "templates_ext", "html");
-        $context = get_param_value($params, "context", "");
-        $template_var = get_param_value($params, "template_var", "{$template_var_prefix}_list");
-        $custom_params = get_param_value($params, "custom_params", array());
-
-        if ($objects_passed) {
-            $n = count($objects);
-        } else {
-            $query = get_param_value($params, "query", $obj->get_select_query());
-            $query_ex = get_param_value($params, "query_ex", array());
-            
-            $query->expand($query_ex);
-            $res = $this->db->run_select_query($query);
-            $n = $res->get_num_rows();
-        }
-
-        $this->print_custom_params($custom_params);
-
-        $no_items_template_name = "{$templates_dir}/list_no_items.{$templates_ext}";
-        if ($n == 0 && $this->is_file_exist($no_items_template_name)) {
-            return $this->print_file($no_items_template_name, $template_var);
-        } else {
-            $this->print_raw_value("{$template_var_prefix}_items", "");
-
-            for ($i = 0; $i < $n; $i++) {
-                if ($objects_passed) {
-                    $row = array();
-                    $obj = $objects[$i];
-                } else {
-                    $row = $res->fetch();
-                    $obj->fetch_row($row);
-                }
-
-                $list_item_parity = $i % 2;
-                $list_item_class = ($list_item_parity == 0) ?
-                    "list-item-even" :
-                    "list-item-odd";
-
-                $this->print_raw_values(array(
-                    "list_item_parity" => $list_item_parity,
-                    "list_item_class" => $list_item_class,
-                ));
-
-                $obj->print_values(array(
-                     "templates_dir" => $templates_dir,
-                     "template_var_prefix" => $template_var_prefix,
-                     "context" => $context,
-                     "list_item_number" => $i + 1,
-                     "list_item_parity" => $list_item_parity,
-                     "list_item_class" => $list_item_class,
-                     "list_items_count" => $n,
-                     "custom_params" => $custom_params,
-                     "row" => $row,
-                ));
-
-                $this->print_file(
-                    "{$templates_dir}/list_item.{$templates_ext}",
-                    "{$template_var_prefix}_items"
-                );
-            }
-
-            return $this->print_file(
-                "{$templates_dir}/list_items.{$templates_ext}",
-                $template_var
-            );
-        }
-    }
-//
     function print_object_view_page($params) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
@@ -1855,7 +1616,10 @@ class App {
     function print_custom_param($param_name, $param_value) {
         $this->print_value($param_name, $param_value);
         $this->print_raw_value("{$param_name}_orig", $param_value);
-        $this->print_suburl_value($param_name, $param_value);
+        $this->print_value(
+            "{$param_name}_suburl",
+            create_suburl(array($param_name => $param_value))
+        );
         $this->print_hidden_input_form_value($param_name, $param_value);
     }
 //
@@ -2080,7 +1844,17 @@ class App {
     }
 //
     function load_component($component_name) {
-        $component_info = $this->components["components_info"][$component_name];
+        $component_info = get_param_value(
+            $this->components["components_info"],
+            $component_name,
+            null
+        );
+        if (is_null($component_info)) {
+            $this->process_fatal_error(
+                "App",
+                "Cannot find required component '{$component_name}'!"
+            );
+        }
 
         $was_loaded = false;
         $required_components = get_param_value($component_info, "required_components", array());
@@ -2111,7 +1885,7 @@ class App {
         if (is_null($component_info)) {
             $this->process_fatal_error(
                 "App",
-                "Cannot find component info for '{$component_name}'!"
+                "Cannot find component '{$component_name}'!"
             );
         }
         $component_class_name = $component_info["class_name"];

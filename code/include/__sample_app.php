@@ -1,9 +1,9 @@
 <?php
 
-class TestApp extends CustomApp {
+class SampleApp extends CustomApp {
 
-    function TestApp() {
-        parent::CustomApp("test");
+    function SampleApp() {
+        parent::CustomApp("_sample");
 
         $e = array("valid_users" => array("guest"));
 
@@ -12,17 +12,15 @@ class TestApp extends CustomApp {
 
             "set_cookie" => $e,
             "check_cookie" => $e,
-            "get_news_articles_xml" => $e,
             "get_news_articles_with_new_field_xml" => $e,
-
-            "pg_view_examples_in_context1" => $e,
-            "pg_view_examples_in_context2" => $e,
-            "pg_view_all_examples_as_objects" => $e,
-
-            "print_and_save_one_example" => $e,
+/*
+            "pg_view_sample_table_records_in_context1" => $e,
+            "pg_view_sample_table_records_in_context2" => $e,
+            "pg_view_all_sample_table_records_as_objects" => $e,
+*/
+            "print_and_save_one_sample_table_record" => $e,
 
             "pg_view_component" => $e,
-            "pg_view_news_articles" => $e,
         );
     }
 //
@@ -48,18 +46,6 @@ class TestApp extends CustomApp {
         exit;
     }
 
-    function get_news_articles_xml() {
-        $xml_content = $this->print_many_objects_list(array(
-            "obj" => "news_article",
-            "templates_dir" => "news_article/xml",
-            "templates_ext" => "xml",
-            "query_ex" => array(
-                "order_by" => "created DESC, id DESC"
-            ),
-        ));
-        $this->create_xml_document_response($xml_content);
-    }
-
     function get_news_articles_with_new_field_xml() {
         $news_article = $this->create_db_object("news_article");
         $news_article->insert_field(array(
@@ -67,23 +53,28 @@ class TestApp extends CustomApp {
             "type" => "integer",
             "select" => "RAND(1000) * 1000",
         ));
-        $xml_content = $this->print_many_objects_list(array(
-            "obj" => $news_article,
-            "templates_dir" => "news_article/xml",
-            "templates_ext" => "xml",
-            "query_ex" => array(
-                "order_by" => "created DESC, id DESC"
-            ),
-        ));
+        $news_articles_list = $this->create_component(
+            "query_objects_list",
+            array(
+                "templates_dir" => "news_article/xml",
+                "templates_ext" => "xml",
+                "obj" => $news_article,
+                "query_ex" => array(
+                    "order_by" => "created DESC, id DESC",
+                ),
+            )
+        );
+        $xml_content = $news_articles_list->print_values();
         $this->create_xml_document_response($xml_content);
     }
 
 //  Context usage example
 //  Print list with specific to context1 template variables
-    function pg_view_examples_in_context1() {
+/*
+    function pg_view_sample_table_records_in_context1() {
         $this->print_many_objects_list_page(array(
-            "obj" => "_example",
-            "templates_dir" => "_example/list_context1",
+            "obj" => "_sample_table",
+            "templates_dir" => "_sample_table/list_context1",
             "context" => "context1",
             "custom_params" => array(
                 "param1" => "param1_value",
@@ -92,40 +83,40 @@ class TestApp extends CustomApp {
         ));
     }
 
-    function pg_view_examples_in_context2() {
+    function pg_view_sample_table_records_in_context2() {
         $this->print_many_objects_list_page(array(
-            "obj" => "_example",
-            "templates_dir" => "_example/list_context2",
+            "obj" => "_sample_table",
+            "templates_dir" => "_sample_table/list_context2",
             "context" => "context2",
         ));
     }
 
-    function pg_view_all_examples_as_objects() {
-        $examples = $this->fetch_db_objects_list(
-            "_example",
+    function pg_view_all_sample_table_records_as_objects() {
+        $objects = $this->fetch_db_objects_list(
+            "_sample_table",
             array("order_by" => "created DESC")
         );
         $this->print_many_objects_list(array(
-            "objects" => $examples,
+            "objects" => $objects,
             "templates_dir" => "_example/list_as_objects",
             "template_var" => "body",
         ));
     }
-
-    function print_and_save_one_example() {
-        $example = $this->fetch_db_object("_example", 1);
-        $example->print_values();
-        $example->field_currency = 99999999.99;
-        $example->save();
+*/
+    function print_and_save_one_sample_table_record() {
+        $obj = $this->fetch_db_object("_sample_table", 1);
+        $obj->print_values();
+        $obj->field_currency = 99999999.99;
+        $obj->save();
         vx($this->page->fillings);
     }
 //
     function pg_view_component() {
-        $templates_dir = "component_view";
+        $templates_dir = "sample_component_view";
 
-        $component = $this->create_component("component_example2");
-        $component->templates_dir = "{$templates_dir}/component_example2";
-        $component->template_var = "component_example2";
+        $component = $this->create_component("sample_component2");
+        $component->templates_dir = "{$templates_dir}/sample_component2";
+        $component->template_var = "sample_component2";
         $component->print_values();
 
         $this->print_file("{$templates_dir}/body.html", "body");

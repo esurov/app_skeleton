@@ -28,7 +28,10 @@ class DbObject {
         global $app;
 
         if (!isset($app)) {
-            die("No app found in DbObject()!");
+            trigger_error(
+                "No 'app' found in DbObject()!",
+                E_USER_ERROR
+            );
         }
 
         $this->app =& $app;

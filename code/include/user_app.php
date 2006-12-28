@@ -36,17 +36,18 @@ class UserApp extends CustomApp {
     function pg_index() {
         $templates_dir = "index";
 
+        $news_article = $this->create_db_object("news_article");
         $n_recent_news_articles = $this->config->get_value("recent_news_articles_number");
         $recent_news_articles_list = $this->create_component(
             "query_objects_list",
             array(
-                "obj" => $this->create_db_object("news_article"),
+                "templates_dir" => "{$templates_dir}/recent_news_articles",
+                "template_var" => "recent_news_articles",
+                "obj" => $news_article,
                 "query_ex" => array(
                     "order_by" => "created DESC, id DESC",
                     "limit" => "0, {$n_recent_news_articles}",
                 ),
-                "templates_dir" => "{$templates_dir}/recent_news_articles",
-                "template_var" => "recent_news_articles",
             )
         );
         $recent_news_articles_list->print_values();
@@ -55,12 +56,22 @@ class UserApp extends CustomApp {
     }
 //
     function pg_view_news_articles() {
-        $this->print_many_objects_list_page(array(
-            "obj" => "news_article",
-            "templates_dir" => "news_articles",
-            "default_order_by" => array("created DESC", "id DESC"),
-            "show_filter_form" => true,
-        ));
+        $templates_dir = "news_articles";
+        
+        $news_article = $this->create_db_object("news_article");
+        $news_articles_list = $this->create_component(
+            "paged_query_objects_list",
+            array(
+                "templates_dir" => "{$templates_dir}/news_articles",
+                "template_var" => "news_articles",
+                "obj" => $news_article,
+                "default_order_by" => array("created DESC", "id DESC"),
+                "filter_form.visible" => true,
+            )
+        );
+        $news_articles_list->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
     }
 
     function pg_view_news_article() {

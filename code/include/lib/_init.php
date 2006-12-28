@@ -19,7 +19,6 @@ require_once("db_result.php");
 require_once("db_object.php");
 
 require_once("http_response.php");
-require_once("pager.php");
 require_once("status_msg.php");
 
 require_once("_init_components.php");

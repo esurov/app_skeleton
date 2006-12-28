@@ -40,12 +40,18 @@ class Config {
         // Read configuration file, parse it and store all data in hash.
 
         if (!file_exists($filename)) {
-            die("Configuration file '{$filename}' does not exist!");
+            trigger_error(
+                "Configuration file '{$filename}' does not exist!",
+                E_USER_ERROR
+            );
         }
 
         $f = fopen($filename, "r");
         if (!$f){
-            die("Cannot open configuration file '{$filename}'!");
+            trigger_error(
+                "Cannot open configuration file '{$filename}'!",
+                E_USER_ERROR
+            );
         }
 
         flock($f, LOCK_SH);
@@ -77,7 +83,10 @@ class Config {
 
         $f = fopen($filename, "w");
         if (!$f) {
-            die("Cannot open configuration file '{$filename}'!");
+            trigger_error(
+                "Cannot open configuration file '{$filename}'!",
+                E_USER_ERROR
+            );
         }
 
         flock($f, LOCK_EX);

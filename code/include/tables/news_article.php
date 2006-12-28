@@ -47,13 +47,6 @@ class NewsArticle extends CustomDbObject {
             "read" => 0,
         ));
 //
-        $this->insert_field(array(
-            "field" => "full_text",
-            "type" => "text",
-            "select" =>
-                "CONCAT(news_article.title_{$this->lang}, news_article.body_{$this->lang})",
-        ));
-//
         $this->insert_filter(array(
             "name" => "full_text",
             "relation" => "like_many",

@@ -14,10 +14,14 @@ $components = array(
             "class_name" => "QueryObjectsList",
             "file_name" => "objects_list.php",
         ),
-//        "objects_paged_query_list" => array(
-//            "class_name" => "ObjectsPagedQueryList",
-//            "file_name" => "objects_list.php",
-//        ),
+        "paged_query_objects_list" => array(
+            "class_name" => "PagedQueryObjectsList",
+            "file_name" => "objects_list.php",
+        ),
+        "pager" => array(
+            "class_name" => "Pager",
+            "file_name" => "pager.php",
+        ),
         "xml" => array(
             "class_name" => "Xml",
             "file_name" => "xml.php",

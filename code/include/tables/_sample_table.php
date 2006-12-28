@@ -30,10 +30,10 @@
 // "value" - default one will be used, its value depends on field type
 // "input" - default one will be used
 
-class Example extends CustomDbObject {
+class SampleTable extends CustomDbObject {
 
-    function Example() {
-        parent::CustomDbObject("_example");
+    function SampleTable() {
+        parent::CustomDbObject("_sample_table");
 
         // note: no need to specify index on primary_key and foreign_key fields
         // it is added automatically
@@ -100,7 +100,7 @@ class Example extends CustomDbObject {
             "table" => "image",
             
             // sql string for join condition
-            "condition" => "_example.image_id = image.id",
+            "condition" => "_sample_table.image_id = image.id",
         ));
 
 
@@ -110,8 +110,8 @@ class Example extends CustomDbObject {
             "type" => "foreign_key",
             "join" => array(
                 "type" => "left",
-                "table" => "_example",
-                "table_alias" => "_example_alias",
+                "table" => "_sample_table",
+                "table_alias" => "_sample_table_alias",
                 "field" => "id",
             ),
         ));
@@ -263,7 +263,10 @@ class Example extends CustomDbObject {
             "field" => "calculated_field",
             "type" => "text",
             "select" =>
-                "CONCAT(_example.field_varchar_{$this->lang}, _example.field_text_{$this->lang})",
+                "CONCAT(" .
+                    "_sample_table.field_varchar_{$this->lang}, " .
+                    "_sample_table.field_text_{$this->lang}".
+                ")",
         ));
 
         // alias for the multilingual field from current table
@@ -277,24 +280,25 @@ class Example extends CustomDbObject {
         // field 'field_text' from self-joined table
         // note: calculated fields cannot be get when table_alias specified
         $this->insert_field(array(
-            "table_alias" => "_example_alias",
+            "table_alias" => "_sample_table_alias",
             "field" => "field_text",
         ));
 
         // alias field name 'field_text_alias' for the field 'field_text' from self-joined table
         // note: calculated fields cannot be get when table_alias specified
         $this->insert_field(array(
-            "table_alias" => "_example_alias",
+            "table_alias" => "_sample_table_alias",
             "field" => "field_text",
             "field_alias" => "field_text_alias"
         ));
 
         // calculated field from news_article table
         // note: do not specify type because it is taken from another table
-        $this->insert_field(array(
-            "table" => "news_article",
-            "field" => "full_text",
-        ));
+        // nb: field commented because field was removed from news_article
+//        $this->insert_field(array(
+//            "table" => "news_article",
+//            "field" => "full_text",
+//        ));
 
         // multilingual field from news_article table
         // note: no need to specify type because it is taken from another table
@@ -338,8 +342,8 @@ class Example extends CustomDbObject {
 
         // This template variable is extension to default printed variables for all contexts
         $this->app->print_raw_value(
-            "_example_field_double_decorated",
-            "!!" . $this->app->page->get_filling_value("_example_field_double") . "!!"
+            "_sample_table_field_double_decorated",
+            "!!" . $this->app->page->get_filling_value("_sample_table_field_double") . "!!"
         );
 
         // Context handling
@@ -360,7 +364,7 @@ class Example extends CustomDbObject {
 
             // Add context-specific template variable
             $this->app->print_varchar_value(
-                "_example_context1_specific_value",
+                "_sample_table_context1_specific_value",
                 "str1&{$list_item_number}<>{$list_item_parity}"
             );
             break;
@@ -368,7 +372,7 @@ class Example extends CustomDbObject {
         case "context2":
             // Add context-specific template variable
             $this->app->print_boolean_value(
-                "_example_context2_specific_value",
+                "_sample_table_context2_specific_value",
                 1 - $this->field_boolean
             );
             break;

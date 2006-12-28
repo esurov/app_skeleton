@@ -17,7 +17,7 @@ require_once("custom_db_object.php");
 require_once("custom_app.php");
 
 $tables = array(
-    "_example" => "Example",
+    "_sample_table" => "SampleTable",
     "image" => "Image",
     "file" => "File",
     "news_article" => "NewsArticle",

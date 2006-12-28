@@ -9,14 +9,14 @@ $components["dirs"] = array_merge(
 );
 
 $components_info = array(
-    "component_example" => array(
-        "class_name" => "ComponentExample",
-        "file_name" => "__component_example.php",
+    "sample_component" => array(
+        "class_name" => "SampleComponent",
+        "file_name" => "__sample_component.php",
     ),
-    "component_example2" => array(
-        "class_name" => "ComponentExample2",
-        "file_name" => "__component_example.php",
-        "required_components" => array("component_example"),
+    "sample_component2" => array(
+        "class_name" => "SampleComponent2",
+        "file_name" => "__sample_component.php",
+        "required_components" => array("sample_component"),
     ),
 );
 

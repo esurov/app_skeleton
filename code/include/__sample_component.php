@@ -1,6 +1,6 @@
 <?php
 
-class ComponentExample {
+class SampleComponent {
 
     var $templates_dir;
     var $template_var;
@@ -11,7 +11,7 @@ class ComponentExample {
     
 }
 
-class ComponentExample2 extends ComponentExample {
+class SampleComponent2 extends SampleComponent {
     
 }
 
