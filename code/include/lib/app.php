@@ -193,13 +193,13 @@ class App {
         $this->action_params = $action_params;
         $page_name = trim(get_param_value($action_params, "page", param("page")));
 
-        $action_func_name = $this->action;
+        $action_func_name = "action_{$this->action}";
         $action_name_expanded = ($page_name == "") ?
             $this->action :
             "{$this->action}_{$page_name}";
         
         $this->print_values(array(
-            "action" => $action_func_name,
+            "action" => $this->action,
             "action_expanded" => $action_name_expanded,
             "page" => $page_name,
         ));
@@ -209,7 +209,7 @@ class App {
         
         $this->on_before_run_action();
 
-        $this->log->write("App", "Running action '{$action_func_name}'", 3);
+        $this->log->write("App", "Running action '{$this->action}'", 3);
         $this->{$action_func_name}();  // NB! Variable function
 
         $this->on_after_run_action();
@@ -1479,7 +1479,7 @@ class App {
     }
 
 //  Common actions
-    function change_lang() {
+    function action_change_lang() {
         $this->set_current_lang(trim(param("new_lang")));
         $cur_action = trim(param("cur_action"));
         $cur_page = trim(param("cur_page"));
@@ -1494,7 +1494,7 @@ class App {
         $this->create_self_redirect_response($suburl_params);
     }
 
-    function pg_static() {
+    function action_pg_static() {
         $page_name = trim(param("page"));
         if (preg_match('/^\w+$/i', $page_name)) {
             $this->print_static_page($page_name);

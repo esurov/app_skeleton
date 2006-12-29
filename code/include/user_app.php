@@ -23,7 +23,7 @@ class UserApp extends CustomApp {
         );
     }
 //
-    function pg_access_denied() {
+    function action_pg_access_denied() {
         $this->create_self_redirect_response();
     }
 
@@ -33,7 +33,7 @@ class UserApp extends CustomApp {
         $this->print_lang_menu();
     }
 //
-    function pg_index() {
+    function action_pg_index() {
         $templates_dir = "index";
 
         $news_article = $this->create_db_object("news_article");
@@ -55,7 +55,7 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 //
-    function pg_view_news_articles() {
+    function action_pg_view_news_articles() {
         $templates_dir = "news_articles";
         
         $news_article = $this->create_db_object("news_article");
@@ -74,7 +74,7 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function pg_view_news_article() {
+    function action_pg_view_news_article() {
         $news_article = $this->read_id_fetch_db_object("news_article");
         $this->print_object_view_page(array(
             "obj" => $news_article,
@@ -82,13 +82,13 @@ class UserApp extends CustomApp {
         ));
     }
 //
-    function pg_contact_form() {
+    function action_pg_contact_form() {
         $contact_info = $this->create_db_object("contact_info");
         $contact_info->print_form_values();
         $this->print_file("contact_form/body.html", "body");
     }
 
-    function process_contact_form() {
+    function action_process_contact_form() {
         $contact_info = $this->create_db_object("contact_info");
         $contact_info->read();
         

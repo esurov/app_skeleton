@@ -24,7 +24,7 @@ class SampleApp extends CustomApp {
         );
     }
 //
-    function pg_index() {
+    function action_pg_index() {
         foreach (array_keys($this->actions) as $action) {
             $this->print_varchar_value("action_name", $action);
             $this->print_varchar_value(
@@ -36,17 +36,17 @@ class SampleApp extends CustomApp {
         $this->print_file("actions_list/list_items.html", "body");
     }
 
-    function set_cookie() {
+    function action_set_cookie() {
         $this->create_self_redirect_response(array("action" => "check_cookie"));
         $this->response->add_cookie(new Cookie("Cookie1", "&%$#@!Value1"));
     }
 
-    function check_cookie() {
+    function action_check_cookie() {
         v($_COOKIE);
         exit;
     }
 
-    function get_news_articles_with_new_field_xml() {
+    function action_get_news_articles_with_new_field_xml() {
         $news_article = $this->create_db_object("news_article");
         $news_article->insert_field(array(
             "field" => "new_field",
@@ -71,7 +71,7 @@ class SampleApp extends CustomApp {
 //  Context usage example
 //  Print list with specific to context1 template variables
 /*
-    function pg_view_sample_table_records_in_context1() {
+    function action_pg_view_sample_table_records_in_context1() {
         $this->print_many_objects_list_page(array(
             "obj" => "_sample_table",
             "templates_dir" => "_sample_table/list_context1",
@@ -83,7 +83,7 @@ class SampleApp extends CustomApp {
         ));
     }
 
-    function pg_view_sample_table_records_in_context2() {
+    function action_pg_view_sample_table_records_in_context2() {
         $this->print_many_objects_list_page(array(
             "obj" => "_sample_table",
             "templates_dir" => "_sample_table/list_context2",
@@ -91,7 +91,7 @@ class SampleApp extends CustomApp {
         ));
     }
 
-    function pg_view_all_sample_table_records_as_objects() {
+    function action_pg_view_all_sample_table_records_as_objects() {
         $objects = $this->fetch_db_objects_list(
             "_sample_table",
             array("order_by" => "created DESC")
@@ -103,7 +103,7 @@ class SampleApp extends CustomApp {
         ));
     }
 */
-    function print_and_save_one_sample_table_record() {
+    function action_print_and_save_one_sample_table_record() {
         $obj = $this->fetch_db_object("_sample_table", 1);
         $obj->print_values();
         $obj->field_currency = 99999999.99;
@@ -111,7 +111,7 @@ class SampleApp extends CustomApp {
         vx($this->page->fillings);
     }
 //
-    function pg_view_component() {
+    function action_pg_view_component() {
         $templates_dir = "sample_component_view";
 
         $component = $this->create_component("sample_component2");

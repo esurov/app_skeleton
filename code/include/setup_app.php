@@ -33,23 +33,23 @@ class SetupApp extends CustomApp {
         $this->create_http_auth_html_document_response($this->get_message("setup_auth_realm"));
     }
 //
-    function pg_index() {
+    function action_pg_index() {
         $this->print_static_page("index");
     }
 
-    function create_update_tables() {
+    function action_create_update_tables() {
         $this->process_create_update_tables();
         $this->add_session_status_message(new OkStatusMsg("tables_updated"));
         $this->create_self_redirect_response();
     }
 
-    function delete_tables() {
+    function action_delete_tables() {
         $this->process_delete_tables();
         $this->add_session_status_message(new OkStatusMsg("tables_deleted"));
         $this->create_self_redirect_response();
     }
 //
-    function pg_tables_dump() {
+    function action_pg_tables_dump() {
         $actual_table_names = $this->db->get_actual_table_names(true);
         foreach ($actual_table_names as $actual_table_name) {
             $this->print_varchar_value("table_name", $actual_table_name);
@@ -58,7 +58,7 @@ class SetupApp extends CustomApp {
         $this->print_file("tables_dump/tables_list/form.html", "body");
     }
 
-    function pg_tables_dump_url() {
+    function action_pg_tables_dump_url() {
         $table_names = param("table_names");
         $table_names_str = join(" ", $table_names);
         
@@ -77,7 +77,7 @@ class SetupApp extends CustomApp {
         $this->print_file("tables_dump/url/body.html", "body");
     }
 
-    function pg_view_tables_dump() {
+    function action_pg_view_tables_dump() {
         $dump_text = $this->create_tables_dump(param("table_names"), false);
         $n_dump_lines = count(explode("\n", $dump_text));
         $this->print_varchar_value("dump_text", $dump_text);
@@ -85,13 +85,13 @@ class SetupApp extends CustomApp {
         $this->print_file("tables_dump/dump_text/body.html", "body");
     }
 
-    function download_tables_dump() {
+    function action_download_tables_dump() {
         $dump_text = $this->create_tables_dump(param("table_names"), true);
         $now_date_str = $this->get_db_now_date();
         $this->create_binary_content_response($dump_text, "dump-{$now_date_str}.sql.bz2");
     }
 
-    function create_tables_dump($table_names_str, $should_compress) {
+    function action_create_tables_dump($table_names_str, $should_compress) {
         $db_connection_info = $this->db->get_connection_info();
         $host = $db_connection_info["host"];
         $database = $db_connection_info["database"];
@@ -105,13 +105,13 @@ class SetupApp extends CustomApp {
         return `{$cmdline}`;
     }
 //
-    function insert_test_data() {
+    function action_insert_test_data() {
         $this->insert_test_news_articles();
         $this->add_session_status_message(new OkStatusMsg("test_data_inserted"));
         $this->create_self_redirect_response();
     }
 
-    function insert_test_news_articles() {
+    function action_insert_test_news_articles() {
         $article = $this->create_db_object("news_article");
         $article->created = "2004-06-20";
         $article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";
@@ -206,7 +206,7 @@ class SetupApp extends CustomApp {
             "Curabitur at odio. Sed vel justo. Aenean suscipit.";
         $article->store();
     }
-//    function insert_initial_data() {
+//    function action_insert_initial_data() {
 //        $this->add_session_status_message(new OkStatusMsg("initial_data_inserted"));
 //        $this->create_self_redirect_response();
 //    }

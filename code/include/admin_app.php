@@ -31,11 +31,11 @@ class AdminApp extends CustomApp {
         $this->create_http_auth_html_document_response($this->get_message("admin_auth_realm"));
     }
 //
-    function pg_index() {
+    function action_pg_index() {
         $this->print_static_page("index");
     }
 //
-    function pg_view_news_articles() {
+    function action_pg_view_news_articles() {
         $templates_dir = "news_articles";
 
         $news_article = $this->create_db_object("news_article");
@@ -55,7 +55,7 @@ class AdminApp extends CustomApp {
 
     }
 
-    function pg_edit_news_article() {
+    function action_pg_edit_news_article() {
         $news_article = get_param_value($this->action_params, "news_article", null);
         if (is_null($news_article)) {
             $news_article = $this->read_id_fetch_db_object("news_article");
@@ -66,7 +66,7 @@ class AdminApp extends CustomApp {
         ));
     }
 
-    function update_news_article() {
+    function action_update_news_article() {
         $news_article = $this->read_id_fetch_db_object("news_article");
         $news_article_old = $news_article;
         $news_article->read();
@@ -97,7 +97,7 @@ class AdminApp extends CustomApp {
         }
     }
 
-    function delete_news_article() {
+    function action_delete_news_article() {
         $news_article = $this->read_id_fetch_db_object("news_article");
         $this->delete_object(array(
             "obj" => $news_article,
