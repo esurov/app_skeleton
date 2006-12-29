@@ -10,7 +10,11 @@ class Db {
     var $connection;
     var $table_prefix;
 
+    var $_has_connection;
+
     function Db(&$app, $connection_info) {
+        $this->_has_connection = false;
+
         $this->app =& $app;
         $this->log =& $this->app->log;
 
@@ -44,12 +48,13 @@ class Db {
                 "Cannot select database '{$database}' -- {$err}"
             );
         }
-
         $this->log->write(
             "Db",
             "Selected database '{$database}'",
             3
         );
+
+        $this->_has_connection = true;
     }
 
     function get_connection_info() {
@@ -62,6 +67,9 @@ class Db {
 
     // Run MySQL query
     function run_query($query_str) {
+        if (!$this->_has_connection) {
+            $this->connect();
+        }
         // Handling table name templates
         $query_str = preg_replace(
             '/{%(.*?)_table%}/',

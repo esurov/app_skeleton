@@ -98,7 +98,6 @@ class App {
         );
 
         $this->db = new Db($this, $sql_params);
-        $this->db->connect();
     }
 
     function create_page_template() {
