@@ -39,7 +39,7 @@ class UserApp extends CustomApp {
         $news_article = $this->create_db_object("news_article");
         $n_recent_news_articles = $this->config->get_value("recent_news_articles_number");
         $recent_news_articles_list = $this->create_component(
-            "query_objects_list",
+            "QueryObjectsList",
             array(
                 "templates_dir" => "{$templates_dir}/recent_news_articles",
                 "template_var" => "recent_news_articles",
@@ -60,7 +60,7 @@ class UserApp extends CustomApp {
         
         $news_article = $this->create_db_object("news_article");
         $news_articles_list = $this->create_component(
-            "paged_query_objects_list",
+            "PagedQueryObjectsList",
             array(
                 "templates_dir" => "{$templates_dir}/news_articles",
                 "template_var" => "news_articles",

@@ -54,7 +54,7 @@ class SampleApp extends CustomApp {
             "select" => "RAND(1000) * 1000",
         ));
         $news_articles_list = $this->create_component(
-            "query_objects_list",
+            "QueryObjectsList",
             array(
                 "templates_dir" => "news_article/xml",
                 "templates_ext" => "xml",
@@ -114,7 +114,7 @@ class SampleApp extends CustomApp {
     function action_pg_view_component() {
         $templates_dir = "sample_component_view";
 
-        $component = $this->create_component("sample_component2");
+        $component = $this->create_component("SampleComponent2");
         $component->templates_dir = "{$templates_dir}/sample_component2";
         $component->template_var = "sample_component2";
         $component->print_values();

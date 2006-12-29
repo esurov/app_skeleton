@@ -6,43 +6,34 @@ $components = array(
         _APP_LIB_DIR . "/components",
     ),
     "components_info" => array(
-        "objects_list" => array(
-            "class_name" => "ObjectsList",
+        "ObjectsList" => array(
             "file_name" => "objects_list.php",
         ),
-        "query_objects_list" => array(
-            "class_name" => "QueryObjectsList",
+        "QueryObjectsList" => array(
             "file_name" => "objects_list.php",
         ),
-        "paged_query_objects_list" => array(
-            "class_name" => "PagedQueryObjectsList",
+        "PagedQueryObjectsList" => array(
             "file_name" => "objects_list.php",
         ),
-        "pager" => array(
-            "class_name" => "Pager",
+        "Pager" => array(
             "file_name" => "pager.php",
         ),
-        "xml" => array(
-            "class_name" => "Xml",
+        "Xml" => array(
             "file_name" => "xml.php",
             "need_app" => false,
         ),
-        "menu" => array(
-            "class_name" => "Menu",
+        "Menu" => array(
             "file_name" => "menu.php",
-            "required_components" => array("xml"),
+            "required_components" => array("Xml"),
         ),
-        "lang_menu" => array(
-            "class_name" => "LangMenu",
+        "LangMenu" => array(
             "file_name" => "lang_menu.php",
         ),
-        "email_sender" => array(
-            "class_name" => "PHPMailer",
+        "PHPMailer" => array(
             "file_name" => "phpmailer.php",
             "need_app" => false,
         ),
-        "image_magick" => array(
-            "class_name" => "ImageMagick",
+        "ImageMagick" => array(
             "file_name" => "image_magick.php",
             "need_app" => false,
         ),

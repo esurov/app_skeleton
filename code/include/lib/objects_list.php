@@ -289,7 +289,7 @@ class PagedQueryObjectsList extends QueryObjectsList {
                 $this->pager_visible = false;
             } else {
                 $this->pager = $this->app->create_component(
-                    "pager",
+                    "Pager",
                     array(
                         "n_rows_per_page" => $pager_n_rows_per_page,
                         "n_total_rows" => $n_objects_total,

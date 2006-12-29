@@ -40,7 +40,7 @@ class AdminApp extends CustomApp {
 
         $news_article = $this->create_db_object("news_article");
         $news_articles_list = $this->create_component(
-            "paged_query_objects_list",
+            "PagedQueryObjectsList",
             array(
                 "templates_dir" => "{$templates_dir}/news_articles",
                 "template_var" => "news_articles",

@@ -1526,7 +1526,7 @@ class App {
     }
 
     function create_menu() {
-        return $this->create_component("menu");
+        return $this->create_component("Menu");
     }
 //
     function print_lang_menu($params = array()) {
@@ -1542,7 +1542,7 @@ class App {
     }
 
     function create_lang_menu() {
-        return $this->create_component("lang_menu");
+        return $this->create_component("LangMenu");
     }
 
 //  Object functions
@@ -1796,7 +1796,7 @@ class App {
         }
     }
 //
-    function get_image() {
+    function action_get_image() {
         $image = $this->read_id_fetch_db_object("image");
         if ($image->is_definite()) {
             $cached_gmt_str = (isset($_SERVER["HTTP_IF_MODIFIED_SINCE"])) ?
@@ -1831,7 +1831,7 @@ class App {
         }
     }
 //
-    function get_file() {
+    function action_get_file() {
         $open_inline = (int) param("show");
 
         $file = $this->read_id_fetch_db_object("file");
@@ -1842,23 +1842,23 @@ class App {
         }
     }
 //
-    function load_component($component_name) {
+    function load_component($component_class_name) {
         $component_info = get_param_value(
             $this->components["components_info"],
-            $component_name,
+            $component_class_name,
             null
         );
         if (is_null($component_info)) {
             $this->process_fatal_error(
                 "App",
-                "Cannot find required component '{$component_name}'!"
+                "Cannot find required component '{$component_class_name}'!"
             );
         }
 
         $was_loaded = false;
         $required_components = get_param_value($component_info, "required_components", array());
-        foreach ($required_components as $required_component) {
-            if (!$this->load_component($required_component)) {
+        foreach ($required_components as $required_component_class_name) {
+            if (!$this->load_component($required_component_class_name)) {
                 return $was_loaded;
             }
         }
@@ -1875,24 +1875,23 @@ class App {
         return $was_loaded;
     }
 
-    function create_component($component_name, $component_params = null) {
+    function create_component($component_class_name, $component_params = null) {
         $component_info = get_param_value(
             $this->components["components_info"],
-            $component_name,
+            $component_class_name,
             null
         );
         if (is_null($component_info)) {
             $this->process_fatal_error(
                 "App",
-                "Cannot find component '{$component_name}'!"
+                "Cannot find component '{$component_class_name}'!"
             );
         }
-        $component_class_name = $component_info["class_name"];
         if (!class_exists($component_class_name)) {
-            if (!$this->load_component($component_name)) {
+            if (!$this->load_component($component_class_name)) {
                 $this->process_fatal_error(
                     "App",
-                    "Cannot load and instantiate component '{$component_name}'!"
+                    "Cannot load and instantiate component '{$component_class_name}'!"
                 );
             }
         }
@@ -1908,7 +1907,7 @@ class App {
     }
 //
     function create_email_sender() {
-        $email_sender = $this->create_component("email_sender");
+        $email_sender = $this->create_component("PHPMailer");
         $email_sender->IsSendmail();
         $email_sender->IsHTML($this->config->get_value("email_is_html"));
         $email_sender->CharSet = $this->config->get_value("email_charset");
@@ -1922,7 +1921,7 @@ class App {
     }
 //
     function create_image_magick() {
-        $im = $this->create_component("image_magick");
+        $im = $this->create_component("ImageMagick");
         $im->set_image_magick_path($this->config->get_value("image_magick_path"));
         $im->app_name = $this->db->table_prefix;
         $im->create_dst_file();
