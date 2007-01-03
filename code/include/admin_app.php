@@ -20,6 +20,8 @@ class AdminApp extends CustomApp {
             "pg_edit_news_article" => $u,
             "update_news_article" => $u,
             "delete_news_article" => $u,
+            "delete_news_article_image" => $u,
+            "delete_news_article_file" => $u,
         );
     }
 //
@@ -103,6 +105,30 @@ class AdminApp extends CustomApp {
             "obj" => $news_article,
             "success_url_params" => array("action" => "pg_view_news_articles"),
             "error_url_params" => array("action" => "pg_view_news_articles"),
+        ));
+    }
+
+    function action_delete_news_article_image() {
+        $news_article = $this->read_id_fetch_db_object("news_article");
+
+        $this->delete_object_image($news_article, "image_id", true);
+        
+        $this->add_session_status_message(new OkStatusMsg("news_article_image_deleted"));
+        $this->create_self_redirect_response(array(
+            "action" => "pg_edit_news_article",
+            "news_article_id" => $news_article->id,
+        ));
+    }
+
+    function action_delete_news_article_file() {
+        $news_article = $this->read_id_fetch_db_object("news_article");
+
+        $this->delete_object_file($news_article, "file_id");
+        
+        $this->add_session_status_message(new OkStatusMsg("news_article_file_deleted"));
+        $this->create_self_redirect_response(array(
+            "action" => "pg_edit_news_article",
+            "news_article_id" => $news_article->id,
         ));
     }
 

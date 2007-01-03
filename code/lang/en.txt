@@ -52,6 +52,8 @@ link_move_left = Left
 link_move_right = Right
 link_accept = Accept
 link_reject = Reject
+link_delete_image = Delete image
+link_delete_file = Delete file
 
 link_view_all_news = View all news
 

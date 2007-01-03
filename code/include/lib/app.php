@@ -1808,11 +1808,7 @@ class App {
         }
     }
 
-    function delete_obj_image(
-        $obj,
-        $image_id_field_name = "image_id",
-        $delete_thumbnail = true
-    ) {
+    function delete_object_image($obj, $image_id_field_name, $delete_thumbnail) {
         if ($obj->is_definite() && $obj->is_field_exist($image_id_field_name)) {
             $field_names_to_update = array($image_id_field_name);
 
@@ -1839,6 +1835,17 @@ class App {
             $this->response = new FileResponse($file, $open_inline);
         } else {
             $this->create_not_found_response();
+        }
+    }
+
+    function delete_object_file($obj, $file_id_field_name) {
+        if ($obj->is_definite() && $obj->is_field_exist($file_id_field_name)) {
+            $field_names_to_update = array($file_id_field_name);
+
+            $obj->del_file($file_id_field_name);
+            $obj->{$file_id_field_name} = 0;
+
+            $obj->update($field_names_to_update);
         }
     }
 //
