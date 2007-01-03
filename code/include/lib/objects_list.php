@@ -12,6 +12,8 @@ class _ObjectsList {
     var $context;
     var $custom_params;
 
+    var $_current_obj_idx;
+
     function init($params) {
         $this->templates_dir = get_param_value($params, "templates_dir", null);
         if (is_null($this->templates_dir)) {
@@ -34,7 +36,7 @@ class _ObjectsList {
     function _prepare_objects_list() {
     }
 
-    function &_fetch_next_object() {
+    function &_fetch_list_object() {
         $obj = false;
         return $obj;
     }
@@ -59,30 +61,11 @@ class _ObjectsList {
     function print_list() {
         $this->app->print_raw_value("{$this->template_var_prefix}_items", "");
 
-        $i = 0;
-        while ($obj =& $this->_fetch_next_object()) {
-            $list_item_parity = $i % 2;
-            $list_item_class = ($list_item_parity == 0) ?
-                "list-item-even" :
-                "list-item-odd";
+        $this->_current_obj_idx = 0;
+        while ($obj =& $this->_fetch_list_object()) {
+            $this->print_list_object($obj);
 
-            $this->app->print_raw_values(array(
-                "list_item_parity" => $list_item_parity,
-                "list_item_class" => $list_item_class,
-            ));
-
-            $obj->print_values(array(
-                 "templates_dir" => $this->templates_dir,
-                 "template_var_prefix" => $this->template_var_prefix,
-                 "context" => $this->context,
-                 "list_item_number" => $i + 1,
-                 "list_item_parity" => $list_item_parity,
-                 "list_item_class" => $list_item_class,
-                 "list_items_count" => $this->_get_num_objects(),
-                 "custom_params" => $this->custom_params,
-            ));
-
-            if ($i > 0) {
+            if ($this->_current_obj_idx > 0) {
                 $this->app->print_file_if_exists(
                     "{$this->templates_dir}/list_item_delimiter.{$this->templates_ext}",
                     "{$this->template_var_prefix}_items"
@@ -93,12 +76,12 @@ class _ObjectsList {
                 "{$this->templates_dir}/list_item.{$this->templates_ext}",
                 "{$this->template_var_prefix}_items"
             );
-            
-            $i++;
+
+            $this->_current_obj_idx++;
         }
         
         if (
-            $i == 0 &&
+            $this->_current_obj_idx == 0 &&
             $this->app->is_file_exist("{$this->templates_dir}/list_no_items.{$this->templates_ext}")
         ) {
             $list_items_template_name = "list_no_items.{$this->templates_ext}";
@@ -116,13 +99,34 @@ class _ObjectsList {
         );
     }
 
+    function print_list_object(&$obj) {
+        $list_item_parity = $this->_current_obj_idx % 2;
+        $list_item_class = ($list_item_parity == 0) ?
+            "list-item-even" :
+            "list-item-odd";
+
+        $this->app->print_raw_values(array(
+            "list_item_parity" => $list_item_parity,
+            "list_item_class" => $list_item_class,
+        ));
+
+        $obj->print_values(array(
+             "templates_dir" => $this->templates_dir,
+             "template_var_prefix" => $this->template_var_prefix,
+             "context" => $this->context,
+             "list_item_number" => $this->_current_obj_idx + 1,
+             "list_item_parity" => $list_item_parity,
+             "list_item_class" => $list_item_class,
+             "list_items_count" => $this->_get_num_objects(),
+             "custom_params" => $this->custom_params,
+        ));
+    }
+
 }
 
 class ObjectsList extends _ObjectsList {
 
     var $objects;
-
-    var $_current_obj_idx;
 
     function init($params) {
         parent::init($params);
@@ -142,15 +146,11 @@ class ObjectsList extends _ObjectsList {
         }
     }
 //
-    function _prepare_objects_list() {
-        $this->_current_obj_idx = 0;
-    }
-
-    function &_fetch_next_object() {
+    function &_fetch_list_object() {
         if ($this->_current_obj_idx == $this->_get_num_objects()) {
             $obj = false;
         } else {
-            $obj =& $this->objects[$this->_current_obj_idx++];
+            $obj =& $this->objects[$this->_current_obj_idx];
         }
         return $obj;
     }
@@ -191,7 +191,7 @@ class QueryObjectsList extends _ObjectsList {
         $this->_res = $this->obj->run_select_query($this->query);
     }
 
-    function &_fetch_next_object() {
+    function &_fetch_list_object() {
         if ($row = $this->_res->fetch()) {
             $this->obj->fetch_row($row);
             $obj =& $this->obj;
