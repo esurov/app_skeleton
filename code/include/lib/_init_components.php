@@ -1,11 +1,11 @@
 <?php
 
 $components = array(
-    "dirs" => array(
+    "class_paths" => array(
         _APP_LIB_DIR,
         _APP_LIB_DIR . "/components",
     ),
-    "components_info" => array(
+    "classes" => array(
         "ObjectsList" => array(
             "file_name" => "objects_list.php",
         ),
@@ -24,7 +24,7 @@ $components = array(
         ),
         "Menu" => array(
             "file_name" => "menu.php",
-            "required_components" => array("Xml"),
+            "required_classes" => array("Xml"),
         ),
         "LangMenu" => array(
             "file_name" => "lang_menu.php",

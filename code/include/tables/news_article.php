@@ -2,8 +2,8 @@
 
 class NewsArticle extends CustomDbObject {
 
-    function NewsArticle() {
-        parent::CustomDbObject("news_article");
+    function init($params) {
+        parent::init($params);
 
         $this->insert_field(array(
             "field" => "id",
@@ -52,8 +52,8 @@ class NewsArticle extends CustomDbObject {
             "relation" => "like_many",
             "type" => "text",
             "select" => array(
-                "news_article.title_{$this->lang}",
-                "news_article.body_{$this->lang}",
+                "news_article.title_{$this->app->lang}",
+                "news_article.body_{$this->app->lang}",
             ),
         ));
     }

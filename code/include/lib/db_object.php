@@ -1,57 +1,32 @@
 <?php
 
+// Base class for all MySQL table based classes
+
 class DbObject {
 
-    // Base class for all MySQL table based classes
+    var $app;
 
-    var $table_name;  // Table name (without db specific prefix)
-    var $fields;
-    var $indexes;
-    var $select_from;      // FROM clause for SELECT query
+    var $_table_name;  // Db table name without db specific prefix
 
-    var $print_params = array();
-    var $filters;
-    var $order_by;
+    var $_fields;
+    var $_indexes;
+    
+    var $_select_from; // FROM clause for SELECT query
 
-    var $app = null;
+    var $_filters;
+    var $_order_by;
 
-    // Variables from App
-    var $db;
-    var $log;
+    var $print_params;
 
-    var $avail_langs; // Available languages
-    var $lang; // Current language
-    var $dlang; // Default language
-
-
-    function DbObject($table_name) {
-        global $app;
-
-        if (!isset($app)) {
-            trigger_error(
-                "No 'app' found in DbObject()!",
-                E_USER_ERROR
-            );
-        }
-
-        $this->app =& $app;
-
-        $this->db =& $this->app->db;
-        $this->log =& $this->app->log;
-
-        $this->avail_langs =& $this->app->avail_langs;
-        $this->lang =& $this->app->lang;
-        $this->dlang =& $this->app->dlang;
-
-        $this->table_name = $table_name;
-
-        $this->fields = array();
-        $this->indexes = array();
-        $this->filters = array();
-
-        $this->set_indefinite();  // initialize object to be indefinie
+    function init($params) {
+        $this->_fields = array();
+        $this->_indexes = array();
 
         $this->insert_select_from();
+
+        $this->_filters = array();
+
+        $this->print_params = array();
     }
 //
     function get_plural_name() {
@@ -63,11 +38,11 @@ class DbObject {
     }
 
     function get_plural_resource_name() {
-        return "{$this->table_name}s";
+        return "{$this->_table_name}s";
     }
 
     function get_singular_resource_name() {
-        return "$this->table_name";
+        return "$this->_table_name";
     }
 
     function get_quantity_str($n) {
@@ -97,7 +72,7 @@ class DbObject {
     }
 //
     function get_full_table_name() {
-        return $this->db->get_full_table_name($this->table_name);
+        return $this->app->db->get_full_table_name($this->_table_name);
     }
 
     function set_field_value($field_name, $field_value) {
@@ -110,7 +85,7 @@ class DbObject {
         $field_names_to_exclude = null
     ) {
         if (is_null($field_names_to_include)) {
-            $field_names = array_keys($this->fields);
+            $field_names = array_keys($this->_fields);
         } else {
             $field_names = $this->expand_multilingual_field_names(
                 $field_names_to_include,
@@ -157,18 +132,18 @@ class DbObject {
     }
 
     function is_field_exist($field_name) {
-        return isset($this->fields[$field_name]);
+        return isset($this->_fields[$field_name]);
     }
 
     function is_field_multilingual($field_name, $field_info = null) {
         if (is_null($field_info)) {
-            $field_info = $this->fields[$field_name];
+            $field_info = $this->_fields[$field_name];
         }
         return get_param_value($field_info, "multilingual", 0);
     }
 
     function is_field_multilingual_child($field_name) {
-        return $this->fields[$field_name]["multilingual_child"];
+        return $this->_fields[$field_name]["multilingual_child"];
     }
 
     function has_multilingual_fields($field_names) {
@@ -182,7 +157,7 @@ class DbObject {
 
     function get_multilingual_field_names($field_names = null) {
         if (is_null($field_names)) {
-            $field_names = array_keys($this->fields);
+            $field_names = array_keys($this->_fields);
         }
         $multilingual_field_names = array();
         foreach ($field_names as $field_name) {
@@ -211,7 +186,7 @@ class DbObject {
 
     function get_full_field_names_for_multilingual_field_name($multilingual_field_name) {
         $full_field_names = array();
-        foreach ($this->avail_langs as $lang) {
+        foreach ($this->app->avail_langs as $lang) {
             $full_field_names[] = "{$multilingual_field_name}_{$lang}";
         }
         return $full_field_names;
@@ -221,17 +196,17 @@ class DbObject {
         return $this->app->messages->get_value($name);
     }
 
-    function create_db_object($obj_name) {
-        return $this->app->create_db_object($obj_name);
+    function create_db_object($obj_name, $obj_params = null) {
+        return $this->app->create_db_object($obj_name, $obj_params);
     }
 //
     function insert_field($field_info) {
-        $field_array_index = count($this->fields);
+        $field_array_index = count($this->_fields);
         $field_name = get_param_value($field_info, "field", null);
         if (is_null($field_name)) {
             $this->app->process_fatal_error(
                 "DbObject",
-                "{$this->table_name}: field name is not specified for field {$field_array_index}!"
+                "{$this->_table_name}: field name is not specified for field {$field_array_index}!"
             );
         }
         $field_name_alias = get_param_value($field_info, "field_alias", null);
@@ -239,8 +214,8 @@ class DbObject {
         $table_name = get_param_value($field_info, "table", null);
         $table_name_alias = get_param_value($field_info, "table_alias", null);
         
-        if (is_null($table_name) || $table_name == $this->table_name) {
-            $table_name = $this->table_name;
+        if (is_null($table_name) || $table_name == $this->_table_name) {
+            $table_name = $this->_table_name;
             if (is_null($table_name_alias) && is_null($field_name_alias)) {
                 // case of real or calculated field from current table
                 $multilingual = get_param_value($field_info, "multilingual", 0);
@@ -260,7 +235,7 @@ class DbObject {
                     $new_field_info["multilingual"] = 0;
                     $new_field_info["multilingual_child"] = 1;
 
-                    foreach ($this->avail_langs as $lang) {
+                    foreach ($this->app->avail_langs as $lang) {
                         $new_field_info["field"] = "{$field_name}_{$lang}";
                         $this->insert_field($new_field_info);
                     }
@@ -268,13 +243,13 @@ class DbObject {
                 $field_name_alias = $field_name;
             } else {
                 // case of alias to real field from current table
-                if (!isset($this->fields[$field_name])) {
+                if (!isset($this->_fields[$field_name])) {
                     $this->app->process_fatal_error(
                         "DbObject",
                         "{$table_name}: cannot find field '{$field_name}'"
                     );
                 }
-                $field_info = $this->fields[$field_name];
+                $field_info = $this->_fields[$field_name];
                 $table_name_alias = if_null($table_name_alias, $table_name);
                 $field_select_expression = $this->create_field_select_expression(
                     $table_name_alias,
@@ -419,19 +394,19 @@ class DbObject {
             if (is_null($obj)) {
                 $this->app->process_fatal_error(
                     "DbObject",
-                    "{$this->table_name}: cannot find joined '{$table_name}'!"
+                    "{$this->_table_name}: cannot find joined '{$table_name}'!"
                 );
             }
 
-            if (!isset($obj->fields[$field_name])) {
+            if (!isset($obj->_fields[$field_name])) {
                 $this->app->process_fatal_error(
                     "DbObject",
-                    "{$this->table_name}: cannot find field " .
+                    "{$this->_table_name}: cannot find field " .
                         "'{$field_name}' in joined '{$table_name}'!"
                 );
             }
 
-            $field_info2 = $obj->fields[$field_name];
+            $field_info2 = $obj->_fields[$field_name];
             $field_type = $field_info2["type"];
 
             if (is_null($table_name_alias)) {
@@ -465,7 +440,7 @@ class DbObject {
             $multilingual_child = 0;
         }
         
-        $this->fields[$field_name_alias] = array(
+        $this->_fields[$field_name_alias] = array(
             "type" => $field_type,
             "value" => $initial_field_value,
             "width" => $width,
@@ -495,9 +470,9 @@ class DbObject {
     ) {
         if ($multilingual) {
             $field_select_expression =
-                "IF ({$table_name_alias}.{$field_name}_{$this->lang} = '', " .
-                "{$table_name_alias}.{$field_name}_{$this->dlang}, " .
-                "{$table_name_alias}.{$field_name}_{$this->lang}" .
+                "IF ({$table_name_alias}.{$field_name}_{$this->app->lang} = '', " .
+                "{$table_name_alias}.{$field_name}_{$this->app->dlang}, " .
+                "{$table_name_alias}.{$field_name}_{$this->app->lang}" .
                 ")";
         } else {
             $field_select_expression = "{$table_name_alias}.{$field_name}";
@@ -512,7 +487,7 @@ class DbObject {
             $index_field_names = array($index_field_names);
         }
         $index_name = $this->create_index_name($index_type, $index_field_names);
-        $this->indexes[$index_name] = array(
+        $this->_indexes[$index_name] = array(
             "type" => $index_type,
             "fields" => $index_field_names,
         );
@@ -541,7 +516,7 @@ class DbObject {
         default:
             $this->app->process_fatal_error(
                 "DbObject",
-                "{$this->table_name}: bad join type '{$join_type}'!"
+                "{$this->_table_name}: bad join type '{$join_type}'!"
             );
         }
         
@@ -549,7 +524,7 @@ class DbObject {
         if (is_null($join_table_name)) {
             $this->app->process_fatal_error(
                 "DbObject",
-                "{$this->table_name}: table name not specified in join!"
+                "{$this->_table_name}: table name not specified in join!"
             );
         }
         $join_table_name_alias = get_param_value($join_info, "table_alias", $join_table_name);
@@ -559,7 +534,7 @@ class DbObject {
             if (is_null($join_condition)) {
                 $this->app->process_fatal_error(
                     "DbObject",
-                    "{$this->table_name}: condition expression not specified in join!"
+                    "{$this->_table_name}: condition expression not specified in join!"
                 );
             }
         } else {
@@ -569,11 +544,11 @@ class DbObject {
                 $this->get_primary_key_name()
             );
             $join_condition =
-                "{$this->table_name}.{$field_name} = " .
+                "{$this->_table_name}.{$field_name} = " .
                 "{$join_table_name_alias}.{$join_table_field_name}";
         }
 
-        $this->select_from .=
+        $this->_select_from .=
             " {$join_type_str} JOIN {%{$join_table_name}_table%} AS {$join_table_name_alias}" .
             " ON {$join_condition}";
     }
@@ -582,11 +557,11 @@ class DbObject {
         if (!isset($filter_info["value"])) {
             $filter_info["value"] = $this->get_nonset_filter_value($filter_info);
         }
-        $this->filters[] = $filter_info;
+        $this->_filters[] = $filter_info;
     }
 
     function get_filter_by_name($filter_name) {
-        foreach ($this->filters as $filter_info) {
+        foreach ($this->_filters as $filter_info) {
             if ($filter_info["name"] == $filter_name) {
                 return $filter_info;
             }
@@ -607,8 +582,8 @@ class DbObject {
 //
     function insert_select_from($select_from = null) {
         // Store FROM clause for SELECT query.
-        $this->select_from = is_null($select_from) ?
-            "{%{$this->table_name}_table%} AS {$this->table_name}" :
+        $this->_select_from = is_null($select_from) ?
+            "{%{$this->_table_name}_table%} AS {$this->_table_name}" :
             $select_from;
     }
 
@@ -617,7 +592,7 @@ class DbObject {
         $create_table_expression = $this->get_create_table_expression();
         if ($create_table_expression != "") {
             $this->run_query(
-                "CREATE TABLE IF NOT EXISTS {%{$this->table_name}_table%} " .
+                "CREATE TABLE IF NOT EXISTS {%{$this->_table_name}_table%} " .
                 "({$create_table_expression})"
             );
         }
@@ -625,20 +600,20 @@ class DbObject {
 
     function get_create_table_expression() {
         $expressions = array();
-        foreach ($this->fields as $field_name => $field_info) {
+        foreach ($this->_fields as $field_name => $field_info) {
             if (!$field_info["create"]) {
                 continue;
             }
             $expressions[] = $this->get_create_field_expression($field_name);
         }
-        foreach (array_keys($this->indexes) as $index_name) {
+        foreach (array_keys($this->_indexes) as $index_name) {
             $expressions[] = $this->get_create_index_expression($index_name);
         }
         return join(", ", $expressions);
     }
 
     function get_create_field_expression($field_name) {
-        $field_info = $this->fields[$field_name];
+        $field_info = $this->_fields[$field_name];
         $field_type = $field_info["type"];
 
         $type_expression = $this->get_create_field_type_expression($field_name);
@@ -655,7 +630,7 @@ class DbObject {
     }
 
     function get_create_field_type_expression($field_name) {
-        $field_info = $this->fields[$field_name];
+        $field_info = $this->_fields[$field_name];
         $field_type = $field_info["type"];
 
         switch ($field_type) {
@@ -706,7 +681,7 @@ class DbObject {
         default:
             $this->app->process_fatal_error(
                 "DbObject",
-                "{$this->table_name}: unknown field type '{$field_type}'!"
+                "{$this->_table_name}: unknown field type '{$field_type}'!"
             );
         }
         
@@ -714,7 +689,7 @@ class DbObject {
     }
 
     function get_create_index_expression($index_name) {
-        $index_info = $this->indexes[$index_name];
+        $index_info = $this->_indexes[$index_name];
         $index_type = $index_info["type"];
         $index_field_names_str = join(", ", $index_info["fields"]);
 
@@ -734,7 +709,7 @@ class DbObject {
         default:
             $this->app->process_fatal_error(
                 "DbObject",
-                "{$this->table_name}: unknown index type '{$index_type}'!"
+                "{$this->_table_name}: unknown index type '{$index_type}'!"
             );
         }
         
@@ -745,7 +720,7 @@ class DbObject {
         $update_table_expression = $this->get_update_table_expression();
         if ($update_table_expression != "") {
             $this->run_query(
-                "ALTER TABLE {%{$this->table_name}_table%} " .
+                "ALTER TABLE {%{$this->_table_name}_table%} " .
                 "{$update_table_expression}"
             );
         }
@@ -753,7 +728,7 @@ class DbObject {
         
     function get_update_table_expression() {
         // Managing fields
-        $actual_fields_info = $this->db->get_actual_table_fields_info($this->table_name);
+        $actual_fields_info = $this->app->db->get_actual_table_fields_info($this->_table_name);
         $actual_field_names = array_keys($actual_fields_info);
         $field_names = $this->get_field_names_without_multilingual_expansion();
 
@@ -763,10 +738,10 @@ class DbObject {
         $expressions = array();
 
         foreach ($field_names as $field_name) {
-            $field_info = $this->fields[$field_name];
+            $field_info = $this->_fields[$field_name];
 
             if ($field_info["multilingual"]) {
-                foreach ($this->avail_langs as $lang) {
+                foreach ($this->app->avail_langs as $lang) {
                     $new_field_name = "{$field_name}_{$lang}";
                     if (in_array($new_field_name, $actual_field_names)) {
                         if ($this->is_field_differ_from_actual_field(
@@ -778,7 +753,10 @@ class DbObject {
                         }
                         unset_array_value_if_exists($new_field_name, $field_names_to_drop);
                     } else {
-                        if (in_array($field_name, $actual_field_names) && $lang == $this->dlang) {
+                        if (
+                            in_array($field_name, $actual_field_names) &&
+                            $lang == $this->app->dlang
+                        ) {
                             $create_expression = $this->get_create_field_expression($new_field_name);
                             $expressions[] = "CHANGE COLUMN {$field_name} {$create_expression}";
                         } else {
@@ -809,7 +787,7 @@ class DbObject {
                     if (!$field_info["create"]) {
                         continue;
                     }
-                    $old_field_name = "{$field_name}_{$this->dlang}";
+                    $old_field_name = "{$field_name}_{$this->app->dlang}";
                     if (in_array($old_field_name, $actual_field_names)) {
                         $create_expression = $this->get_create_field_expression($field_name);
                         $expressions[] = "CHANGE COLUMN {$old_field_name} {$create_expression}";
@@ -830,15 +808,15 @@ class DbObject {
         }
 
         // Managing indexes
-        $actual_indexes_info = $this->db->get_actual_table_indexes_info($this->table_name);
+        $actual_indexes_info = $this->app->db->get_actual_table_indexes_info($this->_table_name);
         $actual_index_names = array_keys($actual_indexes_info);
-        $index_names = array_keys($this->indexes);
+        $index_names = array_keys($this->_indexes);
 
         $index_names_to_add = array_diff($index_names, $actual_index_names);
         $index_names_to_drop = array_diff($actual_index_names, $index_names);
 
         foreach ($index_names_to_add as $index_name) {
-            $index_info = $this->indexes[$index_name];
+            $index_info = $this->_indexes[$index_name];
             $create_expression = $this->get_create_index_expression($index_name);
             $expressions[] = "ADD {$create_expression}";
         }
@@ -857,7 +835,7 @@ class DbObject {
     }
 
     function is_field_differ_from_actual_field($field_name, $actual_field_info) {
-        $field_info = $this->fields[$field_name];
+        $field_info = $this->_fields[$field_name];
 
         // Difference in type:
         $type_expression = strtoupper($this->get_create_field_type_expression($field_name));
@@ -912,7 +890,7 @@ class DbObject {
     }
 
     function delete_table() {
-        $this->db->drop_table($this->table_name);
+        $this->app->db->drop_table($this->_table_name);
     }
 //
     function store(
@@ -920,7 +898,7 @@ class DbObject {
         $field_names_to_not_store = null
     ) {
         // Store data to database table
-        $this->log->write("DbObject", "store()", 3);
+        $this->app->log->write("DbObject", "store()", 3);
 
         $field_names = $this->get_field_names(
             $field_names_to_store,
@@ -932,7 +910,7 @@ class DbObject {
         $comma = "";
         $fields_expression = "";
         foreach ($field_names as $field_name) {
-            $field_info = $this->fields[$field_name];
+            $field_info = $this->_fields[$field_name];
             if ($use_store_flag && !$field_info["store"]) {
                 continue;
             }
@@ -943,12 +921,12 @@ class DbObject {
         }
 
         $this->run_query(
-            "INSERT INTO {%{$this->table_name}_table%} SET {$fields_expression}"
+            "INSERT INTO {%{$this->_table_name}_table%} SET {$fields_expression}"
         );
 
         $pr_key_name = $this->get_primary_key_name();
-        if ($this->fields[$pr_key_name]["type"] == "primary_key") {
-            $this->set_field_value($pr_key_name, $this->db->get_last_autoincrement_id());
+        if ($this->_fields[$pr_key_name]["type"] == "primary_key") {
+            $this->set_field_value($pr_key_name, $this->app->db->get_last_autoincrement_id());
         }
     }
 
@@ -957,7 +935,7 @@ class DbObject {
         $field_names_to_not_update = null
     ) {
         // Update data in database table
-        $this->log->write("DbObject", "update()", 3);
+        $this->app->log->write("DbObject", "update()", 3);
 
         $field_names = $this->get_field_names(
             $field_names_to_update,
@@ -969,7 +947,7 @@ class DbObject {
         $comma = "";
         $fields_expression = "";
         foreach ($field_names as $field_name) {
-            $field_info = $this->fields[$field_name];
+            $field_info = $this->_fields[$field_name];
             if ($use_update_flag && !$field_info["update"]) {
                 continue;
             }
@@ -980,12 +958,12 @@ class DbObject {
         }
         $where_str = $this->get_default_where_str(false);
         $this->run_query(
-            "UPDATE {%{$this->table_name}_table%} SET {$fields_expression} WHERE {$where_str}"
+            "UPDATE {%{$this->_table_name}_table%} SET {$fields_expression} WHERE {$where_str}"
         );
     }
 
     function get_update_field_expression($field_name) {
-        $field_info = $this->fields[$field_name];
+        $field_info = $this->_fields[$field_name];
         $field_type = $field_info["type"];
 
         $field_value = $this->{$field_name};
@@ -1036,7 +1014,7 @@ class DbObject {
 
     function del_where($where_str) {
         $this->run_query(
-            "DELETE FROM {%{$this->table_name}_table%} " .
+            "DELETE FROM {%{$this->_table_name}_table%} " .
             "WHERE {$where_str}"
         );
     }
@@ -1044,18 +1022,18 @@ class DbObject {
     function del_cascade() {
         $relations = $this->get_restrict_relations();
         foreach ($relations as $relation) {
-            list($target_obj_name, $key_field_name) = $relation;
+            list($target_table_name, $key_field_name) = $relation;
 
-            $this->log->write("DelCascade", "Trying delete from '{$target_obj_name}'", 3);
+            $this->app->log->write("DelCascade", "Trying delete from '{$target_table_name}'", 3);
 
-            $target_obj = $this->create_db_object($target_obj_name);
+            $target_obj = $this->create_db_object($target_table_name);
             if (count($target_obj->get_restrict_relations()) == 0) {
                 $target_obj->del_where("{$key_field_name} = {$this->id}");
             } else {
                 $objects_to_delete = $this->fetch_db_objects_list(
-                    $target_obj_name,
+                    $target_table_name,
                     array(
-                        "where" => "{$target_obj_name}.{$key_field_name} = {$this->id}",
+                        "where" => "{$target_table_name}.{$key_field_name} = {$this->id}",
                     )
                 );
                 foreach ($objects_to_delete as $object_to_delete) {
@@ -1078,10 +1056,10 @@ class DbObject {
         $template_var_prefix = null
     ) {
         // Get data from CGI and store to object values.
-        $this->log->write("DbObject", "read()", 3);
+        $this->app->log->write("DbObject", "read()", 3);
 
         if (is_null($template_var_prefix)) {
-            $template_var_prefix = $this->table_name;
+            $template_var_prefix = $this->_table_name;
         }
 
         $field_names = $this->get_field_names($field_names_to_read, $field_names_to_not_read);
@@ -1089,7 +1067,7 @@ class DbObject {
         $use_read_flag = is_null($field_names_to_read);
 
         foreach ($field_names as $field_name) {
-            $field_info = $this->fields[$field_name];
+            $field_info = $this->_fields[$field_name];
             if ($use_read_flag && !$field_info["read"]) {
                 continue;
             }
@@ -1122,8 +1100,8 @@ class DbObject {
                 break;
             case "varchar":
                 if ($this->is_field_multilingual($field_name)) {
-                    $default_lang_field_value = $this->{"{$field_name}_{$this->dlang}"};
-                    $current_lang_field_value = $this->{"{$field_name}_{$this->lang}"};
+                    $default_lang_field_value = $this->{"{$field_name}_{$this->app->dlang}"};
+                    $current_lang_field_value = $this->{"{$field_name}_{$this->app->lang}"};
                     $field_value = ($current_lang_field_value == "") ?
                         $default_lang_field_value :
                         $current_lang_field_value;
@@ -1133,8 +1111,8 @@ class DbObject {
                 break;
             case "text":
                 if ($this->is_field_multilingual($field_name)) {
-                    $default_lang_field_value = $this->{"{$field_name}_{$this->dlang}"};
-                    $current_lang_field_value = $this->{"{$field_name}_{$this->lang}"};
+                    $default_lang_field_value = $this->{"{$field_name}_{$this->app->dlang}"};
+                    $current_lang_field_value = $this->{"{$field_name}_{$this->app->lang}"};
                     $field_value = ($current_lang_field_value == "") ?
                         $default_lang_field_value :
                         $current_lang_field_value;
@@ -1244,8 +1222,8 @@ class DbObject {
     }
 //
     function read_filters() {
-        foreach ($this->filters as $i => $filter_info) {
-            $this->read_filter($this->filters[$i]);
+        foreach ($this->_filters as $i => $filter_info) {
+            $this->read_filter($this->_filters[$i]);
         }
     }
 
@@ -1253,7 +1231,7 @@ class DbObject {
         $filter_name = $filter_info["name"];
         $filter_relation = $filter_info["relation"];
         
-        $param_value = param("{$this->table_name}_{$filter_name}_{$filter_relation}");
+        $param_value = param("{$this->_table_name}_{$filter_name}_{$filter_relation}");
         if (is_null($param_value)) {
             $filter_info["value"] = $this->get_nonset_filter_value($filter_info);
         } else {
@@ -1263,7 +1241,7 @@ class DbObject {
 
     function get_filters_query_ex() {
         $filters_query_ex = new SelectQueryEx();
-        foreach ($this->filters as $filter_info) {
+        foreach ($this->_filters as $filter_info) {
             $filters_query_ex->expand($this->get_filter_query_ex($filter_info));
         }
         return $filters_query_ex;
@@ -1285,7 +1263,7 @@ class DbObject {
                 $field_type = $filter_info["type"];
                 $field_select = $filter_info["select"];
             } else {
-                $field_info = $this->fields[$filter_name];
+                $field_info = $this->_fields[$filter_name];
                 $field_type = $field_info["type"];
                 $field_select = $field_info["select"];
             }
@@ -1425,20 +1403,20 @@ class DbObject {
 
     function get_filters_params() {
         $params = array();
-        foreach ($this->filters as $filter_info) {
+        foreach ($this->_filters as $filter_info) {
             $filter_name = $filter_info["name"];
             $filter_relation = $filter_info["relation"];
             $filter_value = $filter_info["value"];
             $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
             if ($filter_value != $nonset_filter_value) {
-                $params["{$this->table_name}_{$filter_name}_{$filter_relation}"] = $filter_value;
+                $params["{$this->_table_name}_{$filter_name}_{$filter_relation}"] = $filter_value;
             }
         }
         return $params;
     }
 //
     function read_order_by($default_order_by_fields) {
-        $this->order_by = array();
+        $this->_order_by = array();
 
         if (!is_array($default_order_by_fields)) {
             $default_order_by_fields = array($default_order_by_fields);
@@ -1467,7 +1445,7 @@ class DbObject {
                     $order_by_direction = "asc";
                 }
             }
-            $this->order_by[] = array(
+            $this->_order_by[] = array(
                 "field_name" => $order_by_field_name,
                 "direction" => $order_by_direction,
             );
@@ -1476,7 +1454,7 @@ class DbObject {
 
     function get_order_by_params() {
         $order_by_values = array();
-        foreach ($this->order_by as $order_by_info) {
+        foreach ($this->_order_by as $order_by_info) {
             $order_by_values[] = "{$order_by_info['field_name']} {$order_by_info['direction']}";
         }
         return array("order_by" => $order_by_values);
@@ -1484,7 +1462,7 @@ class DbObject {
 
     function get_order_by_query_ex() {
         $order_by_sqls = array();
-        foreach ($this->order_by as $order_by_info) {
+        foreach ($this->_order_by as $order_by_info) {
             $order_by_direction_sql = strtoupper($order_by_info["direction"]);
             $order_by_sqls[] = "{$order_by_info['field_name']} {$order_by_direction_sql}";
         }
@@ -1501,8 +1479,8 @@ class DbObject {
 
     function init_print_params($params) {
         $this->print_params = array();
-        $this->init_print_param($params, "templates_dir", $this->table_name);
-        $this->init_print_param($params, "template_var_prefix", $this->table_name);
+        $this->init_print_param($params, "templates_dir", $this->_table_name);
+        $this->init_print_param($params, "template_var_prefix", $this->_table_name);
         $this->init_print_param($params, "context", "");
         $this->init_print_param($params, "list_item_number", 0);
         $this->init_print_param($params, "list_item_parity", 0);
@@ -1520,7 +1498,7 @@ class DbObject {
         foreach ($field_names as $field_name) {
             $field_value = $this->{$field_name};
             $this->print_value(
-                $this->fields[$field_name],
+                $this->_fields[$field_name],
                 $field_name,
                 $field_value,
                 $template_var_prefix
@@ -1642,7 +1620,7 @@ class DbObject {
         foreach ($field_names as $field_name) {
             $field_value = $this->{$field_name};
             $this->print_form_value(
-                $this->fields[$field_name],
+                $this->_fields[$field_name],
                 $field_name,
                 $field_value,
                 $template_var_prefix
@@ -1673,7 +1651,7 @@ class DbObject {
             $template_var_prefix = get_param_value(
                 $field_info,
                 "template_var_prefix",
-                $this->table_name
+                $this->_table_name
             );
         }
 
@@ -1703,7 +1681,7 @@ class DbObject {
                     "dependent_select_name" => "{$template_var_prefix}_{$dependent_field_name}",
                     "dependency_info" => $dependency_info,
                     "dependent_values_info" =>
-                        $this->fields[$dependent_field_name]["input"]["values"],
+                        $this->_fields[$dependent_field_name]["input"]["values"],
                 );
             }
             $this->app->print_foreign_key_form_value(
@@ -1814,7 +1792,7 @@ class DbObject {
     }
 //
     function print_filter_form_values() {
-        foreach ($this->filters as $filter_info) {
+        foreach ($this->_filters as $filter_info) {
             $this->print_filter_form_value($filter_info);
         }
     }
@@ -1839,11 +1817,11 @@ class DbObject {
             $values_source = $values_info["source"];
             if ($values_source == "field") {
                 $alt_values_info = $values_info;
-                $values_info = $this->fields[$filter_name]["input"]["values"];
+                $values_info = $this->_fields[$filter_name]["input"]["values"];
             }
         }
 
-        $template_var = "{$this->table_name}_{$filter_name}_{$filter_relation}";
+        $template_var = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
 
         $this->app->print_hidden_input_form_value($template_var, $filter_value);
 
@@ -1896,7 +1874,7 @@ class DbObject {
             if ($values_source == "field") {
                 $dependent_field_name = $dependency_info["field"];
                 $dependent_filter_name = $dependent_field_name;
-                $dependent_values_info = $this->fields[$dependent_field_name]["input"]["values"];
+                $dependent_values_info = $this->_fields[$dependent_field_name]["input"]["values"];
             } else {
                 $dependent_filter_name = $dependency_info["filter"];
                 $dependent_filter_info = $this->get_filter_by_name($dependent_filter_name);
@@ -1904,7 +1882,7 @@ class DbObject {
             }
 
             $dependent_select_name =
-                "{$this->table_name}_{$dependent_filter_name}_{$filter_relation}";
+                "{$this->_table_name}_{$dependent_filter_name}_{$filter_relation}";
             $this->app->print_main_select_input_form_value(
                 $template_var,
                 $filter_value,
@@ -2022,7 +2000,7 @@ class DbObject {
 
     function validate_empty_condition($field_name) {
         if ($this->is_field_multilingual($field_name)) {
-            foreach ($this->avail_langs as $lang) {
+            foreach ($this->app->avail_langs as $lang) {
                 $field_names = $this->get_field_names_with_lang_subst(
                     array($field_name),
                     $lang
@@ -2039,7 +2017,7 @@ class DbObject {
 
     function validate_not_empty_condition($field_name) {
         if ($this->is_field_multilingual($field_name)) {
-            foreach ($this->avail_langs as $lang) {
+            foreach ($this->app->avail_langs as $lang) {
                 $field_names = $this->get_field_names_with_lang_subst(
                     array($field_name),
                     $lang
@@ -2068,7 +2046,7 @@ class DbObject {
         $was_definite = is_null($old_obj) ? false : $old_obj->is_definite();
                         
         if ($this->has_multilingual_fields($field_names)) {
-            foreach ($this->avail_langs as $lang) {
+            foreach ($this->app->avail_langs as $lang) {
                 $field_names_to_validate = $this->get_field_names_with_lang_subst(
                     $field_names,
                     $lang
@@ -2101,16 +2079,16 @@ class DbObject {
     
     function are_field_values_exist($field_names) {
         $query = new SelectQuery(array(
-            "from" => "{%{$this->table_name}_table%} AS {$this->table_name}",
+            "from" => "{%{$this->_table_name}_table%} AS {$this->_table_name}",
             "where" => $this->create_where_expression($field_names),
         ));
-        return $this->db->get_select_query_num_rows($query);
+        return $this->app->db->get_select_query_num_rows($query);
     }
 
     function create_where_expression($field_names) {
         $where_expressions = array();
         foreach ($field_names as $field_name) {
-            $field_info = $this->fields[$field_name];
+            $field_info = $this->_fields[$field_name];
             $where_expressions[] = "{$field_info['select']} = " . qw($this->{$field_name});
         }
         return join(" AND ", $where_expressions);
@@ -2157,7 +2135,7 @@ class DbObject {
             }
             
             if ($this->is_field_multilingual($field_name)) {
-                foreach ($this->avail_langs as $lang) {
+                foreach ($this->app->avail_langs as $lang) {
                     $client_validate_condition_strs[] = $this->get_client_validate_condition_str(
                         $condition_info,
                         $lang
@@ -2244,7 +2222,7 @@ class DbObject {
                 "where"  => "{$dep_table_field} = {$this->id}",
             ));
 
-            $n = $this->db->get_select_query_num_rows($query);
+            $n = $this->app->db->get_select_query_num_rows($query);
             if ($n > 0) {
                 if (isset($table_link_counters[$dep_table_name])) {
                     $table_link_counters[$dep_table_name] += $n;
@@ -2285,7 +2263,7 @@ class DbObject {
         $comma = "";
         $fields_expression = "";
         foreach ($field_names as $field_name) {
-            $field_info = $this->fields[$field_name];
+            $field_info = $this->_fields[$field_name];
 
             $fields_expression .= $comma;
             $comma = ", ";
@@ -2294,7 +2272,7 @@ class DbObject {
 
         return new SelectQuery(array(
             "select" => $fields_expression,
-            "from" => $this->select_from,
+            "from" => $this->_select_from,
         ));
     }
 
@@ -2326,11 +2304,11 @@ class DbObject {
     }
 
     function run_query($query_str) {
-        return $this->db->run_query($query_str);    
+        return $this->app->db->run_query($query_str);    
     }
 
     function run_select_query($query) {
-        return $this->db->run_select_query($query);
+        return $this->app->db->run_select_query($query);
     }
 //
     function get_default_where_str($use_table_alias = true) {
@@ -2340,7 +2318,7 @@ class DbObject {
         $pr_key_value_str = qw($pr_key_value);
 
         if ($use_table_alias) {
-            return "{$this->table_name}.{$pr_key_name} = {$pr_key_value_str}";
+            return "{$this->_table_name}.{$pr_key_name} = {$pr_key_value_str}";
         } else {
             return "{$pr_key_name} = {$pr_key_value_str}";
         }
@@ -2434,7 +2412,7 @@ class DbObject {
         $templates_dir = $this->print_params["templates_dir"];
         $this->app->print_file_new_if_exists(
             "{$templates_dir}/{$filename}",
-            "{$this->table_name}{$template_var}"
+            "{$this->_table_name}{$template_var}"
         );
     }
 
@@ -2466,8 +2444,8 @@ class DbObject {
         $filename = $uploaded_file_info["name"];
         
         if (is_null($resize_info)) {
-            $image_width = $this->app->config->get_value("{$this->table_name}_image_width");
-            $image_height = $this->app->config->get_value("{$this->table_name}_image_height");
+            $image_width = $this->app->config->get_value("{$this->_table_name}_image_width");
+            $image_height = $this->app->config->get_value("{$this->_table_name}_image_height");
             $is_thumbnail = 0;
             $resize_func_name = "crop_and_resize";
         } else {
@@ -2498,7 +2476,7 @@ class DbObject {
         $this->set_field_value($image_id_field_name, $image->id);
     }
 
-// File upload helpers
+//  File upload helpers
     function fetch_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         return $this->fetch_db_object("file", $file_id);
@@ -2520,7 +2498,7 @@ class DbObject {
         $templates_dir = $this->print_params["templates_dir"];
         $this->app->print_file_new_if_exists(
             "{$templates_dir}/{$filename}",
-            "{$this->table_name}{$template_var}"
+            "{$this->_table_name}{$template_var}"
         );
     }
 
@@ -2545,7 +2523,7 @@ class DbObject {
         $query = new SelectQuery(array(
             "select" => "IFNULL(SUM(LENGTH(file.content)), 0) as total_size",
             "from" =>
-                "{%{$this->table_name}_table%} AS file_info " .
+                "{%{$this->_table_name}_table%} AS file_info " .
                     "INNER JOIN {%file_table%} AS file" .
                     " ON file_info.{$file_id_field_name} = file.id",
         ));
@@ -2557,7 +2535,7 @@ class DbObject {
     function fetch_last_db_object_position($where_str = "1") {
         $query = new SelectQuery(array(
             "select" => "IFNULL(MAX(position), 0) as last_position",
-            "from" => "{%{$this->table_name}_table%}",
+            "from" => "{%{$this->_table_name}_table%}",
             "where" => $where_str,
         ));
         $res = $this->run_select_query($query);
@@ -2568,7 +2546,7 @@ class DbObject {
     function fetch_prev_db_object_position($where_str = "1") {
         $query = new SelectQuery(array(
             "select" => "IFNULL(MAX(position), 0) AS prev_position",
-            "from" => "{%{$this->table_name}_table%}",
+            "from" => "{%{$this->_table_name}_table%}",
             "where" => "position < {$this->position} AND {$where_str}",
         ));
         $res = $this->run_select_query($query);
@@ -2579,7 +2557,7 @@ class DbObject {
     function fetch_next_db_object_position($where_str = "1") {
         $query = new SelectQuery(array(
             "select" => "IFNULL(MIN(position), 0) AS next_position",
-            "from" => "{%{$this->table_name}_table%}",
+            "from" => "{%{$this->_table_name}_table%}",
             "where" => "position > {$this->position} AND {$where_str}",
         ));
         $res = $this->run_select_query($query);
@@ -2598,7 +2576,7 @@ class DbObject {
             return null;
         }
 
-        $neighbor_obj = $this->create_db_object($this->table_name);
+        $neighbor_obj = $this->create_db_object($this->_table_name);
         if ($neighbor_obj->fetch("position = {$neighbor_obj_position} AND {$where_str}")) {
             return $neighbor_obj;
         } else {

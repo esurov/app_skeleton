@@ -1,30 +1,24 @@
 <?php
 
-$__tmp_saved_lib_dir = getcwd();
-
 define("_APP_LIB_DIR", dirname(__FILE__));
 
-chdir(_APP_LIB_DIR);
+require_once(_APP_LIB_DIR . "/global.php");
 
-require_once("global.php");
+require_once(_APP_LIB_DIR . "/session.php");
+require_once(_APP_LIB_DIR . "/config.php");
+require_once(_APP_LIB_DIR . "/template.php");
+require_once(_APP_LIB_DIR . "/logger.php");
 
-require_once("session.php");
-require_once("config.php");
-require_once("template.php");
-require_once("logger.php");
+require_once(_APP_LIB_DIR . "/db.php");
+require_once(_APP_LIB_DIR . "/select_query.php");
+require_once(_APP_LIB_DIR . "/db_result.php");
+require_once(_APP_LIB_DIR . "/db_object.php");
 
-require_once("db.php");
-require_once("select_query.php");
-require_once("db_result.php");
-require_once("db_object.php");
+require_once(_APP_LIB_DIR . "/http_response.php");
+require_once(_APP_LIB_DIR . "/status_msg.php");
 
-require_once("http_response.php");
-require_once("status_msg.php");
+require_once(_APP_LIB_DIR . "/app.php");
 
-require_once("_init_components.php");
-
-require_once("app.php");
-
-chdir($__tmp_saved_lib_dir);
+require_once(_APP_LIB_DIR . "/_init_components.php");
 
 ?>

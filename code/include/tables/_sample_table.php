@@ -32,8 +32,8 @@
 
 class SampleTable extends CustomDbObject {
 
-    function SampleTable() {
-        parent::CustomDbObject("_sample_table");
+    function init($params) {
+        parent::init($params);
 
         // note: no need to specify index on primary_key and foreign_key fields
         // it is added automatically
@@ -100,7 +100,7 @@ class SampleTable extends CustomDbObject {
             "table" => "image",
             
             // sql string for join condition
-            "condition" => "_sample_table.image_id = image.id",
+            "condition" => "{$this->_table_name}.image_id = image.id",
         ));
 
 
@@ -110,8 +110,8 @@ class SampleTable extends CustomDbObject {
             "type" => "foreign_key",
             "join" => array(
                 "type" => "left",
-                "table" => "_sample_table",
-                "table_alias" => "_sample_table_alias",
+                "table" => $this->_table_name,
+                "table_alias" => "{$this->_table_name}_alias",
                 "field" => "id",
             ),
         ));
@@ -264,8 +264,8 @@ class SampleTable extends CustomDbObject {
             "type" => "text",
             "select" =>
                 "CONCAT(" .
-                    "_sample_table.field_varchar_{$this->lang}, " .
-                    "_sample_table.field_text_{$this->lang}".
+                    "{$this->_table_name}.field_varchar_{$this->app->lang}, " .
+                    "{$this->_table_name}.field_text_{$this->app->lang}".
                 ")",
         ));
 
@@ -280,14 +280,14 @@ class SampleTable extends CustomDbObject {
         // field 'field_text' from self-joined table
         // note: calculated fields cannot be get when table_alias specified
         $this->insert_field(array(
-            "table_alias" => "_sample_table_alias",
+            "table_alias" => "{$this->_table_name}_alias",
             "field" => "field_text",
         ));
 
         // alias field name 'field_text_alias' for the field 'field_text' from self-joined table
         // note: calculated fields cannot be get when table_alias specified
         $this->insert_field(array(
-            "table_alias" => "_sample_table_alias",
+            "table_alias" => "{$this->_table_name}_alias",
             "field" => "field_text",
             "field_alias" => "field_text_alias"
         ));
@@ -342,8 +342,8 @@ class SampleTable extends CustomDbObject {
 
         // This template variable is extension to default printed variables for all contexts
         $this->app->print_raw_value(
-            "_sample_table_field_double_decorated",
-            "!!" . $this->app->page->get_filling_value("_sample_table_field_double") . "!!"
+            "_sample_table2_field_double_decorated",
+            "!!" . $this->app->page->get_filling_value("_sample_table2_field_double") . "!!"
         );
 
         // Context handling
@@ -364,7 +364,7 @@ class SampleTable extends CustomDbObject {
 
             // Add context-specific template variable
             $this->app->print_varchar_value(
-                "_sample_table_context1_specific_value",
+                "_sample_table2_context1_specific_value",
                 "str1&{$list_item_number}<>{$list_item_parity}"
             );
             break;
@@ -372,7 +372,7 @@ class SampleTable extends CustomDbObject {
         case "context2":
             // Add context-specific template variable
             $this->app->print_boolean_value(
-                "_sample_table_context2_specific_value",
+                "_sample_table2_context2_specific_value",
                 1 - $this->field_boolean
             );
             break;

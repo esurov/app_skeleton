@@ -179,7 +179,7 @@ class QueryObjectsList extends _ObjectsList {
             );
         }
         if ($this->template_var_prefix == "") {
-            $this->template_var_prefix = $this->obj->table_name;
+            $this->template_var_prefix = $this->obj->_table_name;
         }
 
         $this->query = get_param_value($params, "query", $this->obj->get_select_query());

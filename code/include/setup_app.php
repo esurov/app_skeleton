@@ -111,7 +111,7 @@ class SetupApp extends CustomApp {
         $this->create_self_redirect_response();
     }
 
-    function action_insert_test_news_articles() {
+    function insert_test_news_articles() {
         $article = $this->create_db_object("news_article");
         $article->created = "2004-06-20";
         $article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";

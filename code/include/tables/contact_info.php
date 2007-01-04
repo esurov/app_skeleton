@@ -2,8 +2,8 @@
 
 class ContactInfo extends CustomDbObject {
 
-    function ContactInfo() {
-        parent::CustomDbObject("contact_info");
+    function init($params) {
+        parent::init($params);
 
         $this->insert_field(array(
             "field" => "id",

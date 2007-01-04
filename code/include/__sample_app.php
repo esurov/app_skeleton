@@ -18,7 +18,7 @@ class SampleApp extends CustomApp {
             "pg_view_sample_table_records_in_context2" => $e,
             "pg_view_all_sample_table_records_as_objects" => $e,
 */
-            "print_and_save_one_sample_table_record" => $e,
+            "print_and_save_one_sample_table2_record" => $e,
 
             "pg_view_component" => $e,
         );
@@ -103,8 +103,8 @@ class SampleApp extends CustomApp {
         ));
     }
 */
-    function action_print_and_save_one_sample_table_record() {
-        $obj = $this->fetch_db_object("_sample_table", 1);
+    function action_print_and_save_one_sample_table2_record() {
+        $obj = $this->fetch_db_object("_sample_table2", 1);
         $obj->print_values();
         $obj->field_currency = 99999999.99;
         $obj->save();

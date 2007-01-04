@@ -21,7 +21,6 @@ class App {
     var $log;
 
     var $db;
-    var $tables;
 
     var $popup = 0;
     var $report = 0;
@@ -32,11 +31,7 @@ class App {
     var $avail_langs;
 
     function App($app_name) {
-        global $tables, $components;
-
         $this->app_name = $app_name;
-        $this->tables = $tables;
-        $this->components = $components;
 
         $this->response = null;
 
@@ -352,89 +347,6 @@ class App {
         $open_inline = true
     ) {
         $this->response = new PdfDocumentResponse($content, $filename, $open_inline);
-    }
-//
-    function create_db_object($obj_name) {
-        $obj_class_name = get_param_value($this->tables, $obj_name, null);
-        if (is_null($obj_class_name)) {
-            $this->process_fatal_error(
-                "App",
-                "Cannot find and instantiate db_object child class for '{$obj_name}'!"
-            );
-        }
-        if (!class_exists($obj_class_name)) {
-            require_once(_APP_TABLES_DIR . "/{$obj_name}.php");
-        }
-        return new $obj_class_name();
-    }
-//
-    function fetch_db_object(
-        $obj,
-        $id,
-        $where_str = "1",
-        $field_names_to_select = null,
-        $field_names_to_not_select = null
-    ) {
-        // If object is given by its name then create instance here
-        // If no then instance should be created outside this function
-        // and could be expanded with new fields (using insert_field())
-        if (is_string($obj)) {
-            $obj = $this->create_db_object($obj);
-        }
-        if ($id != 0) {
-            $obj->fetch(
-                "{$obj->table_name}.id = {$id} AND {$where_str}",
-                $field_names_to_select,
-                $field_names_to_not_select
-            );
-        }
-        return $obj;
-    }
-
-    function fetch_db_objects_list(
-        $obj,
-        $query_ex,
-        $field_names_to_select = null,
-        $field_names_to_not_select = null
-    ) {
-        if (is_string($obj)) {
-            $obj = $this->create_db_object($obj);
-        }
-        $res = $obj->run_expanded_select_query(
-            $query_ex,
-            $field_names_to_select,
-            $field_names_to_not_select
-        );
-        $objects = array();
-        while ($row = $res->fetch()) {
-            $obj->fetch_row($row);
-            $objects[] = $obj;
-        }
-        return $objects;
-    }
-
-    function fetch_rows_list($query) {
-        $res = $this->db->run_select_query($query);
-        $rows = array();
-        while ($row = $res->fetch()) {
-            $rows[] = $row;
-        }
-        return $rows;
-    }
-
-    function read_id_fetch_db_object(
-        $obj_name,
-        $where_str = "1",
-        $id_param_name = null
-    ) {
-        // Create new object, read it's PRIMARY KEY from CGI
-        // (using CGI variable with name $id_param_name),
-        // then fetch object from database table
-        if (is_null($id_param_name)) {
-            $id_param_name = "{$obj_name}_id";
-        }
-        $pr_key_value = (int) param($id_param_name);
-        return $this->fetch_db_object($obj_name, $pr_key_value, $where_str);
     }
 //
     function get_app_datetime_format() {
@@ -1554,7 +1466,7 @@ class App {
                 "No 'obj' in App::print_object_view_page()"
             );
         }
-        $obj_name = $obj->table_name;
+        $obj_name = $obj->_table_name;
         
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
         $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
@@ -1583,7 +1495,7 @@ class App {
                 "No 'obj' in App::print_object_edit_page()"
             );
         }
-        $obj_name = $obj->table_name;
+        $obj_name = $obj->_table_name;
 
         $templates_dir = get_param_value($params, "templates_dir", $obj_name);
         $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
@@ -1729,11 +1641,11 @@ class App {
 
     function print_status_message_object_updated($obj) {
         $action_done = ($obj->is_definite()) ? "updated" : "added";
-        $this->add_session_status_message(new OkStatusMsg("{$obj->table_name}_{$action_done}"));
+        $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}_{$action_done}"));
     }
         
     function print_status_message_object_deleted($obj) {
-        $this->add_session_status_message(new OkStatusMsg("{$obj->table_name}_deleted"));
+        $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}_deleted"));
     }
 
     function print_session_status_messages() {
@@ -1768,11 +1680,11 @@ class App {
 //
     function process_create_update_tables() {
         $actual_table_names = $this->db->get_actual_table_names();
-        $table_names = array_keys($this->tables);
+        $all_table_names_to_create = $this->get_all_table_names_to_create();
 
-        $table_names_to_create = array_diff($table_names, $actual_table_names);
-        $table_names_to_update = array_intersect($table_names, $actual_table_names);
-        $table_names_to_drop = array_diff($actual_table_names, $table_names);
+        $table_names_to_create = array_diff($all_table_names_to_create, $actual_table_names);
+        $table_names_to_update = array_intersect($all_table_names_to_create, $actual_table_names);
+        $table_names_to_drop = array_diff($actual_table_names, $all_table_names_to_create);
 
         foreach ($table_names_to_create as $table_name) {
             $obj = $this->create_db_object($table_name);
@@ -1794,6 +1706,23 @@ class App {
         foreach ($table_names_to_drop as $table_name) {
             $this->db->drop_table($table_name);
         }
+    }
+
+    function get_all_table_names_to_create() {
+        global $tables;
+
+        $table_classes_info = $tables["classes"];
+        $table_names = array_keys($table_classes_info);
+
+        $result_table_names = array();
+        foreach ($table_names as $table_name) {
+            $table_class_info = $table_classes_info[$table_name];
+            $should_be_created = get_param_value($table_class_info, "create", true);
+            if ($should_be_created) {
+                $result_table_names[] = $table_name;
+            }
+        }
+        return $result_table_names;
     }
 //
     function action_get_image() {
@@ -1849,56 +1778,58 @@ class App {
         }
     }
 //
-    function load_component($component_class_name) {
-        $component_info = get_param_value(
-            $this->components["components_info"],
-            $component_class_name,
-            null
-        );
-        if (is_null($component_info)) {
+    function create_db_object($obj_name, $obj_params = null) {
+        global $tables;
+
+        $obj_info = get_param_value($tables["classes"], $obj_name, null);
+        if (is_null($obj_info)) {
             $this->process_fatal_error(
                 "App",
-                "Cannot find required component '{$component_class_name}'!"
+                "Cannot find info about table '{$obj_name}'!"
             );
         }
-
-        $was_loaded = false;
-        $required_components = get_param_value($component_info, "required_components", array());
-        foreach ($required_components as $required_component_class_name) {
-            if (!$this->load_component($required_component_class_name)) {
-                return $was_loaded;
+        $obj_class_name = $obj_info["class_name"];
+        if (!class_exists($obj_class_name)) {
+            // NB: Here obj_name is used because tables are named in lower case
+            if (!$this->_load_class(
+                $obj_name,
+                $tables["class_paths"],
+                $tables["classes"])
+            ) {
+                $this->process_fatal_error(
+                    "App",
+                    "Cannot load DbObject-derived class for table '{$obj_name}'!"
+                );
             }
         }
-
-        foreach ($this->components["dirs"] as $component_dir) {
-            $component_file_name = $component_info["file_name"];
-            $component_full_file_name = "{$component_dir}/{$component_file_name}";
-            if (is_file($component_full_file_name)) {
-                require_once($component_full_file_name);
-                $was_loaded = true;
-                break;
-            }
+        $obj = new $obj_class_name();
+        $obj->app =& $this;
+        $obj->_table_name = $obj_name;
+        if (method_exists($obj, "init")) {
+            $obj->init($obj_params);
         }
-        return $was_loaded;
+        return $obj;
     }
 
     function create_component($component_class_name, $component_params = null) {
-        $component_info = get_param_value(
-            $this->components["components_info"],
-            $component_class_name,
-            null
-        );
+        global $components;
+
+        $component_info = get_param_value($components["classes"], $component_class_name, null);
         if (is_null($component_info)) {
             $this->process_fatal_error(
                 "App",
-                "Cannot find component '{$component_class_name}'!"
+                "Cannot find info about component '{$component_class_name}'!"
             );
         }
         if (!class_exists($component_class_name)) {
-            if (!$this->load_component($component_class_name)) {
+            if (!$this->_load_class(
+                $component_class_name,
+                $components["class_paths"],
+                $components["classes"]
+            )) {
                 $this->process_fatal_error(
                     "App",
-                    "Cannot load and instantiate component '{$component_class_name}'!"
+                    "Cannot load class for component '{$component_class_name}'!"
                 );
             }
         }
@@ -1907,12 +1838,109 @@ class App {
         if ($need_app) {
             $component->app =& $this;
         }
-        if (!is_null($component_params) && method_exists($component, "init")) {
+        if (method_exists($component, "init")) {
             $component->init($component_params);
         }
         return $component;
     }
+
+    function _load_class($class_name, $class_paths, $classes_info) {
+        $class_info = get_param_value($classes_info, $class_name, null);
+        if (is_null($class_info)) {
+            $this->process_fatal_error(
+                "App",
+                "Cannot find info about class '{$class_name}'!"
+            );
+        }
+
+        $required_classes = get_param_value($class_info, "required_classes", array());
+        foreach ($required_classes as $required_class_name) {
+            if (!$this->_load_class($required_class_name, $class_paths, $classes_info)) {
+                return false;
+            }
+        }
+
+        foreach ($class_paths as $class_dir) {
+            $class_file_name = $class_info["file_name"];
+            $class_full_file_name = "{$class_dir}/{$class_file_name}";
+            if (is_file($class_full_file_name)) {
+                require_once($class_full_file_name);
+                return true;
+            }
+        }
+        return false;
+    }
 //
+    function fetch_db_object(
+        $obj,
+        $id,
+        $where_str = "1",
+        $field_names_to_select = null,
+        $field_names_to_not_select = null
+    ) {
+        // If object is given by its name then create instance here
+        // If no then instance should be created outside this function
+        // and could be expanded with new fields (using insert_field())
+        if (is_string($obj)) {
+            $obj = $this->create_db_object($obj);
+        }
+        if ($id != 0) {
+            $obj->fetch(
+                "{$obj->_table_name}.id = {$id} AND {$where_str}",
+                $field_names_to_select,
+                $field_names_to_not_select
+            );
+        }
+        return $obj;
+    }
+
+    function fetch_db_objects_list(
+        $obj,
+        $query_ex,
+        $field_names_to_select = null,
+        $field_names_to_not_select = null
+    ) {
+        if (is_string($obj)) {
+            $obj = $this->create_db_object($obj);
+        }
+        $res = $obj->run_expanded_select_query(
+            $query_ex,
+            $field_names_to_select,
+            $field_names_to_not_select
+        );
+        $objects = array();
+        while ($row = $res->fetch()) {
+            $obj->fetch_row($row);
+            $objects[] = $obj;
+        }
+        return $objects;
+    }
+
+    function fetch_rows_list($query) {
+        $res = $this->db->run_select_query($query);
+        $rows = array();
+        while ($row = $res->fetch()) {
+            $rows[] = $row;
+        }
+        return $rows;
+    }
+
+    function read_id_fetch_db_object(
+        $obj_name,
+        $where_str = "1",
+        $id_param_name = null
+    ) {
+        // Create new object, read it's PRIMARY KEY from CGI
+        // (using CGI variable with name $id_param_name),
+        // then fetch object from database table
+        if (is_null($id_param_name)) {
+            $id_param_name = "{$obj_name}_id";
+        }
+        $pr_key_value = (int) param($id_param_name);
+        return $this->fetch_db_object($obj_name, $pr_key_value, $where_str);
+    }
+
+//  Components creation helpers
     function create_email_sender() {
         $email_sender = $this->create_component("PHPMailer");
         $email_sender->IsSendmail();

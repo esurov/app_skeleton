@@ -2,8 +2,8 @@
 
 class Image extends CustomDbObject {
     
-    function Image() {
-        parent::CustomDbObject("image");
+    function init($params) {
+        parent::init($params);
 
         $this->insert_field(array(
             "field" => "id",

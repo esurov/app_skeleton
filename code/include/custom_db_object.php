@@ -1,10 +1,8 @@
 <?php
 
-class CustomDbObject extends DbObject {
+// Class for custom functionality of all DbObject classes
 
-    function CustomDbObject($table_name) {
-        parent::DbObject($table_name);
-    }
+class CustomDbObject extends DbObject {
 
 }
 
