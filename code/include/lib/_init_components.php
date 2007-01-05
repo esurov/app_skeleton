@@ -27,12 +27,15 @@ $components = array(
 //        ),
         "ObjectsList" => array(
             "file_name" => "objects_list.php",
+            "required_classes" => array("ObjectTemplateComponent"),
         ),
         "QueryObjectsList" => array(
             "file_name" => "objects_list.php",
+            "required_classes" => array("ObjectTemplateComponent"),
         ),
         "PagedQueryObjectsList" => array(
             "file_name" => "objects_list.php",
+            "required_classes" => array("ObjectTemplateComponent"),
         ),
         "Pager" => array(
             "file_name" => "pager.php",

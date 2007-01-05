@@ -1,38 +1,9 @@
 <?php
 
-class _ObjectsList {
-
-    var $app;
-
-    var $templates_dir;
-    var $template_var_prefix;
-    var $template_var;
-    var $templates_ext;
-
-    var $context;
-    var $custom_params;
+class _ObjectsList extends ObjectTemplateComponent {
 
     var $_current_obj_idx;
 
-    function init($params) {
-        $this->templates_dir = get_param_value($params, "templates_dir", null);
-        if (is_null($this->templates_dir)) {
-            $this->app->process_fatal_error(
-                "_ObjectsList",
-                "No 'templates_dir' in _ObjectsList::init()"
-            );
-        }
-        $this->template_var_prefix = get_param_value($params, "template_var_prefix", "");
-        $this->template_var = get_param_value(
-            $params,
-            "template_var",
-            "{$this->template_var_prefix}_list"
-        );
-        $this->templates_ext = get_param_value($params, "templates_ext", "html");
-        $this->context = get_param_value($params, "context", "");
-        $this->custom_params = get_param_value($params, "custom_params", array());
-    }
-//
     function _prepare_objects_list() {
     }
 
@@ -48,10 +19,14 @@ class _ObjectsList {
     function print_values() {
         $this->_prepare_objects_list();
 
-        $this->app->print_custom_params($this->custom_params);
+        $this->print_list_custom_params();
         $content = $this->print_list();
         
         return $content;
+    }
+
+    function print_list_custom_params() {
+        $this->app->print_custom_params($this->custom_params);
     }
 
     function print_list() {
@@ -160,7 +135,6 @@ class ObjectsList extends _ObjectsList {
 
 class QueryObjectsList extends _ObjectsList {
 
-    var $obj;
     var $query;
     
     var $_res;
@@ -168,15 +142,11 @@ class QueryObjectsList extends _ObjectsList {
     function init($params) {
         parent::init($params);
 
-        $this->obj = get_param_value($params, "obj", null);
         if (is_null($this->obj)) {
             $this->app->process_fatal_error(
                 "QueryObjectsList",
                 "No 'obj' in QueryObjectsList::init()"
             );
-        }
-        if ($this->template_var_prefix == "") {
-            $this->template_var_prefix = $this->obj->_table_name;
         }
 
         $this->query = get_param_value($params, "query", $this->obj->get_select_query());
