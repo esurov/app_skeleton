@@ -6,6 +6,25 @@ $components = array(
         _APP_LIB_DIR . "/components",
     ),
     "classes" => array(
+        "Component" => array(
+            "file_name" => "component.php",
+        ),
+        "TemplateComponent" => array(
+            "file_name" => "component.php",
+            "required_classes" => array("Component"),
+        ),
+        "ObjectTemplateComponent" => array(
+            "file_name" => "component.php",
+            "required_classes" => array("TemplateComponent"),
+        ),
+        "ObjectView" => array(
+            "file_name" => "object_view.php",
+            "required_classes" => array("ObjectTemplateComponent"),
+        ),
+//        "ObjectEdit" => array(
+//            "file_name" => "object_edit.php",
+//            "required_classes" => array("ObjectTemplateComponent"),
+//        ),
         "ObjectsList" => array(
             "file_name" => "objects_list.php",
         ),

@@ -48,14 +48,10 @@ class _ObjectsList {
     function print_values() {
         $this->_prepare_objects_list();
 
-        $this->print_list_custom_params();
+        $this->app->print_custom_params($this->custom_params);
         $content = $this->print_list();
         
         return $content;
-    }
-
-    function print_list_custom_params() {
-        $this->app->print_custom_params($this->custom_params);
     }
 
     function print_list() {
@@ -63,7 +59,7 @@ class _ObjectsList {
 
         $this->_current_obj_idx = 0;
         while ($obj =& $this->_fetch_list_object()) {
-            $this->print_list_object($obj);
+            $this->print_object_values($obj);
 
             if ($this->_current_obj_idx > 0) {
                 $this->app->print_file_if_exists(
@@ -88,6 +84,7 @@ class _ObjectsList {
         } else {
             $list_items_template_name = "list_items.{$this->templates_ext}";
         }
+        
         $this->app->print_file(
             "{$this->templates_dir}/{$list_items_template_name}",
             "{$this->template_var_prefix}_list"
@@ -99,7 +96,7 @@ class _ObjectsList {
         );
     }
 
-    function print_list_object(&$obj) {
+    function print_object_values(&$obj) {
         $list_item_parity = $this->_current_obj_idx % 2;
         $list_item_class = ($list_item_parity == 0) ?
             "list-item-even" :

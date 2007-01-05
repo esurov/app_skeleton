@@ -1458,35 +1458,6 @@ class App {
     }
 
 //  Object functions
-    function print_object_view_page($params) {
-        $obj = get_param_value($params, "obj", null);
-        if (is_null($obj)) {
-            $this->process_fatal_error(
-                "App",
-                "No 'obj' in App::print_object_view_page()"
-            );
-        }
-        $obj_name = $obj->_table_name;
-        
-        $templates_dir = get_param_value($params, "templates_dir", $obj_name);
-        $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
-        $template_var = get_param_value($params, "template_var", "body");
-        $context = get_param_value($params, "context", "");
-        $custom_params = get_param_value($params, "custom_params", array());
-
-        $this->print_custom_params($custom_params);
-
-        $obj->print_values(array(
-            "templates_dir" => $templates_dir,
-            "template_var_prefix" => $template_var_prefix,
-            "context" => $context,
-            "custom_params" => $custom_params,
-        ));
-        
-        $this->print_file_new("{$templates_dir}/view_info.html", "{$template_var_prefix}_info");
-        return $this->print_file("{$templates_dir}/view.html", $template_var);
-    }
-//
     function print_object_edit_page($params) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {

@@ -75,11 +75,20 @@ class UserApp extends CustomApp {
     }
 
     function action_pg_view_news_article() {
+        $templates_dir = "news_article_view";
+
         $news_article = $this->read_id_fetch_db_object("news_article");
-        $this->print_object_view_page(array(
-            "obj" => $news_article,
-            "templates_dir" => "news_article_view",
-        ));
+        $news_article_view = $this->create_component(
+            "ObjectView",
+            array(
+                "templates_dir" => "{$templates_dir}/news_article_view",
+                "template_var" => "news_article_view",
+                "obj" => $news_article,
+            )
+        );
+        $news_article_view->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
     }
 //
     function action_pg_contact_form() {
