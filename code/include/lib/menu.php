@@ -1,12 +1,7 @@
 <?php
 
-class Menu {
+class Menu extends TemplateComponent {
     
-    var $app;
-
-    var $templates_dir;
-    var $template_var;
-
     var $name;
     var $template_name;
     var $item_template_name;
@@ -38,7 +33,7 @@ class Menu {
     }
 //
     function print_values() {
-        $this->print_menu_items($this);
+        return $this->print_menu_items($this);
     }
 
     function print_menu_items(&$menu) {
@@ -110,7 +105,7 @@ class Menu {
             }
         }
         
-        $this->app->print_file_new_if_exists(
+        return $this->app->print_file_new_if_exists(
             "{$menu->templates_dir}/{$menu->template_name}",
             $menu->template_var
         );

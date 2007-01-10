@@ -1,11 +1,6 @@
 <?php
 
-class LangMenu {
-
-    var $app;
-
-    var $templates_dir;
-    var $template_var;
+class LangMenu extends TemplateComponent {
 
     var $avail_langs = array();
     var $current_lang = "";
@@ -34,7 +29,10 @@ class LangMenu {
                 "lang_menu_items"
             );
         }
-        $this->app->print_file_new("{$this->templates_dir}/menu.html", $this->template_var);
+        return $this->app->print_file_new(
+            "{$this->templates_dir}/menu.html",
+            $this->template_var
+        );
     }
 
 }

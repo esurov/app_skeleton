@@ -13,6 +13,7 @@ class TemplateComponent extends Component {
 
     var $templates_dir;
     var $templates_ext;
+    var $template_var;
 
     function init($params) {
         parent::init($params);
@@ -25,6 +26,7 @@ class TemplateComponent extends Component {
             );
         }
         $this->templates_ext = get_param_value($params, "templates_ext", "html");
+        $this->template_var = get_param_value($params, "template_var", null);
     }
 
     function print_values() {
@@ -37,7 +39,6 @@ class ObjectTemplateComponent extends TemplateComponent {
     var $obj;
 
     var $template_var_prefix;
-    var $template_var;
 
     var $context;
     var $custom_params;
@@ -52,7 +53,6 @@ class ObjectTemplateComponent extends TemplateComponent {
             "template_var_prefix",
             is_null($this->obj) ? "" : $this->obj->_table_name
         );
-        $this->template_var = get_param_value($params, "template_var", null);
         
         $this->context = get_param_value($params, "context", "");
         $this->custom_params = get_param_value($params, "custom_params", array());

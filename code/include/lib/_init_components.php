@@ -39,6 +39,7 @@ $components = array(
         ),
         "Pager" => array(
             "file_name" => "pager.php",
+            "required_classes" => array("Component"),
         ),
         "Xml" => array(
             "file_name" => "xml.php",
@@ -46,10 +47,11 @@ $components = array(
         ),
         "Menu" => array(
             "file_name" => "menu.php",
-            "required_classes" => array("Xml"),
+            "required_classes" => array("TemplateComponent", "Xml"),
         ),
         "LangMenu" => array(
             "file_name" => "lang_menu.php",
+            "required_classes" => array("TemplateComponent"),
         ),
         "PHPMailer" => array(
             "file_name" => "phpmailer.php",

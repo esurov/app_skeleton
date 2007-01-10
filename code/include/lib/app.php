@@ -1426,35 +1426,41 @@ class App {
     }
 //
     function print_menu($params = array()) {
-        $menu =& $this->create_menu();
-        
-        $menu->templates_dir = get_param_value($params, "templates_dir", "_menu");
-        $menu->template_var = get_param_value($params, "template_var", "menu");
+        $menu =& $this->create_menu($params);
         
         $menu->load_from_xml(get_param_value($params, "xml_filename", "menu.xml"));
         $menu->select_items_by_context(get_param_value($params, "context", $this->action));
         
-        $menu->print_values();
+        return $menu->print_values();
     }
 
-    function create_menu() {
-        return $this->create_component("Menu");
+    function create_menu($params = array()) {
+        return $this->create_component(
+            "Menu",
+            array(
+                "templates_dir" => get_param_value($params, "templates_dir", "_menu"),
+                "template_var" => get_param_value($params, "template_var", "menu"),
+            )
+        );
     }
 //
     function print_lang_menu($params = array()) {
-        $lang_menu = $this->create_lang_menu();
-
-        $lang_menu->templates_dir = get_param_value($params, "templates_dir", "_lang_menu");
-        $lang_menu->template_var = get_param_value($params, "template_var", "lang_menu");
+        $lang_menu = $this->create_lang_menu($params);
 
         $lang_menu->avail_langs = $this->get_avail_langs();
         $lang_menu->current_lang = $this->lang;
 
-        $lang_menu->print_values();
+        return $lang_menu->print_values();
     }
 
-    function create_lang_menu() {
-        return $this->create_component("LangMenu");
+    function create_lang_menu($params = array()) {
+        return $this->create_component(
+            "LangMenu",
+            array(
+                "templates_dir" => get_param_value($params, "templates_dir", "_lang_menu"),
+                "template_var" => get_param_value($params, "template_var", "lang_menu"),
+            )
+        );
     }
 
 //  Object functions
@@ -1782,7 +1788,7 @@ class App {
         return $obj;
     }
 
-    function create_component($component_class_name, $component_params = null) {
+    function create_component($component_class_name, $component_params = array()) {
         global $components;
 
         $component_info = get_param_value($components["classes"], $component_class_name, null);

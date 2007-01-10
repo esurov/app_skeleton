@@ -1,9 +1,7 @@
 <?php
 
 // Class for page splitting
-class Pager {
-
-    var $app;
+class Pager extends Component {
 
     var $n_rows_per_page;
     var $n_total_rows;
@@ -61,15 +59,19 @@ class Pager {
     function print_values() {
         switch ($this->style) {
         case "exponential":
-            $this->print_exponential_nav_str();
+            $nav_str = $this->create_exponential_nav_str();
             break;
         case "simple":
-            $this->print_simple_nav_str();
+            $nav_str = $this->create_simple_nav_str();
             break;
+        default:
+            $nav_str = "";
         }
+        $this->app->print_raw_value("nav_str", $nav_str);
+        return $nav_str;
     }
 
-    function print_exponential_nav_str() {
+    function create_exponential_nav_str() {
         // Create navigation links
         $nav_str = $this->app->get_message("pager_pages_title") . " \n";
 
@@ -99,10 +101,10 @@ class Pager {
             }
         }
         
-        $this->app->print_raw_value("nav_str", $nav_str);
+        return $nav_str;
     }
 
-    function print_simple_nav_str() {
+    function create_simple_nav_str() {
         // Create simplified navigation links (previous page and next page).
         $nav_str = "";
 
@@ -125,7 +127,7 @@ class Pager {
                 "{$next_page_str}&nbsp;&gt;&gt;</a>\n";
         }
 
-        $this->app->print_raw_value("nav_str", $nav_str);
+        return $nav_str;
     }
 
 }
