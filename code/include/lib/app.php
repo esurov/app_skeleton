@@ -1654,7 +1654,8 @@ class App {
             return $msgs;
         }
     }
-//
+
+//  Common action helpers
     function process_create_update_tables() {
         $actual_table_names = $this->db->get_actual_table_names();
         $all_table_names_to_create = $this->get_all_table_names_to_create();
@@ -1705,28 +1706,29 @@ class App {
     function action_get_image() {
         $image = $this->read_id_fetch_db_object("image");
         if ($image->is_definite()) {
-            $cached_gmt_str = (isset($_SERVER["HTTP_IF_MODIFIED_SINCE"])) ?
-                get_gmt_str_from_if_modified_since($_SERVER["HTTP_IF_MODIFIED_SINCE"]) :
-                null;
-            $this->response = new ImageResponse($image, $cached_gmt_str);
+            $this->response = new ImageResponse(
+                $image->create_in_memory_image(),
+                $image->filename,
+                $image->get_updated_as_gmt_str()
+            );
         } else {
             $this->create_not_found_response();
         }
     }
 
-    function delete_object_image($obj, $image_id_field_name, $delete_thumbnail) {
+    function delete_object_image($obj, $image_id_field_name, $delete_thumbnail = true) {
         if ($obj->is_definite() && $obj->is_field_exist($image_id_field_name)) {
             $field_names_to_update = array($image_id_field_name);
 
             $obj->del_image($image_id_field_name);
-            $obj->{$image_id_field_name} = 0;
+            $obj->set_field_value($image_id_field_name, 0);
 
             $thumbnail_image_id_field_name = "thumbnail_{$image_id_field_name}";
             if ($delete_thumbnail && $obj->is_field_exist($thumbnail_image_id_field_name)) {
                 $field_names_to_update[] = $thumbnail_image_id_field_name;
 
                 $obj->del_image($thumbnail_image_id_field_name);
-                $obj->{$thumbnail_image_id_field_name} = 0;
+                $obj->set_field_value($thumbnail_image_id_field_name, 0);
             }
 
             $obj->update($field_names_to_update);
@@ -1765,7 +1767,7 @@ class App {
                 "Cannot find info about table '{$obj_name}'!"
             );
         }
-        $obj_class_name = $obj_info["class_name"];
+        $obj_class_name = $obj_info["class"];
         if (!class_exists($obj_class_name)) {
             // NB: Here obj_name is used because tables are named in lower case
             if (!$this->_load_class(
@@ -1810,9 +1812,8 @@ class App {
                 );
             }
         }
-        $need_app = get_param_value($component_info, "need_app", true);
         $component = new $component_class_name();
-        if ($need_app) {
+        if (is_subclass_of($component, "Component")) {
             $component->app =& $this;
         }
         if (method_exists($component, "init")) {
@@ -1838,10 +1839,10 @@ class App {
         }
 
         foreach ($class_paths as $class_dir) {
-            $class_file_name = $class_info["file_name"];
-            $class_full_file_name = "{$class_dir}/{$class_file_name}";
-            if (is_file($class_full_file_name)) {
-                require_once($class_full_file_name);
+            $class_filename = $class_info["filename"];
+            $class_full_filename = "{$class_dir}/{$class_filename}";
+            if (is_file($class_full_filename)) {
+                require_once($class_full_filename);
                 return true;
             }
         }
@@ -1939,6 +1940,59 @@ class App {
         $im->create_dst_file();
         $im->set_dst_file_ext();
         return $im;
+    }
+
+//  Uploaded file helpers
+    function process_uploaded_image(
+        &$obj,
+        $image_id_field_name,
+        $input_name,
+        $params = array()
+    ) {
+        if (!was_file_uploaded($input_name)) {
+            return true;
+        }
+
+        $uploaded_image = $this->create_component(
+            "UploadedImage", 
+            array(
+                "input_name" => $input_name,
+            )
+        );
+        
+        $obj_image = $obj->fetch_image_without_content($image_id_field_name);
+
+        $image_processor_class_name = get_param_value($params, "image_processor.class", null);
+        if (!is_null($image_processor_class_name)) {
+            $image_processor_params = array(
+                "actions" => get_param_value($params, "image_processor.actions", array()),
+            );
+            $image_processor = $this->create_component(
+                $image_processor_class_name,
+                $image_processor_params
+            );
+            if (!$image_processor->process($uploaded_image)) {
+                return false;
+            }
+            $image_processor->fetch_actual_image_properties();
+        }
+
+        $obj_image->filename = $uploaded_image->get_orig_filename();
+        $obj_image->set_image_fields_from($uploaded_image);
+        
+        if (!$obj_image->is_definite()) {
+            $obj_image->is_thumbnail = get_param_value($params, "is_thumbnail", 0);
+        }
+
+        $obj_image->save();
+
+        $obj->set_field_value($image_id_field_name, $obj_image->id);
+        
+        if (!is_null($image_processor_class_name)) {
+            $image_processor->cleanup();
+        }
+        
+        return true;
     }
 
 }

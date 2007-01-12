@@ -7,59 +7,66 @@ $components = array(
     ),
     "classes" => array(
         "Component" => array(
-            "file_name" => "component.php",
+            "filename" => "component.php",
         ),
         "TemplateComponent" => array(
-            "file_name" => "component.php",
+            "filename" => "component.php",
             "required_classes" => array("Component"),
         ),
         "ObjectTemplateComponent" => array(
-            "file_name" => "component.php",
+            "filename" => "component.php",
             "required_classes" => array("TemplateComponent"),
         ),
         "ObjectView" => array(
-            "file_name" => "object_view.php",
+            "filename" => "object_view.php",
             "required_classes" => array("ObjectTemplateComponent"),
         ),
 //        "ObjectEdit" => array(
-//            "file_name" => "object_edit.php",
+//            "filename" => "object_edit.php",
 //            "required_classes" => array("ObjectTemplateComponent"),
 //        ),
         "ObjectsList" => array(
-            "file_name" => "objects_list.php",
+            "filename" => "objects_list.php",
             "required_classes" => array("ObjectTemplateComponent"),
         ),
         "QueryObjectsList" => array(
-            "file_name" => "objects_list.php",
+            "filename" => "objects_list.php",
             "required_classes" => array("ObjectTemplateComponent"),
         ),
         "PagedQueryObjectsList" => array(
-            "file_name" => "objects_list.php",
+            "filename" => "objects_list.php",
             "required_classes" => array("ObjectTemplateComponent"),
         ),
         "Pager" => array(
-            "file_name" => "pager.php",
+            "filename" => "pager.php",
             "required_classes" => array("Component"),
         ),
         "Xml" => array(
-            "file_name" => "xml.php",
-            "need_app" => false,
+            "filename" => "xml.php",
         ),
         "Menu" => array(
-            "file_name" => "menu.php",
+            "filename" => "menu.php",
             "required_classes" => array("TemplateComponent", "Xml"),
         ),
         "LangMenu" => array(
-            "file_name" => "lang_menu.php",
+            "filename" => "lang_menu.php",
             "required_classes" => array("TemplateComponent"),
         ),
         "PHPMailer" => array(
-            "file_name" => "phpmailer.php",
-            "need_app" => false,
+            "filename" => "phpmailer.php",
         ),
-        "ImageMagick" => array(
-            "file_name" => "image_magick.php",
-            "need_app" => false,
+        "InMemoryImage" => array(
+            "filename" => "image.php",
+        ),
+        "FilesystemImage" => array(
+            "filename" => "image.php",
+        ),
+        "UploadedImage" => array(
+            "filename" => "image.php",
+        ),
+        "ImageMagickWrapper" => array(
+            "filename" => "image_processor.php",
+            "required_classes" => array("Component"),
         ),
     ),
 );

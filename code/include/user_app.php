@@ -48,6 +48,7 @@ class UserApp extends CustomApp {
                     "order_by" => "created DESC, id DESC",
                     "limit" => "0, {$n_recent_news_articles}",
                 ),
+                "context" => "list_item",
             )
         );
         $recent_news_articles_list->print_values();
@@ -67,6 +68,7 @@ class UserApp extends CustomApp {
                 "obj" => $news_article,
                 "default_order_by" => array("created DESC", "id DESC"),
                 "filter_form.visible" => true,
+                "context" => "list_item",
             )
         );
         $news_articles_list->print_values();
@@ -84,6 +86,7 @@ class UserApp extends CustomApp {
                 "templates_dir" => "{$templates_dir}/news_article_view",
                 "template_var" => "news_article_view",
                 "obj" => $news_article,
+                "context" => "view",
             )
         );
         $news_article_view->print_values();

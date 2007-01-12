@@ -42,6 +42,12 @@ class NewsArticle extends CustomDbObject {
         ));
 
         $this->insert_field(array(
+            "field" => "thumbnail_image_id",
+            "type" => "foreign_key",
+            "read" => 0,
+        ));
+
+        $this->insert_field(array(
             "field" => "file_id",
             "type" => "foreign_key",
             "read" => 0,
@@ -60,6 +66,7 @@ class NewsArticle extends CustomDbObject {
 //
     function del() {
         $this->del_image("image_id");
+        $this->del_image("thumbnail_image_id");
         $this->del_file("file_id");
       
         parent::del();
@@ -83,10 +90,10 @@ class NewsArticle extends CustomDbObject {
                 $messages,
                 array(
                     "field" => "file_id",
-                    "type" => "file_upload_types",
+                    "type" => "uploaded_file_types",
                     "param" => array(
                         "input_name" => "file",
-                        "group" => "files",
+                        "type" => "files",
                     ),
                     "message" => "news_article_file_bad",
                 ),
@@ -96,44 +103,51 @@ class NewsArticle extends CustomDbObject {
             $uploaded_file_info = get_uploaded_file_info("file");
             $filesize = $uploaded_file_info["size"];
             if ($filesize > $this->app->config->get_value("news_article_file_max_size")) {
-                $messages[] = new ErrorStatusMsg("news_article_file_size_limit_reached");
+                $messages[] = new ErrorStatusMsg("news_article_file_max_size_reached");
             }
-            /*
             if (
-                $obj->get_files_total_size("file_id") + $filesize >
+                $this->get_files_total_size("file_id") + $filesize >
                     $this->app->config->get_value("news_article_files_max_total_size")
             ) {
-                $messages[] = new ErrorStatusMsg("news_article_files_size_limit_reached");
+                $messages[] = new ErrorStatusMsg("news_article_files_max_total_size_reached");
             }
-            */
-        }/* else {
+        } /* else {
             if ($old_obj->file_id == 0) {
                 $messages[] = new ErrorStatusMsg("news_article_file_empty");
             }
-        }*/
+        } */
 
         return $messages;
     }
-
-
 //
     function print_values($params = array()) {
         parent::print_values($params);
 
-        $this->print_image_info("image_id", "_image");
-        $this->print_file_info("file_id", "_file_info");
+        $context = $this->print_params["context"];
 
-        $title_short_len = $this->app->config->get_value("news_article_title_short_length");
-        $this->app->print_varchar_value(
-            "news_article_title_short",
-            get_word_shortened_string(strip_tags($this->title), $title_short_len, "...")
-        );
+        if ($context == "list_item" || $context == "list_item_admin") {
+            $title_short_len = $this->app->config->get_value("news_article_title_short_length");
+            $this->app->print_varchar_value(
+                "news_article_title_short",
+                get_word_shortened_string(strip_tags($this->title), $title_short_len, "...")
+            );
+            
+            $body_short_len = $this->app->config->get_value("news_article_body_short_length");
+            $this->app->print_varchar_value(
+                "news_article_body_short",
+                get_word_shortened_string(strip_tags($this->body), $body_short_len, "...")
+            );
+
+            $this->print_image_info("thumbnail_image_id", "_thumbnail_image");
+            if ($context == "list_item_admin") {
+                $this->print_file_info("file_id", "_file_info");
+            }
+        }
         
-        $body_short_len = $this->app->config->get_value("news_article_body_short_length");
-        $this->app->print_varchar_value(
-            "news_article_body_short",
-            get_word_shortened_string(strip_tags($this->body), $body_short_len, "...")
-        );
+        if ($context == "view" || $context == "edit") {
+            $this->print_image_info("image_id", "_image");
+            $this->print_file_info("file_id", "_file_info");
+        }
     }
 
 }

@@ -1970,12 +1970,12 @@ class DbObject {
         case "not_equal":
             $result = $this->validate_not_equal_condition($field_name, $param);
             break;
-        case "file_upload_types":
-            $group = get_param_value($param, "group", "files");
+        case "uploaded_file_types":
+            $type = get_param_value($param, "type", "files");
             $custom_types_str = get_param_value($param, "custom_types", "*");
-            if ($group != "custom") {
+            if ($type != "custom") {
                 $custom_types_str = trim(
-                    $this->app->config->get_value("file_upload_{$group}_types_allowed")
+                    $this->app->config->get_value("uploaded_{$type}_types_allowed")
                 );
             }
             if ($custom_types_str == "*") {
@@ -1983,7 +1983,7 @@ class DbObject {
             } else {
                 $file_types_allowed = preg_split('/\s*,\s*/', trim($custom_types_str));
             }
-            $result = $this->validate_file_upload_types_condition(
+            $result = $this->validate_uploaded_file_types_condition(
                 $param["input_name"],
                 $file_types_allowed
             );
@@ -2109,7 +2109,7 @@ class DbObject {
         );
     }
 //
-    function validate_file_upload_types_condition($input_name, $file_types_allowed) {
+    function validate_uploaded_file_types_condition($input_name, $file_types_allowed) {
         if (is_null($file_types_allowed)) {
             return true;
         }
@@ -2424,59 +2424,7 @@ class DbObject {
         }
     }
 
-    function process_image_upload($image_id_field_name, $input_name) {
-        $image = $this->fetch_image_without_content($image_id_field_name);
-
-        $image->read_uploaded_info($input_name);
-        $image->save();
-
-        $this->set_field_value($image_id_field_name, $image->id);
-    }
-
-    function process_image_upload_and_imagemagick_resize(
-        $image_id_field_name,
-        $input_name,
-        $resize_info = null
-    ) {
-        $uploaded_file_info = get_uploaded_file_info($input_name);
-
-        $file_path = $uploaded_file_info["tmp_name"];
-        $filename = $uploaded_file_info["name"];
-        
-        if (is_null($resize_info)) {
-            $image_width = $this->app->config->get_value("{$this->_table_name}_image_width");
-            $image_height = $this->app->config->get_value("{$this->_table_name}_image_height");
-            $is_thumbnail = 0;
-            $resize_func_name = "crop_and_resize";
-        } else {
-            $image_width = $resize_info["width"];
-            $image_height = $resize_info["height"];
-            $is_thumbnail = get_param_value($resize_info, "is_thumbnail", 0);
-            $resize_func_name = get_param_value($resize_info, "resize_func", "crop_and_resize");
-        }
-
-        $im = $this->app->create_image_magick();
-        $im->{$resize_func_name}(
-            $file_path,
-            array(
-                "width" => $image_width,
-                "height" => $image_height,
-            )
-        );
-        $image = $this->fetch_image_without_content($image_id_field_name);
-        
-        $image_new = $image->create_from_image_magick($im, $filename);
-        $im->cleanup();
-        $image->init_from($image_new);
-        if (!$image->is_definite()) {
-            $image->is_thumbnail = $is_thumbnail;
-        }
-        $image->save();
-
-        $this->set_field_value($image_id_field_name, $image->id);
-    }
-
-//  File upload helpers
+//  Uploaded file helpers
     function fetch_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         return $this->fetch_db_object("file", $file_id);

@@ -49,6 +49,7 @@ class AdminApp extends CustomApp {
                 "obj" => $news_article,
                 "default_order_by" => array("created DESC", "id DESC"),
                 "filter_form.visible" => true,
+                "context" => "list_item_admin",
             )
         );
         $news_articles_list->print_values();
@@ -65,6 +66,7 @@ class AdminApp extends CustomApp {
         $this->print_object_edit_page(array(
             "obj" => $news_article,
             "templates_dir" => "news_article_edit",
+            "context" => "edit",
         ));
     }
 
@@ -79,16 +81,48 @@ class AdminApp extends CustomApp {
             $this->print_status_messages($messages);
             $this->run_action("pg_edit_news_article", array("news_article" => $news_article));
         } else {
-            if (was_file_uploaded("image_file")) {
-                $news_article->process_image_upload_and_imagemagick_resize(
-                    "image_id",
-                    "image_file",
-                    array(
-                        "width" => $this->config->get_value("news_article_image_width"),
-                        "height" => $this->config->get_value("news_article_image_height"),
-                    )
-                );
-            }
+            $this->process_uploaded_image(
+                $news_article,
+                "image_id",
+                "image_file",
+                array(
+                    "image_processor.class" => $this->config->get_value("image_processor"),
+                    "image_processor.actions" => array(
+                        array(
+                            "name" => "crop_and_resize",
+                            "width" => $this->config->get_value("news_article_image_width"),
+                            "height" => $this->config->get_value("news_article_image_height"),
+                        ),
+                    ),
+                    "is_thumbnail" => 0,
+                )
+            );
+            $this->process_uploaded_image(
+                $news_article,
+                "thumbnail_image_id",
+                "image_file",
+                array(
+                    "image_processor.class" => $this->config->get_value("image_processor"),
+                    "image_processor.actions" => array(
+                        array(
+                            "name" => "crop_and_resize",
+                            "width" => $this->config->get_value(
+                                "news_article_thumbnail_image_width"
+                            ),
+                            "height" => $this->config->get_value(
+                                "news_article_thumbnail_image_height"
+                            ),
+                        ),
+                        // This is example of second image processor action
+                        // Remove if grayscale is not needed (almost always ;) )
+                        array(
+                            "name" => "convert_to_grayscale",
+                        ),
+                    ),
+                    "is_thumbnail" => 1,
+                )
+            );
+
             if (was_file_uploaded("file")) {
                 $news_article->process_file_upload("file_id", "file");
             }
@@ -111,7 +145,7 @@ class AdminApp extends CustomApp {
     function action_delete_news_article_image() {
         $news_article = $this->read_id_fetch_db_object("news_article");
 
-        $this->delete_object_image($news_article, "image_id", true);
+        $this->delete_object_image($news_article, "image_id");
         
         $this->add_session_status_message(new OkStatusMsg("news_article_image_deleted"));
         $this->create_self_redirect_response(array(

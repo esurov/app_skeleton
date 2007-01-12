@@ -19,11 +19,11 @@ class Menu extends TemplateComponent {
         $this->items[] =& $item;
     }
 //
-    function load_from_xml($xml_file_name) {
+    function load_from_xml($xml_filename) {
         $old_print_template_name = $this->app->page->print_template_name;
         $this->app->page->print_template_name = false;
         $xml_file_content = $this->app->print_file_if_exists(
-            "{$this->templates_dir}/{$xml_file_name}"
+            "{$this->templates_dir}/{$xml_filename}"
         );
         $this->app->page->print_template_name = $old_print_template_name;
 

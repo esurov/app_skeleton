@@ -10,10 +10,10 @@ $components["class_paths"] = array_merge(
 
 $components["classes"] += array(
     "SampleComponent" => array(
-        "file_name" => "__sample_component.php",
+        "filename" => "__sample_component.php",
     ),
     "SampleComponent2" => array(
-        "file_name" => "__sample_component.php",
+        "filename" => "__sample_component.php",
         "required_classes" => array("SampleComponent"),
     ),
 );

@@ -782,8 +782,22 @@ function get_gmt_str_from_if_modified_since($if_modified_since_str) {
     return $strs[0];
 }
 
-if (!function_exists("file_put_contents")) {
+function read_and_parse_csv_file($filepath, $separator = ";") {
+    $f = fopen($filepath, "r");
+    if (!$f) {
+        return false;
+    }
+    $lines = array();
+    while (!feof($f)) {
+        $line = trim(fgets($f, 1024));
+        $line_values = preg_split('/\s*' . $separator . '\s*/', $line);
+        $lines[] = $line_values;
+    }
+    fclose($f);
+    return $lines;
+}
 
+if (!function_exists("file_put_contents")) {
 function file_put_contents($filename, $content, $should_append = false) {
     $fp = fopen($filename, ($should_append) ? "a+" : "w+");
     if (!$fp) {
@@ -793,7 +807,6 @@ function file_put_contents($filename, $content, $should_append = false) {
     fclose($fp);
     return ($result !== false);
 }
-
 }
 
 function get_uploaded_file_info($input_name) {
@@ -805,11 +818,6 @@ function was_file_uploaded($input_name) {
         ($_FILES[$input_name]["error"] == UPLOAD_ERR_OK) &&
         isset($_FILES[$input_name]["size"]) &&
         ($_FILES[$input_name]["size"] > 0);
-}
-
-function get_file_extension($filename) {
-    $pos = strrpos($filename, ".");
-    return ($pos === false) ? "" : (string) substr($filename, $pos + 1);
 }
 
 function get_formatted_filesize_str($filesize) {
@@ -829,31 +837,170 @@ function get_formatted_filesize_str($filesize) {
     return $str;
 }
 
-function read_and_parse_csv_file($filepath, $separator = ";") {
-    $f = fopen($filepath, "r");
-    if (!$f) {
-        return false;
-    }
-    $lines = array();
-    while (!feof($f)) {
-        $line = trim(fgets($f, 1024));
-        $line_values = preg_split('/\s*' . $separator . '\s*/', $line);
-        $lines[] = $line_values;
-    }
-    fclose($f);
-    return $lines;
+function get_file_extension($filename) {
+    $pos = strrpos($filename, ".");
+    return ($pos === false) ? "" : (string) substr($filename, $pos + 1);
 }
 
-if (!function_exists("file_put_contents")) {
-function file_put_contents($filename, $data, $file_append = false) {
-    $fp = fopen($filename, (!$file_append ? 'w+' : 'a+'));
-    if (!$fp) {
-        trigger_error('file_put_contents cannot write in file.', E_USER_ERROR);
-        return;
+function get_image_file_extension_by_type($image_type) {
+    switch ($image_type) {
+    case IMAGETYPE_GIF:
+        $file_ext = "gif";
+        break;
+    case IMAGETYPE_JPEG:
+        $file_ext = "jpg";
+        break;
+    case IMAGETYPE_PNG:
+        $file_ext = "png";
+        break;
+    case IMAGETYPE_PSD:
+        $file_ext = "psd";
+        break;
+    case IMAGETYPE_BMP:
+        $file_ext = "bmp";
+        break;
+    case IMAGETYPE_TIFF:
+        $file_ext = "tiff";
+        break;
+    case IMAGETYPE_IFF:
+        $file_ext = "gif";
+        break;
+    case IMAGETYPE_WBMP:
+        $file_ext = "wbmp";
+        break;
+    case IMAGETYPE_XBM:
+        $file_ext = "xbm";
+        break;
+    default:
+        $file_ext = "";
     }
-    fputs($fp, $data);
-    fclose($fp);
+    return $file_ext;
 }
+
+function get_mime_type_by_file_extension($file_ext) {
+    switch (strtolower($file_ext)) {
+
+    // Image formats
+    case "jpg":
+    case "jpe":
+    case "jpeg":
+        $mime_type = "image/jpeg";
+        break;
+    case "gif":
+        $mime_type = "image/gif";
+        break;
+    case "png":
+        $mime_type = "image/png";
+        break;
+    case "bmp":
+        $mime_type = "image/bmp";
+        break;
+    case "psd":
+        $mime_type = "image/psd";
+        break;
+    case "tif":
+    case "tiff":
+        $mime_type = "image/tiff";
+        break;
+    case "iff":
+        $mime_type = "image/iff";
+        break;
+    case "wbmp":
+        $mime_type = "image/vnd.wap.wbmp";
+        break;
+    case "xbm":
+        $mime_type = "image/x-xbitmap";
+        break;
+    case "swf":
+        $mime_type = "application/x-shockwave-flash";
+        break;
+
+    // Text formats
+    case "txt":
+        $mime_type = "text/plain";
+        break;
+    case "css":
+        $mime_type = "text/css";
+        break;
+    case "htm":
+    case "html":
+        $mime_type = "text/html";
+        break;
+    case "xml":
+        $mime_type = "text/xml";
+        break;
+    case "js":
+        $mime_type = "text/javascript";
+        break;
+    case "csv":
+        $mime_type = "text/csv";
+        break;
+    case "rtf":
+    case "rtx":
+        $mime_type = "application/rtf";
+        break;
+
+    // Application document formats
+    case "pdf":
+        $mime_type = "application/pdf";
+        break;
+    case "doc":
+    case "dot":
+        $mime_type = "application/msword";
+        break;
+    case "xls":
+        $mime_type = "application/vnd.ms-excel";
+        break;
+    case "ppt":
+        $mime_type = "application/vnd.ms-powerpoint";
+        break;
+    case "ai":
+    case "eps":
+    case "ps":
+        $mime_type = "application/postscript";
+        break;
+
+    // Archive formats
+    case "zip":
+        $mime_type = "application/zip";
+        break;
+    case "gz":
+        $mime_type = "application/x-gzip";
+        break;
+    case "tar":
+        $mime_type = "application/x-tar";
+        break;
+
+    // Sound formats
+    case "mp2":
+    case "mp3":
+        $mime_type = "audio/mpeg";
+        break;
+    case "wav":
+        $mime_type = "audio/x-wav";
+        break;
+    case "mid":
+        $mime_type = "audio/x-midi";
+        break;
+
+    // Video formats
+    case "mpg":
+    case "mpe":
+    case "mpeg":
+        $mime_type = "video/mpeg";
+        break;
+    case "qt":
+    case "mov":
+        $mime_type = "video/quicktime";
+        break;
+    case "avi":
+        $mime_type = "video/x-msvideo";
+        break;
+
+    default:
+        $mime_type = "application/octet-stream";
+    }
+    return $mime_type;
 }
 
 ?>

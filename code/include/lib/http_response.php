@@ -171,7 +171,7 @@ class BinaryContentResponse extends HttpResponse {
         $content,
         $mime_type = null,
         $content_length = null,
-        $no_cache = true
+        $should_cache = false
     ) {
         parent::HttpResponse();
 
@@ -181,7 +181,7 @@ class BinaryContentResponse extends HttpResponse {
             $this->add_content_type_header($mime_type);
         }
 
-        if ($no_cache) {
+        if (!$should_cache) {
             $this->add_no_cache_headers();
         }
 
@@ -247,7 +247,7 @@ class PdfDocumentResponse extends BinaryContentResponse {
     
     function PdfDocumentResponse($content, $filename, $open_inline) {
         
-        parent::BinaryContentResponse($content, "application/pdf", null, false);
+        parent::BinaryContentResponse($content, "application/pdf", null, true);
 
         if (!is_null($filename)) {
             if ($filename == "") {
@@ -264,21 +264,32 @@ class PdfDocumentResponse extends BinaryContentResponse {
 
 class ImageResponse extends BinaryContentResponse {
     
-    function ImageResponse($image, $cached_gmt_str) {
-        $updated_gmt_str = $image->get_updated_as_gmt_str();
-        $content = ($updated_gmt_str == $cached_gmt_str) ? null : $image->content;
-        
-        parent::BinaryContentResponse($content, $image->type, $image->filesize, false);
+    function ImageResponse($image, $image_filename, $updated_gmt_str) {
+        $cached_gmt_str = (isset($_SERVER["HTTP_IF_MODIFIED_SINCE"])) ?
+            get_gmt_str_from_if_modified_since($_SERVER["HTTP_IF_MODIFIED_SINCE"]) :
+            "";
+        $image_content = ($updated_gmt_str == $cached_gmt_str) ? null : $image->get_content();
 
-        if (is_null($content)) {
+        parent::BinaryContentResponse(
+            $image_content,
+            $image->get_mime_type(),
+            $image->get_content_length(),
+            true
+        );
+
+        if (is_null($image_content)) {
             $this->push_header(new HttpHeader("HTTP/1.1 304 Not Modified"));
         } else {
-            $this->add_content_disposition_header($image->filename);
+            if ($image_filename != "") {
+                $this->add_content_disposition_header($image_filename);
+            }
             $this->add_headers(array(
                 new HttpHeader("Expires", "0"),
                 new HttpHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0"),
             ));
-            $this->add_last_modified_header($updated_gmt_str);
+            if ($updated_gmt_str != "") {
+                $this->add_last_modified_header($updated_gmt_str);
+            }
         }
     }
 
@@ -287,7 +298,7 @@ class ImageResponse extends BinaryContentResponse {
 class FileResponse extends BinaryContentResponse {
     
     function FileResponse($file, $open_inline) {
-        parent::BinaryContentResponse($file->content, $file->type, $file->filesize, false);
+        parent::BinaryContentResponse($file->content, $file->type, $file->filesize, true);
 
         $this->add_content_disposition_header(
             $file->filename,

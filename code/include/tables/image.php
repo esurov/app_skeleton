@@ -34,11 +34,6 @@ class Image extends CustomDbObject {
         ));
 
         $this->insert_field(array(
-            "field" => "filesize",
-            "type" => "integer",
-        ));
-
-        $this->insert_field(array(
             "field" => "width",
             "type" => "integer",
         ));
@@ -59,6 +54,11 @@ class Image extends CustomDbObject {
         ));
 
         $this->insert_field(array(
+            "field" => "content_length",
+            "type" => "integer",
+        ));
+
+        $this->insert_field(array(
             "field" => "is_thumbnail",
             "type"   => "boolean",
         ));
@@ -69,6 +69,7 @@ class Image extends CustomDbObject {
         $fields_names_to_not_update = null
     ) {
         $this->updated = $this->app->get_db_now_datetime();
+        
         parent::update($fields_names_to_update, $fields_names_to_not_update);
     }
 //
@@ -78,48 +79,25 @@ class Image extends CustomDbObject {
         );
     }
 //
-    function read_uploaded_info($input_name) {
-        $uploaded_file_info = get_uploaded_file_info($input_name);
-
-        $this->filename = $uploaded_file_info["name"];
-        $this->filesize = $uploaded_file_info["size"];
-        $this->type = $uploaded_file_info["type"];
-
-        $filename = $uploaded_file_info["tmp_name"];
-        $image_size_info = getimagesize($filename);
-
-        $this->width = $image_size_info[0];
-        $this->height = $image_size_info[1];
-
-        $this->content = file_get_contents($filename);
-    }
-//
-    function init_from($image_new) {
-        $this->filename = $image_new->filename;
-        $this->filesize = $image_new->filesize;
-        $this->type = $image_new->type;
-
-        $this->width = $image_new->width;
-        $this->height = $image_new->height;
-
-        $this->content = $image_new->content;
-
-        $this->is_thumbnail = $image_new->is_thumbnail;
+    // $uploaded_image here means UploadedImage-based class
+    function set_image_fields_from($uploaded_image) {
+        $this->width = $uploaded_image->get_width();
+        $this->height = $uploaded_image->get_height();
+        $this->type = $uploaded_image->get_type();
+        $this->content = $uploaded_image->get_content();
+        $this->content_length = $uploaded_image->get_content_length();
     }
 
-    function create_from_image_magick($image_magick, $filename) {
-        $image = $this->create_db_object("image");
-
-        $image->filename = $filename;
-        $image->filesize = $image_magick->get_filesize();
-        $image->type = $image_magick->get_mime_type();
-
-        $image->width = $image_magick->get_width();
-        $image->height = $image_magick->get_height();
-
-        $image->content = $image_magick->get_content();
-        
-        return $image;
+    function create_in_memory_image() {
+        return $this->app->create_component(
+            "InMemoryImage", 
+            array(
+                "width" => $this->width,
+                "height" => $this->height,
+                "type" => $this->type,
+                "content" => $this->content,
+            )
+        );
     }
 
 }
