@@ -40,7 +40,7 @@ class MySqlDb extends AppObject {
         }
         $this->write_log(
             "Connected to MySQL server '{$this->_host}' as '{$this->_username}'",
-            3
+            DL_INFO
         );
 
         if (!mysql_select_db($this->_database, $this->_connection)) {
@@ -51,7 +51,7 @@ class MySqlDb extends AppObject {
         }
         $this->write_log(
             "Selected database '{$this->_database}'",
-            3
+            DL_INFO
         );
 
         $this->_has_connection = true;
@@ -75,8 +75,8 @@ class MySqlDb extends AppObject {
 
         // Write query to log file
         $this->write_log(
-            "Running MySQL query:\n{$query_str}",
-            2
+            "Running MySQL query:\n  {$query_str}",
+            DL_INFO
         );
 
         // Read time (before starting query)
@@ -89,7 +89,6 @@ class MySqlDb extends AppObject {
             $err_no = mysql_errno($this->_connection);
             $err_str = mysql_error($this->_connection);
             $this->process_fatal_error(
-                "Db",
                 "MySQL error #{$err_no}: {$err_str}"
             );
         }
@@ -103,7 +102,7 @@ class MySqlDb extends AppObject {
         $n = $this->get_num_affected_rows();
         $this->write_log(
             "Query result: {$n} rows (in $t_str sec)",
-            2
+            DL_INFO
         );
 
         return $this->create_object(
@@ -241,12 +240,12 @@ class MySqlDbResult extends AppObject {
             mysql_fetch_assoc($this->_res);
 
         // Logger optimization
-        if ($this->get_log_debug_level() == 8) {
+        if ($this->get_log_debug_level() >= DL_DEBUG) {
             if (is_array($row)) {
                 $field_value_pairs = array();
                 foreach ($row as $field => $value) {
-                    $value = get_shortened_string($value, 300);
-                    $field_value_pairs[] = "{$field}='{$value}'";
+                    $value = qw(get_shortened_string($value, 300));
+                    $field_value_pairs[] = "{$field}={$value}";
                 }
                 $log_str = join(", ", $field_value_pairs);
             } else {
@@ -254,7 +253,7 @@ class MySqlDbResult extends AppObject {
             }
             $this->write_log(
                 "fetch(): {$log_str}",
-                8
+                DL_DEBUG
             );
         }
         

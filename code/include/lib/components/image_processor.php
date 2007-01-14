@@ -53,7 +53,7 @@ class ImageMagickWrapper extends _ImageProcessor {
     function _init($params) {
         parent::_init($params);
 
-        $this->set_image_magick_path($this->app->config->get_value("image_magick_path"));
+        $this->set_image_magick_path($this->get_config_value("image_magick_path"));
 
         $this->_output_file_created = false;
         $this->_output_file_full_filename = get_param_value($params, "output_filename", null);
@@ -81,7 +81,7 @@ class ImageMagickWrapper extends _ImageProcessor {
     }
     
     function get_default_output_image_type() {
-        return $this->app->config->get_value("image_magick_output_image_type");
+        return $this->get_config_value("image_magick_output_image_type");
     }
 
     function get_default_output_image_jpg_quality() {
@@ -113,7 +113,7 @@ class ImageMagickWrapper extends _ImageProcessor {
         $this->write_log(
             "Starting image processing:\n" .
             "Commandline: {$this->_cmdline}",
-            3
+            DL_INFO
         );
 
         exec($this->_cmdline, $returned_lines, $returned_value);
@@ -124,7 +124,7 @@ class ImageMagickWrapper extends _ImageProcessor {
                 "Commandline: {$this->_cmdline}\n" .
                 "Error #{$returned_value}. Output:\n" .
                 join("\n", $returned_lines),
-                1
+                DL_ERROR
             );
         }
 

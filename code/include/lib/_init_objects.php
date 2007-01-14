@@ -6,6 +6,16 @@ $objects = array(
         _APP_LIB_DIR . "/components",
     ),
     "classes" => array(
+        // Core classes
+        "Logger" => array(
+            "filename" => "logger.php",
+        ),
+        "MySqlDb" => array(
+            "filename" => "db_mysql.php",
+        ),
+        "MySqlDbResult" => array(
+            "filename" => "db_mysql.php",
+        ),
         "AppComponent" => array(
             "filename" => "app_component.php",
         ),
@@ -17,6 +27,8 @@ $objects = array(
             "filename" => "app_component.php",
             "required_classes" => array("TemplateComponent"),
         ),
+        
+        // App objects and component classes
         "ObjectView" => array(
             "filename" => "object_view.php",
             "required_classes" => array("ObjectTemplateComponent"),
@@ -41,12 +53,6 @@ $objects = array(
             "filename" => "pager.php",
             "required_classes" => array("AppComponent"),
         ),
-        "MySqlDb" => array(
-            "filename" => "db_mysql.php",
-        ),
-        "MySqlDbResult" => array(
-            "filename" => "db_mysql.php",
-        ),
         "Xml" => array(
             "filename" => "xml.php",
         ),
@@ -57,9 +63,6 @@ $objects = array(
         "LangMenu" => array(
             "filename" => "lang_menu.php",
             "required_classes" => array("TemplateComponent"),
-        ),
-        "PHPMailer" => array(
-            "filename" => "phpmailer.php",
         ),
         "InMemoryImage" => array(
             "filename" => "image.php",
@@ -73,6 +76,11 @@ $objects = array(
         "ImageMagickWrapper" => array(
             "filename" => "image_processor.php",
             "required_classes" => array("AppComponent"),
+        ),
+
+        // Third-party classes
+        "PHPMailer" => array(
+            "filename" => "phpmailer.php",
         ),
     ),
 );

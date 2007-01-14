@@ -1,45 +1,37 @@
 <?php
 
+// Configuration file
 class Config {
 
-    // Configuration file with simple format:
-    // name = value
-
-    var $params;
+    var $_params;
 
     function Config() {
-        // Constructor.
-
-        $this->params = array();
+        $this->_params = array();
     }
 
+    // Return value of the given parameter
     function get_value($name, $default_value = null) {
-        // Return value of the given parameter.
-
-        return (isset($this->params[$name]) ? $this->params[$name] : $default_value);
+        return get_param_value($this->_params, $name, $default_value);
     }
 
     function set_value($name, $value) {
-        $this->params[$name] = $value;
+        $this->_params[$name] = $value;
     }
 
+    // Read configuration file, parse it and store all data
+    // Also read debug configuration file, if exists
     function read($filename) {
-        // Read configuration file, parse it and store all data in hash.
-        // Also read debug configuration file, if exists.
-
         $this->read_file($filename);
 
         $debug_filename = "{$filename}.debug";
-
-        if (file_exists($debug_filename)) {
+        if (is_file($debug_filename)) {
             $this->read_file($debug_filename);
         }
     }
 
+    // Read configuration file, parse it and store all data
     function read_file($filename) {
-        // Read configuration file, parse it and store all data in hash.
-
-        if (!file_exists($filename)) {
+        if (!is_file($filename)) {
             trigger_error(
                 "Configuration file '{$filename}' does not exist!",
                 E_USER_ERROR
@@ -55,9 +47,8 @@ class Config {
         }
 
         flock($f, LOCK_SH);
-
         while ($line = fgets($f, 1024)) {
-            $line = chop($line);
+            $line = rtrim($line);
 
             if (
                 preg_match('/^#.*$/', $line) ||
@@ -68,18 +59,16 @@ class Config {
             }
 
             if (preg_match('/^(.+?)\s*=\s*(.*)$/', $line, $matches)) {
-                $var_name = $matches[1];
-                $var_value = $matches[2];
-                $this->params[$var_name] = $var_value;
+                $this->_params[$matches[1]] = $matches[2];
             }
         }
-
         flock($f, LOCK_UN);
+
         fclose($f);
     }
-
+/*
+    // Write all data into configuration file
     function write($filename) {
-        // Write all data from array into configuration file.
 
         $f = fopen($filename, "w");
         if (!$f) {
@@ -91,14 +80,15 @@ class Config {
 
         flock($f, LOCK_EX);
 
-        reset($params);
-        while (list($name, $value) = each($this->params)) {
+        reset($this->_params);
+        while (list($name, $value) = each($this->_params)) {
             fputs($f, "$name = $value\n");
         }
 
         flock($f, LOCK_UN);
         fclose($f);
     }
+*/
 
 }
 

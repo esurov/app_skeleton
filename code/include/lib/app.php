@@ -2,78 +2,73 @@
 
 class App extends AppObject {
 
-    var $_app_name;
+    // App name
+    var $app_name;
 
-    // Html page template
-    var $page;
-    var $html_charset;
-
-    var $messages;
-    var $actions;
-
-    var $user;
-    var $action;
-    var $action_params;
-    var $page_template_name;
-    var $response;
-
+    // App core objects
     var $config;
     var $log;
     var $db;
 
+    // Html page template vars
+    var $html_charset;
+    var $page;
+    var $page_template_name;
+    
+    // App specific custom CGI vars
     var $popup = 0;
     var $report = 0;
     var $printable = 0;
 
-    var $lang;
-    var $dlang;
-    var $avail_langs;
+    // Http response
+    var $response = null;
+
+    // Language vars
+    var $lang; // Current language
+    var $dlang; // Default language
+    var $avail_langs; // Available languages
+    var $messages; // Language resources
+
+    // Action vars
+    var $actions;
+    var $action;
+    var $action_params;
+    var $user;
 
     function App($app_class_name, $app_name) {
         $this->set_class_name($app_class_name); 
         $this->app =& $this;
 
-        $this->_app_name = $app_name;
+        $this->app_name = $app_name;
 
-        $this->response = null;
-
-        $this->create_config();
-        $this->create_logger();
-        $this->create_db();
-
-        $this->create_page_template();
-        $this->html_charset = $this->config->get_value("html_charset");
-        $this->print_raw_value("html_charset", $this->html_charset);
-
-        $this->avail_langs = $this->get_avail_langs();
-        $this->dlang = $this->config->get_value("default_language");
-        $this->lang = $this->get_current_lang();
-
-        $this->messages = new Config();
-        $this->messages->read("lang/default.txt");
-        $this->messages->read("lang/{$this->lang}.txt");
-
-        $this->init_lang_dependent_data();
+        $this->create_core_objects();
+        $this->init_vars();
 
         // One action defined, but nobody can access it
-        $actions = array("pg_index" => array("valid_users" => array()));
+        $this->actions = array(
+            "pg_index" => array("valid_users" => array())
+        );
 
         $this->write_log(
-            "App '{$this->_app_name}' started",
-            3
+            "App '{$this->app_name}' started",
+            DL_INFO
         );
     }
 //
+    function create_core_objects() {
+        $this->create_config();
+        $this->create_logger();
+        $this->create_db();
+        $this->create_page_template();
+    }
+
     function create_config() {
         $this->config = new Config();
         $this->config->read("config/app.cfg");
     }
 
     function create_logger() {
-        $this->log = new Logger();
-        $this->log->set_debug_level($this->config->get_value("log_debug_level", 1));
-        $this->log->set_max_filesize($this->config->get_value("log_max_filesize"));
-        $this->log->set_truncate_always($this->config->get_value("log_truncate_always", 0));
+        $this->log = $this->create_object("Logger");
     }
 
     function create_db() {
@@ -93,16 +88,29 @@ class App extends AppObject {
     }
 
     function create_page_template() {
-        $print_template_name = $this->config->get_value("print_template_name");
-        $this->page = new Template("templates/{$this->_app_name}", $print_template_name);
+        $print_template_name = $this->get_config_value("print_template_name");
+        $this->page = new Template("templates/{$this->app_name}", $print_template_name);
         $this->page_template_name = "";
     }
 
-    function init_lang_dependent_data() {
-        foreach ($this->messages->params as $key => $value) {
-            $this->print_raw_value("str_{$key}", $value);
-        }
-        $this->print_raw_value("lang", $this->lang);
+    function init_vars() {
+        $this->html_charset = $this->get_config_value("html_charset");
+
+        $this->init_lang_vars();
+    }
+
+    function init_lang_vars() {
+        $this->avail_langs = $this->get_avail_langs();
+        $this->dlang = $this->get_config_value("default_language");
+        $this->lang = $this->get_current_lang();
+
+        $this->init_lang_resources();
+    }
+
+    function init_lang_resources() {
+        $this->messages = new Config();
+        $this->messages->read("lang/default.txt");
+        $this->messages->read("lang/{$this->lang}.txt");
     }
 //
     function run() {
@@ -118,7 +126,7 @@ class App extends AppObject {
         // Ensure that action name is valid
         $this->write_log(
             "Validating action '{$this->action}'",
-            3
+            DL_INFO
         );
 
         if ($this->validate_action_name()) {
@@ -132,7 +140,7 @@ class App extends AppObject {
             } else {
                 $this->write_log(
                     "User level '{$user_level}' is denied to run action '{$this->action}'",
-                    1
+                    LOG_WARNING
                 );
                 $this->run_access_denied_action();
             }
@@ -140,7 +148,7 @@ class App extends AppObject {
             $this->action = $this->get_default_action_name();
             $this->write_log(
                 "Invalid action! Will try default action '{$this->action}'",
-                3
+                LOG_WARNING
             );
             if ($this->validate_action_name()) {
                 $this->run_invalid_action_name_action();
@@ -196,13 +204,11 @@ class App extends AppObject {
         ));
         $this->action = $action_name_expanded;
 
-        $this->print_page_titles();
-        
         $this->on_before_run_action();
 
         $this->write_log(
             "Running action '{$this->action}'",
-            3
+            DL_INFO
         );
         $this->{$action_func_name}();  // NB! Variable function
 
@@ -210,6 +216,10 @@ class App extends AppObject {
     }
 
     function on_before_run_action() {
+        $this->print_raw_value("html_charset", $this->html_charset);
+
+        $this->print_lang_resources();
+
         $this->popup = (int) param("popup");
         $this->report = (int) param("report");
         $this->printable = (int) param("printable");
@@ -221,6 +231,8 @@ class App extends AppObject {
         if (!$this->report && !$this->printable) {
             $this->print_session_status_messages();
         }
+
+        $this->print_page_titles();
     }
 
     function on_after_run_action() {
@@ -235,8 +247,8 @@ class App extends AppObject {
     }
 //
     function get_http_auth_user_access_level() {
-        $login = $this->config->get_value("admin_login");
-        $password = $this->config->get_value("admin_password");
+        $login = $this->get_config_value("admin_login");
+        $password = $this->get_config_value("admin_password");
         return ($this->is_valid_http_auth_user($login, $password)) ? "user" : "guest";
     }
 
@@ -251,7 +263,7 @@ class App extends AppObject {
         $this->response = new RedirectResponse($url);
         $this->write_log(
             "Redirecting to {$url}",
-            3
+            DL_INFO
         );
     }
 
@@ -353,27 +365,27 @@ class App extends AppObject {
     }
 //
     function get_app_datetime_format() {
-        return $this->config->get_value("app_datetime_format");
+        return $this->get_config_value("app_datetime_format");
     }
 
     function get_app_date_format() {
-        return $this->config->get_value("app_date_format");
+        return $this->get_config_value("app_date_format");
     }
 
     function get_app_time_format() {
-        return $this->config->get_value("app_time_format");
+        return $this->get_config_value("app_time_format");
     }
 
     function get_db_datetime_format() {
-        return $this->config->get_value("db_datetime_format");
+        return $this->get_config_value("db_datetime_format");
     }
 
     function get_db_date_format() {
-        return $this->config->get_value("db_date_format");
+        return $this->get_config_value("db_date_format");
     }
 
     function get_db_time_format() {
-        return $this->config->get_value("db_time_format");
+        return $this->get_config_value("db_time_format");
     }
 //
     function get_app_datetime($db_datetime, $date_if_unknown = "") {
@@ -1369,13 +1381,13 @@ class App extends AppObject {
     function get_current_lang() {
         $cur_lang = Session::get_param("current_language");
         if (!$this->is_valid_lang($cur_lang)) {
-            $cur_lang = $this->config->get_value("default_language");
+            $cur_lang = $this->get_config_value("default_language");
         }
         return $cur_lang;
     }
 
     function get_avail_langs() {
-        return explode(",", $this->config->get_value("languages"));
+        return explode(",", $this->get_config_value("languages"));
     }
 
     function is_valid_lang($lang) {
@@ -1559,7 +1571,15 @@ class App extends AppObject {
         $neighbor_obj->update(array("position"));
     }
 //
-//  Page titles and status messages
+    // Language resources
+    function print_lang_resources() {
+        foreach ($this->messages->_params as $resource_name => $resource_value) {
+            $this->print_raw_value("str_{$resource_name}", $resource_value);
+        }
+        $this->print_raw_value("lang", $this->lang);
+    }
+
+    // Page titles and status messages
     function print_page_titles() {
         $this->print_head_and_page_title($this->create_page_title_resource());
     }
@@ -1925,14 +1945,14 @@ class App extends AppObject {
     function create_email_sender() {
         $email_sender = $this->create_object("PHPMailer");
         $email_sender->IsSendmail();
-        $email_sender->IsHTML($this->config->get_value("email_is_html"));
-        $email_sender->CharSet = $this->config->get_value("email_charset");
+        $email_sender->IsHTML($this->get_config_value("email_is_html"));
+        $email_sender->CharSet = $this->get_config_value("email_charset");
         return $email_sender;
     }
 
     function get_actual_email_to($email_to) {
-        return $this->config->get_value("email_debug_mode") ?
-            $this->config->get_value("admin_email_to") :
+        return $this->get_config_value("email_debug_mode") ?
+            $this->get_config_value("admin_email_to") :
             $email_to;
     }
 
@@ -1968,7 +1988,6 @@ class App extends AppObject {
             if (!$image_processor->process($uploaded_image)) {
                 return false;
             }
-            $image_processor->fetch_actual_image_properties();
         }
 
         $obj_image->filename = $uploaded_image->get_orig_filename();

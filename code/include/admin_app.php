@@ -86,12 +86,12 @@ class AdminApp extends CustomApp {
                 "image_id",
                 "image_file",
                 array(
-                    "image_processor.class" => $this->config->get_value("image_processor"),
+                    "image_processor.class" => $this->get_config_value("image_processor"),
                     "image_processor.actions" => array(
                         array(
                             "name" => "crop_and_resize",
-                            "width" => $this->config->get_value("news_article_image_width"),
-                            "height" => $this->config->get_value("news_article_image_height"),
+                            "width" => $this->get_config_value("news_article_image_width"),
+                            "height" => $this->get_config_value("news_article_image_height"),
                         ),
                     ),
                     "is_thumbnail" => 0,
@@ -102,14 +102,14 @@ class AdminApp extends CustomApp {
                 "thumbnail_image_id",
                 "image_file",
                 array(
-                    "image_processor.class" => $this->config->get_value("image_processor"),
+                    "image_processor.class" => $this->get_config_value("image_processor"),
                     "image_processor.actions" => array(
                         array(
                             "name" => "crop_and_resize",
-                            "width" => $this->config->get_value(
+                            "width" => $this->get_config_value(
                                 "news_article_thumbnail_image_width"
                             ),
-                            "height" => $this->config->get_value(
+                            "height" => $this->get_config_value(
                                 "news_article_thumbnail_image_height"
                             ),
                         ),

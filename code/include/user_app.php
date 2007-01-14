@@ -37,7 +37,7 @@ class UserApp extends CustomApp {
         $templates_dir = "index";
 
         $news_article = $this->create_db_object("news_article");
-        $n_recent_news_articles = $this->config->get_value("recent_news_articles_number");
+        $n_recent_news_articles = $this->get_config_value("recent_news_articles_number");
         $recent_news_articles_list = $this->create_object(
             "QueryObjectsList",
             array(
@@ -113,9 +113,9 @@ class UserApp extends CustomApp {
     function send_email_contact_form_processed_to_admin($contact_info) {
         $email_from = $contact_info->email;
         $name_from = "{$contact_info->first_name} {$contact_info->last_name}";
-        $email_to = $this->get_actual_email_to($this->config->get_value("contact_form_email_to"));
-        $name_to = $this->config->get_value("contact_form_name_to");
-        $subject = $this->config->get_value("email_contact_form_processed_subject");
+        $email_to = $this->get_actual_email_to($this->get_config_value("contact_form_email_to"));
+        $name_to = $this->get_config_value("contact_form_name_to");
+        $subject = $this->get_config_value("email_contact_form_processed_subject");
         $contact_info->print_values();
         $body = $this->print_file("contact_form/email.html");
 

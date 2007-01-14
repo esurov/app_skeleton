@@ -886,7 +886,7 @@ class DbObject extends AppObject {
         // Store data to database table
         $this->write_log(
             "store()",
-            3
+            DL_INFO
         );
 
         $field_names = $this->get_field_names(
@@ -926,7 +926,7 @@ class DbObject extends AppObject {
         // Update data in database table
         $this->write_log(
             "update()",
-            3
+            DL_INFO
         );
 
         $field_names = $this->get_field_names(
@@ -1017,8 +1017,8 @@ class DbObject extends AppObject {
             list($target_table_name, $key_field_name) = $relation;
 
             $this->write_log(
-                "del_cascade(): trying delete from '{$target_table_name}'",
-                3
+                "del_cascade(): Trying to delete from '{$target_table_name}'",
+                DL_INFO
             );
 
             $target_obj = $this->create_db_object($target_table_name);
@@ -1053,7 +1053,7 @@ class DbObject extends AppObject {
         // Get data from CGI and store to object values.
         $this->write_log(
             "read()",
-            3
+            DL_INFO
         );
 
         if (is_null($template_var_prefix)) {
@@ -1973,7 +1973,7 @@ class DbObject extends AppObject {
             $custom_types_str = get_param_value($param, "custom_types", "*");
             if ($type != "custom") {
                 $custom_types_str = trim(
-                    $this->app->config->get_value("uploaded_{$type}_types_allowed")
+                    $this->get_config_value("uploaded_{$type}_types_allowed")
                 );
             }
             if ($custom_types_str == "*") {

@@ -17,8 +17,8 @@ class Pager extends AppComponent {
 
         $this->n_rows_per_page = get_param_value($params, "n_rows_per_page", null);
         if (is_null($this->n_rows_per_page)) {
-            $this->n_rows_per_page = $this->app->config->get_value(
-                "{$this->app->_app_name}_rows_per_page",
+            $this->n_rows_per_page = $this->get_config_value(
+                "{$this->app->app_name}_rows_per_page",
                 20
             );
         }

@@ -1,18 +1,29 @@
 <?php
 
-class Logger {
+define("DL_FATAL_ERROR", 1);
+define("DL_ERROR", 2);
+define("DL_WARNING", 4);
+define("DL_INFO", 8);
+define("DL_DEBUG", 16);
+define("DL_EXTRA_DEBUG", 32);
 
-    // Logger with 'debug_level' support.
-    var $_truncate_always;
+// Logger with 'debug_level' support.
+class Logger extends AppObject {
+
     var $_filename;
+
+    var $_truncate_always;
     var $_debug_level;
     var $_max_filesize;
 
-    function Logger() {
-        $this->set_truncate_always(false);
+    function _init($params) {
+        parent::_init($params);
+
         $this->set_filename("log/app.log");
-        $this->set_debug_level(1);
-        $this->set_max_filesize(1048576);
+
+        $this->set_debug_level(constant($this->get_config_value("log_debug_level")), DL_ERROR);
+        $this->set_max_filesize($this->get_config_value("log_max_filesize", 1048576));
+        $this->set_truncate_always($this->get_config_value("log_truncate_always", false));
     }
 //
     function set_truncate_always($truncate_always) {

@@ -12,15 +12,14 @@ class LangMenu extends TemplateComponent {
                 $this->app->print_raw_values(array(
                     "current_lang_name" => $this->app->get_message($lang),
                     "current_lang_image_url" =>
-                        $this->app->config->get_value("lang_image_current_url_{$lang}"),
+                        $this->get_config_value("lang_image_current_url_{$lang}"),
                 ));
                 $item_template_name = "menu_item_current.html";
             } else {
                 $this->app->print_raw_values(array(
                     "new_lang" => $lang,
                     "new_lang_name" => $this->app->get_message($lang),
-                    "new_lang_image_url" =>
-                        $this->app->config->get_value("lang_image_url_{$lang}"),
+                    "new_lang_image_url" => $this->get_config_value("lang_image_url_{$lang}"),
                 ));
                 $item_template_name = "menu_item.html";
             }

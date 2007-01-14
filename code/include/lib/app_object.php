@@ -29,6 +29,10 @@ class AppObject extends Object {
         return $this->app->create_object($obj_class_name, $obj_params);
     }
 
+    function get_config_value($name, $default_value = null) {
+        return $this->app->config->get_value($name, $default_value);
+    }
+
     function get_log_debug_level() {
         return $this->app->log->get_debug_level();
     }
@@ -36,11 +40,11 @@ class AppObject extends Object {
     function write_log($message, $debug_level) {
         $this->app->log->write($this->get_class_name(), $message, $debug_level);
     }
-//
-    function process_fatal_error($message) {
-        $this->write_log("FATAL ERROR: {$message}", 1);
 
-        if ($this->get_log_debug_level() == 8) {
+    function process_fatal_error($message) {
+        $this->write_log("FATAL ERROR: {$message}", DL_FATAL_ERROR);
+
+        if ($this->get_log_debug_level() >= DL_DEBUG) {
             $class_name = $this->get_class_name();
             $message = "[{$class_name}] {$message}";
         } else {

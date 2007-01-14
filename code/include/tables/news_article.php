@@ -102,12 +102,12 @@ class NewsArticle extends CustomDbObject {
 
             $uploaded_file_info = get_uploaded_file_info("file");
             $filesize = $uploaded_file_info["size"];
-            if ($filesize > $this->app->config->get_value("news_article_file_max_size")) {
+            if ($filesize > $this->get_config_value("news_article_file_max_size")) {
                 $messages[] = new ErrorStatusMsg("news_article_file_max_size_reached");
             }
             if (
                 $this->get_files_total_size("file_id") + $filesize >
-                    $this->app->config->get_value("news_article_files_max_total_size")
+                    $this->get_config_value("news_article_files_max_total_size")
             ) {
                 $messages[] = new ErrorStatusMsg("news_article_files_max_total_size_reached");
             }
@@ -126,13 +126,13 @@ class NewsArticle extends CustomDbObject {
         $context = $this->print_params["context"];
 
         if ($context == "list_item" || $context == "list_item_admin") {
-            $title_short_len = $this->app->config->get_value("news_article_title_short_length");
+            $title_short_len = $this->get_config_value("news_article_title_short_length");
             $this->app->print_varchar_value(
                 "news_article_title_short",
                 get_word_shortened_string(strip_tags($this->title), $title_short_len, "...")
             );
             
-            $body_short_len = $this->app->config->get_value("news_article_body_short_length");
+            $body_short_len = $this->get_config_value("news_article_body_short_length");
             $this->app->print_varchar_value(
                 "news_article_body_short",
                 get_word_shortened_string(strip_tags($this->body), $body_short_len, "...")
