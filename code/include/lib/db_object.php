@@ -18,6 +18,13 @@ class DbObject extends AppObject {
     function _init($params) {
         parent::_init($params);
 
+        $this->_table_name = get_param_value($params, "table_name", null);
+        if (is_null($this->_table_name)) {
+            $this->process_fatal_error(
+                "Required param 'table_name' not found!"
+            );
+        }
+
         $this->_fields = array();
         $this->_indexes = array();
 
@@ -194,10 +201,6 @@ class DbObject extends AppObject {
     function get_message($name) {
         return $this->app->messages->get_value($name);
     }
-
-    function create_db_object($obj_name, $obj_params = null) {
-        return $this->app->create_db_object($obj_name, $obj_params);
-    }
 //
     function insert_field($field_info) {
         $field_array_index = count($this->_fields);
@@ -209,18 +212,17 @@ class DbObject extends AppObject {
         }
         $field_name_alias = get_param_value($field_info, "field_alias", null);
 
-        $table_name = get_param_value($field_info, "table", null);
+        $obj_class_name = get_param_value($field_info, "obj", null);
         $table_name_alias = get_param_value($field_info, "table_alias", null);
         
-        if (is_null($table_name) || $table_name == $this->_table_name) {
-            $table_name = $this->_table_name;
+        if (is_null($obj_class_name) || ($obj_class_name == $this->get_class_name())) {
             if (is_null($table_name_alias) && is_null($field_name_alias)) {
-                // case of real or calculated field from current table
+                // Case of real or calculated field from current DbObject
                 $multilingual = get_param_value($field_info, "multilingual", 0);
                 $field_select_expression = get_param_value($field_info, "select", null);
                 if (is_null($field_select_expression)) {
                     $field_select_expression = $this->create_field_select_expression(
-                        if_null($table_name_alias, $table_name),
+                        is_null($table_name_alias) ? $this->_table_name : $table_name_alias,
                         $field_name,
                         $multilingual
                     );
@@ -240,14 +242,16 @@ class DbObject extends AppObject {
                 }
                 $field_name_alias = $field_name;
             } else {
-                // case of alias to real field from current table
+                // Case of alias to real field from current DbObject
                 if (!isset($this->_fields[$field_name])) {
                     $this->process_fatal_error(
-                        "{$table_name}: Cannot find field '{$field_name}'"
+                        "Cannot find field '{$field_name}'"
                     );
                 }
                 $field_info = $this->_fields[$field_name];
-                $table_name_alias = if_null($table_name_alias, $table_name);
+                if (is_null($table_name_alias)) {
+                    $table_name_alias = $this->_table_name;
+                }
                 $field_select_expression = $this->create_field_select_expression(
                     $table_name_alias,
                     $field_name,
@@ -267,7 +271,7 @@ class DbObject extends AppObject {
             $field_type = get_param_value($field_info, "type", null);
             if (is_null($field_type)) {
                 $this->process_fatal_error(
-                    "{$table_name}: Field type for '{$field_name}' not specified!"
+                    "Field type for '{$field_name}' not specified!"
                 );
             }
 
@@ -311,13 +315,12 @@ class DbObject extends AppObject {
                 $initial_field_value = get_param_value($field_info, "value", null);
                 if (is_null($initial_field_value)) {
                     $this->process_fatal_error(
-                        "{$table_name}: Initial field 'value' for enum" .
-                        " '{$field_name}' not specified!"
+                        "Initial field 'value' for enum '{$field_name}' not specified!"
                     );
                 }
                 if (is_null(get_param_value($field_info, "input", null))) {
                     $this->process_fatal_error(
-                        "{$table_name}: 'input' for enum '{$field_name}' not specified!"
+                        "'input' for enum '{$field_name}' not specified!"
                     );
                 }
                 break;
@@ -351,7 +354,7 @@ class DbObject extends AppObject {
                 break;
             default:
                 $this->process_fatal_error(
-                    "{$table_name}: Unknown type '{$field_type}' for field '{$field_name}'"
+                    "Unknown field type '{$field_type}' for field '{$field_name}'"
                 );
             }
 
@@ -382,18 +385,11 @@ class DbObject extends AppObject {
                 ));
             }
         } else {
-            // insert info for field from another table
-            $obj = $this->create_db_object($table_name);
-            if (is_null($obj)) {
-                $this->process_fatal_error(
-                    "{$this->_table_name}: Cannot find joined '{$table_name}'!"
-                );
-            }
-
+            // Insert info for field from another DbObject
+            $obj = $this->create_object($obj_class_name);
             if (!isset($obj->_fields[$field_name])) {
                 $this->process_fatal_error(
-                    "{$this->_table_name}: Cannot find field " .
-                    "'{$field_name}' in joined '{$table_name}'!"
+                    "Cannot find field '{$field_name}' in joined '{$obj_class_name}'!"
                 );
             }
 
@@ -402,7 +398,7 @@ class DbObject extends AppObject {
 
             if (is_null($table_name_alias)) {
                 $field_select_expression = $field_info2["select"];
-                $table_name_alias = $table_name;
+                $table_name_alias = $obj->_table_name;
             } else {
                 $field_select_expression = $this->create_field_select_expression(
                     $table_name_alias,
@@ -506,14 +502,21 @@ class DbObject extends AppObject {
             break;
         default:
             $this->process_fatal_error(
-                "{$this->_table_name}: Bad join type '{$join_type}'!"
+                "Bad join type '{$join_type}'!"
             );
         }
         
-        $join_table_name = get_param_value($join_info, "table", null);
-        if (is_null($join_table_name)) {
+        $join_obj_class_name = get_param_value($join_info, "obj", null);
+        if (is_null($join_obj_class_name)) {
             $this->process_fatal_error(
-                "{$this->_table_name}: Table name not specified in join!"
+                "DbObject class name 'obj' to be joined not specified in join info!"
+            );
+        }
+        if ($join_obj_class_name == $this->get_class_name()) {
+            $join_table_name = $this->_table_name;
+        } else {
+            $join_table_name = $this->app->get_table_name_by_object_class_name(
+                $join_obj_class_name
             );
         }
         $join_table_name_alias = get_param_value($join_info, "table_alias", $join_table_name);
@@ -522,7 +525,7 @@ class DbObject extends AppObject {
             $join_condition = get_param_value($join_info, "condition", null);
             if (is_null($join_condition)) {
                 $this->process_fatal_error(
-                    "{$this->_table_name}: Condition expression not specified in join!"
+                    "Condition expression 'condition' not specified in join!"
                 );
             }
         } else {
@@ -1014,21 +1017,21 @@ class DbObject extends AppObject {
     function del_cascade() {
         $relations = $this->get_restrict_relations();
         foreach ($relations as $relation) {
-            list($target_table_name, $key_field_name) = $relation;
+            list($dep_obj_class_name, $key_field_name) = $relation;
+            $dep_obj = $this->create_object($dep_obj_class_name);
 
             $this->write_log(
-                "del_cascade(): Trying to delete from '{$target_table_name}'",
+                "del_cascade(): Trying to delete from '{$dep_obj->_table_name}'",
                 DL_INFO
             );
 
-            $target_obj = $this->create_db_object($target_table_name);
-            if (count($target_obj->get_restrict_relations()) == 0) {
-                $target_obj->del_where("{$key_field_name} = {$this->id}");
+            if (count($dep_obj->get_restrict_relations()) == 0) {
+                $dep_obj->del_where("{$key_field_name} = {$this->id}");
             } else {
-                $objects_to_delete = $this->fetch_db_objects_list(
-                    $target_table_name,
+                $objects_to_delete = $this->fetch_objects_list(
+                    $dep_obj,
                     array(
-                        "where" => "{$target_table_name}.{$key_field_name} = {$this->id}",
+                        "where" => "{$dep_obj->_table_name}.{$key_field_name} = {$this->id}",
                     )
                 );
                 foreach ($objects_to_delete as $object_to_delete) {
@@ -1036,7 +1039,6 @@ class DbObject extends AppObject {
                 }
             }
         }
-
         return $this->del();
     }
 
@@ -1044,13 +1046,13 @@ class DbObject extends AppObject {
         return array();
     }
 
-//  CGI functions:
+//  CGI functions
     function read(
         $field_names_to_read = null,
         $field_names_to_not_read = null,
         $template_var_prefix = null
     ) {
-        // Get data from CGI and store to object values.
+        // Get data from CGI and store to object values
         $this->write_log(
             "read()",
             DL_INFO
@@ -2210,42 +2212,42 @@ class DbObject extends AppObject {
 //
     // check reference integrity
     function check_restrict_relations_before_delete() {
-        $table_link_counters = array();
+        $obj_dependency_counters = array();
         foreach ($this->get_restrict_relations() as $relation) {
-            list($dep_table_name, $dep_table_field) = $relation;
+            list($dep_obj_class_name, $key_field_name) = $relation;
+            $dep_obj = $this->create_object($dep_obj_class_name);
 
             $query = new SelectQuery(array(
                 "select" => "id",
-                "from"   => "{%{$dep_table_name}_table%}",
-                "where"  => "{$dep_table_field} = {$this->id}",
+                "from"   => "{%{$dep_obj->_table_name}_table%}",
+                "where"  => "{$key_field_name} = {$this->id}",
             ));
 
             $n = $this->app->db->get_select_query_num_rows($query);
             if ($n > 0) {
-                if (isset($table_link_counters[$dep_table_name])) {
-                    $table_link_counters[$dep_table_name] += $n;
+                if (isset($obj_dependency_counters[$dep_obj_class_name])) {
+                    $obj_dependency_counters[$dep_obj_class_name] += $n;
                 } else {
-                    $table_link_counters[$dep_table_name] = $n;
+                    $obj_dependency_counters[$dep_obj_class_name] = $n;
                 }
             }
         }
 
         $messages = array();
-        if (count($table_link_counters) != 0) {
+        if (count($obj_dependency_counters) != 0) {
             $dep_objs_data = array();
-            foreach ($table_link_counters as $dep_table_name => $n) {
-                $dep_obj = $this->create_db_object($dep_table_name);
-                $dep_objs_data[] = $dep_obj->get_quantity_str($n);
+            foreach ($obj_dependency_counters as $dep_obj_class_name => $dependency_counter) {
+                $dep_obj = $this->create_object($dep_obj_class_name);
+                $dep_objs_data[] = $dep_obj->get_quantity_str($dependency_counter);
             }
             $messages[] = new ErrorStatusMsg(
-                "cannot_delete_record_because_it_has_links",
+                "cannot_delete_record_because_it_has_restrict_relations",
                 array(
                     "main_obj_name" => $this->get_singular_name(),
-                    "dep_objs_data" => join(", ", $dep_objs_data),
+                    "dep_objs_info_str" => join(", ", $dep_objs_data),
                 )    
             );
         }
-
         return $messages;
     }
 //
@@ -2327,7 +2329,7 @@ class DbObject extends AppObject {
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        // Fetch data from database table using given WHERE condition
+        // Fetch data from db table using given WHERE condition
         // Return true if ONE record found
         if (is_null($where_str)) {
             $where_str = $this->get_default_where_str();
@@ -2358,29 +2360,29 @@ class DbObject extends AppObject {
         }
     }
 
-    function fetch_db_object(
+    function fetch_object(
         $obj,
-        $id,
+        $obj_id,
         $where_str = "1",
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        return $this->app->fetch_db_object(
+        return $this->app->fetch_object(
             $obj,
-            $id,
+            $obj_id,
             $where_str,
             $field_names_to_select,
             $field_names_to_not_select
         );
     }
 
-    function fetch_db_objects_list(
+    function fetch_objects_list(
         $obj,
         $query_ex,
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        return $this->app->fetch_db_objects_list(
+        return $this->app->fetch_objects_list(
             $obj,
             $query_ex,
             $field_names_to_select,
@@ -2391,12 +2393,12 @@ class DbObject extends AppObject {
 //  Uploaded image helpers
     function fetch_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
-        return $this->fetch_db_object("image", $image_id);
+        return $this->fetch_object("Image", $image_id);
     }
 
     function fetch_image_without_content($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
-        return $this->fetch_db_object("image", $image_id, "1", null, array("content"));
+        return $this->fetch_object("Image", $image_id, "1", null, array("content"));
     }
 
     function print_image_info($image_id_field_name, $template_var) {
@@ -2417,7 +2419,7 @@ class DbObject extends AppObject {
     function del_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
         if ($image_id != 0) {
-            $image = $this->create_db_object("image");
+            $image = $this->create_object("Image");
             $image->del_where("id = {$image_id}");
         }
     }
@@ -2425,12 +2427,12 @@ class DbObject extends AppObject {
 //  Uploaded file helpers
     function fetch_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
-        return $this->fetch_db_object("file", $file_id);
+        return $this->fetch_object("File", $file_id);
     }
 
     function fetch_file_without_content($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
-        return $this->fetch_db_object("file", $file_id, "1", null, array("content"));
+        return $this->fetch_object("File", $file_id, "1", null, array("content"));
     }
 
     function print_file_info($file_id_field_name, $template_var) {
@@ -2451,7 +2453,7 @@ class DbObject extends AppObject {
     function del_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         if ($file_id != 0) {
-            $file = $this->create_db_object("file");
+            $file = $this->create_object("File");
             $file->del_where("id = {$file_id}");
         }
     }
@@ -2522,7 +2524,7 @@ class DbObject extends AppObject {
             return null;
         }
 
-        $neighbor_obj = $this->create_db_object($this->_table_name);
+        $neighbor_obj = $this->create_object($this->_table_name);
         if ($neighbor_obj->fetch("position = {$neighbor_obj_position} AND {$where_str}")) {
             return $neighbor_obj;
         } else {

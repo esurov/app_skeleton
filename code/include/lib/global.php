@@ -144,14 +144,6 @@ function create_self_full_url($params = array(), $protocol = "http") {
     return "{$protocol}://{$host}{$self_url}";
 }
 
-function if_null($variable, $value) {
-    return is_null($variable) ? $value : $variable;
-}
-
-function if_not_null($variable, $value) {
-    return !is_null($variable) ? $value : null;
-}
-
 function unset_array_value_if_exists($value, &$values) {
     $i = array_search($value, $values);
     if ($i !== false) {

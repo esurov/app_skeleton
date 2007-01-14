@@ -2,8 +2,8 @@
 
 // These are parameters for insert_field():
 
-// "table" - table name, if not specified - current table name
-// "table_alias" - table alias name, if not specified - table name
+// "obj" - DbObject class name, if not specified - current class name
+// "table_alias" - table alias name, if not specified - table name of current DbObject class
 // "field" - field name
 // "field_alias" - field alias name, if not specified - field name
 // "type" - field type (type is then mapped to real database specific type)
@@ -12,10 +12,10 @@
 // "select" - select sql expression for field (makes create = 0)
 // "attr" - attribute section of create table sql query, rarely used
 
-// "create" - field should be created in the real db table
-// "read" - field should be read from cgi by read()
-// "store" - field should be stored to DB by store()
-// "update" - field should be updated to DB by update()
+// "create" - field should be created in db table
+// "read" - field should be read from CGI by read()
+// "store" - field should be stored to db by store()
+// "update" - field should be updated to db by update()
 
 // "value" - initial value of the field when db_object created
 // "multilingual" - is field multilingual (has additional fields for all languages)
@@ -23,10 +23,10 @@
 // "input" - html control for field value editing
 
 // note that you may not specify for many field types:
-// "create" - default is true for current table fields and false for another
-// "read" - default is true for current table fields and false for another
-// "store" - field should be stored to DB by store()
-// "update" - field should be updated to DB by update()
+// "create" - default is true for all current DbObject's fields and false for another
+// "read" - default is true for all current DbObject's fields and false for another
+// "store" - field should be stored to db by store()
+// "update" - field should be updated to db by update()
 // "value" - default one will be used, its value depends on field type
 // "input" - default one will be used
 
@@ -35,9 +35,8 @@ class SampleTable extends CustomDbObject {
     function _init($params) {
         parent::_init($params);
 
-        // note: no need to specify index on primary_key and foreign_key fields
+        // Note: No need to specify index on primary_key and foreign_key fields
         // it is added automatically
-
         $this->insert_field(array(
             "field" => "id",
             "type" => "primary_key",
@@ -47,10 +46,10 @@ class SampleTable extends CustomDbObject {
             "field" => "news_article_id",
             "type" => "foreign_key",
             
-            // join example in insert_field()
+            // Join example in insert_field()
             "join" => array(
                 "type" => "left",
-                "table" => "news_article",
+                "obj" => "NewsArticle",
                 "field" => "id",
             ),
         ));
@@ -59,10 +58,10 @@ class SampleTable extends CustomDbObject {
             "field" => "news_article2_id",
             "type" => "foreign_key",
             
-            // another join example in insert_field()
+            // One more join to the same table
             "join" => array(
                 "type" => "left",
-                "table" => "news_article",
+                "obj" => "NewsArticle",
                 "table_alias" => "news_article2",
                 "field" => "id",
             ),
@@ -75,16 +74,16 @@ class SampleTable extends CustomDbObject {
                 // "type" can be "text", "select", "radio"
                 "type" => "select",
                 "values" => array(
-                    // "source" can be "array", "db_object", "function"
-                    "source" => "db_object",
+                    // "source" can be "array", "db_object_query", "query"
+                    "source" => "db_object_query",
                     "data" => array(
                         "nonset_value_caption_pair" =>
                             array(0, $this->get_message("choose_one")),
-                        "obj_name" => "image",
-                        "captions_field_name" => "filename",
+                        "obj" => "Image",
                         "query_ex" => array(
                             "order_by" => "filename",
                         ),
+                        "captions_field_name" => "filename",
                         "end_value_caption_pairs" => array(
                             array(-1, $this->get_message("other")),
                         ),
@@ -93,31 +92,31 @@ class SampleTable extends CustomDbObject {
             ),
         ));
 
-        // join example out of insert_field()
-        // should be used for complex join conditions
+        // Join example out of insert_field()
+        // Should be used for complex join conditions
+        // Current DbObject's table name is accessed by _table_name member var
         $this->insert_join(array(
             "type" => "left",
-            "table" => "image",
+            "obj" => "Image",
             
-            // sql string for join condition
+            // SQL string for join condition
             "condition" => "{$this->_table_name}.image_id = image.id",
         ));
 
-
-        // self-join example
+        // Self-join example
         $this->insert_field(array(
             "field" => "parent_id",
             "type" => "foreign_key",
             "join" => array(
                 "type" => "left",
-                "table" => $this->_table_name,
+                "obj" => $this->get_class_name(),
                 "table_alias" => "{$this->_table_name}_alias",
                 "field" => "id",
             ),
         ));
 
-        // datetime value of record creation
-        // note: it should not be read from cgi and updated
+        // Datetime value of record creation
+        // Note: It should not be read from CGI and should not be updated
         $this->insert_field(array(
             "field" => "created",
             "type" => "datetime",
@@ -125,12 +124,12 @@ class SampleTable extends CustomDbObject {
             "read" => 0,
             "update" => 0,
 
-            // create ordinary index on this field
+            // Create ordinary index on this field
             "index" => "index",
         ));
 
-        // datetime value of last record update
-        // note: it should not be read from cgi and therefore
+        // Datetime value of last record update
+        // Note: It should not be read from CGI and therefore
         // new value should be set in redefined update() function
         $this->insert_field(array(
             "field" => "updated",
@@ -143,15 +142,15 @@ class SampleTable extends CustomDbObject {
             "field" => "field_varchar",
             "type" => "varchar",
 
-            // create field for every language
+            // Create field for every language
             "multilingual" => 1,
 
-            // create unique index on this field
-            // use validate() before store(), update(), save()
+            // Create unique index on this field
+            // Use validate() before calling save(), store(), update()
             // to be sure this value is really unique
             "index" => "unique", 
 
-            // this is optional
+            // This is optional
             "input" => array(
                 "type" => "text",
                 "type_attrs" => array(
@@ -164,10 +163,10 @@ class SampleTable extends CustomDbObject {
             "field" => "field_text",
             "type" => "text",
 
-            // create field for every language
+            // Create field for every language
             "multilingual" => 1,
 
-            // this is optional
+            // This is optional
             "input" => array(
                 "type" => "textarea",
                 "type_attrs" => array(
@@ -258,7 +257,8 @@ class SampleTable extends CustomDbObject {
             "type" => "time",
         ));
 //
-        // calculated field example
+        // Calculated field example, could be used to create complex field
+        // Field type affects field printing
         $this->insert_field(array(
             "field" => "calculated_field",
             "type" => "text",
@@ -269,54 +269,54 @@ class SampleTable extends CustomDbObject {
                 ")",
         ));
 
-        // alias for the multilingual field from current table
-        // note: fields with alias are never created in DB
-        // note: no need to specify type because it is taken from current table field
+        // Alias for the multilingual field from current table
+        // Note: Fields with alias are never created in db table
+        // Note: No need to specify type because it is taken from that field
         $this->insert_field(array(
             "field" => "field_varchar",
             "field_alias" => "field_varchar_alias",
         ));
 
-        // field 'field_text' from self-joined table
-        // note: calculated fields cannot be get when table_alias specified
+        // Field 'field_text' from self-joined table
+        // Note: Calculated fields cannot be got this way when table_alias specified
         $this->insert_field(array(
             "table_alias" => "{$this->_table_name}_alias",
             "field" => "field_text",
         ));
 
-        // alias field name 'field_text_alias' for the field 'field_text' from self-joined table
-        // note: calculated fields cannot be get when table_alias specified
+        // Alias field name 'field_text_alias' for the field 'field_text' from self-joined table
+        // Note: Calculated fields cannot be got this way when table_alias specified
         $this->insert_field(array(
             "table_alias" => "{$this->_table_name}_alias",
             "field" => "field_text",
             "field_alias" => "field_text_alias"
         ));
 
-        // calculated field from news_article table
-        // note: do not specify type because it is taken from another table
-        // nb: field commented because field was removed from news_article
+        // Calculated field from 'news_article' table
+        // Note: do not specify type because it is taken from another table
+        // NB: field commented because field was removed from 'news_article'
 //        $this->insert_field(array(
-//            "table" => "news_article",
+//            "obj" => "NewsArticle",
 //            "field" => "full_text",
 //        ));
 
-        // multilingual field from news_article table
-        // note: no need to specify type because it is taken from another table
-        // note: fields from another tables are never created in DB
+        // Multilingual field from 'news_article' table
+        // Note: No need to specify type because it is taken from that table
+        // Note: Fields from another tables are never created in db table
         $this->insert_field(array(
-            "table" => "news_article",
+            "obj" => "NewsArticle",
             "field" => "title",
         ));
 
-        // field from news_article joined with alias name news_article2
+        // Field from 'news_article' joined with alias name 'news_article2'
         $this->insert_field(array(
-            "table" => "news_article",
+            "obj" => "NewsArticle",
             "table_alias" => "news_article2",
             "field" => "title",
         ));
 
-        // complex index example
-        // note: fields should exist
+        // Complex index example
+        // Note: Fields should exist
         $this->insert_index(array(
             "type" => "index",
             "fields" => array("field_datetime", "field_date", "field_time"),
@@ -333,6 +333,7 @@ class SampleTable extends CustomDbObject {
         $fields_names_to_not_update = null
     ) {
         $this->updated = $this->app->get_db_now_datetime();
+        
         parent::update($fields_names_to_update, $fields_names_to_not_update);
     }
 //
@@ -340,10 +341,10 @@ class SampleTable extends CustomDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        // This template variable is extension to default printed variables for all contexts
+        // This template variable is expansion of default printed variables for all contexts
         $this->app->print_raw_value(
-            "_sample_table2_field_double_decorated",
-            "!!" . $this->app->page->get_filling_value("_sample_table2_field_double") . "!!"
+            "{$this->_table_name}_field_double_decorated",
+            "!!" . $this->app->page->get_filling_value("{$this->_table_name}_field_double") . "!!"
         );
 
         // Context handling
@@ -364,7 +365,7 @@ class SampleTable extends CustomDbObject {
 
             // Add context-specific template variable
             $this->app->print_varchar_value(
-                "_sample_table2_context1_specific_value",
+                "{$this->_table_name}_context1_specific_value",
                 "str1&{$list_item_number}<>{$list_item_parity}"
             );
             break;
@@ -372,7 +373,7 @@ class SampleTable extends CustomDbObject {
         case "context2":
             // Add context-specific template variable
             $this->app->print_boolean_value(
-                "_sample_table2_context2_specific_value",
+                "{$this->_table_name}_context2_specific_value",
                 1 - $this->field_boolean
             );
             break;

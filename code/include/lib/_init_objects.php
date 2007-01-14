@@ -16,6 +16,9 @@ $objects = array(
         "MySqlDbResult" => array(
             "filename" => "db_mysql.php",
         ),
+        "DbObject" => array(
+            "filename" => "db_object.php",
+        ),
         "AppComponent" => array(
             "filename" => "app_component.php",
         ),
@@ -65,13 +68,13 @@ $objects = array(
             "required_classes" => array("TemplateComponent"),
         ),
         "InMemoryImage" => array(
-            "filename" => "image.php",
+            "filename" => "image_helper.php",
         ),
         "FilesystemImage" => array(
-            "filename" => "image.php",
+            "filename" => "image_helper.php",
         ),
         "UploadedImage" => array(
-            "filename" => "image.php",
+            "filename" => "image_helper.php",
         ),
         "ImageMagickWrapper" => array(
             "filename" => "image_processor.php",

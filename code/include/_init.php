@@ -8,10 +8,8 @@ define("_APP_DIR", dirname(__FILE__));
 require_once(_APP_DIR . "/lib/_init.php");
 
 require_once(_APP_DIR . "/global.php");
-require_once(_APP_DIR . "/custom_db_object.php");
 require_once(_APP_DIR . "/custom_app.php");
 
-require_once(_APP_DIR . "/_init_tables.php");
 require_once(_APP_DIR . "/_init_objects.php");
 
 ini_set("session.gc_maxlifetime", 14400);

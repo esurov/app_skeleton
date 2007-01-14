@@ -119,7 +119,7 @@ filter_by = Filter by
 no_records_found = No records found
 
 sure_delete = Are you sure you want to delete record?
-cannot_delete_record_because_it_has_links = Cannot delete {%main_obj_name%} because it has links to {%dep_objs_data%}
+cannot_delete_record_because_it_has_restrict_relations = Cannot delete {%main_obj_name%} because it has links to {%dep_objs_info_str%}
 
 status_message_resource_access_denied = Requested page cannot be displayed. Please use your access info.
 status_message_logged_out = Logout completed successfully

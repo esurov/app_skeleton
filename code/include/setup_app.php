@@ -111,10 +111,10 @@ class SetupApp extends CustomApp {
     }
 
     function insert_test_news_articles() {
-        $article = $this->create_db_object("news_article");
-        $article->created = "2004-06-20";
-        $article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";
-        $article->body_it =
+        $news_article = $this->read_id_fetch_object("NewsArticle");
+        $news_article->created = "2004-06-20";
+        $news_article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";
+        $news_article->body_it =
             "Integer id ante dignissim lacus elementum dapibus. " .
             "Sed interdum porttitor diam. Class aptent taciti sociosqu " .
             "ad litora torquent per conubia nostra, per inceptos hymenaeos. " .
@@ -131,8 +131,8 @@ class SetupApp extends CustomApp {
             "nisl metus bibendum augue, sit amet adipiscing lectus quam eu " .
             "urna. Ut lectus erat, iaculis nec, adipiscing non, " .
             "elementum sit amet, erat.";
-        $article->title_en = "EN: Integer id ante dignissim lacus elementum dapibus.";
-        $article->body_en =
+        $news_article->title_en = "EN: Integer id ante dignissim lacus elementum dapibus.";
+        $news_article->body_en =
             "Vivamus ut arcu in nunc interdum mattis. Suspendisse in felis. " .
             "Morbi sed nulla. Proin ut sapien id turpis pharetra pellentesque. " .
             "<a href=\"http://www.google.com/\">GOOGLE</a> " .
@@ -144,11 +144,11 @@ class SetupApp extends CustomApp {
             "Sed venenatis bibendum nisl. Class aptent taciti sociosqu ad litora " .
             "torquent per conubia nostra, per inceptos hymenaeos. Vestibulum " .
             "mauris felis, eleifend eget, lacinia eget, blandit nec, lacus.";
-        $article->store();
+        $news_article->store();
 
-        $article->created = "2004-06-23";
-        $article->title_it = "IT: Phasellus nec neque. Morbi massa.";
-        $article->body_it =
+        $news_article->created = "2004-06-23";
+        $news_article->title_it = "IT: Phasellus nec neque. Morbi massa.";
+        $news_article->body_it =
             "Phasellus nec neque. Morbi massa. Quisque sed odio. " .
             "Suspendisse blandit elementum dui. Pellentesque commodo. " .
             "Mauris massa nisl, placerat eu, eleifend at, dictum vel, urna. " .
@@ -159,8 +159,8 @@ class SetupApp extends CustomApp {
             "Curabitur libero. Nam mauris. Nam tincidunt. Cum sociis " .
             "natoque penatibus et magnis dis parturient montes, " .
             "nascetur ridiculus mus. In ultricies pharetra tellus.";
-        $article->title_en = "EN: Phasellus nec neque. Morbi massa.";
-        $article->body_en =
+        $news_article->title_en = "EN: Phasellus nec neque. Morbi massa.";
+        $news_article->body_en =
             "Suspendisse pulvinar ultricies enim. Duis pharetra. " .
             "Cras venenatis nisl molestie urna. Proin vel nulla vitae " .
             "dolor porta iaculis. Pellentesque felis risus, sollicitudin " .
@@ -173,11 +173,11 @@ class SetupApp extends CustomApp {
             "tristique senectus et netus et malesuada fames ac turpis egestas. " .
             "Nulla facilisi. Nunc laoreet, erat vitae ornare elementum, " .
             "nisl nisl egestas odio, non lobortis massa ipsum vitae dui.";
-        $article->store();
+        $news_article->store();
 
-        $article->created = "2004-06-24";
-        $article->title_it = "IT: Nam molestie lectus vitae tellus.";
-        $article->body_it =
+        $news_article->created = "2004-06-24";
+        $news_article->title_it = "IT: Nam molestie lectus vitae tellus.";
+        $news_article->body_it =
             "Nam molestie lectus vitae tellus. Etiam molestie placerat " .
             "tellus. Etiam ac orci eget ipsum hendrerit rutrum. In eros. " .
             "Proin elit metus, accumsan quis, placerat eu, convallis at, " .
@@ -191,8 +191,8 @@ class SetupApp extends CustomApp {
             "habitasse platea dictumst. Etiam accumsan urna id dolor. " .
             "Mauris pharetra eleifend mi. Quisque quis purus quis " .
             "purus malesuada rhoncus.";
-        $article->title_en = "EN: Nam molestie lectus vitae tellus.";
-        $article->body_en =
+        $news_article->title_en = "EN: Nam molestie lectus vitae tellus.";
+        $news_article->body_en =
             "Nulla magna nulla, dignissim at, dictum in, tincidunt eu, " .
             "mauris. Curabitur eu nisl. Curabitur a magna. Proin elit " .
             "mi, fringilla vel, pretium quis, mollis feugiat, enim. " .
@@ -203,7 +203,7 @@ class SetupApp extends CustomApp {
             "et magnis dis parturient montes, nascetur ridiculus mus. " .
             "Morbi eros. Quisque luctus neque et justo. Nullam facilisis velit. " .
             "Curabitur at odio. Sed vel justo. Aenean suscipit.";
-        $article->store();
+        $news_article->store();
     }
 //    function action_insert_initial_data() {
 //        $this->add_session_status_message(new OkStatusMsg("initial_data_inserted"));

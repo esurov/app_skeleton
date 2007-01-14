@@ -47,7 +47,7 @@ class SampleApp extends CustomApp {
     }
 
     function action_get_news_articles_with_new_field_xml() {
-        $news_article = $this->create_db_object("news_article");
+        $news_article = $this->create_object("NewsArticle");
         $news_article->insert_field(array(
             "field" => "new_field",
             "type" => "integer",
@@ -92,8 +92,8 @@ class SampleApp extends CustomApp {
     }
 
     function action_pg_view_all_sample_table_records_as_objects() {
-        $objects = $this->fetch_db_objects_list(
-            "_sample_table",
+        $objects = $this->fetch_objects_list(
+            "SampleTable",
             array("order_by" => "created DESC")
         );
         $this->print_many_objects_list(array(
@@ -104,7 +104,7 @@ class SampleApp extends CustomApp {
     }
 */
     function action_print_and_save_one_sample_table2_record() {
-        $obj = $this->fetch_db_object("_sample_table2", 1);
+        $obj = $this->fetch_object("SampleTable2", 1);
         $obj->print_values();
         $obj->field_currency = 99999999.99;
         $obj->save();

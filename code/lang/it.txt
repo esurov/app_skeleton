@@ -119,7 +119,7 @@ filter_by = Filtra per
 no_records_found = Non sono stati trovati dati
 
 sure_delete = Sei sicuro di voler cancellare l\'informazione?
-cannot_delete_record_because_it_has_links = Impossibile eliminare {%main_obj_name%} perché in relazione con {%dep_objs_data%}
+cannot_delete_record_because_it_has_restrict_relations = Impossibile eliminare {%main_obj_name%} perché in relazione con {%dep_objs_info_str%}
 
 status_message_resource_access_denied = La pagina richiesta non può essere visualizzata. Prego effettuare l'accesso mediante login/password.
 status_message_logged_out = Logout effettuato con successo
