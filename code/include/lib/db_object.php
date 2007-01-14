@@ -1,10 +1,7 @@
 <?php
 
 // Base class for all MySQL table based classes
-
-class DbObject {
-
-    var $app;
+class DbObject extends AppObject {
 
     var $_table_name;  // Db table name without db specific prefix
 
@@ -18,7 +15,9 @@ class DbObject {
 
     var $print_params;
 
-    function init($params) {
+    function _init($params) {
+        parent::_init($params);
+
         $this->_fields = array();
         $this->_indexes = array();
 
@@ -204,9 +203,8 @@ class DbObject {
         $field_array_index = count($this->_fields);
         $field_name = get_param_value($field_info, "field", null);
         if (is_null($field_name)) {
-            $this->app->process_fatal_error(
-                "DbObject",
-                "{$this->_table_name}: field name is not specified for field {$field_array_index}!"
+            $this->process_fatal_error(
+                "{$this->_table_name}: Field name is not specified for field {$field_array_index}!"
             );
         }
         $field_name_alias = get_param_value($field_info, "field_alias", null);
@@ -244,9 +242,8 @@ class DbObject {
             } else {
                 // case of alias to real field from current table
                 if (!isset($this->_fields[$field_name])) {
-                    $this->app->process_fatal_error(
-                        "DbObject",
-                        "{$table_name}: cannot find field '{$field_name}'"
+                    $this->process_fatal_error(
+                        "{$table_name}: Cannot find field '{$field_name}'"
                     );
                 }
                 $field_info = $this->_fields[$field_name];
@@ -269,9 +266,8 @@ class DbObject {
 
             $field_type = get_param_value($field_info, "type", null);
             if (is_null($field_type)) {
-                $this->app->process_fatal_error(
-                    "DbObject",
-                    "{$table_name}: field type for '{$field_name}' not specified!"
+                $this->process_fatal_error(
+                    "{$table_name}: Field type for '{$field_name}' not specified!"
                 );
             }
 
@@ -314,15 +310,13 @@ class DbObject {
             case "enum":
                 $initial_field_value = get_param_value($field_info, "value", null);
                 if (is_null($initial_field_value)) {
-                    $this->app->process_fatal_error(
-                        "DbObject",
-                        "{$table_name}: initial field 'value' for enum" .
-                            " '{$field_name}' not specified!"
+                    $this->process_fatal_error(
+                        "{$table_name}: Initial field 'value' for enum" .
+                        " '{$field_name}' not specified!"
                     );
                 }
                 if (is_null(get_param_value($field_info, "input", null))) {
-                    $this->app->process_fatal_error(
-                        "DbObject",
+                    $this->process_fatal_error(
                         "{$table_name}: 'input' for enum '{$field_name}' not specified!"
                     );
                 }
@@ -356,9 +350,8 @@ class DbObject {
                 $initial_field_value = get_param_value($field_info, "value", "00:00:00");
                 break;
             default:
-                $this->app->process_fatal_error(
-                    "DbObject",
-                    "{$table_name}: unknown type '{$field_type}' for field '{$field_name}'"
+                $this->process_fatal_error(
+                    "{$table_name}: Unknown type '{$field_type}' for field '{$field_name}'"
                 );
             }
 
@@ -392,17 +385,15 @@ class DbObject {
             // insert info for field from another table
             $obj = $this->create_db_object($table_name);
             if (is_null($obj)) {
-                $this->app->process_fatal_error(
-                    "DbObject",
-                    "{$this->_table_name}: cannot find joined '{$table_name}'!"
+                $this->process_fatal_error(
+                    "{$this->_table_name}: Cannot find joined '{$table_name}'!"
                 );
             }
 
             if (!isset($obj->_fields[$field_name])) {
-                $this->app->process_fatal_error(
-                    "DbObject",
-                    "{$this->_table_name}: cannot find field " .
-                        "'{$field_name}' in joined '{$table_name}'!"
+                $this->process_fatal_error(
+                    "{$this->_table_name}: Cannot find field " .
+                    "'{$field_name}' in joined '{$table_name}'!"
                 );
             }
 
@@ -514,17 +505,15 @@ class DbObject {
             $join_type_str = "RIGHT";
             break;
         default:
-            $this->app->process_fatal_error(
-                "DbObject",
-                "{$this->_table_name}: bad join type '{$join_type}'!"
+            $this->process_fatal_error(
+                "{$this->_table_name}: Bad join type '{$join_type}'!"
             );
         }
         
         $join_table_name = get_param_value($join_info, "table", null);
         if (is_null($join_table_name)) {
-            $this->app->process_fatal_error(
-                "DbObject",
-                "{$this->_table_name}: table name not specified in join!"
+            $this->process_fatal_error(
+                "{$this->_table_name}: Table name not specified in join!"
             );
         }
         $join_table_name_alias = get_param_value($join_info, "table_alias", $join_table_name);
@@ -532,9 +521,8 @@ class DbObject {
         if (is_null($field_name)) {
             $join_condition = get_param_value($join_info, "condition", null);
             if (is_null($join_condition)) {
-                $this->app->process_fatal_error(
-                    "DbObject",
-                    "{$this->_table_name}: condition expression not specified in join!"
+                $this->process_fatal_error(
+                    "{$this->_table_name}: Condition expression not specified in join!"
                 );
             }
         } else {
@@ -679,9 +667,8 @@ class DbObject {
             $type_expression = "TIME";
             break;
         default:
-            $this->app->process_fatal_error(
-                "DbObject",
-                "{$this->_table_name}: unknown field type '{$field_type}'!"
+            $this->process_fatal_error(
+                "{$this->_table_name}: Unknown field type '{$field_type}'!"
             );
         }
         
@@ -707,9 +694,8 @@ class DbObject {
             $expression = "FULLTEXT {$index_name} ({$index_field_names_str})";
             break;
         default:
-            $this->app->process_fatal_error(
-                "DbObject",
-                "{$this->_table_name}: unknown index type '{$index_type}'!"
+            $this->process_fatal_error(
+                "{$this->_table_name}: Unknown index type '{$index_type}'!"
             );
         }
         
@@ -898,7 +884,10 @@ class DbObject {
         $field_names_to_not_store = null
     ) {
         // Store data to database table
-        $this->app->log->write("DbObject", "store()", 3);
+        $this->write_log(
+            "store()",
+            3
+        );
 
         $field_names = $this->get_field_names(
             $field_names_to_store,
@@ -935,7 +924,10 @@ class DbObject {
         $field_names_to_not_update = null
     ) {
         // Update data in database table
-        $this->app->log->write("DbObject", "update()", 3);
+        $this->write_log(
+            "update()",
+            3
+        );
 
         $field_names = $this->get_field_names(
             $field_names_to_update,
@@ -1024,7 +1016,10 @@ class DbObject {
         foreach ($relations as $relation) {
             list($target_table_name, $key_field_name) = $relation;
 
-            $this->app->log->write("DelCascade", "Trying delete from '{$target_table_name}'", 3);
+            $this->write_log(
+                "del_cascade(): trying delete from '{$target_table_name}'",
+                3
+            );
 
             $target_obj = $this->create_db_object($target_table_name);
             if (count($target_obj->get_restrict_relations()) == 0) {
@@ -1056,7 +1051,10 @@ class DbObject {
         $template_var_prefix = null
     ) {
         // Get data from CGI and store to object values.
-        $this->app->log->write("DbObject", "read()", 3);
+        $this->write_log(
+            "read()",
+            3
+        );
 
         if (is_null($template_var_prefix)) {
             $template_var_prefix = $this->_table_name;

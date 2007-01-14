@@ -100,20 +100,18 @@ class ObjectsList extends _ObjectsList {
 
     var $objects;
 
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         $this->objects = get_param_value($params, "objects", null);
         if (is_null($this->objects)) {
-            $this->app->process_fatal_error(
-                "ObjectsList",
-                "No 'objects' in ObjectsList::init()"
+            $this->process_fatal_error(
+                "Required param 'objects' not found!"
             );
         }
         if ($this->template_var_prefix == "") {
-            $this->app->process_fatal_error(
-                "ObjectsList",
-                "No 'template_var_prefix' in ObjectsList::init()"
+            $this->process_fatal_error(
+                "Required param 'template_var_prefix' not found!"
             );
         }
     }
@@ -139,13 +137,12 @@ class QueryObjectsList extends _ObjectsList {
     
     var $_res;
 
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         if (is_null($this->obj)) {
-            $this->app->process_fatal_error(
-                "QueryObjectsList",
-                "No 'obj' in QueryObjectsList::init()"
+            $this->process_fatal_error(
+                "Required param 'obj' not found!"
             );
         }
 
@@ -193,8 +190,8 @@ class PagedQueryObjectsList extends QueryObjectsList {
 
     var $_obj_quantity_str;
 
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         $this->default_order_by = get_param_value($params, "default_order_by", null);
 
@@ -255,7 +252,7 @@ class PagedQueryObjectsList extends QueryObjectsList {
             if ($n_objects_total == 0) {
                 $this->pager_visible = false;
             } else {
-                $this->pager = $this->app->create_component(
+                $this->pager = $this->create_object(
                     "Pager",
                     array(
                         "n_rows_per_page" => $pager_n_rows_per_page,

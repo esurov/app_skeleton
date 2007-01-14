@@ -1,68 +1,64 @@
 <?php
 
-class Db {
+class MySqlDb extends AppObject {
 
-    var $app;
-    var $log;
+    // MySQL connection info
+    var $_host;
+    var $_database;
+    var $_username;
+    var $_password;
 
     // MySQL connection
-    var $connection_info;
-    var $connection;
-    var $table_prefix;
+    var $_connection;
+    var $_table_prefix;
 
     var $_has_connection;
 
-    function Db(&$app, $connection_info) {
+    function _init($params) {
+        parent::_init($params);
+
+        $this->_host = $params["host"];
+        $this->_database = $params["database"];
+        $this->_username = $params["username"];
+        $this->_password = $params["password"];
+
+        $this->_table_prefix = $params["table_prefix"];
+
         $this->_has_connection = false;
-
-        $this->app =& $app;
-        $this->log =& $this->app->log;
-
-        $this->connection_info = $connection_info;
-        $this->table_prefix = $connection_info["table_prefix"];
     }
 
     function connect() {
-        $host = $this->connection_info["host"];
-        $database = $this->connection_info["database"];
-        $username = $this->connection_info["username"];
-        $password = $this->connection_info["password"];
-
-        $this->connection = mysql_pconnect($host, $username, $password);
-        if ($this->connection === false) {
-            $this->app->process_fatal_error(
-                "Db",
-                "Cannot connect to MySQL server '{$host} as {$username}'!"
+        $this->_connection = mysql_pconnect(
+            $this->_host,
+            $this->_username,
+            $this->_password
+        );
+        if ($this->_connection === false) {
+            $this->process_fatal_error(
+                "Cannot connect to MySQL server '{$this->_host} as {$this->_username}'!"
             );
         }
-        $this->log->write(
-            "Db",
-            "Connected to MySQL server '{$host}' as '{$username}'",
+        $this->write_log(
+            "Connected to MySQL server '{$this->_host}' as '{$this->_username}'",
             3
         );
 
-        if (!mysql_select_db($database, $this->connection)) {
-            $err = mysql_error($this->connection);
-            $this->app->process_fatal_error(
-                "Db",
-                "Cannot select database '{$database}' -- {$err}"
+        if (!mysql_select_db($this->_database, $this->_connection)) {
+            $err_str = mysql_error($this->_connection);
+            $this->process_fatal_error(
+                "Cannot select database '{$this->_database}'! MySQL error: {$err_str}"
             );
         }
-        $this->log->write(
-            "Db",
-            "Selected database '{$database}'",
+        $this->write_log(
+            "Selected database '{$this->_database}'",
             3
         );
 
         $this->_has_connection = true;
     }
 
-    function get_connection_info() {
-        return $this->connection_info;
-    }
-
     function get_full_table_name($table_name) {
-        return "{$this->table_prefix}{$table_name}";
+        return "{$this->_table_prefix}{$table_name}";
     }
 
     // Run MySQL query
@@ -73,13 +69,12 @@ class Db {
         // Handling table name templates
         $query_str = preg_replace(
             '/{%(.*?)_table%}/',
-            "{$this->table_prefix}\$1",
+            "{$this->_table_prefix}\$1",
             $query_str
         );
 
         // Write query to log file
-        $this->log->write(
-            "Db",
+        $this->write_log(
             "Running MySQL query:\n{$query_str}",
             2
         );
@@ -89,13 +84,13 @@ class Db {
         $t0 = (float)$sec + (float)$usec;
 
         // Run query
-        $resource = mysql_query($query_str, $this->connection);
-        if ($resource === false) {
-            $err_no = mysql_errno($this->connection);
-            $err = mysql_error($this->connection);
-            $this->app->process_fatal_error(
+        $res = mysql_query($query_str, $this->_connection);
+        if ($res === false) {
+            $err_no = mysql_errno($this->_connection);
+            $err_str = mysql_error($this->_connection);
+            $this->process_fatal_error(
                 "Db",
-                "MySQL error: #{$err_no}: {$err}"
+                "MySQL error #{$err_no}: {$err_str}"
             );
         }
 
@@ -106,10 +101,17 @@ class Db {
         // Write query result and timing to log file
         $t_str = number_format(($t1 - $t0), 6);
         $n = $this->get_num_affected_rows();
-        $this->log->write("Db", "Query result: {$n} rows (in $t_str sec)", 2);
+        $this->write_log(
+            "Query result: {$n} rows (in $t_str sec)",
+            2
+        );
 
-        // Return result
-        return new DbResult($resource, $this->log);
+        return $this->create_object(
+            "MySqlDbResult",
+            array(
+                "res" => $res,
+            )
+        );
     }
 
     function run_select_query($query) {
@@ -137,12 +139,12 @@ class Db {
 
     // Return number of rows in last UPDATE or DELETE query.
     function get_num_affected_rows() {
-        return mysql_affected_rows($this->connection);
+        return mysql_affected_rows($this->_connection);
     }
 
     // Return id, generated in last INSERT query by field with type primary_key
     function get_last_autoincrement_id() {
-        return mysql_insert_id($this->connection);
+        return mysql_insert_id($this->_connection);
     }
 
     function drop_table($table_name) {
@@ -156,7 +158,7 @@ class Db {
         while ($row = $res->fetch(true)) {
             $table_name_with_prefix = $row[0];
             if (preg_match(
-                '/^' . $this->table_prefix . '(\w+)$/', $table_name_with_prefix, $matches
+                '/^' . $this->_table_prefix . '(\w+)$/', $table_name_with_prefix, $matches
             )) {
                 if ($with_prefix) {
                     $table_names[] = $table_name_with_prefix;
@@ -216,6 +218,49 @@ class Db {
         
         return $actual_indexes_info;
     }
+}
+
+class MySqlDbResult extends AppObject {
+
+    // Result resource of the last MySQL query
+    var $_res;
+
+    function _init($params) {
+        $this->_res = $params["res"];
+    }
+
+    // Return number of rows in last SELECT query.
+    function get_num_rows() {
+        return mysql_num_rows($this->_res);
+    }
+
+    function fetch($with_numeric_keys = false) {
+        // Fetch data trom the result.
+        $row = ($with_numeric_keys) ?
+            mysql_fetch_row($this->_res) :
+            mysql_fetch_assoc($this->_res);
+
+        // Logger optimization
+        if ($this->get_log_debug_level() == 8) {
+            if (is_array($row)) {
+                $field_value_pairs = array();
+                foreach ($row as $field => $value) {
+                    $value = get_shortened_string($value, 300);
+                    $field_value_pairs[] = "{$field}='{$value}'";
+                }
+                $log_str = join(", ", $field_value_pairs);
+            } else {
+                $log_str = "no rows left";
+            }
+            $this->write_log(
+                "fetch(): {$log_str}",
+                8
+            );
+        }
+        
+        return $row;
+    }
+
 }
 
 ?>

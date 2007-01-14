@@ -56,9 +56,8 @@ class Menu extends TemplateComponent {
                 $caption_resource = "{$menu->name}_item_{$menu_item->name}";
                 $caption = $this->app->get_message($caption_resource);
                 if (is_null($caption)) {
-                    $this->app->process_fatal_error(
-                        "Menu",
-                        "Cannot find resource '{$caption_resource}' for menu item!"
+                    $this->process_fatal_error(
+                        "Cannot find language resource '{$caption_resource}' for menu item!"
                     );
                 }
             }

@@ -43,7 +43,7 @@ class InMemoryImage extends _Image {
     // Image binary content length in bytes, if null - autodetect
     var $_content_length;
 
-    function init($params) {
+    function _init($params) {
         $this->set_width(get_param_value($params, "width", 0));
         $this->set_height(get_param_value($params, "height", 0));
         $this->set_type(get_param_value($params, "type", ""));
@@ -98,7 +98,7 @@ class FilesystemImage extends _Image {
 
     var $_full_filename;
 
-    function init($params) {
+    function _init($params) {
         $this->set_full_filename(get_param_value($params, "filename", ""));
     }
 //
@@ -149,8 +149,8 @@ class UploadedImage extends FilesystemImage {
     var $_input_name;
     var $_uploaded_file_info;
 
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         $this->_input_name = get_param_value($params, "input_name", "image_file");
         $this->_uploaded_file_info = get_uploaded_file_info($this->_input_name);

@@ -1,6 +1,6 @@
 <?php
 
-class SampleComponent {
+class SampleComponent extends AppComponent {
 
     var $templates_dir;
     var $template_var;

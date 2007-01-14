@@ -3,7 +3,7 @@
 class SetupApp extends CustomApp {
 
     function SetupApp() {
-        parent::CustomApp("setup");
+        parent::CustomApp("SetupApp", "setup");
 
         $this->set_current_lang($this->dlang);
 
@@ -92,11 +92,10 @@ class SetupApp extends CustomApp {
     }
 
     function action_create_tables_dump($table_names_str, $should_compress) {
-        $db_connection_info = $this->db->get_connection_info();
-        $host = $db_connection_info["host"];
-        $database = $db_connection_info["database"];
-        $username = $db_connection_info["username"];
-        $password = $db_connection_info["password"];
+        $host = $this->db->get_host();
+        $database = $this->db->get_database();
+        $username = $this->db->get_username();
+        $password = $this->db->get_password();
         $compress_subcmdline = ($should_compress) ?
             " | bzip2 -" : "";
         $cmdline =

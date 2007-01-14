@@ -1,20 +1,20 @@
 <?php
 
-$components = array(
+$objects = array(
     "class_paths" => array(
         _APP_LIB_DIR,
         _APP_LIB_DIR . "/components",
     ),
     "classes" => array(
-        "Component" => array(
-            "filename" => "component.php",
+        "AppComponent" => array(
+            "filename" => "app_component.php",
         ),
         "TemplateComponent" => array(
-            "filename" => "component.php",
-            "required_classes" => array("Component"),
+            "filename" => "app_component.php",
+            "required_classes" => array("AppComponent"),
         ),
         "ObjectTemplateComponent" => array(
-            "filename" => "component.php",
+            "filename" => "app_component.php",
             "required_classes" => array("TemplateComponent"),
         ),
         "ObjectView" => array(
@@ -39,7 +39,13 @@ $components = array(
         ),
         "Pager" => array(
             "filename" => "pager.php",
-            "required_classes" => array("Component"),
+            "required_classes" => array("AppComponent"),
+        ),
+        "MySqlDb" => array(
+            "filename" => "db_mysql.php",
+        ),
+        "MySqlDbResult" => array(
+            "filename" => "db_mysql.php",
         ),
         "Xml" => array(
             "filename" => "xml.php",
@@ -66,7 +72,7 @@ $components = array(
         ),
         "ImageMagickWrapper" => array(
             "filename" => "image_processor.php",
-            "required_classes" => array("Component"),
+            "required_classes" => array("AppComponent"),
         ),
     ),
 );

@@ -1,8 +1,8 @@
 <?php
 
-class App {
+class App extends AppObject {
 
-    var $app_name;
+    var $_app_name;
 
     // Html page template
     var $page;
@@ -19,7 +19,6 @@ class App {
 
     var $config;
     var $log;
-
     var $db;
 
     var $popup = 0;
@@ -30,8 +29,11 @@ class App {
     var $dlang;
     var $avail_langs;
 
-    function App($app_name) {
-        $this->app_name = $app_name;
+    function App($app_class_name, $app_name) {
+        $this->set_class_name($app_class_name); 
+        $this->app =& $this;
+
+        $this->_app_name = $app_name;
 
         $this->response = null;
 
@@ -56,7 +58,10 @@ class App {
         // One action defined, but nobody can access it
         $actions = array("pg_index" => array("valid_users" => array()));
 
-        $this->log->write("App", "App '{$this->app_name}' started", 3);
+        $this->write_log(
+            "App '{$this->_app_name}' started",
+            3
+        );
     }
 //
     function create_config() {
@@ -71,33 +76,25 @@ class App {
         $this->log->set_truncate_always($this->config->get_value("log_truncate_always", 0));
     }
 
-    function process_fatal_error($class_name, $message) {
-        $this->log->write($class_name, "FATAL ERROR: {$message}", 1);
-        if ($this->log->debug_level == 8) {
-            $message = "[{$class_name}] {$message}";
-        } else {
-            $message = "";
-        }
-        trigger_error($message, E_USER_ERROR);
-    }
-
     function create_db() {
         $sql_config = new Config();
         $sql_config->read("config/sql.cfg");
-        $sql_params = array(
-            "host"     => $sql_config->get_value("host"),
-            "database" => $sql_config->get_value("database"),
-            "username" => $sql_config->get_value("username"),
-            "password" => $sql_config->get_value("password"),
-            "table_prefix" => $sql_config->get_value("table_prefix"),
-        );
 
-        $this->db = new Db($this, $sql_params);
+        $this->db = $this->create_object(
+            "MySqlDb",
+            array(
+                "host"     => $sql_config->get_value("host"),
+                "database" => $sql_config->get_value("database"),
+                "username" => $sql_config->get_value("username"),
+                "password" => $sql_config->get_value("password"),
+                "table_prefix" => $sql_config->get_value("table_prefix"),
+            )
+        );
     }
 
     function create_page_template() {
         $print_template_name = $this->config->get_value("print_template_name");
-        $this->page = new Template("templates/{$this->app_name}", $print_template_name);
+        $this->page = new Template("templates/{$this->_app_name}", $print_template_name);
         $this->page_template_name = "";
     }
 
@@ -119,7 +116,10 @@ class App {
         }
 
         // Ensure that action name is valid
-        $this->log->write("App", "Validating action '{$this->action}'", 3);
+        $this->write_log(
+            "Validating action '{$this->action}'",
+            3
+        );
 
         if ($this->validate_action_name()) {
             // Ensure that current user is allowed to run this action
@@ -130,8 +130,7 @@ class App {
             if (in_array($user_level, $valid_levels)) {
                 $this->run_action();
             } else {
-                $this->log->write(
-                    "App",
+                $this->write_log(
                     "User level '{$user_level}' is denied to run action '{$this->action}'",
                     1
                 );
@@ -139,8 +138,7 @@ class App {
             }
         } else {
             $this->action = $this->get_default_action_name();
-            $this->log->write(
-                "App",
+            $this->write_log(
                 "Invalid action! Will try default action '{$this->action}'",
                 3
             );
@@ -148,7 +146,6 @@ class App {
                 $this->run_invalid_action_name_action();
             } else {
                 $this->process_fatal_error(
-                    "App",
                     "Default action '{$this->action}' is invalid!"
                 );
             }
@@ -203,7 +200,10 @@ class App {
         
         $this->on_before_run_action();
 
-        $this->log->write("App", "Running action '{$this->action}'", 3);
+        $this->write_log(
+            "Running action '{$this->action}'",
+            3
+        );
         $this->{$action_func_name}();  // NB! Variable function
 
         $this->on_after_run_action();
@@ -249,7 +249,10 @@ class App {
 //
     function create_redirect_response($url) {
         $this->response = new RedirectResponse($url);
-        $this->log->write("App", "Redirect to {$url}", 3);
+        $this->write_log(
+            "Redirecting to {$url}",
+            3
+        );
     }
 
     function create_self_redirect_response($suburl_params = array(), $protocol = "http") {
@@ -1435,7 +1438,7 @@ class App {
     }
 
     function create_menu($params = array()) {
-        return $this->create_component(
+        return $this->create_object(
             "Menu",
             array(
                 "templates_dir" => get_param_value($params, "templates_dir", "_menu"),
@@ -1454,7 +1457,7 @@ class App {
     }
 
     function create_lang_menu($params = array()) {
-        return $this->create_component(
+        return $this->create_object(
             "LangMenu",
             array(
                 "templates_dir" => get_param_value($params, "templates_dir", "_lang_menu"),
@@ -1468,8 +1471,7 @@ class App {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
             $this->process_fatal_error(
-                "App",
-                "No 'obj' in App::print_object_edit_page()"
+                "print_object_edit_page(): Required param 'obj' not found!"
             );
         }
         $obj_name = $obj->_table_name;
@@ -1515,8 +1517,7 @@ class App {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
             $this->process_fatal_error(
-                "App",
-                "No 'obj' in App::delete_object()"
+                "delete_object(): Required param 'obj' not found!"
             );
         }
 
@@ -1763,7 +1764,6 @@ class App {
         $obj_info = get_param_value($tables["classes"], $obj_name, null);
         if (is_null($obj_info)) {
             $this->process_fatal_error(
-                "App",
                 "Cannot find info about table '{$obj_name}'!"
             );
         }
@@ -1776,57 +1776,60 @@ class App {
                 $tables["classes"])
             ) {
                 $this->process_fatal_error(
-                    "App",
                     "Cannot load DbObject-derived class for table '{$obj_name}'!"
                 );
             }
         }
         $obj = new $obj_class_name();
+        
+        $obj->set_class_name($obj_class_name);
         $obj->app =& $this;
         $obj->_table_name = $obj_name;
-        if (method_exists($obj, "init")) {
-            $obj->init($obj_params);
-        }
+        
+        $obj->_init($obj_params);
+        
         return $obj;
     }
 
-    function create_component($component_class_name, $component_params = array()) {
-        global $components;
+    function create_object($obj_class_name, $obj_params = array()) {
+        global $objects;
 
-        $component_info = get_param_value($components["classes"], $component_class_name, null);
-        if (is_null($component_info)) {
+        $obj_info = get_param_value($objects["classes"], $obj_class_name, null);
+        if (is_null($obj_info)) {
             $this->process_fatal_error(
-                "App",
-                "Cannot find info about component '{$component_class_name}'!"
+                "Cannot find info about object '{$obj_class_name}'!"
             );
         }
-        if (!class_exists($component_class_name)) {
+        if (!class_exists($obj_class_name)) {
             if (!$this->_load_class(
-                $component_class_name,
-                $components["class_paths"],
-                $components["classes"]
+                $obj_class_name,
+                $objects["class_paths"],
+                $objects["classes"]
             )) {
                 $this->process_fatal_error(
-                    "App",
-                    "Cannot load class for component '{$component_class_name}'!"
+                    "Cannot load class for object '{$obj_class_name}'!"
                 );
             }
         }
-        $component = new $component_class_name();
-        if (is_subclass_of($component, "Component")) {
-            $component->app =& $this;
+        $obj = new $obj_class_name();
+        if (is_subclass_of($obj, "Object")) {
+            $obj->set_class_name($obj_class_name);
+            
+            if (is_subclass_of($obj, "AppObject")) {
+                $obj->app =& $this;
+            }
         }
-        if (method_exists($component, "init")) {
-            $component->init($component_params);
+        if (method_exists($obj, "_init")) {
+            $obj->_init($obj_params);
         }
-        return $component;
+
+        return $obj;
     }
 
     function _load_class($class_name, $class_paths, $classes_info) {
         $class_info = get_param_value($classes_info, $class_name, null);
         if (is_null($class_info)) {
             $this->process_fatal_error(
-                "App",
                 "Cannot find info about class '{$class_name}'!"
             );
         }
@@ -1920,7 +1923,7 @@ class App {
 
 //  Components creation helpers
     function create_email_sender() {
-        $email_sender = $this->create_component("PHPMailer");
+        $email_sender = $this->create_object("PHPMailer");
         $email_sender->IsSendmail();
         $email_sender->IsHTML($this->config->get_value("email_is_html"));
         $email_sender->CharSet = $this->config->get_value("email_charset");
@@ -1931,15 +1934,6 @@ class App {
         return $this->config->get_value("email_debug_mode") ?
             $this->config->get_value("admin_email_to") :
             $email_to;
-    }
-//
-    function create_image_magick() {
-        $im = $this->create_component("ImageMagick");
-        $im->set_image_magick_path($this->config->get_value("image_magick_path"));
-        $im->app_name = $this->db->table_prefix;
-        $im->create_dst_file();
-        $im->set_dst_file_ext();
-        return $im;
     }
 
 //  Uploaded file helpers
@@ -1953,7 +1947,7 @@ class App {
             return true;
         }
 
-        $uploaded_image = $this->create_component(
+        $uploaded_image = $this->create_object(
             "UploadedImage", 
             array(
                 "input_name" => $input_name,
@@ -1967,7 +1961,7 @@ class App {
             $image_processor_params = array(
                 "actions" => get_param_value($params, "image_processor.actions", array()),
             );
-            $image_processor = $this->create_component(
+            $image_processor = $this->create_object(
                 $image_processor_class_name,
                 $image_processor_params
             );

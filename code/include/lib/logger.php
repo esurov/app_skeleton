@@ -2,11 +2,11 @@
 
 class Logger {
 
-    // Logger with 'debug level' support.
-    var $truncate_always;
-    var $filename;
-    var $debug_level;
-    var $max_filesize;
+    // Logger with 'debug_level' support.
+    var $_truncate_always;
+    var $_filename;
+    var $_debug_level;
+    var $_max_filesize;
 
     function Logger() {
         $this->set_truncate_always(false);
@@ -15,43 +15,46 @@ class Logger {
         $this->set_max_filesize(1048576);
     }
 //
-    function set_truncate_always($new_truncate_always) {
-        $this->truncate_always = (bool) $new_truncate_always;
+    function set_truncate_always($truncate_always) {
+        $this->_truncate_always = (bool) $truncate_always;
         
-        if ($this->truncate_always) {
+        if ($this->_truncate_always) {
             $this->truncate();
         }
     }
 
-    function set_filename($new_filename) {
-        $this->filename = $new_filename;
+    function set_filename($filename) {
+        $this->_filename = $filename;
 
-        if ($this->truncate_always) {
+        if ($this->_truncate_always) {
             $this->truncate();
         }
     }
 
-    function set_debug_level($new_debug_level) {
-        $this->debug_level = $new_debug_level;
+    function set_debug_level($debug_level) {
+        $this->_debug_level = $debug_level;
     }
 
-    function set_max_filesize($new_max_filesize) {
-        $max_filesize = $new_max_filesize;
-        if ($new_max_filesize > 0) {
-            $this->max_filesize = $new_max_filesize;
+    function get_debug_level() {
+        return $this->_debug_level;
+    }
+
+    function set_max_filesize($max_filesize) {
+        if ($max_filesize > 0) {
+            $this->_max_filesize = $max_filesize;
         }
     }
 //
-    function write($class_name, $message, $debug_level) {
-        // Write $class_name and $message to log file,
-        // if debug level is high enough.
+    function write($header, $message, $debug_level) {
+        // Write $header and $message to log file,
+        // if debug_level is high enough.
 
         // Skip insignificant messages:
-        if ($debug_level > $this->debug_level) {
+        if ($debug_level > $this->_debug_level) {
             return;
         }
 
-        $f = @fopen($this->filename, "a");
+        $f = @fopen($this->_filename, "a");
         if (!$f) {
             return;
         }
@@ -59,7 +62,7 @@ class Logger {
 
         $file_stats = fstat($f);
         $filesize = $file_stats["size"];
-        if ($filesize > $this->max_filesize) {
+        if ($filesize > $this->_max_filesize) {
             ftruncate($f, 0);
         }
 
@@ -73,14 +76,14 @@ class Logger {
             $message_text = $message;
         }
         $time_str = strftime("%Y-%m-%d %H:%M:%S", time());
-        fputs($f, "{$time_str} - [{$class_name}] {$message_text}\n");
+        fputs($f, "{$time_str} - [{$header}] {$message_text}\n");
 
         flock($f, LOCK_UN);  // unlock
         fclose($f);
     }
 
     function truncate() {
-        $f = @fopen($this->filename, "a");
+        $f = @fopen($this->_filename, "a");
         if ($f) {
             flock($f, LOCK_EX);  // lock
             ftruncate($f, 0);

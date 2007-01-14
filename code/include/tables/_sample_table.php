@@ -32,8 +32,8 @@
 
 class SampleTable extends CustomDbObject {
 
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         // note: no need to specify index on primary_key and foreign_key fields
         // it is added automatically

@@ -3,7 +3,7 @@
 class AdminApp extends CustomApp {
 
     function AdminApp() {
-        parent::CustomApp("admin");
+        parent::CustomApp("AdminApp", "admin");
 
         $this->set_current_lang($this->dlang);
 
@@ -41,7 +41,7 @@ class AdminApp extends CustomApp {
         $templates_dir = "news_articles";
 
         $news_article = $this->create_db_object("news_article");
-        $news_articles_list = $this->create_component(
+        $news_articles_list = $this->create_object(
             "PagedQueryObjectsList",
             array(
                 "templates_dir" => "{$templates_dir}/news_articles",

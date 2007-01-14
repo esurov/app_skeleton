@@ -2,19 +2,16 @@
 
 class ObjectView extends ObjectTemplateComponent {
 
-    var $obj;
-
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
     
         if (is_null($this->obj)) {
-            $this->app->process_fatal_error(
-                "ObjectView",
-                "No 'obj' in ObjectView::init()"
+            $this->process_fatal_error(
+                "Required param 'obj' not found!"
             );
         }
     }
-
+//
     function print_values() {
         $this->app->print_custom_params($this->custom_params);
 

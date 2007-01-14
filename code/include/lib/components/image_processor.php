@@ -1,6 +1,6 @@
 <?php
 
-class _ImageProcessor extends Component {
+class _ImageProcessor extends AppObject {
 
     // Info about actions to be performed with the image
     var $_actions;
@@ -8,7 +8,9 @@ class _ImageProcessor extends Component {
     // Parameters of running action
     var $_action_params;
 //
-    function init($params) {
+    function _init($params) {
+        parent::_init($params);
+
         $this->_actions = get_param_value($params, "actions", array());
     }
 //
@@ -48,8 +50,8 @@ class ImageMagickWrapper extends _ImageProcessor {
     var $_output_image_type;
     var $_output_image_jpg_quality;
 
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         $this->set_image_magick_path($this->app->config->get_value("image_magick_path"));
 
@@ -108,8 +110,7 @@ class ImageMagickWrapper extends _ImageProcessor {
     }
 
     function exec_cmdline() {
-        $this->app->log->write(
-            "ImageMagickWrapper",
+        $this->write_log(
             "Starting image processing:\n" .
             "Commandline: {$this->_cmdline}",
             3
@@ -118,8 +119,7 @@ class ImageMagickWrapper extends _ImageProcessor {
         exec($this->_cmdline, $returned_lines, $returned_value);
         
         if ($returned_value != 0) {
-            $this->app->log->write(
-                "ImageMagickWrapper",
+            $this->write_log(
                 "Image processing failed!\n" .
                 "Commandline: {$this->_cmdline}\n" .
                 "Error #{$returned_value}. Output:\n" .

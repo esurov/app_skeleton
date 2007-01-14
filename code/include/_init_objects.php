@@ -1,16 +1,17 @@
 <?php
 
-$components["class_paths"] = array_merge(
+$objects["class_paths"] = array_merge(
     array(
         _APP_DIR,
         _APP_DIR . "/components",
     ),
-    $components["class_paths"]
+    $objects["class_paths"]
 );
 
-$components["classes"] += array(
+$objects["classes"] += array(
     "SampleComponent" => array(
         "filename" => "__sample_component.php",
+        "required_classes" => array("AppComponent"),
     ),
     "SampleComponent2" => array(
         "filename" => "__sample_component.php",

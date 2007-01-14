@@ -2,8 +2,8 @@
 
 class Image extends CustomDbObject {
     
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         $this->insert_field(array(
             "field" => "id",
@@ -89,7 +89,7 @@ class Image extends CustomDbObject {
     }
 
     function create_in_memory_image() {
-        return $this->app->create_component(
+        return $this->create_object(
             "InMemoryImage", 
             array(
                 "width" => $this->width,

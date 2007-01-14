@@ -3,7 +3,7 @@
 class UserApp extends CustomApp {
 
     function UserApp() {
-        parent::CustomApp("user");
+        parent::CustomApp("UserApp", "user");
 
         $e = array("valid_users" => array("guest"));
 
@@ -38,7 +38,7 @@ class UserApp extends CustomApp {
 
         $news_article = $this->create_db_object("news_article");
         $n_recent_news_articles = $this->config->get_value("recent_news_articles_number");
-        $recent_news_articles_list = $this->create_component(
+        $recent_news_articles_list = $this->create_object(
             "QueryObjectsList",
             array(
                 "templates_dir" => "{$templates_dir}/recent_news_articles",
@@ -60,7 +60,7 @@ class UserApp extends CustomApp {
         $templates_dir = "news_articles";
         
         $news_article = $this->create_db_object("news_article");
-        $news_articles_list = $this->create_component(
+        $news_articles_list = $this->create_object(
             "PagedQueryObjectsList",
             array(
                 "templates_dir" => "{$templates_dir}/news_articles",
@@ -80,7 +80,7 @@ class UserApp extends CustomApp {
         $templates_dir = "news_article_view";
 
         $news_article = $this->read_id_fetch_db_object("news_article");
-        $news_article_view = $this->create_component(
+        $news_article_view = $this->create_object(
             "ObjectView",
             array(
                 "templates_dir" => "{$templates_dir}/news_article_view",

@@ -1,7 +1,7 @@
 <?php
 
 // Class for page splitting
-class Pager extends Component {
+class Pager extends AppComponent {
 
     var $n_rows_per_page;
     var $n_total_rows;
@@ -12,13 +12,13 @@ class Pager extends Component {
 
     var $_offset;
 
-    function init($params) {
+    function _init($params) {
         $this->_offset = 0;
 
         $this->n_rows_per_page = get_param_value($params, "n_rows_per_page", null);
         if (is_null($this->n_rows_per_page)) {
             $this->n_rows_per_page = $this->app->config->get_value(
-                "{$this->app->app_name}_rows_per_page",
+                "{$this->app->_app_name}_rows_per_page",
                 20
             );
         }

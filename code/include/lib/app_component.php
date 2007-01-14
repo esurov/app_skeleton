@@ -1,28 +1,26 @@
 <?php
 
-class Component {
+class AppComponent extends AppObject {
 
-    var $app;
-
-    function init($params) {
+    function _init($params) {
+        parent::_init($params);
     }
 
 }
 
-class TemplateComponent extends Component {
+class TemplateComponent extends AppComponent {
 
     var $templates_dir;
     var $templates_ext;
     var $template_var;
 
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         $this->templates_dir = get_param_value($params, "templates_dir", null);
         if (is_null($this->templates_dir)) {
             $this->app->process_fatal_error(
-                "TemplateComponent",
-                "No 'templates_dir' in TemplateComponent::init()"
+                "Required param 'templates_dir' not found!"
             );
         }
         $this->templates_ext = get_param_value($params, "templates_ext", "html");
@@ -43,8 +41,8 @@ class ObjectTemplateComponent extends TemplateComponent {
     var $context;
     var $custom_params;
 
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         $this->obj = get_param_value($params, "obj", null);
 

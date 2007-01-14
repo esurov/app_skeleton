@@ -2,8 +2,8 @@
 
 class File extends CustomDbObject {
 
-    function init($params) {
-        parent::init($params);
+    function _init($params) {
+        parent::_init($params);
 
         $this->insert_field(array(
             "field" => "id",

@@ -3,7 +3,7 @@
 class SampleApp extends CustomApp {
 
     function SampleApp() {
-        parent::CustomApp("_sample");
+        parent::CustomApp("SampleApp", "_sample");
 
         $e = array("valid_users" => array("guest"));
 
@@ -53,7 +53,7 @@ class SampleApp extends CustomApp {
             "type" => "integer",
             "select" => "RAND(1000) * 1000",
         ));
-        $news_articles_list = $this->create_component(
+        $news_articles_list = $this->create_object(
             "QueryObjectsList",
             array(
                 "templates_dir" => "news_article/xml",
@@ -114,7 +114,7 @@ class SampleApp extends CustomApp {
     function action_pg_view_component() {
         $templates_dir = "sample_component_view";
 
-        $component = $this->create_component("SampleComponent2");
+        $component = $this->create_object("SampleComponent2");
         $component->templates_dir = "{$templates_dir}/sample_component2";
         $component->template_var = "sample_component2";
         $component->print_values();
