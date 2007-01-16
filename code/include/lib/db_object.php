@@ -1428,8 +1428,8 @@ class DbObject extends AppObject {
             $default_order_by_field_name = $default_order_by_field_parts[0];
             if (!$this->is_field_exist($default_order_by_field_name)) {
                 $this->process_fatal_error(
-                    "read_order_by(): Field {$default_order_by_field_name} used " .
-                    "in 'default_order_by' not found!"
+                    "read_order_by(): Field '{$default_order_by_field_name}' " .
+                    "specified in 'default_order_by' not found!"
                 );
             }
         }
