@@ -150,12 +150,12 @@ class SelectQuery extends SelectQueryEx {
         $distinct_str = ($this->distinct) ? "DISTINCT " : "";
         return
             "SELECT {$distinct_str}{$this->select}" .
-            "\n    FROM {$this->from}" .
-            ($this->where    ? "\n    WHERE {$this->where}"       : "") .
-            ($this->group_by ? "\n    GROUP BY {$this->group_by}" : "") .
-            ($this->having   ? "\n    HAVING {$this->having}"     : "") .
-            ($this->order_by ? "\n    ORDER BY {$this->order_by}" : "") .
-            ($this->limit    ? "\n    LIMIT {$this->limit}"       : "");
+            "\n  FROM {$this->from}" .
+            ($this->where    ? "\n  WHERE {$this->where}"       : "") .
+            ($this->group_by ? "\n  GROUP BY {$this->group_by}" : "") .
+            ($this->having   ? "\n  HAVING {$this->having}"     : "") .
+            ($this->order_by ? "\n  ORDER BY {$this->order_by}" : "") .
+            ($this->limit    ? "\n  LIMIT {$this->limit}"       : "");
     }
 
 }

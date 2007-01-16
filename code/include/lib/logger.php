@@ -19,50 +19,65 @@ class Logger extends AppObject {
     function _init($params) {
         parent::_init($params);
 
+        $this->set_debug_level(constant($this->get_config_value("log_debug_level")), DL_ERROR);
+        $this->set_max_filesize($this->get_config_value("log_max_filesize", 0));
+        $this->set_truncate_always($this->get_config_value("log_truncate_always", false));
+
         $this->set_filename("log/app.log");
 
-        $this->set_debug_level(constant($this->get_config_value("log_debug_level")), DL_ERROR);
-        $this->set_max_filesize($this->get_config_value("log_max_filesize", 1048576));
-        $this->set_truncate_always($this->get_config_value("log_truncate_always", false));
+        if ($this->_truncate_always) {
+            $this->truncate();
+        } else {
+            $this->_write_line(str_repeat("-", 100));
+        }
     }
 //
-    function set_truncate_always($truncate_always) {
-        $this->_truncate_always = (bool) $truncate_always;
-        
-        if ($this->_truncate_always) {
-            $this->truncate();
-        }
-    }
-
     function set_filename($filename) {
         $this->_filename = $filename;
-
-        if ($this->_truncate_always) {
-            $this->truncate();
-        }
     }
 
-    function set_debug_level($debug_level) {
-        $this->_debug_level = $debug_level;
+    function set_truncate_always($truncate_always) {
+        $this->_truncate_always = (bool) $truncate_always;
     }
 
     function get_debug_level() {
         return $this->_debug_level;
     }
 
+    function set_debug_level($debug_level) {
+        $this->_debug_level = $debug_level;
+    }
+
     function set_max_filesize($max_filesize) {
-        if ($max_filesize > 0) {
-            $this->_max_filesize = $max_filesize;
-        }
+        $this->_max_filesize = $max_filesize;
     }
 //
+    // Write header and message to log file, if debug_level is high enough
     function write($header, $message, $debug_level) {
-        // Write $header and $message to log file,
-        // if debug_level is high enough.
-
-        // Skip insignificant messages:
         if ($debug_level > $this->_debug_level) {
             return;
+        }
+
+        if (is_array($message)) {
+            $message_lines = array();
+            foreach ($message as $key => $value) {
+                $message_lines[] = "    '{$key}' => '{$value}',\n";
+            }
+            $line_text = "array(\n" . join("", $message_lines) . ")";
+        } else {
+            $line_text = $message;
+        }
+
+        $datetime_str = date("Y-m-d H:i:s");
+        $this->_write_line("{$datetime_str} - [{$header}] {$line_text}");
+    }
+
+    function _write_line($line_text) {
+        if ($this->_max_filesize > 0) {
+            clearstatcache();
+            if (filesize($this->_filename) > $this->_max_filesize) {
+                $this->truncate();
+            }
         }
 
         $f = @fopen($this->_filename, "a");
@@ -70,37 +85,20 @@ class Logger extends AppObject {
             return;
         }
         flock($f, LOCK_EX);  // lock
-
-        $file_stats = fstat($f);
-        $filesize = $file_stats["size"];
-        if ($filesize > $this->_max_filesize) {
-            ftruncate($f, 0);
-        }
-
-        if (is_array($message)) {
-            $messages = array();
-            foreach ($message as $key => $value) {
-                $messages[] = "'{$key}' => '{$value}'";
-            }
-            $message_text = "array(" . join(", ", $messages) . ")";
-        } else {
-            $message_text = $message;
-        }
-        $time_str = strftime("%Y-%m-%d %H:%M:%S", time());
-        fputs($f, "{$time_str} - [{$header}] {$message_text}\n");
-
+        fputs($f, "{$line_text}\n");
         flock($f, LOCK_UN);  // unlock
         fclose($f);
     }
 
     function truncate() {
         $f = @fopen($this->_filename, "a");
-        if ($f) {
-            flock($f, LOCK_EX);  // lock
-            ftruncate($f, 0);
-            flock($f, LOCK_UN);  // unlock
-            fclose($f);
+        if (!$f) {
+            return;
         }
+        flock($f, LOCK_EX);  // lock
+        ftruncate($f, 0);
+        flock($f, LOCK_UN);  // unlock
+        fclose($f);
     }
 
 }

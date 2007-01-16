@@ -1422,6 +1422,18 @@ class DbObject extends AppObject {
             $default_order_by_fields = array($default_order_by_fields);
         }
         
+        // Check if all default_order_by fields really exist in this obj
+        foreach ($default_order_by_fields as $default_order_by_field) {
+            $default_order_by_field_parts = explode(" ", $default_order_by_field, 2);
+            $default_order_by_field_name = $default_order_by_field_parts[0];
+            if (!$this->is_field_exist($default_order_by_field_name)) {
+                $this->process_fatal_error(
+                    "read_order_by(): Field {$default_order_by_field_name} used " .
+                    "in 'default_order_by' not found!"
+                );
+            }
+        }
+
         $order_by_fields = param("order_by");
         if (!is_array($order_by_fields)) {
             if (is_null($order_by_fields) || trim($order_by_fields) == "") {
@@ -1431,11 +1443,10 @@ class DbObject extends AppObject {
             }
         }
 
-        $field_names = $this->get_field_names();
         foreach ($order_by_fields as $order_by_field) {
             $order_by_field_parts = explode(" ", $order_by_field, 2);
             $order_by_field_name = $order_by_field_parts[0];
-            if (!in_array($order_by_field_name, $field_names)) {
+            if (!$this->is_field_exist($order_by_field_name)) {
                 continue;
             }
             $order_by_direction = "asc";

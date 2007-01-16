@@ -240,7 +240,7 @@ class MySqlDbResult extends AppObject {
             mysql_fetch_assoc($this->_res);
 
         // Logger optimization
-        if ($this->get_log_debug_level() >= DL_DEBUG) {
+        if ($this->get_log_debug_level() == DL_EXTRA_DEBUG) {
             if (is_array($row)) {
                 $field_value_pairs = array();
                 foreach ($row as $field => $value) {
@@ -253,7 +253,7 @@ class MySqlDbResult extends AppObject {
             }
             $this->write_log(
                 "fetch(): {$log_str}",
-                DL_DEBUG
+                DL_EXTRA_DEBUG
             );
         }
         

@@ -66,7 +66,9 @@ class UserApp extends CustomApp {
                 "templates_dir" => "{$templates_dir}/news_articles",
                 "template_var" => "news_articles",
                 "obj" => $news_article,
-                "default_order_by" => array("created DESC", "id DESC"),
+                "query_ex" => array(
+                    "order_by" => "created DESC, id DESC",
+                ),
                 "filter_form.visible" => true,
                 "context" => "list_item",
             )
