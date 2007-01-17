@@ -13,8 +13,8 @@
     />
     <menu_item
         name="news_articles"
-        url="?action=pg_view_news_articles"
-        contexts="pg_view_news_articles, pg_edit_news_article"
+        url="?action=pg_news_articles"
+        contexts="pg_news_articles, pg_edit_news_article_edit"
     />
     <menu_item
         name="app"

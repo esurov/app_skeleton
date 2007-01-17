@@ -141,8 +141,8 @@ no_file = No file uploaded
 recent_news = Recent news
 
 ["news_articles"]
-page_title_view_news_articles = News
-page_title_view_news_article = View news article
+page_title_news_articles = News
+page_title_news_article_view = View news article
 news_article = news article
 news_articles = news articles
 

@@ -139,7 +139,7 @@ class AdminApp extends CustomApp {
 
             $news_article->save();
             $this->print_status_message_object_updated($news_article_old);
-            $this->create_self_redirect_response(array("action" => "pg_view_news_articles"));
+            $this->create_self_redirect_response(array("action" => "pg_news_articles"));
         }
     }
 
@@ -148,8 +148,8 @@ class AdminApp extends CustomApp {
 
         $this->delete_object(array(
             "obj" => $news_article,
-            "success_url_params" => array("action" => "pg_view_news_articles"),
-            "error_url_params" => array("action" => "pg_view_news_articles"),
+            "success_url_params" => array("action" => "pg_news_articles"),
+            "error_url_params" => array("action" => "pg_news_articles"),
         ));
     }
 
@@ -160,7 +160,7 @@ class AdminApp extends CustomApp {
         
         $this->add_session_status_message(new OkStatusMsg("news_article_image_deleted"));
         $this->create_self_redirect_response(array(
-            "action" => "pg_edit_news_article",
+            "action" => "pg_news_article_edit",
             "news_article_id" => $news_article->id,
         ));
     }
@@ -172,7 +172,7 @@ class AdminApp extends CustomApp {
         
         $this->add_session_status_message(new OkStatusMsg("news_article_file_deleted"));
         $this->create_self_redirect_response(array(
-            "action" => "pg_edit_news_article",
+            "action" => "pg_news_article_edit",
             "news_article_id" => $news_article->id,
         ));
     }

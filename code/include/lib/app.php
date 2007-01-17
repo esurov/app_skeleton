@@ -1517,7 +1517,7 @@ class App extends AppObject {
             );
         }
 
-        $default_url_params = array("action" => "pg_view_" . $obj->get_plural_resource());
+        $default_url_params = array("action" => "pg_" . $obj->get_plural_lang_resource());
         $error_url_params = get_param_value($params, "error_url_params", $default_url_params);
         $success_url_params = get_param_value($params, "success_url_params", $default_url_params);
         $cascade = get_param_value($params, "cascade", false);

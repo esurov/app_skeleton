@@ -65,13 +65,13 @@ $app_classes = array(
             "required_classes" => array("TemplateComponent"),
         ),
         "InMemoryImage" => array(
-            "filename" => "image_helper.php",
+            "filename" => "image.php",
         ),
         "FilesystemImage" => array(
-            "filename" => "image_helper.php",
+            "filename" => "image.php",
         ),
         "UploadedImage" => array(
-            "filename" => "image_helper.php",
+            "filename" => "image.php",
         ),
         "ImageMagickWrapper" => array(
             "filename" => "image_processor.php",

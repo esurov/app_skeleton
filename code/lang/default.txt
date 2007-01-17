@@ -18,10 +18,10 @@ admin_menu_item_news_articles = Notizie
 admin_menu_item_app = App
 
 ["news_articles"]
-page_title_pg_view_news_articles = Visualizza notizie
-page_title_pg_view_news_article = Visualizza notizia
-page_title_pg_edit_news_article_new = Aggiungi notizia
-page_title_pg_edit_news_article = Modifica notizia
+page_title_pg_news_articles = Visualizza notizie
+page_title_pg_news_article_view = Visualizza notizia
+page_title_pg_news_article_edit_new = Aggiungi notizia
+page_title_pg_news_article_edit = Modifica notizia
 news_article_added = Aggiunta nuova notizia
 news_article_updated = Notizia è stata modificata
 news_article_deleted = Notizia è stata eliminata

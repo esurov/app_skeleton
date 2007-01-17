@@ -27,8 +27,8 @@
     />
     <menu_item
         name="news"
-        url="?action=pg_view_news_articles"
-        contexts="pg_view_news_articles, pg_view_news_article"
+        url="?action=pg_news_articles"
+        contexts="pg_news_articles, pg_news_article_view"
     />
     <menu_item
         name="contact_form"
