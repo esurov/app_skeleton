@@ -28,6 +28,19 @@ class TemplateComponent extends AppComponent {
     }
 
     function print_values() {
+        $this->_on_before_print_values();
+        $content = $this->_print_values();
+        $this->_on_after_print_values();
+        return $content;
+    }
+
+    function _print_values() {
+    }
+
+    function _on_before_print_values() {
+    }
+
+    function _on_after_print_values() {
     }
 
 }
@@ -54,6 +67,16 @@ class ObjectTemplateComponent extends TemplateComponent {
         
         $this->context = get_param_value($params, "context", "");
         $this->custom_params = get_param_value($params, "custom_params", array());
+    }
+
+    function _print_values() {
+        parent::_print_values();
+
+        $this->_print_custom_params();
+    }
+
+    function _print_custom_params() {
+        $this->app->print_custom_params($this->custom_params);
     }
 
 }

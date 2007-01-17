@@ -12,19 +12,15 @@ class ObjectEdit extends ObjectTemplateComponent {
         }
     }
 //
-    function print_values() {
-        $this->print_custom_params();
+    function _print_values() {
+        parent::_print_values();
 
-        return $this->print_object_edit();
+        return $this->_print_object_edit();
     }
 
-    function print_custom_params() {
-        $this->app->print_custom_params($this->custom_params);
-    }
-
-    function print_object_edit() {
-        $this->print_page_titles();
-        $this->print_object_values($this->obj);
+    function _print_object_edit() {
+        $this->_print_page_titles();
+        $this->_print_object_values($this->obj);
 
         $this->app->print_file_new(
             "{$this->templates_dir}/edit_form.{$this->templates_ext}",
@@ -36,7 +32,7 @@ class ObjectEdit extends ObjectTemplateComponent {
         );
     }
 
-    function print_page_titles() {
+    function _print_page_titles() {
         $resource = $this->app->get_default_page_title_lang_resource();
         if (!$this->obj->is_definite()) {
             $resource .= "_new";
@@ -44,7 +40,7 @@ class ObjectEdit extends ObjectTemplateComponent {
         $this->app->print_head_and_page_titles($resource);
     }
 
-    function print_object_values(&$obj) {
+    function _print_object_values(&$obj) {
         $obj->print_form_values(array(
             "templates_dir" => $this->templates_dir,
             "template_var_prefix" => $this->template_var_prefix,

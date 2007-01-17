@@ -566,6 +566,24 @@ class App extends AppObject {
             $this->print_value($template_var, $value);
         }
     }
+
+    function print_custom_params($custom_params) {
+        foreach ($custom_params as $param_name => $param_value) {
+            if (is_scalar($param_value)) {
+                $this->print_custom_param($param_name, $param_value);
+            }
+        }
+    }
+
+    function print_custom_param($param_name, $param_value) {
+        $this->print_value($param_name, $param_value);
+        $this->print_raw_value("{$param_name}_orig", $param_value);
+        $this->print_value(
+            "{$param_name}_suburl",
+            create_suburl(array($param_name => $param_value))
+        );
+        $this->print_hidden_input_form_value($param_name, $param_value);
+    }
 //
     function print_file($template_name, $append_to_name = null) {
         return $this->page->parse_file($template_name, $append_to_name);
@@ -1489,26 +1507,8 @@ class App extends AppObject {
             )
         );
     }
-
-//  Object functions
-    function print_custom_params($custom_params) {
-        foreach ($custom_params as $param_name => $param_value) {
-            if (is_scalar($param_value)) {
-                $this->print_custom_param($param_name, $param_value);
-            }
-        }
-    }
-
-    function print_custom_param($param_name, $param_value) {
-        $this->print_value($param_name, $param_value);
-        $this->print_raw_value("{$param_name}_orig", $param_value);
-        $this->print_value(
-            "{$param_name}_suburl",
-            create_suburl(array($param_name => $param_value))
-        );
-        $this->print_hidden_input_form_value($param_name, $param_value);
-    }
 //
+    // Object functions
     function delete_object($params = array()) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {

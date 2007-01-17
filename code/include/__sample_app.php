@@ -114,9 +114,13 @@ class SampleApp extends CustomApp {
     function action_pg_component_view() {
         $templates_dir = "sample_component_view";
 
-        $component = $this->create_object("SampleComponent2");
-        $component->templates_dir = "{$templates_dir}/sample_component2";
-        $component->template_var = "sample_component2";
+        $component = $this->create_object(
+            "SampleComponent2",
+            array(
+                "templates_dir" => "{$templates_dir}/sample_component2",
+                "template_var" => "sample_component2",
+            )
+        );
         $component->print_values();
 
         $this->print_file("{$templates_dir}/body.html", "body");

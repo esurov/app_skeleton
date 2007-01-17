@@ -1,17 +1,16 @@
 <?php
 
-class SampleComponent extends AppComponent {
+class SampleComponent extends TemplateComponent {
 
-    var $templates_dir;
-    var $template_var;
-
-    function print_values() {
-        $this->app->print_file("{$this->templates_dir}/body.html", $this->template_var);
-    }
-    
 }
 
 class SampleComponent2 extends SampleComponent {
+    
+    function _print_values() {
+        parent::_print_values();
+
+        $this->app->print_file("{$this->templates_dir}/body.html", $this->template_var);
+    }
     
 }
 

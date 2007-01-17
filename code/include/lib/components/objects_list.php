@@ -4,9 +4,6 @@ class _ObjectsList extends ObjectTemplateComponent {
 
     var $_current_obj_idx;
 
-    function _prepare_objects_list() {
-    }
-
     function &_fetch_list_object() {
         $obj = false;
         return $obj;
@@ -16,25 +13,18 @@ class _ObjectsList extends ObjectTemplateComponent {
         return null;
     }
 //
-    function print_values() {
-        $this->_prepare_objects_list();
+    function _print_values() {
+        parent::_print_values();
 
-        $this->print_list_custom_params();
-        $content = $this->print_list();
-        
-        return $content;
+        return $this->_print_list();
     }
 
-    function print_list_custom_params() {
-        $this->app->print_custom_params($this->custom_params);
-    }
-
-    function print_list() {
+    function _print_list() {
         $this->app->print_raw_value("{$this->template_var_prefix}_items", "");
 
         $this->_current_obj_idx = 0;
         while ($obj =& $this->_fetch_list_object()) {
-            $this->print_object_values($obj);
+            $this->_print_object_values($obj);
 
             if ($this->_current_obj_idx > 0) {
                 $this->app->print_file_if_exists(
@@ -71,7 +61,7 @@ class _ObjectsList extends ObjectTemplateComponent {
         );
     }
 
-    function print_object_values(&$obj) {
+    function _print_object_values(&$obj) {
         $list_item_parity = $this->_current_obj_idx % 2;
         $list_item_class = ($list_item_parity == 0) ?
             "list-item-even" :
@@ -151,7 +141,9 @@ class QueryObjectsList extends _ObjectsList {
         $this->query->expand($query_ex);
     }
 //
-    function _prepare_objects_list() {
+    function _on_before_print_values() {
+        parent::_on_before_print_values();
+
         $this->_res = $this->obj->run_select_query($this->query);
     }
 
@@ -269,8 +261,8 @@ class PagedQueryObjectsList extends QueryObjectsList {
         }
     }
 
-    function print_list_custom_params() {
-        parent::print_list_custom_params();
+    function _print_custom_params() {
+        parent::_print_custom_params();
 
         $this->app->print_values(array(
             "action_suburl" => create_suburl($this->_action_suburl_params),
@@ -281,7 +273,7 @@ class PagedQueryObjectsList extends QueryObjectsList {
         ));
     }
 
-    function print_list() {
+    function _print_list() {
         if ($this->filter_form_visible) {
             $this->app->print_values($this->_filters_params);
             $this->obj->print_filter_form_values();
@@ -296,7 +288,7 @@ class PagedQueryObjectsList extends QueryObjectsList {
             $this->app->print_value("total", $this->_obj_quantity_str);
         }
 
-        return parent::print_list();
+        return parent::_print_list();
     }
 
 }
