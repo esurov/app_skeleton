@@ -1256,7 +1256,7 @@ class App extends AppObject {
         $captions_field_name
     ) {
         if (is_string($obj)) {
-            $obj = $this->create_object($obj);
+            $obj = $this->create_db_object($obj);
         }
         $query = $obj->get_expanded_select_query(
             $query_ex,
@@ -1691,26 +1691,21 @@ class App extends AppObject {
 //  Common action helpers
     function process_create_update_tables() {
         $actual_table_names = $this->db->get_actual_table_names();
-        $all_table_names_to_create = $this->get_all_table_names_to_create();
+        $all_creatable_db_objects_info = $this->get_all_creatable_db_objects_info();
+        $all_table_names_to_create = array_keys($all_creatable_db_objects_info);
 
         $table_names_to_create = array_diff($all_table_names_to_create, $actual_table_names);
         $table_names_to_update = array_intersect($all_table_names_to_create, $actual_table_names);
         $table_names_to_drop = array_diff($actual_table_names, $all_table_names_to_create);
 
         foreach ($table_names_to_create as $table_name) {
-            $obj_class_name = $this->get_object_class_name_by_table_name($table_name);
-            if (!is_null($obj_class_name)) {
-                $obj = $this->create_object($obj_class_name);
-                $obj->create_table();
-            }
+            $obj = $this->create_db_object($all_creatable_db_objects_info[$table_name]);
+            $obj->create_table();
         }
 
         foreach ($table_names_to_update as $table_name) {
-            $obj_class_name = $this->get_object_class_name_by_table_name($table_name);
-            if (!is_null($obj_class_name)) {
-                $obj = $this->create_object($obj_class_name);
-                $obj->update_table();
-            }
+            $obj = $this->create_db_object($all_creatable_db_objects_info[$table_name]);
+            $obj->update_table();
         }
 
         $this->process_delete_tables($table_names_to_drop);
@@ -1725,60 +1720,30 @@ class App extends AppObject {
         }
     }
 
-    function get_all_table_names_to_create() {
-        global $objects;
+    function get_all_creatable_db_objects_info() {
+        global $db_classes;
 
-        $result_table_names = array();
-        foreach ($objects["classes"] as $obj_class_name => $obj_class_info) {
+        $db_objects_info = array();
+        foreach ($db_classes["classes"] as $obj_class_name => $obj_class_info) {
             $obj_class_params = get_param_value($obj_class_info, "params", null);
             if (is_null($obj_class_params)) {
+                continue;
+            }
+            $should_create = get_param_value($obj_class_params, "create", null);
+            if (is_null($should_create) || !$should_create) {
                 continue;
             }
             $obj_table_name = get_param_value($obj_class_params, "table_name", null);
             if (is_null($obj_table_name)) {
                 continue;
             }
-            $should_create = get_param_value($obj_class_params, "create", true);
-            if (!$should_create) {
-                continue;
-            }
-            $result_table_names[] = $table_name;
+            $db_objects_info[$obj_table_name] = $obj_class_name;
         }
-        return $result_table_names;
-    }
-
-    function get_object_class_name_by_table_name($table_name) {
-        global $objects;
-
-        foreach ($objects["classes"] as $obj_class_name => $obj_class_info) {
-            $obj_class_params = get_param_value($obj_class_info, "params", null);
-            if (is_null($obj_class_params)) {
-                continue;
-            }
-            $obj_table_name = get_param_value($obj_class_params, "table_name", null);
-            if (!is_null($obj_table_name) && ($obj_table_name == $table_name)) {
-                return $obj_class_name;
-            }
-        }
-        return null;
-    }
-
-    function get_table_name_by_object_class_name($obj_class_name) {
-        global $objects;
-
-        $obj_class_info = get_param_value($objects, $obj_class_name, null);
-        if (is_null($obj_class_info)) {
-            return null;
-        }
-        $obj_class_params = get_param_value($obj_class_info, "params", null);
-        if (is_null($obj_class_params)) {
-            return null;
-        }
-        return get_param_value($obj_class_params, "table_name", null);
+        return $db_objects_info;
     }
 //
     function action_get_image() {
-        $image = $this->read_id_fetch_object("Image");
+        $image = $this->read_id_fetch_db_object("ImageTable");
         if ($image->is_definite()) {
             $this->response = new ImageResponse(
                 $image->create_in_memory_image(),
@@ -1812,7 +1777,7 @@ class App extends AppObject {
     function action_get_file() {
         $open_inline = (int) param("show");
 
-        $file = $this->read_id_fetch_object("File");
+        $file = $this->read_id_fetch_db_object("FileTable");
         if ($file->is_definite()) {
             $this->response = new FileResponse($file, $open_inline);
         } else {
@@ -1832,30 +1797,51 @@ class App extends AppObject {
     }
 //
     function create_object($obj_class_name, $obj_params = array()) {
-        global $objects;
+        global $app_classes;
 
-        $obj_class_info = get_param_value($objects["classes"], $obj_class_name, null);
-        if (is_null($obj_class_info)) {
+        return $this->_create_object(
+            $obj_class_name,
+            $app_classes["classes"],
+            $app_classes["class_paths"],
+            $obj_params
+        );
+    }
+
+    function create_db_object($obj_class_name, $obj_params = array()) {
+        global $db_classes;
+
+        return $this->_create_object(
+            $obj_class_name,
+            $db_classes["classes"],
+            $db_classes["class_paths"],
+            $obj_params
+        );
+    }
+
+
+    function _create_object($class_name, $classes_info, $class_paths, $obj_params = array()) {
+        $class_info = get_param_value($classes_info, $class_name, null);
+        if (is_null($class_info)) {
             $this->process_fatal_error(
-                "Cannot find info about object '{$obj_class_name}'!"
+                "Cannot find info about class '{$class_name}'!"
             );
         }
-        if (!class_exists($obj_class_name)) {
-            if (!$this->_load_class(
-                $obj_class_name,
-                $objects["class_paths"],
-                $objects["classes"]
-            )) {
+        
+        if (!class_exists($class_name)) {
+            if (!$this->_load_class($class_name, $classes_info, $class_paths)) {
                 $this->process_fatal_error(
-                    "Cannot load class for object '{$obj_class_name}'!"
+                    "Cannot load class '{$class_name}'!"
                 );
             }
         }
-
-        $obj = new $obj_class_name();
+        
+        $obj = new $class_name();
         if (is_subclass_of($obj, "Object")) {
-            $obj->set_class_name($obj_class_name);
-            $obj_params = get_param_value($obj_class_info, "params", array()) + $obj_params;
+            $obj->set_class_name($class_name);
+            $init_obj_params = get_param_value($class_info, "params", null);
+            if (!is_null($init_obj_params)) {
+                $obj_params = $init_obj_params + $obj_params;
+            }
             if (is_subclass_of($obj, "AppObject")) {
                 $obj->app =& $this;
             }
@@ -1863,10 +1849,11 @@ class App extends AppObject {
         if (method_exists($obj, "_init")) {
             $obj->_init($obj_params);
         }
+        
         return $obj;
     }
 
-    function _load_class($class_name, $class_paths, $classes_info) {
+    function _load_class($class_name, $classes_info, $class_paths) {
         $class_info = get_param_value($classes_info, $class_name, null);
         if (is_null($class_info)) {
             $this->process_fatal_error(
@@ -1876,7 +1863,7 @@ class App extends AppObject {
 
         $required_classes = get_param_value($class_info, "required_classes", array());
         foreach ($required_classes as $required_class_name) {
-            if (!$this->_load_class($required_class_name, $class_paths, $classes_info)) {
+            if (!$this->_load_class($required_class_name, $classes_info, $class_paths)) {
                 return false;
             }
         }
@@ -1889,10 +1876,11 @@ class App extends AppObject {
                 return true;
             }
         }
+        
         return false;
     }
 //
-    function fetch_object(
+    function fetch_db_object(
         $obj,
         $obj_id,
         $where_str = "1",
@@ -1903,7 +1891,7 @@ class App extends AppObject {
         // If no then instance should be created somewhere outside and passed to this function
         // In that case object could be expanded with new fields (using insert_field())
         if (is_string($obj)) {
-            $obj = $this->create_object($obj);
+            $obj = $this->create_db_object($obj);
         }
         $obj->fetch(
             "{$obj->_table_name}.id = {$obj_id} AND {$where_str}",
@@ -1916,16 +1904,16 @@ class App extends AppObject {
     // Create new object, read it's PRIMARY KEY from CGI
     // (using CGI variable with name $id_param_name),
     // then fetch object from db table
-    function read_id_fetch_object(
+    function read_id_fetch_db_object(
         $obj_class_name,
         $where_str = "1",
         $id_param_name = null,
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        $obj = $this->create_object($obj_class_name);
+        $obj = $this->create_db_object($obj_class_name);
         $obj->read(array("id"));
-        return $this->fetch_object(
+        return $this->fetch_db_object(
             $obj,
             $obj->id,
             $where_str,
@@ -1934,14 +1922,14 @@ class App extends AppObject {
         );
     }
 
-    function fetch_objects_list(
+    function fetch_db_objects_list(
         $obj,
         $query_ex,
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
         if (is_string($obj)) {
-            $obj = $this->create_object($obj);
+            $obj = $this->create_db_object($obj);
         }
         $res = $obj->run_expanded_select_query(
             $query_ex,

@@ -298,7 +298,7 @@ class ImageResponse extends BinaryContentResponse {
 class FileResponse extends BinaryContentResponse {
     
     function FileResponse($file, $open_inline) {
-        parent::BinaryContentResponse($file->content, $file->type, $file->filesize, true);
+        parent::BinaryContentResponse($file->content, $file->type, $file->content_length, true);
 
         $this->add_content_disposition_header(
             $file->filename,

@@ -49,7 +49,7 @@ class SampleTable extends CustomDbObject {
             // Join example in insert_field()
             "join" => array(
                 "type" => "left",
-                "obj" => "NewsArticle",
+                "obj" => "NewsArticleTable",
                 "field" => "id",
             ),
         ));
@@ -61,7 +61,7 @@ class SampleTable extends CustomDbObject {
             // One more join to the same table
             "join" => array(
                 "type" => "left",
-                "obj" => "NewsArticle",
+                "obj" => "NewsArticleTable",
                 "table_alias" => "news_article2",
                 "field" => "id",
             ),
@@ -97,7 +97,7 @@ class SampleTable extends CustomDbObject {
         // Current DbObject's table name is accessed by _table_name member var
         $this->insert_join(array(
             "type" => "left",
-            "obj" => "Image",
+            "obj" => "ImageTable",
             
             // SQL string for join condition
             "condition" => "{$this->_table_name}.image_id = image.id",
@@ -296,7 +296,7 @@ class SampleTable extends CustomDbObject {
         // Note: do not specify type because it is taken from another table
         // NB: field commented because field was removed from 'news_article'
 //        $this->insert_field(array(
-//            "obj" => "NewsArticle",
+//            "obj" => "NewsArticleTable",
 //            "field" => "full_text",
 //        ));
 
@@ -304,13 +304,13 @@ class SampleTable extends CustomDbObject {
         // Note: No need to specify type because it is taken from that table
         // Note: Fields from another tables are never created in db table
         $this->insert_field(array(
-            "obj" => "NewsArticle",
+            "obj" => "NewsArticleTable",
             "field" => "title",
         ));
 
         // Field from 'news_article' joined with alias name 'news_article2'
         $this->insert_field(array(
-            "obj" => "NewsArticle",
+            "obj" => "NewsArticleTable",
             "table_alias" => "news_article2",
             "field" => "title",
         ));

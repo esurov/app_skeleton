@@ -386,7 +386,7 @@ class DbObject extends AppObject {
             }
         } else {
             // Insert info for field from another DbObject
-            $obj = $this->create_object($obj_class_name);
+            $obj = $this->create_db_object($obj_class_name);
             if (!isset($obj->_fields[$field_name])) {
                 $this->process_fatal_error(
                     "Cannot find field '{$field_name}' in joined '{$obj_class_name}'!"
@@ -515,9 +515,8 @@ class DbObject extends AppObject {
         if ($join_obj_class_name == $this->get_class_name()) {
             $join_table_name = $this->_table_name;
         } else {
-            $join_table_name = $this->app->get_table_name_by_object_class_name(
-                $join_obj_class_name
-            );
+            $join_obj = $this->create_db_object($join_obj_class_name);
+            $join_table_name = $join_obj->_table_name;
         }
         $join_table_name_alias = get_param_value($join_info, "table_alias", $join_table_name);
 
@@ -1018,7 +1017,7 @@ class DbObject extends AppObject {
         $relations = $this->get_restrict_relations();
         foreach ($relations as $relation) {
             list($dep_obj_class_name, $key_field_name) = $relation;
-            $dep_obj = $this->create_object($dep_obj_class_name);
+            $dep_obj = $this->create_db_object($dep_obj_class_name);
 
             $this->write_log(
                 "del_cascade(): Trying to delete from '{$dep_obj->_table_name}'",
@@ -1028,7 +1027,7 @@ class DbObject extends AppObject {
             if (count($dep_obj->get_restrict_relations()) == 0) {
                 $dep_obj->del_where("{$key_field_name} = {$this->id}");
             } else {
-                $objects_to_delete = $this->fetch_objects_list(
+                $objects_to_delete = $this->fetch_db_objects_list(
                     $dep_obj,
                     array(
                         "where" => "{$dep_obj->_table_name}.{$key_field_name} = {$this->id}",
@@ -2226,7 +2225,7 @@ class DbObject extends AppObject {
         $obj_dependency_counters = array();
         foreach ($this->get_restrict_relations() as $relation) {
             list($dep_obj_class_name, $key_field_name) = $relation;
-            $dep_obj = $this->create_object($dep_obj_class_name);
+            $dep_obj = $this->create_db_object($dep_obj_class_name);
 
             $query = new SelectQuery(array(
                 "select" => "id",
@@ -2248,7 +2247,7 @@ class DbObject extends AppObject {
         if (count($obj_dependency_counters) != 0) {
             $dep_objs_data = array();
             foreach ($obj_dependency_counters as $dep_obj_class_name => $dependency_counter) {
-                $dep_obj = $this->create_object($dep_obj_class_name);
+                $dep_obj = $this->create_db_object($dep_obj_class_name);
                 $dep_objs_data[] = $dep_obj->get_quantity_str($dependency_counter);
             }
             $messages[] = new ErrorStatusMsg(
@@ -2335,6 +2334,10 @@ class DbObject extends AppObject {
         }
     }
 //
+    function create_db_object($obj_class_name, $obj_params = array()) {
+        return $this->app->create_db_object($obj_class_name, $obj_params);
+    }
+
     function fetch(
         $where_str = null,
         $field_names_to_select = null,
@@ -2371,14 +2374,14 @@ class DbObject extends AppObject {
         }
     }
 
-    function fetch_object(
+    function fetch_db_object(
         $obj,
         $obj_id,
         $where_str = "1",
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        return $this->app->fetch_object(
+        return $this->app->fetch_db_object(
             $obj,
             $obj_id,
             $where_str,
@@ -2387,13 +2390,13 @@ class DbObject extends AppObject {
         );
     }
 
-    function fetch_objects_list(
+    function fetch_db_objects_list(
         $obj,
         $query_ex,
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        return $this->app->fetch_objects_list(
+        return $this->app->fetch_db_objects_list(
             $obj,
             $query_ex,
             $field_names_to_select,
@@ -2404,12 +2407,12 @@ class DbObject extends AppObject {
 //  Uploaded image helpers
     function fetch_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
-        return $this->fetch_object("Image", $image_id);
+        return $this->fetch_db_object("ImageTable", $image_id);
     }
 
     function fetch_image_without_content($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
-        return $this->fetch_object("Image", $image_id, "1", null, array("content"));
+        return $this->fetch_db_object("ImageTable", $image_id, "1", null, array("content"));
     }
 
     function print_image_info($image_id_field_name, $template_var) {
@@ -2430,7 +2433,7 @@ class DbObject extends AppObject {
     function del_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
         if ($image_id != 0) {
-            $image = $this->create_object("Image");
+            $image = $this->create_db_object("ImageTable");
             $image->del_where("id = {$image_id}");
         }
     }
@@ -2438,12 +2441,12 @@ class DbObject extends AppObject {
 //  Uploaded file helpers
     function fetch_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
-        return $this->fetch_object("File", $file_id);
+        return $this->fetch_db_object("FileTable", $file_id);
     }
 
     function fetch_file_without_content($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
-        return $this->fetch_object("File", $file_id, "1", null, array("content"));
+        return $this->fetch_db_object("FileTable", $file_id, "1", null, array("content"));
     }
 
     function print_file_info($file_id_field_name, $template_var) {
@@ -2464,7 +2467,7 @@ class DbObject extends AppObject {
     function del_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         if ($file_id != 0) {
-            $file = $this->create_object("File");
+            $file = $this->create_db_object("FileTable");
             $file->del_where("id = {$file_id}");
         }
     }
@@ -2535,7 +2538,7 @@ class DbObject extends AppObject {
             return null;
         }
 
-        $neighbor_obj = $this->create_object($this->_table_name);
+        $neighbor_obj = $this->create_db_object($this->get_class_name());
         if ($neighbor_obj->fetch("position = {$neighbor_obj_position} AND {$where_str}")) {
             return $neighbor_obj;
         } else {

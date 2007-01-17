@@ -111,7 +111,7 @@ class SetupApp extends CustomApp {
     }
 
     function insert_test_news_articles() {
-        $news_article = $this->read_id_fetch_object("NewsArticle");
+        $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
         $news_article->created = "2004-06-20";
         $news_article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";
         $news_article->body_it =

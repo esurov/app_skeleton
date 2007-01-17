@@ -40,7 +40,7 @@ class AdminApp extends CustomApp {
     function action_pg_view_news_articles() {
         $templates_dir = "news_articles";
 
-        $news_article = $this->create_object("NewsArticle");
+        $news_article = $this->create_db_object("NewsArticleTable");
         $news_articles_list = $this->create_object(
             "PagedQueryObjectsList",
             array(
@@ -61,7 +61,7 @@ class AdminApp extends CustomApp {
     function action_pg_edit_news_article() {
         $news_article = get_param_value($this->action_params, "news_article", null);
         if (is_null($news_article)) {
-            $news_article = $this->read_id_fetch_object("NewsArticle");
+            $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
         }
         $this->print_object_edit_page(array(
             "obj" => $news_article,
@@ -71,7 +71,7 @@ class AdminApp extends CustomApp {
     }
 
     function action_update_news_article() {
-        $news_article = $this->read_id_fetch_object("NewsArticle");
+        $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
         $news_article_old = $news_article;
         $news_article->read();
 
@@ -134,7 +134,7 @@ class AdminApp extends CustomApp {
     }
 
     function action_delete_news_article() {
-        $news_article = $this->read_id_fetch_object("NewsArticle");
+        $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
 
         $this->delete_object(array(
             "obj" => $news_article,
@@ -144,7 +144,7 @@ class AdminApp extends CustomApp {
     }
 
     function action_delete_news_article_image() {
-        $news_article = $this->read_id_fetch_object("NewsArticle");
+        $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
 
         $this->delete_object_image($news_article, "image_id");
         
@@ -156,7 +156,7 @@ class AdminApp extends CustomApp {
     }
 
     function action_delete_news_article_file() {
-        $news_article = $this->read_id_fetch_object("NewsArticle");
+        $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
 
         $this->delete_object_file($news_article, "file_id");
         

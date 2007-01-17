@@ -36,7 +36,7 @@ class UserApp extends CustomApp {
     function action_pg_index() {
         $templates_dir = "index";
 
-        $news_article = $this->create_object("NewsArticle");
+        $news_article = $this->create_db_object("NewsArticleTable");
         $n_recent_news_articles = $this->get_config_value("recent_news_articles_number");
         $recent_news_articles_list = $this->create_object(
             "QueryObjectsList",
@@ -59,7 +59,7 @@ class UserApp extends CustomApp {
     function action_pg_view_news_articles() {
         $templates_dir = "news_articles";
         
-        $news_article = $this->create_object("NewsArticle");
+        $news_article = $this->create_db_object("NewsArticleTable");
         $news_articles_list = $this->create_object(
             "PagedQueryObjectsList",
             array(
@@ -81,7 +81,7 @@ class UserApp extends CustomApp {
     function action_pg_view_news_article() {
         $templates_dir = "news_article_view";
 
-        $news_article = $this->read_id_fetch_object("NewsArticle");
+        $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
         $news_article_view = $this->create_object(
             "ObjectView",
             array(
@@ -97,13 +97,13 @@ class UserApp extends CustomApp {
     }
 //
     function action_pg_contact_form() {
-        $contact_info = $this->create_object("ContactInfo");
+        $contact_info = $this->create_db_object("ContactInfo");
         $contact_info->print_form_values();
         $this->print_file("contact_form/body.html", "body");
     }
 
     function action_process_contact_form() {
-        $contact_info = $this->create_object("ContactInfo");
+        $contact_info = $this->create_db_object("ContactInfo");
         $contact_info->read();
         
         $this->send_email_contact_form_processed_to_admin($contact_info);

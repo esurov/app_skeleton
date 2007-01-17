@@ -1,6 +1,6 @@
 <?php
 
-class NewsArticle extends CustomDbObject {
+class NewsArticleTable extends CustomDbObject {
 
     function _init($params) {
         parent::_init($params);

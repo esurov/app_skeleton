@@ -1,6 +1,6 @@
 <?php
 
-$objects = array(
+$app_classes = array(
     "class_paths" => array(
         _APP_LIB_DIR,
         _APP_LIB_DIR . "/components",
@@ -15,9 +15,6 @@ $objects = array(
         ),
         "MySqlDbResult" => array(
             "filename" => "db_mysql.php",
-        ),
-        "DbObject" => array(
-            "filename" => "db_object.php",
         ),
         "AppComponent" => array(
             "filename" => "app_component.php",

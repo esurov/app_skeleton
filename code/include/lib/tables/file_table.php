@@ -1,6 +1,6 @@
 <?php
 
-class File extends CustomDbObject {
+class FileTable extends CustomDbObject {
 
     function _init($params) {
         parent::_init($params);
@@ -34,11 +34,6 @@ class File extends CustomDbObject {
         ));
 
         $this->insert_field(array(
-            "field" => "filesize",
-            "type" => "integer",
-        ));
-
-        $this->insert_field(array(
             "field" => "type",
             "type" => "varchar",
         ));
@@ -47,23 +42,11 @@ class File extends CustomDbObject {
             "field" => "content",
             "type" => "blob",
         ));
-    }
-//
-    function get_updated_as_gmt_str() {
-        return get_gmt_str_from_timestamp(
-            $this->app->get_timestamp_from_db_datetime($this->updated)
-        );
-    }
-//
-    function read_uploaded_info($input_name) {
-        $uploaded_file_info = get_uploaded_file_info($input_name);
 
-        $this->filename = $uploaded_file_info["name"];
-        $this->filesize = $uploaded_file_info["size"];
-        $this->type = $uploaded_file_info["type"];
-        
-        $filename = $uploaded_file_info["tmp_name"];
-        $this->content = file_get_contents($filename);
+        $this->insert_field(array(
+            "field" => "content_length",
+            "type" => "integer",
+        ));
     }
 //
     function update(
@@ -80,8 +63,25 @@ class File extends CustomDbObject {
 
         $this->app->print_varchar_value(
             "file_filesize_formatted",
-            get_formatted_filesize_str($this->filesize)
+            get_formatted_filesize_str($this->content_length)
         );
+    }
+//
+    function get_updated_as_gmt_str() {
+        return get_gmt_str_from_timestamp(
+            $this->app->get_timestamp_from_db_datetime($this->updated)
+        );
+    }
+//
+    function read_uploaded_info($input_name) {
+        $uploaded_file_info = get_uploaded_file_info($input_name);
+
+        $this->filename = $uploaded_file_info["name"];
+        $this->type = $uploaded_file_info["type"];
+        
+        $filename = $uploaded_file_info["tmp_name"];
+        $this->content = file_get_contents($filename);
+        $this->content_length = $uploaded_file_info["size"];
     }
 
 }

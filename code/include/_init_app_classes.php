@@ -1,15 +1,14 @@
 <?php
 
-$objects["class_paths"] = array_merge(
+$app_classes["class_paths"] = array_merge(
     array(
         _APP_DIR,
         _APP_DIR . "/components",
-        _APP_DIR . "/tables",
     ),
-    $objects["class_paths"]
+    $app_classes["class_paths"]
 );
 
-$objects["classes"] += array(
+$app_classes["classes"] += array(
     // App object and component classes 
     "SampleComponent" => array(
         "filename" => "__sample_component.php",
@@ -25,12 +24,12 @@ $objects["classes"] += array(
     "CustomDbObject" => array(
         "filename" => "custom_db_object.php",
         "required_classes" => array("DbObject"),
-        "params" => array("table_name" => "custom_db_object", "create" => false),
+        "params" => array("table_name" => "", "create" => false),
     ),
     "SampleTable" => array(
         "filename" => "_sample_table.php",
         "required_classes" => array("CustomDbObject"),
-        "params" => array("table_name" => "_sample_table", "create" => false),
+        "params" => array("table_name" => "_sample", "create" => false),
     ),
     "ContactInfo" => array(
         "filename" => "contact_info.php",
@@ -39,23 +38,23 @@ $objects["classes"] += array(
     ),
 
     // App DbObject-derived classes (real db tables)
-    "SampleTable2" => array(
-        "filename" => "_sample_table2.php",
+    "Sample2Table" => array(
+        "filename" => "_sample2_table.php",
         "required_classes" => array("SampleTable"),
-        "params" => array("table_name" => "_sample_table2"),
+        "params" => array("table_name" => "_sample2"),
     ),
-    "Image" => array(
-        "filename" => "image.php",
+    "ImageTable" => array(
+        "filename" => "image_table.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "image"),
     ),
-    "File" => array(
-        "filename" => "file.php",
+    "FileTable" => array(
+        "filename" => "file_table.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "file"),
     ),
-    "NewsArticle" => array(
-        "filename" => "news_article.php",
+    "NewsArticleTable" => array(
+        "filename" => "news_article_table.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "news_article"),
     ),

@@ -1,6 +1,6 @@
 <?php
 
-class SampleTable2 extends SampleTable {
+class Sample2Table extends SampleTable {
 
     function _init($params) {
         parent::_init($params);
