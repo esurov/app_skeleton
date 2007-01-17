@@ -73,7 +73,7 @@ class Pager extends AppComponent {
 
     function create_exponential_nav_str() {
         // Create navigation links
-        $nav_str = $this->app->get_message("pager_pages_title") . " \n";
+        $nav_str = $this->get_lang_str("pager_pages_title") . " \n";
 
         $suburl_params_str = create_suburl($this->suburl_params, "&amp;");
 
@@ -114,14 +114,14 @@ class Pager extends AppComponent {
         $next_offset = $this->_offset + $this->n_rows_per_page;
 
         if ($prev_offset >= 0) {
-            $prev_page_str = $this->app->get_message("pager_previous_page");
+            $prev_page_str = $this->get_lang_str("pager_previous_page");
             $nav_str .=
                 "<a href=\"{$suburl_params_str}&amp;offset={$prev_offset}\">" .
                 "&lt;&lt;&nbsp;{$prev_page_str}</a>&nbsp;&nbsp;&nbsp;\n";
         }
         
         if ($next_offset < $this->n_total_rows) {
-            $next_page_str = $this->app->get_message("pager_next_page");
+            $next_page_str = $this->get_lang_str("pager_next_page");
             $nav_str .=
                 "<a href=\"{$suburl_params_str}&amp;offset={$next_offset}\">" .
                 "{$next_page_str}&nbsp;&gt;&gt;</a>\n";

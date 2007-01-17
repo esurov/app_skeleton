@@ -15,8 +15,8 @@ class UserApp extends CustomApp {
 
             "pg_index" => $e,
 
-            "pg_view_news_articles" => $e,
-            "pg_view_news_article" => $e,
+            "pg_news_articles" => $e,
+            "pg_news_article_view" => $e,
 
             "pg_contact_form" => $e,
             "process_contact_form" => $e,
@@ -56,7 +56,7 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 //
-    function action_pg_view_news_articles() {
+    function action_pg_news_articles() {
         $templates_dir = "news_articles";
         
         $news_article = $this->create_db_object("NewsArticleTable");
@@ -78,7 +78,7 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_pg_view_news_article() {
+    function action_pg_news_article_view() {
         $templates_dir = "news_article_view";
 
         $news_article = $this->read_id_fetch_db_object("NewsArticleTable");

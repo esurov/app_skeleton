@@ -10,7 +10,7 @@ class LangMenu extends TemplateComponent {
         foreach ($this->avail_langs as $lang) {
             if ($lang == $this->current_lang) {
                 $this->app->print_raw_values(array(
-                    "current_lang_name" => $this->app->get_message($lang),
+                    "current_lang_name" => $this->get_lang_str($lang),
                     "current_lang_image_url" =>
                         $this->get_config_value("lang_image_current_url_{$lang}"),
                 ));
@@ -18,7 +18,7 @@ class LangMenu extends TemplateComponent {
             } else {
                 $this->app->print_raw_values(array(
                     "new_lang" => $lang,
-                    "new_lang_name" => $this->app->get_message($lang),
+                    "new_lang_name" => $this->get_lang_str($lang),
                     "new_lang_image_url" => $this->get_config_value("lang_image_url_{$lang}"),
                 ));
                 $item_template_name = "menu_item.html";

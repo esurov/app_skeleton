@@ -27,7 +27,7 @@ class App extends AppObject {
     var $lang; // Current language
     var $dlang; // Default language
     var $avail_langs; // Available languages
-    var $messages; // Language resources
+    var $lang_resources; // Language resources
 
     // Action vars
     var $actions;
@@ -108,9 +108,9 @@ class App extends AppObject {
     }
 
     function init_lang_resources() {
-        $this->messages = new Config();
-        $this->messages->read("lang/default.txt");
-        $this->messages->read("lang/{$this->lang}.txt");
+        $this->lang_resources = new Config();
+        $this->lang_resources->read("lang/default.txt");
+        $this->lang_resources->read("lang/{$this->lang}.txt");
     }
 //
     function run() {
@@ -688,8 +688,8 @@ class App extends AppObject {
     function print_boolean_value($template_var, $value, $value_caption_pairs = null) {
         if (is_null($value_caption_pairs)) {
             $value_caption_pairs = array(
-                array(0, $this->get_message("no")),
-                array(1, $this->get_message("yes")),
+                array(0, $this->get_lang_str("no")),
+                array(1, $this->get_lang_str("yes")),
             );
         }
         $caption = get_caption_by_value_from_value_caption_pairs(
@@ -991,7 +991,7 @@ class App extends AppObject {
     function print_multilingual_form_value($template_var, $value) {
         $lang_inputs_with_captions_str = "";
         foreach ($this->avail_langs as $lang) {
-            $lang_str = $this->get_message($lang);
+            $lang_str = $this->get_lang_str($lang);
             $lang_input = $this->page->get_filling_value("{$template_var}_{$lang}_input");
             $lang_inputs_with_captions_str .=
                 "<tr>\n" .
@@ -1378,16 +1378,16 @@ class App extends AppObject {
         return $dependency_array;
     }
 //
-    function get_message($resource, $resource_params = null) {
-        $message_text = $this->messages->get_value($resource);
-        if (is_null($message_text)) {
+    function get_lang_str($resource, $resource_params = null) {
+        $lang_str = $this->lang_resources->get_value($resource);
+        if (is_null($lang_str)) {
             return null;        
-        } else {
-            if (!is_null($resource_params)) {
-                $this->print_values($resource_params);
-            }
-            return $this->page->get_parsed_text($message_text);
         }
+        if (!is_null($resource_params)) {
+            $this->print_values($resource_params);
+            $lang_str = $this->page->get_parsed_text($lang_str);
+        }
+        return $lang_str;
     }
 
     function get_current_lang() {
@@ -1396,6 +1396,12 @@ class App extends AppObject {
             $cur_lang = $this->get_config_value("default_language");
         }
         return $cur_lang;
+    }
+
+    function set_current_lang($new_lang) {
+        if ($this->is_valid_lang($new_lang)) {
+            Session::set_param("current_language", $new_lang);
+        }
     }
 
     function get_avail_langs() {
@@ -1407,12 +1413,6 @@ class App extends AppObject {
             return false;
         } else {
             return true;
-        }
-    }
-
-    function set_current_lang($new_lang) {
-        if ($this->is_valid_lang($new_lang)) {
-            Session::set_param("current_language", $new_lang);
         }
     }
 
@@ -1491,34 +1491,6 @@ class App extends AppObject {
     }
 
 //  Object functions
-    function print_object_edit_page($params) {
-        $obj = get_param_value($params, "obj", null);
-        if (is_null($obj)) {
-            $this->process_fatal_error(
-                "print_object_edit_page(): Required param 'obj' not found!"
-            );
-        }
-        $obj_name = $obj->_table_name;
-
-        $templates_dir = get_param_value($params, "templates_dir", $obj_name);
-        $template_var_prefix = get_param_value($params, "template_var_prefix", $obj_name);
-        $template_var = get_param_value($params, "template_var", "body");
-        $context = get_param_value($params, "context", "");
-        $custom_params = get_param_value($params, "custom_params", array());
-
-        $this->print_custom_params($custom_params);
-
-        $obj->print_form_values(array(
-            "templates_dir" => $templates_dir,
-            "context" => $context,
-            "custom_params" => $custom_params,
-        ));
-        $this->print_object_edit_page_titles($obj);
-        
-        $this->print_file_new("{$templates_dir}/edit_form.html", "{$obj_name}_form");
-        return $this->print_file("{$templates_dir}/edit.html", $template_var);
-    }
-//
     function print_custom_params($custom_params) {
         foreach ($custom_params as $param_name => $param_value) {
             if (is_scalar($param_value)) {
@@ -1545,7 +1517,7 @@ class App extends AppObject {
             );
         }
 
-        $default_url_params = array("action" => "pg_view_" . $obj->get_plural_resource_name());
+        $default_url_params = array("action" => "pg_view_" . $obj->get_plural_resource());
         $error_url_params = get_param_value($params, "error_url_params", $default_url_params);
         $success_url_params = get_param_value($params, "success_url_params", $default_url_params);
         $cascade = get_param_value($params, "cascade", false);
@@ -1585,29 +1557,29 @@ class App extends AppObject {
 //
     // Language resources
     function print_lang_resources() {
-        foreach ($this->messages->_params as $resource_name => $resource_value) {
+        foreach ($this->lang_resources->_params as $resource_name => $resource_value) {
             $this->print_raw_value("str_{$resource_name}", $resource_value);
         }
         $this->print_raw_value("lang", $this->lang);
     }
 
-    // Page titles and status messages
+    // Page titles
     function print_page_titles() {
-        $this->print_head_and_page_title($this->create_page_title_resource());
+        $this->print_head_and_page_titles($this->get_default_page_title_lang_resource());
     }
 
-    function create_page_title_resource() {
-        return "page_title_{$this->action}";
-    }
-
-    function print_head_and_page_title($resource) {
-        $this->print_raw_value("page_title_resource", $resource);
+    function print_head_and_page_titles($resource) {
+        $this->print_raw_value("page_title_lang_resource", $resource);
         $this->print_page_title($resource);
         $this->print_head_page_title($resource);
     }
 
+    function get_default_page_title_lang_resource() {
+        return "page_title_{$this->action}";
+    }
+
     function print_page_title($resource, $is_html = false) {
-        $page_title_text = $this->get_message($resource);
+        $page_title_text = $this->get_lang_str($resource);
         if (!is_null($page_title_text)) {
             if ($is_html) {
                 $this->print_raw_value("page_title_text", $page_title_text);
@@ -1619,27 +1591,23 @@ class App extends AppObject {
     }
 
     function print_head_page_title($resource) {
-        $resource_text = $this->get_message("head_{$resource}");
+        $resource_text = $this->get_lang_str("head_{$resource}");
         if (is_null($resource_text)) {
             // If have no head_page_title use page_title instead
-            $resource_text = $this->get_message($resource);
+            $resource_text = $this->get_lang_str($resource);
         }
         if (!is_null($resource_text)) {
             $this->print_raw_value("head_page_title", $resource_text);
         }
     }
 
-    function print_object_edit_page_titles($obj) {
-        $resource = $this->create_page_title_resource();
-        if (!$obj->is_definite()) {
-            $resource .= "_new";
-        }
-        $this->print_head_and_page_title($resource);
-    }
-
+    // Status messages
     function print_status_message($message) {
-        $status_message_text = $this->get_message($message->resource, $message->resource_params);
-        $this->print_raw_values(array("text" => $status_message_text, "type" => $message->type));
+        $status_message_text = $this->get_lang_str($message->resource, $message->resource_params);
+        $this->print_raw_values(array(
+            "text" => $status_message_text,
+            "type" => $message->type,
+        ));
         return $this->print_file("_status_message.html", "status_messages");
     }
 

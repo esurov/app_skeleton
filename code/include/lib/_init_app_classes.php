@@ -33,10 +33,10 @@ $app_classes = array(
             "filename" => "object_view.php",
             "required_classes" => array("ObjectTemplateComponent"),
         ),
-//        "ObjectEdit" => array(
-//            "filename" => "object_edit.php",
-//            "required_classes" => array("ObjectTemplateComponent"),
-//        ),
+        "ObjectEdit" => array(
+            "filename" => "object_edit.php",
+            "required_classes" => array("ObjectTemplateComponent"),
+        ),
         "ObjectsList" => array(
             "filename" => "objects_list.php",
             "required_classes" => array("ObjectTemplateComponent"),

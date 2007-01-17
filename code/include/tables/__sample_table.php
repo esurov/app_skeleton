@@ -78,14 +78,14 @@ class SampleTable extends CustomDbObject {
                     "source" => "db_object_query",
                     "data" => array(
                         "nonset_value_caption_pair" =>
-                            array(0, $this->get_message("choose_one")),
+                            array(0, $this->get_lang_str("choose_one")),
                         "obj" => "Image",
                         "query_ex" => array(
                             "order_by" => "filename",
                         ),
                         "captions_field_name" => "filename",
                         "end_value_caption_pairs" => array(
-                            array(-1, $this->get_message("other")),
+                            array(-1, $this->get_lang_str("other")),
                         ),
                     ),
                 ),
@@ -206,7 +206,7 @@ class SampleTable extends CustomDbObject {
                         "sign" => "!super_currency_sign!",
                         "sign_at_start" => false,
                         "nonset_value_caption_pair" =>
-                            array(0.0, $this->get_message("not_specified")),
+                            array(0.0, $this->get_lang_str("not_specified")),
                     ),
                 ),
             ),
@@ -228,9 +228,9 @@ class SampleTable extends CustomDbObject {
                     "source" => "array",
                     "data" => array(
                         "array" => array(
-                            array("value1", $this->get_message("_example_field_enum_value1")),
-                            array("value2", $this->get_message("_example_field_enum_value2")),
-                            array("value3", $this->get_message("_example_field_enum_value3")),
+                            array("value1", $this->get_lang_str("_example_field_enum_value1")),
+                            array("value2", $this->get_lang_str("_example_field_enum_value2")),
+                            array("value3", $this->get_lang_str("_example_field_enum_value3")),
                         ),
                     ),
                 ),

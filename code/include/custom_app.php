@@ -29,7 +29,7 @@ class CustomApp extends App {
     }
 
     function get_currency_nonset_value_caption_pair() {
-        return array(0.0, $this->get_message("not_specified"));
+        return array(0.0, $this->get_lang_str("not_specified"));
     }
 
 }

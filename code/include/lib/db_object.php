@@ -36,18 +36,18 @@ class DbObject extends AppObject {
     }
 //
     function get_plural_name() {
-        return $this->get_message($this->get_plural_resource_name());
+        return $this->get_lang_str($this->get_plural_lang_resource());
     }
 
     function get_singular_name() {
-        return $this->get_message($this->get_singular_resource_name());
+        return $this->get_lang_str($this->get_singular_lang_resource());
     }
 
-    function get_plural_resource_name() {
+    function get_plural_lang_resource() {
         return "{$this->_table_name}s";
     }
 
-    function get_singular_resource_name() {
+    function get_singular_lang_resource() {
         return "$this->_table_name";
     }
 
@@ -196,10 +196,6 @@ class DbObject extends AppObject {
             $full_field_names[] = "{$multilingual_field_name}_{$lang}";
         }
         return $full_field_names;
-    }
-//
-    function get_message($name) {
-        return $this->app->messages->get_value($name);
     }
 //
     function insert_field($field_info) {
@@ -1945,14 +1941,10 @@ class DbObject extends AppObject {
                 $this->validate_condition($messages, $condition_info, $old_obj);
             }
         } else {
-            $message_resource = get_param_value($condition_info, "message", null);
-            $message_resource_params = get_param_value(
-                $condition_info,
-                "message_params",
-                array()
-            );
-            if (!is_null($message_resource)) {
-                $messages[] = new ErrorStatusMsg($message_resource, $message_resource_params);
+            $resource = get_param_value($condition_info, "message", null);
+            $resource_params = get_param_value($condition_info, "message_params", array());
+            if (!is_null($lang_resource)) {
+                $messages[] = new ErrorStatusMsg($resource, $resource_params);
             }
         }
     }
@@ -2183,10 +2175,8 @@ class DbObject extends AppObject {
         $template_var_prefix = $this->print_params["template_var_prefix"];
         $input_name = "{$template_var_prefix}_{$field_name}";
         $type = $condition_info["type"];
-        $message_resource = $condition_info["message"];
-        $message_text = (is_null($message_resource)) ?
-            null :
-            $this->get_message($message_resource);
+        $resource = $condition_info["message"];
+        $message_text = (is_null($resource)) ? null : $this->get_lang_str($resource);
         $param = get_param_value($condition_info, "param", null);
         
         switch ($type) {

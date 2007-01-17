@@ -14,13 +14,13 @@ class SampleApp extends CustomApp {
             "check_cookie" => $e,
             "get_news_articles_with_new_field_xml" => $e,
 /*
-            "pg_view_sample_table_records_in_context1" => $e,
-            "pg_view_sample_table_records_in_context2" => $e,
-            "pg_view_all_sample_table_records_as_objects" => $e,
+            "pg_sample_records_list_in_context1" => $e,
+            "pg_sample_records_list_in_context2" => $e,
+            "pg_sample_records_list_as_objects" => $e,
 */
             "print_and_save_one_sample2_record" => $e,
 
-            "pg_view_component" => $e,
+            "pg_component_view" => $e,
         );
     }
 //
@@ -47,7 +47,7 @@ class SampleApp extends CustomApp {
     }
 
     function action_get_news_articles_with_new_field_xml() {
-        $news_article = $this->create_object("NewsArticle");
+        $news_article = $this->create_db_object("NewsArticleTable");
         $news_article->insert_field(array(
             "field" => "new_field",
             "type" => "integer",
@@ -71,7 +71,7 @@ class SampleApp extends CustomApp {
 //  Context usage example
 //  Print list with specific to context1 template variables
 /*
-    function action_pg_view_sample_table_records_in_context1() {
+    function action_pg_sample_records_list_in_context1() {
         $this->print_many_objects_list_page(array(
             "obj" => "_sample_table",
             "templates_dir" => "_sample_table/list_context1",
@@ -83,7 +83,7 @@ class SampleApp extends CustomApp {
         ));
     }
 
-    function action_pg_view_sample_table_records_in_context2() {
+    function action_pg_sample_records_list_in_context2() {
         $this->print_many_objects_list_page(array(
             "obj" => "_sample_table",
             "templates_dir" => "_sample_table/list_context2",
@@ -91,7 +91,7 @@ class SampleApp extends CustomApp {
         ));
     }
 
-    function action_pg_view_all_sample_table_records_as_objects() {
+    function action_pg_sample_records_list_as_objects() {
         $objects = $this->fetch_db_objects_list(
             "SampleTable",
             array("order_by" => "created DESC")
@@ -111,7 +111,7 @@ class SampleApp extends CustomApp {
         vx($this->page->fillings);
     }
 //
-    function action_pg_view_component() {
+    function action_pg_component_view() {
         $templates_dir = "sample_component_view";
 
         $component = $this->create_object("SampleComponent2");

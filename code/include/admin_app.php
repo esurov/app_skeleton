@@ -16,8 +16,8 @@ class AdminApp extends CustomApp {
 
             "pg_index" => $u,
 
-            "pg_view_news_articles" => $u,
-            "pg_edit_news_article" => $u,
+            "pg_news_articles" => $u,
+            "pg_news_article_edit" => $u,
             "update_news_article" => $u,
             "delete_news_article" => $u,
             "delete_news_article_image" => $u,
@@ -30,14 +30,14 @@ class AdminApp extends CustomApp {
     }
 
     function run_access_denied_action() {
-        $this->create_http_auth_html_document_response($this->get_message("admin_auth_realm"));
+        $this->create_http_auth_html_document_response($this->get_lang_str("admin_auth_realm"));
     }
 //
     function action_pg_index() {
         $this->print_static_page("index");
     }
 //
-    function action_pg_view_news_articles() {
+    function action_pg_news_articles() {
         $templates_dir = "news_articles";
 
         $news_article = $this->create_db_object("NewsArticleTable");
@@ -58,17 +58,27 @@ class AdminApp extends CustomApp {
 
     }
 
-    function action_pg_edit_news_article() {
+    function action_pg_news_article_edit() {
+        $templates_dir = "news_article_edit";
+
         $news_article = get_param_value($this->action_params, "news_article", null);
         if (is_null($news_article)) {
             $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
         }
-        $this->print_object_edit_page(array(
-            "obj" => $news_article,
-            "templates_dir" => "news_article_edit",
-            "context" => "edit",
-        ));
+        $news_article_edit = $this->create_object(
+            "ObjectEdit",
+            array(
+                "templates_dir" => "{$templates_dir}/news_article_edit",
+                "template_var" => "news_article_edit",
+                "obj" => $news_article,
+                "context" => "edit",
+            )
+        );
+        $news_article_edit->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
     }
+
 
     function action_update_news_article() {
         $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
@@ -79,7 +89,7 @@ class AdminApp extends CustomApp {
 
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
-            $this->run_action("pg_edit_news_article", array("news_article" => $news_article));
+            $this->run_action("pg_news_article_edit", array("news_article" => $news_article));
         } else {
             $this->process_uploaded_image(
                 $news_article,

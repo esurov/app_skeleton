@@ -18,7 +18,7 @@ class SetupApp extends CustomApp {
             "delete_tables" => $u,
             "pg_tables_dump" => $u,
             "pg_tables_dump_url" => $u,
-            "pg_view_tables_dump" => $u,
+            "pg_tables_dump_view" => $u,
             "download_tables_dump" => $u,
             "insert_test_data" => $u,
 //            "insert_initial_data" => $u,
@@ -30,7 +30,7 @@ class SetupApp extends CustomApp {
     }
 
     function run_access_denied_action() {
-        $this->create_http_auth_html_document_response($this->get_message("setup_auth_realm"));
+        $this->create_http_auth_html_document_response($this->get_lang_str("setup_auth_realm"));
     }
 //
     function action_pg_index() {
@@ -63,7 +63,7 @@ class SetupApp extends CustomApp {
         $table_names_str = join(" ", $table_names);
         
         $url = create_self_full_url(array(
-            "action" => "pg_view_tables_dump",
+            "action" => "pg_tables_dump_view",
             "table_names" => $table_names_str,
         ));
         $this->print_varchar_value("view_dump_url", $url);
@@ -77,7 +77,7 @@ class SetupApp extends CustomApp {
         $this->print_file("tables_dump/url/body.html", "body");
     }
 
-    function action_pg_view_tables_dump() {
+    function action_pg_tables_dump_view() {
         $dump_text = $this->create_tables_dump(param("table_names"), false);
         $n_dump_lines = count(explode("\n", $dump_text));
         $this->print_varchar_value("dump_text", $dump_text);

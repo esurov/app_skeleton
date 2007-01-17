@@ -28,11 +28,11 @@ class AppObject extends Object {
     function create_object($obj_class_name, $obj_params = array()) {
         return $this->app->create_object($obj_class_name, $obj_params);
     }
-
+//
     function get_config_value($name, $default_value = null) {
         return $this->app->config->get_value($name, $default_value);
     }
-
+//
     function get_log_debug_level() {
         return $this->app->log->get_debug_level();
     }
@@ -40,7 +40,7 @@ class AppObject extends Object {
     function write_log($message, $debug_level) {
         $this->app->log->write($this->get_class_name(), $message, $debug_level);
     }
-
+//
     function process_fatal_error($message) {
         $this->write_log("FATAL ERROR: {$message}", DL_FATAL_ERROR);
 
@@ -51,6 +51,10 @@ class AppObject extends Object {
             $message = "";
         }
         trigger_error($message, E_USER_ERROR);
+    }
+//
+    function get_lang_str($resource, $resource_params = null) {
+        return $this->app->get_lang_str($resource, $resource_params);
     }
 
 }
