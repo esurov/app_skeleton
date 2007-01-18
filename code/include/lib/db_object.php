@@ -20,9 +20,7 @@ class DbObject extends AppObject {
 
         $this->_table_name = get_param_value($params, "table_name", null);
         if (is_null($this->_table_name)) {
-            $this->process_fatal_error(
-                "Required param 'table_name' not found!"
-            );
+            $this->process_fatal_error_required_param_not_found("table_name");
         }
 
         $this->_fields = array();

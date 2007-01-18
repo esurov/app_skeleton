@@ -6,9 +6,7 @@ class ObjectEdit extends ObjectTemplateComponent {
         parent::_init($params);
     
         if (is_null($this->obj)) {
-            $this->process_fatal_error(
-                "Required param 'obj' not found!"
-            );
+            $this->process_fatal_error_required_param_not_found("obj");
         }
     }
 //

@@ -95,14 +95,10 @@ class ObjectsList extends _ObjectsList {
 
         $this->objects = get_param_value($params, "objects", null);
         if (is_null($this->objects)) {
-            $this->process_fatal_error(
-                "Required param 'objects' not found!"
-            );
+            $this->process_fatal_error_required_param_not_found("objects");
         }
         if ($this->template_var_prefix == "") {
-            $this->process_fatal_error(
-                "Required param 'template_var_prefix' not found!"
-            );
+            $this->process_fatal_error_required_param_not_found("template_var_prefix");
         }
     }
 //
@@ -131,9 +127,7 @@ class QueryObjectsList extends _ObjectsList {
         parent::_init($params);
 
         if (is_null($this->obj)) {
-            $this->process_fatal_error(
-                "Required param 'obj' not found!"
-            );
+            $this->process_fatal_error_required_param_not_found("obj");
         }
 
         $this->query = get_param_value($params, "query", $this->obj->get_select_query());

@@ -52,6 +52,15 @@ class AppObject extends Object {
         }
         trigger_error($message, E_USER_ERROR);
     }
+
+    function process_fatal_error_required_param_not_found($param_name, $message_prefix = "") {
+        if ($message_prefix != "") {
+            $message_prefix = "{$message_prefix}: ";
+        }
+        $this->process_fatal_error(
+            "{$message_prefix}Required param '{$param_name}' not found!"
+        );
+    }
 //
     function get_lang_str($resource, $resource_params = null) {
         return $this->app->get_lang_str($resource, $resource_params);

@@ -19,9 +19,7 @@ class TemplateComponent extends AppComponent {
 
         $this->templates_dir = get_param_value($params, "templates_dir", null);
         if (is_null($this->templates_dir)) {
-            $this->app->process_fatal_error(
-                "Required param 'templates_dir' not found!"
-            );
+            $this->process_fatal_error_required_param_not_found("templates_dir");
         }
         $this->templates_ext = get_param_value($params, "templates_ext", "html");
         $this->template_var = get_param_value($params, "template_var", null);

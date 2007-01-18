@@ -146,7 +146,7 @@ class AdminApp extends CustomApp {
     function action_delete_news_article() {
         $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
 
-        $this->delete_object(array(
+        $this->delete_db_object(array(
             "obj" => $news_article,
             "success_url_params" => array("action" => "pg_news_articles"),
             "error_url_params" => array("action" => "pg_news_articles"),
@@ -156,7 +156,7 @@ class AdminApp extends CustomApp {
     function action_delete_news_article_image() {
         $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
 
-        $this->delete_object_image($news_article, "image_id");
+        $this->delete_db_object_image($news_article, "image_id");
         
         $this->add_session_status_message(new OkStatusMsg("news_article_image_deleted"));
         $this->create_self_redirect_response(array(
@@ -168,7 +168,7 @@ class AdminApp extends CustomApp {
     function action_delete_news_article_file() {
         $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
 
-        $this->delete_object_file($news_article, "file_id");
+        $this->delete_db_object_file($news_article, "file_id");
         
         $this->add_session_status_message(new OkStatusMsg("news_article_file_deleted"));
         $this->create_self_redirect_response(array(

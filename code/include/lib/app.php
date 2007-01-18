@@ -1508,27 +1508,37 @@ class App extends AppObject {
         );
     }
 //
-    // Object functions
-    function delete_object($params = array()) {
+    // DbObject action helper functions
+    function delete_db_object($params = array()) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
-            $this->process_fatal_error(
-                "delete_object(): Required param 'obj' not found!"
+            $this->process_fatal_error_required_param_not_found("obj", "delete_db_object()");
+        }
+
+        $success_url_params = get_param_value($params, "success_url_params", null);
+        if (is_null($success_url_params)) {
+            $this->process_fatal_error_required_param_not_found(
+                "success_url_params",
+                "delete_db_object()"
             );
         }
 
-        $default_url_params = array("action" => "pg_" . $obj->get_plural_lang_resource());
-        $error_url_params = get_param_value($params, "error_url_params", $default_url_params);
-        $success_url_params = get_param_value($params, "success_url_params", $default_url_params);
-        $cascade = get_param_value($params, "cascade", false);
+        $error_url_params = get_param_value($params, "error_url_params", null);
+        if (is_null($error_url_params)) {
+            $this->process_fatal_error_required_param_not_found(
+                "error_url_params",
+                "delete_db_object()"
+            );
+        }
+        $del_cascade = get_param_value($params, "cascade", false);
 
-        if ($cascade) {
+        if ($del_cascade) {
             $obj->del_cascade();
         } else {
             $messages = $obj->check_restrict_relations_before_delete();
             
             if (count($messages) != 0) {
-                $this->print_status_messages_cannot_delete_object($messages);
+                $this->print_status_messages_cannot_delete_db_object($messages);
                 $this->create_self_redirect_response($error_url_params);
                 return;
             } else {
@@ -1630,7 +1640,7 @@ class App extends AppObject {
         $this->print_status_messages($this->get_and_delete_session_status_messages());
     }
 
-    function print_status_messages_cannot_delete_object($messages) {
+    function print_status_messages_cannot_delete_db_object($messages) {
         foreach ($messages as $message) {
             $this->add_session_status_message($message);
         }
@@ -1723,7 +1733,7 @@ class App extends AppObject {
         }
     }
 
-    function delete_object_image($obj, $image_id_field_name, $delete_thumbnail = true) {
+    function delete_db_object_image($obj, $image_id_field_name, $delete_thumbnail = true) {
         if ($obj->is_definite() && $obj->is_field_exist($image_id_field_name)) {
             $field_names_to_update = array($image_id_field_name);
 
@@ -1753,7 +1763,7 @@ class App extends AppObject {
         }
     }
 
-    function delete_object_file($obj, $file_id_field_name) {
+    function delete_db_object_file($obj, $file_id_field_name) {
         if ($obj->is_definite() && $obj->is_field_exist($file_id_field_name)) {
             $field_names_to_update = array($file_id_field_name);
 
