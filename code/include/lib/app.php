@@ -164,6 +164,15 @@ class App extends AppObject {
         }
 
         $this->response->send();
+
+        $exec_time_str = number_format(
+            get_microtime_as_double() - get_microtime_as_double(_APP_START_MICROTIME),
+            6
+        );
+        $this->write_log(
+            "App '{$this->app_name}' finished (in {$exec_time_str} sec)",
+            DL_INFO
+        );
     }
     
     function create_current_user() {

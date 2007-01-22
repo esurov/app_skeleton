@@ -764,6 +764,14 @@ function get_timestamp_from_date_parts($date_parts) {
     );
 }
 
+function get_microtime_as_double($microtime_str = null) {
+    if (is_null($microtime_str)) {
+        $microtime_str = microtime();
+    }
+    list($usec, $sec) = explode(" ", $microtime_str);
+    return ((double) $usec + (double) $sec);
+}
+
 function get_gmt_str_from_timestamp($timestamp) {
     $gmt_str = gmdate("D, d M Y H:i:s", $timestamp);
     return "{$gmt_str} GMT";

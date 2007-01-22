@@ -80,8 +80,7 @@ class MySqlDb extends AppObject {
         );
 
         // Read time (before starting query)
-        list($usec, $sec) = explode(" ", microtime());
-        $t0 = (float)$sec + (float)$usec;
+        $start_time = get_microtime_as_double();
 
         // Run query
         $res = mysql_query($query_str, $this->_connection);
@@ -94,14 +93,15 @@ class MySqlDb extends AppObject {
         }
 
         // Read time (after query is finished)
-        list($usec, $sec) = explode(" ", microtime());
-        $t1 = ((float)$sec + (float)$usec);
+        $exec_time_str = number_format(
+            get_microtime_as_double() - $start_time,
+            6
+        );
 
         // Write query result and timing to log file
-        $t_str = number_format(($t1 - $t0), 6);
         $n = $this->get_num_affected_rows();
         $this->write_log(
-            "Query result: {$n} rows (in $t_str sec)",
+            "Query result: {$n} rows (in {$exec_time_str} sec)",
             DL_INFO
         );
 
