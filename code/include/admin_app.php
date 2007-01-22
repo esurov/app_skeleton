@@ -138,7 +138,7 @@ class AdminApp extends CustomApp {
             }
 
             $news_article->save();
-            $this->print_status_message_object_updated($news_article_old);
+            $this->print_status_message_db_object_updated($news_article_old);
             $this->create_self_redirect_response(array("action" => "pg_news_articles"));
         }
     }

@@ -129,7 +129,7 @@ class App extends AppObject {
             DL_INFO
         );
 
-        if ($this->validate_action_name()) {
+        if ($this->is_valid_action_name()) {
             // Ensure that current user is allowed to run this action
             // Validate user permission level
             $user_level = $this->get_user_access_level();
@@ -145,18 +145,11 @@ class App extends AppObject {
                 $this->run_access_denied_action();
             }
         } else {
-            $this->action = $this->get_default_action_name();
             $this->write_log(
-                "Invalid action! Will try default action '{$this->action}'",
-                LOG_WARNING
+                "Invalid action!",
+                DL_WARNING
             );
-            if ($this->validate_action_name()) {
-                $this->run_invalid_action_name_action();
-            } else {
-                $this->process_fatal_error(
-                    "Default action '{$this->action}' is invalid!"
-                );
-            }
+            $this->run_invalid_action_name_action();
         }
 
         if (is_null($this->response)) {
@@ -175,16 +168,16 @@ class App extends AppObject {
         );
     }
     
-    function create_current_user() {
-        return null;
-    }
-
-    function validate_action_name() {
+    function is_valid_action_name() {
         return isset($this->actions[$this->action]);
     }
 
     function get_default_action_name($user = null) {
         return "pg_index";
+    }
+
+    function create_current_user() {
+        return null;
     }
 
     function get_user_access_level($user = null) {
@@ -246,13 +239,31 @@ class App extends AppObject {
 
     function on_after_run_action() {
     }
-//
+
+    function print_lang_resources() {
+        foreach ($this->lang_resources->_params as $resource_name => $resource_value) {
+            $this->print_raw_value("str_{$resource_name}", $resource_value);
+        }
+        $this->print_raw_value("lang", $this->lang);
+    }
+
     function run_access_denied_action() {
         $this->create_access_denied_html_document_response();
     }
 
     function run_invalid_action_name_action() {
-        $this->create_self_redirect_response(array("action" => $this->action));
+        $this->action = $this->get_default_action_name();
+        $this->write_log(
+            "Validating default action '{$this->action}'",
+            DL_INFO
+        );
+        if ($this->is_valid_action_name()) {
+            $this->create_self_redirect_response(array("action" => $this->action));
+        } else {
+            $this->process_fatal_error(
+                "Default action '{$this->action}' is invalid!"
+            );
+        }
     }
 //
     function get_http_auth_user_access_level() {
@@ -268,6 +279,7 @@ class App extends AppObject {
             $_SERVER["PHP_AUTH_PW"] == $password;
     }
 //
+    // HTTP response creation helpers
     function create_redirect_response($url) {
         $this->response = new RedirectResponse($url);
         $this->write_log(
@@ -292,12 +304,12 @@ class App extends AppObject {
         }
         return $params;
     }
-//
+
     function create_binary_content_response($content, $filename) {
         $this->response = new BinaryContentResponse($content, "application/octet-stream");
         $this->response->add_content_disposition_header($filename);
     }
-//
+
     function create_html_document_response() {
         $this->create_html_page_template_name();
         $this->response = new HtmlDocumentResponse(
@@ -347,12 +359,12 @@ class App extends AppObject {
             new HttpHeader("HTTP/1.0 401 Unauthorized"),
         ));
     }
-//
-    function create_not_found_response() {
+
+    function create_http_not_found_response() {
         $this->response = new HttpResponse();
         $this->response->add_header(new HttpHeader("HTTP/1.0 404 Not Found"));
     }
-//
+
     function create_xml_document_response($content) {
         $this->response = new XmlDocumentResponse($content);
     }
@@ -373,6 +385,7 @@ class App extends AppObject {
         $this->response = new PdfDocumentResponse($content, $filename, $open_inline);
     }
 //
+    // Date & Time format and formatting
     function get_app_datetime_format() {
         return $this->get_config_value("app_datetime_format");
     }
@@ -482,13 +495,14 @@ class App extends AppObject {
             parse_date_by_format($this->get_db_datetime_format(), $db_datetime)
         );
     }
-//
+
     function get_timestamp_from_db_date($db_date) {
         return get_timestamp_from_date_parts(
             parse_date_by_format($this->get_db_date_format(), $db_date)
         );
     }
 //
+    // Integer, double and currency formatting
     function get_app_integer_value($php_integer_value) {
         return format_integer_value($php_integer_value, ",");
     }
@@ -558,6 +572,7 @@ class App extends AppObject {
         return null;
     }
 //
+    // Template printing functions
     function print_raw_value($template_var, $value) {
         $this->page->set_filling_value($template_var, $value);
     }
@@ -593,7 +608,7 @@ class App extends AppObject {
         );
         $this->print_hidden_input_form_value($param_name, $param_value);
     }
-//
+
     function print_file($template_name, $append_to_name = null) {
         return $this->page->parse_file($template_name, $append_to_name);
     }
@@ -614,6 +629,7 @@ class App extends AppObject {
         return $this->page->is_template_exist($template_name);
     }
 //
+    // Complex types template printing functions
     function print_primary_key_value($template_var, $value) {
         $this->print_raw_value("{$template_var}", $value);
     }
@@ -772,6 +788,7 @@ class App extends AppObject {
         ));
     }
 //
+    // Form values template printing functions
     function print_primary_key_form_value($template_var, $value) {
         $this->print_hidden_input_form_value($template_var, $value);
         $this->print_text_input_form_value($template_var, $value);
@@ -1405,6 +1422,7 @@ class App extends AppObject {
         return $dependency_array;
     }
 //
+    // Language resources functions
     function get_lang_str($resource, $resource_params = null) {
         $lang_str = $this->lang_resources->get_value($resource);
         if (is_null($lang_str)) {
@@ -1442,145 +1460,8 @@ class App extends AppObject {
             return true;
         }
     }
-
-//  Common actions
-    function action_change_lang() {
-        $this->set_current_lang(trim(param("new_lang")));
-        $cur_action = trim(param("cur_action"));
-        $cur_page = trim(param("cur_page"));
-        
-        $suburl_params = array();
-        if ($cur_action != "") {
-            $suburl_params["action"] = $cur_action;
-        }
-        if ($cur_page != "") {
-            $suburl_params["page"] = $cur_page;
-        }
-        $this->create_self_redirect_response($suburl_params);
-    }
-
-    function action_pg_static() {
-        $page_name = trim(param("page"));
-        if (preg_match('/^\w+$/i', $page_name)) {
-            $this->print_static_page($page_name);
-        }
-    }
-
-//  Page construction helper functions
-    function print_static_page($page_name) {
-        $this->print_static_file($page_name, "body");
-    }
-
-    function print_static_file($filename, $template_var) {
-        $file_path = "static/{$filename}_{$this->lang}.html";
-        if (!$this->is_file_exist($file_path)) {
-            $file_path = "static/{$filename}.html";
-        }
-        return $this->print_file_if_exists($file_path, $template_var);
-    }
 //
-    function print_menu($params = array()) {
-        $menu =& $this->create_menu($params);
-        
-        $menu->load_from_xml(get_param_value($params, "xml_filename", "menu.xml"));
-        $menu->select_items_by_context(get_param_value($params, "context", $this->action));
-        
-        return $menu->print_values();
-    }
-
-    function create_menu($params = array()) {
-        return $this->create_object(
-            "Menu",
-            array(
-                "templates_dir" => get_param_value($params, "templates_dir", "_menu"),
-                "template_var" => get_param_value($params, "template_var", "menu"),
-            )
-        );
-    }
-//
-    function print_lang_menu($params = array()) {
-        $lang_menu = $this->create_lang_menu($params);
-
-        $lang_menu->avail_langs = $this->get_avail_langs();
-        $lang_menu->current_lang = $this->lang;
-
-        return $lang_menu->print_values();
-    }
-
-    function create_lang_menu($params = array()) {
-        return $this->create_object(
-            "LangMenu",
-            array(
-                "templates_dir" => get_param_value($params, "templates_dir", "_lang_menu"),
-                "template_var" => get_param_value($params, "template_var", "lang_menu"),
-            )
-        );
-    }
-//
-    // DbObject action helper functions
-    function delete_db_object($params = array()) {
-        $obj = get_param_value($params, "obj", null);
-        if (is_null($obj)) {
-            $this->process_fatal_error_required_param_not_found("obj", "delete_db_object()");
-        }
-
-        $success_url_params = get_param_value($params, "success_url_params", null);
-        if (is_null($success_url_params)) {
-            $this->process_fatal_error_required_param_not_found(
-                "success_url_params",
-                "delete_db_object()"
-            );
-        }
-
-        $error_url_params = get_param_value($params, "error_url_params", null);
-        if (is_null($error_url_params)) {
-            $this->process_fatal_error_required_param_not_found(
-                "error_url_params",
-                "delete_db_object()"
-            );
-        }
-        $del_cascade = get_param_value($params, "cascade", false);
-
-        if ($del_cascade) {
-            $obj->del_cascade();
-        } else {
-            $messages = $obj->check_restrict_relations_before_delete();
-            
-            if (count($messages) != 0) {
-                $this->print_status_messages_cannot_delete_db_object($messages);
-                $this->create_self_redirect_response($error_url_params);
-                return;
-            } else {
-                $obj->del();
-            }
-        }
-        $this->print_status_message_object_deleted($obj);
-        $this->create_self_redirect_response($success_url_params);
-    }
-//
-    function move_db_object($obj, $move_to, $where_str = "1") {
-        if (!$obj->is_definite()) {
-            return;
-        }
-        $neighbor_obj = $obj->fetch_neighbor_db_object($move_to, $where_str);
-        if (is_null($neighbor_obj)) {
-            return;
-        }
-        $tmp_position = $obj->position;
-        $obj->position = $neighbor_obj->position;
-        $neighbor_obj->position = $tmp_position;
-
-        $obj->update(array("position"));
-        $neighbor_obj->update(array("position"));
-    }
-//
-    // Language resources
-    function print_lang_resources() {
-        foreach ($this->lang_resources->_params as $resource_name => $resource_value) {
-            $this->print_raw_value("str_{$resource_name}", $resource_value);
-        }
-        $this->print_raw_value("lang", $this->lang);
-    }
+    // Page construction helper functions
 
     // Page titles
     function print_page_titles() {
@@ -1636,23 +1517,23 @@ class App extends AppObject {
         }    
     }
 
-    function print_status_message_object_updated($obj) {
+    function print_status_message_db_object_updated($obj) {
         $action_done = ($obj->is_definite()) ? "updated" : "added";
         $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}_{$action_done}"));
     }
         
-    function print_status_message_object_deleted($obj) {
+    function print_status_message_db_object_deleted($obj) {
         $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}_deleted"));
-    }
-
-    function print_session_status_messages() {
-        $this->print_status_messages($this->get_and_delete_session_status_messages());
     }
 
     function print_status_messages_cannot_delete_db_object($messages) {
         foreach ($messages as $message) {
             $this->add_session_status_message($message);
         }
+    }
+
+    function print_session_status_messages() {
+        $this->print_status_messages($this->get_and_delete_session_status_messages());
     }
 
     function add_session_status_message($new_msg) {
@@ -1675,60 +1556,82 @@ class App extends AppObject {
         }
     }
 
-//  Common action helpers
-    function process_create_update_tables() {
-        $actual_table_names = $this->db->get_actual_table_names();
-        $all_creatable_db_objects_info = $this->get_all_creatable_db_objects_info();
-        $all_table_names_to_create = array_keys($all_creatable_db_objects_info);
-
-        $table_names_to_create = array_diff($all_table_names_to_create, $actual_table_names);
-        $table_names_to_update = array_intersect($all_table_names_to_create, $actual_table_names);
-        $table_names_to_drop = array_diff($actual_table_names, $all_table_names_to_create);
-
-        foreach ($table_names_to_create as $table_name) {
-            $obj = $this->create_db_object($all_creatable_db_objects_info[$table_name]);
-            $obj->create_table();
-        }
-
-        foreach ($table_names_to_update as $table_name) {
-            $obj = $this->create_db_object($all_creatable_db_objects_info[$table_name]);
-            $obj->update_table();
-        }
-
-        $this->process_delete_tables($table_names_to_drop);
+    // Static page
+    function print_static_page($page_name) {
+        $this->print_static_file($page_name, "body");
     }
 
-    function process_delete_tables($table_names_to_drop = null) {
-        if (is_null($table_names_to_drop)) {
-            $table_names_to_drop = $this->db->get_actual_table_names();
+    function print_static_file($filename, $template_var) {
+        $file_path = "static/{$filename}_{$this->lang}.html";
+        if (!$this->is_file_exist($file_path)) {
+            $file_path = "static/{$filename}.html";
         }
-        foreach ($table_names_to_drop as $table_name) {
-            $this->db->drop_table($table_name);
-        }
+        return $this->print_file_if_exists($file_path, $template_var);
     }
 
-    function get_all_creatable_db_objects_info() {
-        global $db_classes;
+    // Main menu
+    function print_menu($params = array()) {
+        $menu =& $this->create_menu($params);
+        
+        $menu->load_from_xml(get_param_value($params, "xml_filename", "menu.xml"));
+        $menu->select_items_by_context(get_param_value($params, "context", $this->action));
+        
+        return $menu->print_values();
+    }
 
-        $db_objects_info = array();
-        foreach ($db_classes["classes"] as $obj_class_name => $obj_class_info) {
-            $obj_class_params = get_param_value($obj_class_info, "params", null);
-            if (is_null($obj_class_params)) {
-                continue;
-            }
-            $should_create = get_param_value($obj_class_params, "create", null);
-            if (is_null($should_create) || !$should_create) {
-                continue;
-            }
-            $obj_table_name = get_param_value($obj_class_params, "table_name", null);
-            if (is_null($obj_table_name)) {
-                continue;
-            }
-            $db_objects_info[$obj_table_name] = $obj_class_name;
-        }
-        return $db_objects_info;
+    function create_menu($params = array()) {
+        return $this->create_object(
+            "Menu",
+            array(
+                "templates_dir" => get_param_value($params, "templates_dir", "_menu"),
+                "template_var" => get_param_value($params, "template_var", "menu"),
+            )
+        );
+    }
+
+    // Lang menu
+    function print_lang_menu($params = array()) {
+        $lang_menu = $this->create_lang_menu($params);
+
+        $lang_menu->avail_langs = $this->get_avail_langs();
+        $lang_menu->current_lang = $this->lang;
+
+        return $lang_menu->print_values();
+    }
+
+    function create_lang_menu($params = array()) {
+        return $this->create_object(
+            "LangMenu",
+            array(
+                "templates_dir" => get_param_value($params, "templates_dir", "_lang_menu"),
+                "template_var" => get_param_value($params, "template_var", "lang_menu"),
+            )
+        );
     }
 //
+    // Common actions
+    function action_change_lang() {
+        $this->set_current_lang(trim(param("new_lang")));
+        $cur_action = trim(param("cur_action"));
+        $cur_page = trim(param("cur_page"));
+        
+        $suburl_params = array();
+        if ($cur_action != "") {
+            $suburl_params["action"] = $cur_action;
+        }
+        if ($cur_page != "") {
+            $suburl_params["page"] = $cur_page;
+        }
+        $this->create_self_redirect_response($suburl_params);
+    }
+
+    function action_pg_static() {
+        $page_name = trim(param("page"));
+        if (preg_match('/^\w+$/i', $page_name)) {
+            $this->print_static_page($page_name);
+        }
+    }
+
     function action_get_image() {
         $image = $this->read_id_fetch_db_object("ImageTable");
         if ($image->is_definite()) {
@@ -1738,29 +1641,10 @@ class App extends AppObject {
                 $image->get_updated_as_gmt_str()
             );
         } else {
-            $this->create_not_found_response();
+            $this->create_http_not_found_response();
         }
     }
 
-    function delete_db_object_image($obj, $image_id_field_name, $delete_thumbnail = true) {
-        if ($obj->is_definite() && $obj->is_field_exist($image_id_field_name)) {
-            $field_names_to_update = array($image_id_field_name);
-
-            $obj->del_image($image_id_field_name);
-            $obj->set_field_value($image_id_field_name, 0);
-
-            $thumbnail_image_id_field_name = "thumbnail_{$image_id_field_name}";
-            if ($delete_thumbnail && $obj->is_field_exist($thumbnail_image_id_field_name)) {
-                $field_names_to_update[] = $thumbnail_image_id_field_name;
-
-                $obj->del_image($thumbnail_image_id_field_name);
-                $obj->set_field_value($thumbnail_image_id_field_name, 0);
-            }
-
-            $obj->update($field_names_to_update);
-        }
-    }
-//
     function action_get_file() {
         $open_inline = (int) param("show");
 
@@ -1768,21 +1652,11 @@ class App extends AppObject {
         if ($file->is_definite()) {
             $this->response = new FileResponse($file, $open_inline);
         } else {
-            $this->create_not_found_response();
+            $this->create_http_not_found_response();
         }
     }
 
-    function delete_db_object_file($obj, $file_id_field_name) {
-        if ($obj->is_definite() && $obj->is_field_exist($file_id_field_name)) {
-            $field_names_to_update = array($file_id_field_name);
-
-            $obj->del_file($file_id_field_name);
-            $obj->{$file_id_field_name} = 0;
-
-            $obj->update($field_names_to_update);
-        }
-    }
-//
+    // App objects creation functions
     function create_object($obj_class_name, $obj_params = array()) {
         global $app_classes;
 
@@ -1804,7 +1678,6 @@ class App extends AppObject {
             $obj_params
         );
     }
-
 
     function _create_object($class_name, $classes_info, $class_paths, $obj_params = array()) {
         $class_info = get_param_value($classes_info, $class_name, null);
@@ -1866,7 +1739,8 @@ class App extends AppObject {
         
         return false;
     }
-//
+    
+    // Action helper functions
     function fetch_db_object(
         $obj,
         $obj_id,
@@ -1939,23 +1813,61 @@ class App extends AppObject {
         }
         return $rows;
     }
+//
+    function process_create_update_tables() {
+        $actual_table_names = $this->db->get_actual_table_names();
+        $all_creatable_db_objects_info = $this->get_all_creatable_db_objects_info();
+        $all_table_names_to_create = array_keys($all_creatable_db_objects_info);
 
-//  Components creation helpers
-    function create_email_sender() {
-        $email_sender = $this->create_object("PHPMailer");
-        $email_sender->IsSendmail();
-        $email_sender->IsHTML($this->get_config_value("email_is_html"));
-        $email_sender->CharSet = $this->get_config_value("email_charset");
-        return $email_sender;
+        $table_names_to_create = array_diff($all_table_names_to_create, $actual_table_names);
+        $table_names_to_update = array_intersect($all_table_names_to_create, $actual_table_names);
+        $table_names_to_drop = array_diff($actual_table_names, $all_table_names_to_create);
+
+        foreach ($table_names_to_create as $table_name) {
+            $obj = $this->create_db_object($all_creatable_db_objects_info[$table_name]);
+            $obj->create_table();
+        }
+
+        foreach ($table_names_to_update as $table_name) {
+            $obj = $this->create_db_object($all_creatable_db_objects_info[$table_name]);
+            $obj->update_table();
+        }
+
+        $this->process_delete_tables($table_names_to_drop);
     }
 
-    function get_actual_email_to($email_to) {
-        return $this->get_config_value("email_debug_mode") ?
-            $this->get_config_value("admin_email_to") :
-            $email_to;
+    function process_delete_tables($table_names_to_drop = null) {
+        if (is_null($table_names_to_drop)) {
+            $table_names_to_drop = $this->db->get_actual_table_names();
+        }
+        foreach ($table_names_to_drop as $table_name) {
+            $this->db->drop_table($table_name);
+        }
     }
 
-//  Uploaded file helpers
+    function get_all_creatable_db_objects_info() {
+        global $db_classes;
+
+        $db_objects_info = array();
+        foreach ($db_classes["classes"] as $obj_class_name => $obj_class_info) {
+            $obj_class_params = get_param_value($obj_class_info, "params", null);
+            if (is_null($obj_class_params)) {
+                continue;
+            }
+            $should_create = get_param_value($obj_class_params, "create", null);
+            if (is_null($should_create) || !$should_create) {
+                continue;
+            }
+            $obj_table_name = get_param_value($obj_class_params, "table_name", null);
+            if (is_null($obj_table_name)) {
+                continue;
+            }
+            $db_objects_info[$obj_table_name] = $obj_class_name;
+        }
+        return $db_objects_info;
+    }
+
+    // Uploaded image
     function process_uploaded_image(
         &$obj,
         $image_id_field_name,
@@ -2005,6 +1917,107 @@ class App extends AppObject {
         }
         
         return true;
+    }
+
+    function delete_db_object($params = array()) {
+        $obj = get_param_value($params, "obj", null);
+        if (is_null($obj)) {
+            $this->process_fatal_error_required_param_not_found("obj", "delete_db_object()");
+        }
+
+        $success_url_params = get_param_value($params, "success_url_params", null);
+        if (is_null($success_url_params)) {
+            $this->process_fatal_error_required_param_not_found(
+                "success_url_params",
+                "delete_db_object()"
+            );
+        }
+
+        $error_url_params = get_param_value($params, "error_url_params", null);
+        if (is_null($error_url_params)) {
+            $this->process_fatal_error_required_param_not_found(
+                "error_url_params",
+                "delete_db_object()"
+            );
+        }
+        $del_cascade = get_param_value($params, "cascade", false);
+
+        if ($del_cascade) {
+            $obj->del_cascade();
+        } else {
+            $messages = $obj->check_restrict_relations_before_delete();
+            
+            if (count($messages) != 0) {
+                $this->print_status_messages_cannot_delete_db_object($messages);
+                $this->create_self_redirect_response($error_url_params);
+                return;
+            } else {
+                $obj->del();
+            }
+        }
+        $this->print_status_message_db_object_deleted($obj);
+        $this->create_self_redirect_response($success_url_params);
+    }
+
+    function delete_db_object_image($obj, $image_id_field_name, $delete_thumbnail = true) {
+        if ($obj->is_definite() && $obj->is_field_exist($image_id_field_name)) {
+            $field_names_to_update = array($image_id_field_name);
+
+            $obj->del_image($image_id_field_name);
+            $obj->set_field_value($image_id_field_name, 0);
+
+            $thumbnail_image_id_field_name = "thumbnail_{$image_id_field_name}";
+            if ($delete_thumbnail && $obj->is_field_exist($thumbnail_image_id_field_name)) {
+                $field_names_to_update[] = $thumbnail_image_id_field_name;
+
+                $obj->del_image($thumbnail_image_id_field_name);
+                $obj->set_field_value($thumbnail_image_id_field_name, 0);
+            }
+
+            $obj->update($field_names_to_update);
+        }
+    }
+
+    function delete_db_object_file($obj, $file_id_field_name) {
+        if ($obj->is_definite() && $obj->is_field_exist($file_id_field_name)) {
+            $field_names_to_update = array($file_id_field_name);
+
+            $obj->del_file($file_id_field_name);
+            $obj->{$file_id_field_name} = 0;
+
+            $obj->update($field_names_to_update);
+        }
+    }
+
+    function move_db_object($obj, $move_to, $where_str = "1") {
+        if (!$obj->is_definite()) {
+            return;
+        }
+        $neighbor_obj = $obj->fetch_neighbor_db_object($move_to, $where_str);
+        if (is_null($neighbor_obj)) {
+            return;
+        }
+        $tmp_position = $obj->position;
+        $obj->position = $neighbor_obj->position;
+        $neighbor_obj->position = $tmp_position;
+
+        $obj->update(array("position"));
+        $neighbor_obj->update(array("position"));
+    }
+
+    // Email sender
+    function create_email_sender() {
+        $email_sender = $this->create_object("PHPMailer");
+        $email_sender->IsSendmail();
+        $email_sender->IsHTML($this->get_config_value("email_is_html"));
+        $email_sender->CharSet = $this->get_config_value("email_charset");
+        return $email_sender;
+    }
+
+    function get_actual_email_to($email_to) {
+        return $this->get_config_value("email_debug_mode") ?
+            $this->get_config_value("admin_email_to") :
+            $email_to;
     }
 
 }
