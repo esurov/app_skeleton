@@ -30,108 +30,111 @@ class SelectQueryEx {
                 $this->distinct = $query_ex["distinct"];
             }
             
-            if (!empty($query_ex["select"])) {
-                if (empty($this->select)) {
+            if (isset($query_ex["select"]) && is_value_not_empty($query_ex["select"])) {
+                if (is_value_empty($this->select)) {
                     $this->select = $query_ex["select"];
                 } else {
                     $this->select .= ", " . $query_ex["select"];
                 }
             }
             
-            if (!empty($query_ex["from"])) {
-                if (empty($this->from)) {
+            if (isset($query_ex["from"]) && is_value_not_empty($query_ex["from"])) {
+                if (is_value_empty($this->from)) {
                     $this->from = $query_ex["from"];
                 } else {
                     $this->from .= " " . $query_ex["from"];
                 }
             }
             
-            if (!empty($query_ex["where"])) {
-                if (empty($this->where)) {
+            if (isset($query_ex["where"]) && is_value_not_empty($query_ex["where"])) {
+                if (is_value_empty($this->where)) {
                     $this->where = $query_ex["where"];
                 } else {
                     $this->where .= " AND " . $query_ex["where"];
                 }
             }
             
-            if (!empty($query_ex["group_by"])) {
-                if (empty($this->group_by)) {
+            if (isset($query_ex["group_by"]) && is_value_not_empty($query_ex["group_by"])) {
+                if (is_value_empty($this->group_by)) {
                     $this->group_by = $query_ex["group_by"];
                 } else {
                     $this->group_by .= ", " . $query_ex["group_by"];    
                 }
             }
             
-            if (!empty($query_ex["having"])) {
-                if (empty($this->having)) {
+            if (isset($query_ex["having"]) && is_value_not_empty($query_ex["having"])) {
+                if (is_value_empty($this->having)) {
                     $this->having = $query_ex["having"];
                 } else {
                     $this->having .= " AND " . $query_ex["having"];
                 }
             }
             
-            if (!empty($query_ex["order_by"])) {
-                if (empty($this->order_by)) {
+            if (isset($query_ex["order_by"]) && is_value_not_empty($query_ex["order_by"])) {
+                if (is_value_empty($this->order_by)) {
                     $this->order_by = $query_ex["order_by"];
                 } else {
                     $this->order_by .= ", " . $query_ex["order_by"];
                 }
             }
             
-            if (!empty($query_ex["limit"])) {
+            if (isset($query_ex["limit"]) && is_value_not_empty($query_ex["limit"])) {
                 $this->limit = $query_ex["limit"];
             }
         } else {
 
             // Expand from SelectQueryEx object
             $this->distinct = $query_ex->distinct;
-            if (!empty($query_ex->select)) {
-                if (empty($this->select)) {
+            
+            if (is_value_not_empty($query_ex->select)) {
+                if (is_value_empty($this->select)) {
                     $this->select = $query_ex->select;
                 } else {
                     $this->select .= ", " . $query_ex->select;
                 }
             }
             
-            if (empty($this->from)) {
-                $this->from = $query_ex->from;
-            } else {
-                $this->from .= " " . $query_ex->from;
+            if (is_value_not_empty($query_ex->from)) {
+                if (is_value_empty($this->from)) {
+                    $this->from = $query_ex->from;
+                } else {
+                    $this->from .= " " . $query_ex->from;
+                }
             }
             
-            if (!empty($query_ex->where)) {
-                if (empty($this->where)) {
+            if (is_value_not_empty($query_ex->where)) {
+                if (is_value_empty($this->where)) {
                     $this->where = $query_ex->where;
                 } else {
                     $this->where .= " AND " . $query_ex->where;
                 }
             }
 
-            if (!empty($query_ex->group_by)) {
-                if (empty($this->group_by)) {
+            if (is_value_not_empty($query_ex->group_by)) {
+                if (is_value_empty($this->group_by)) {
                     $this->group_by = $query_ex->group_by;
                 } else {
                     $this->group_by .= ", " . $query_ex->group_by;
                 }
             }
                 
-            if (!empty($query_ex->having)) {
-                if (empty($this->having)) {
+            if (is_value_not_empty($query_ex->having)) {
+                if (is_value_empty($this->having)) {
                     $this->having = $query_ex->having;
                 } else {
                     $this->having .= " AND " . $query_ex->having;
                 }
             }
                 
-            if (!empty($query_ex->order_by)) {
-                if (empty($this->order_by)) {
+            if (is_value_not_empty($query_ex->order_by)) {
+                if (is_value_empty($this->order_by)) {
                     $this->order_by = $query_ex->order_by;
                 } else {
                     $this->order_by .= ", " . $query_ex->order_by;
                 }
             }    
             
-            if (!empty($query_ex->limit)) {
+            if (is_value_not_empty($query_ex->limit)) {
                 $this->limit = $query_ex->limit;
             }
         }
@@ -151,11 +154,11 @@ class SelectQuery extends SelectQueryEx {
         return
             "SELECT {$distinct_str}{$this->select}" .
             "\n  FROM {$this->from}" .
-            ($this->where    ? "\n  WHERE {$this->where}"       : "") .
-            ($this->group_by ? "\n  GROUP BY {$this->group_by}" : "") .
-            ($this->having   ? "\n  HAVING {$this->having}"     : "") .
-            ($this->order_by ? "\n  ORDER BY {$this->order_by}" : "") .
-            ($this->limit    ? "\n  LIMIT {$this->limit}"       : "");
+            ((is_value_empty($this->where))    ? "" : "\n  WHERE {$this->where}") .
+            ((is_value_empty($this->group_by)) ? "" : "\n  GROUP BY {$this->group_by}") .
+            ((is_value_empty($this->having))   ? "" : "\n  HAVING {$this->having}") .
+            ((is_value_empty($this->order_by)) ? "" : "\n  ORDER BY {$this->order_by}") .
+            ((is_value_empty($this->limit))    ? "" : "\n  LIMIT {$this->limit}");
     }
 
 }
