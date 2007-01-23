@@ -55,23 +55,23 @@ class DbObject extends AppObject {
     }
 //
     function get_primary_key_name() {
-        // Return name of the PRIMARY KEY column.
+        // Return name of the PRIMARY KEY column
         return "id";
     }
 
     function get_primary_key_value() {
-        // Return value of the PRIMARY KEY member variable.
+        // Return value of the PRIMARY KEY member variable
         $pr_key_name = $this->get_primary_key_name();
         return $this->{$pr_key_name};
     }
 
     function is_definite() {
-        // Return true if PRIMARY KEY member variable is non-zero.
+        // Return true if PRIMARY KEY member variable is non-zero
         return ($this->get_primary_key_value() != 0);
     }
 
     function set_indefinite() {
-        // Set PRIMARY KEY member variable to zero.
+        // Set PRIMARY KEY member variable to zero
         $this->set_field_value($this->get_primary_key_name(), 0);
     }
 //
@@ -83,6 +83,12 @@ class DbObject extends AppObject {
         $this->{$field_name} = $field_value;
     }
 
+    function set_field_values_from_row($row) {
+        // Set values to DbObject fields from query result row
+        foreach ($row as $field_name => $field_value) {
+            $this->set_field_value($field_name, $field_value);
+        }
+    }
 //
     function get_field_names(
         $field_names_to_include = null,
@@ -201,22 +207,23 @@ class DbObject extends AppObject {
         $field_name = get_param_value($field_info, "field", null);
         if (is_null($field_name)) {
             $this->process_fatal_error(
-                "{$this->_table_name}: Field name is not specified for field {$field_array_index}!"
+                "{$this->_table_name}: Field name param 'field' not specified " .
+                "for field with index {$field_array_index}!"
             );
         }
-        $field_name_alias = get_param_value($field_info, "field_alias", null);
+        $field_name_sql_alias = get_param_value($field_info, "field_sql_alias", null);
 
-        $obj_class_name = get_param_value($field_info, "obj", null);
-        $table_name_alias = get_param_value($field_info, "table_alias", null);
+        $obj_class_name = get_param_value($field_info, "obj_class", null);
+        $table_name_sql_alias = get_param_value($field_info, "table_sql_alias", null);
         
         if (is_null($obj_class_name) || ($obj_class_name == $this->get_class_name())) {
-            if (is_null($table_name_alias) && is_null($field_name_alias)) {
+            if (is_null($table_name_sql_alias) && is_null($field_name_sql_alias)) {
                 // Case of real or calculated field from current DbObject
                 $multilingual = get_param_value($field_info, "multilingual", 0);
                 $field_select_expression = get_param_value($field_info, "select", null);
                 if (is_null($field_select_expression)) {
                     $field_select_expression = $this->create_field_select_expression(
-                        is_null($table_name_alias) ? $this->_table_name : $table_name_alias,
+                        is_null($table_name_sql_alias) ? $this->_table_name : $table_name_sql_alias,
                         $field_name,
                         $multilingual
                     );
@@ -234,7 +241,7 @@ class DbObject extends AppObject {
                         $this->insert_field($new_field_info);
                     }
                 }
-                $field_name_alias = $field_name;
+                $field_name_sql_alias = $field_name;
             } else {
                 // Case of alias to real field from current DbObject
                 if (!isset($this->_fields[$field_name])) {
@@ -243,20 +250,20 @@ class DbObject extends AppObject {
                     );
                 }
                 $field_info = $this->_fields[$field_name];
-                if (is_null($table_name_alias)) {
-                    $table_name_alias = $this->_table_name;
+                if (is_null($table_name_sql_alias)) {
+                    $table_name_sql_alias = $this->_table_name;
                 }
                 $field_select_expression = $this->create_field_select_expression(
-                    $table_name_alias,
+                    $table_name_sql_alias,
                     $field_name,
                     $field_info["multilingual"]
                 );
                 $field_info["multilingual"] = 0;
                 $field_info["multilingual_child"] = 0;
                 
-                $field_name_alias = (is_null($field_name_alias)) ?
-                    "{$table_name_alias}_{$field_name}" :
-                    "{$table_name_alias}_{$field_name_alias}";
+                $field_name_sql_alias = (is_null($field_name_sql_alias)) ?
+                    "{$table_name_sql_alias}_{$field_name}" :
+                    "{$table_name_sql_alias}_{$field_name_sql_alias}";
                 $default_create = 0;
             }
             $multilingual = get_param_value($field_info, "multilingual", 0);
@@ -390,19 +397,19 @@ class DbObject extends AppObject {
             $field_info2 = $obj->_fields[$field_name];
             $field_type = $field_info2["type"];
 
-            if (is_null($table_name_alias)) {
+            if (is_null($table_name_sql_alias)) {
                 $field_select_expression = $field_info2["select"];
-                $table_name_alias = $obj->_table_name;
+                $table_name_sql_alias = $obj->_table_name;
             } else {
                 $field_select_expression = $this->create_field_select_expression(
-                    $table_name_alias,
+                    $table_name_sql_alias,
                     $field_name,
                     $field_info2["multilingual"]
                 );
             }
-            $field_name_alias = (is_null($field_name_alias)) ?
-                "{$table_name_alias}_{$field_name}" :
-                "{$table_name_alias}_{$field_name_alias}";
+            $field_name_sql_alias = (is_null($field_name_sql_alias)) ?
+                "{$table_name_sql_alias}_{$field_name}" :
+                "{$table_name_sql_alias}_{$field_name_sql_alias}";
 
             $initial_field_value = $field_info2["value"];
             $width = get_param_value($field_info2, "width", null);
@@ -421,7 +428,7 @@ class DbObject extends AppObject {
             $multilingual_child = 0;
         }
         
-        $this->_fields[$field_name_alias] = array(
+        $this->_fields[$field_name_sql_alias] = array(
             "type" => $field_type,
             "value" => $initial_field_value,
             "width" => $width,
@@ -441,22 +448,22 @@ class DbObject extends AppObject {
             "multilingual_child" => $multilingual_child,
         );
 
-        $this->set_field_value($field_name_alias, $initial_field_value);
+        $this->set_field_value($field_name_sql_alias, $initial_field_value);
     }
 
     function create_field_select_expression(
-        $table_name_alias,
+        $table_name_sql_alias,
         $field_name,
         $multilingual
     ) {
         if ($multilingual) {
             $field_select_expression =
-                "IF ({$table_name_alias}.{$field_name}_{$this->app->lang} = '', " .
-                "{$table_name_alias}.{$field_name}_{$this->app->dlang}, " .
-                "{$table_name_alias}.{$field_name}_{$this->app->lang}" .
+                "IF ({$table_name_sql_alias}.{$field_name}_{$this->app->lang} = '', " .
+                "{$table_name_sql_alias}.{$field_name}_{$this->app->dlang}, " .
+                "{$table_name_sql_alias}.{$field_name}_{$this->app->lang}" .
                 ")";
         } else {
-            $field_select_expression = "{$table_name_alias}.{$field_name}";
+            $field_select_expression = "{$table_name_sql_alias}.{$field_name}";
         }
         return $field_select_expression;
     }
@@ -482,7 +489,11 @@ class DbObject extends AppObject {
         }
     }
 //
-    function insert_join($join_info, $field_name = null) {
+    function insert_join($join_info, $join_field_name = null) {
+        $field_name_error_str = (is_null($join_field_name)) ?
+            "" :
+            " for field '{$join_field_name}'";
+
         $join_type = $join_info["type"];
         switch ($join_type) {
         case "inner":
@@ -496,45 +507,53 @@ class DbObject extends AppObject {
             break;
         default:
             $this->process_fatal_error(
-                "Bad join type '{$join_type}'!"
+                "Bad join type '{$join_type}'{$field_name_error_str}!"
             );
         }
         
-        $join_obj_class_name = get_param_value($join_info, "obj", null);
-        if (is_null($join_obj_class_name)) {
+        $joined_obj_class_name = get_param_value($join_info, "obj_class", null);
+        if (is_null($joined_obj_class_name)) {
             $this->process_fatal_error(
-                "DbObject class name 'obj' to be joined not specified in join info!"
+                "Joined DbObject class name 'obj_class' not specified " .
+                "in join info{$field_name_error_str}!"
             );
         }
-        if ($join_obj_class_name == $this->get_class_name()) {
-            $join_table_name = $this->_table_name;
+        if ($joined_obj_class_name == $this->get_class_name()) {
+            $joined_obj = $this;
         } else {
-            $join_obj = $this->create_db_object($join_obj_class_name);
-            $join_table_name = $join_obj->_table_name;
+            $joined_obj = $this->create_db_object($joined_obj_class_name);
         }
-        $join_table_name_alias = get_param_value($join_info, "table_alias", $join_table_name);
+        $joined_table_name_sql_alias = get_param_value(
+            $join_info,
+            "table_sql_alias",
+            $joined_obj->_table_name
+        );
 
-        if (is_null($field_name)) {
-            $join_condition = get_param_value($join_info, "condition", null);
-            if (is_null($join_condition)) {
+        if (is_null($join_field_name)) {
+            // Join SQL condition expression should be created manually and passed here
+            $join_sql_condition = get_param_value($join_info, "condition", null);
+            if (is_null($join_sql_condition)) {
                 $this->process_fatal_error(
-                    "Condition expression 'condition' not specified in join!"
+                    "Join SQL condition expression 'condition' not specified in join info!"
                 );
             }
         } else {
-            $join_table_field_name = get_param_value(
+            // Join SQL condition expression is created here automatically
+            // (join is done with current DbObject)
+            $joined_table_field_name = get_param_value(
                 $join_info,
                 "field",
                 $this->get_primary_key_name()
             );
-            $join_condition =
-                "{$this->_table_name}.{$field_name} = " .
-                "{$join_table_name_alias}.{$join_table_field_name}";
+            $join_sql_condition =
+                "{$this->_table_name}.{$join_field_name} = " .
+                "{$joined_table_name_sql_alias}.{$joined_table_field_name}";
         }
 
         $this->_select_from .=
-            " {$join_type_str} JOIN {%{$join_table_name}_table%} AS {$join_table_name_alias}" .
-            " ON {$join_condition}";
+            " {$join_type_str} JOIN {%{$joined_obj->_table_name}_table%} " .
+                "AS {$joined_table_name_sql_alias} " .
+                "ON {$join_sql_condition}";
     }
 //
     function insert_filter($filter_info) {
@@ -571,7 +590,7 @@ class DbObject extends AppObject {
             $select_from;
     }
 
-//  Db tables management functions (create, update, delete)
+    // Db tables maintenance functions (create, update, delete)
     function create_table() {
         $create_table_expression = $this->get_create_table_expression();
         if ($create_table_expression != "") {
@@ -995,9 +1014,7 @@ class DbObject extends AppObject {
     }
 //
     function del() {
-        $this->del_where(
-            $this->get_default_where_str(false)
-        );
+        $this->del_where($this->get_default_where_str(false));
     }
 
     function del_where($where_str) {
@@ -2309,23 +2326,19 @@ class DbObject extends AppObject {
         return $this->app->db->run_select_query($query);
     }
 //
-    function get_default_where_str($use_table_alias = true) {
-        // Return default WHERE condition for fetching one object.
+    function get_default_where_str($add_table_name_alias = true) {
+        // Return default WHERE condition for fetching one object
         $pr_key_name  = $this->get_primary_key_name();
         $pr_key_value = $this->get_primary_key_value();
         $pr_key_value_str = qw($pr_key_value);
 
-        if ($use_table_alias) {
+        if ($add_table_name_alias) {
             return "{$this->_table_name}.{$pr_key_name} = {$pr_key_value_str}";
         } else {
             return "{$pr_key_name} = {$pr_key_value_str}";
         }
     }
 //
-    function create_db_object($obj_class_name, $obj_params = array()) {
-        return $this->app->create_db_object($obj_class_name, $obj_params);
-    }
-
     function fetch(
         $where_str = null,
         $field_names_to_select = null,
@@ -2333,14 +2346,14 @@ class DbObject extends AppObject {
     ) {
         // Fetch data from db table using given WHERE condition
         // Return true if ONE record found
+        
         if (is_null($where_str)) {
             $where_str = $this->get_default_where_str();
         }
-
-        $query_ex = array("where" => $where_str);
-
         $res = $this->run_expanded_select_query(
-            $query_ex,
+            new SelectQueryEx(array(
+                "where" => $where_str,
+            )),
             $field_names_to_select,
             $field_names_to_not_select
         );
@@ -2349,17 +2362,13 @@ class DbObject extends AppObject {
             return false;
         }
 
-        $row = $res->fetch();
-        $this->fetch_row($row);
+        $res->fetch_next_row_to_db_object($this);
 
         return true;
     }
 
-    function fetch_row($row) {
-        // Fetch data from query result row.
-        foreach ($row as $field_name => $field_value) {
-            $this->set_field_value($field_name, $field_value);
-        }
+    function create_db_object($obj_class_name, $obj_params = array()) {
+        return $this->app->create_db_object($obj_class_name, $obj_params);
     }
 
     function fetch_db_object(
@@ -2392,7 +2401,11 @@ class DbObject extends AppObject {
         );
     }
 
-//  Uploaded image helpers
+    function fetch_rows_list($query) {
+        return $this->app->fetch_rows_list($query);
+    }
+//
+    // Uploaded image helper functions
     function fetch_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
         return $this->fetch_db_object("ImageTable", $image_id);
@@ -2426,7 +2439,7 @@ class DbObject extends AppObject {
         }
     }
 
-//  Uploaded file helpers
+    // Uploaded file helper functions
     function fetch_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         return $this->fetch_db_object("FileTable", $file_id);
@@ -2478,7 +2491,7 @@ class DbObject extends AppObject {
                     " ON file_info.{$file_id_field_name} = file.id",
         ));
         $res = $this->run_select_query($query);
-        $row = $res->fetch();
+        $row = $res->fetch_next_row();
         return $row["total_size"];
     }
 //
@@ -2489,7 +2502,7 @@ class DbObject extends AppObject {
             "where" => $where_str,
         ));
         $res = $this->run_select_query($query);
-        $row = $res->fetch();
+        $row = $res->fetch_next_row();
         return $row["last_position"];
     }
 
@@ -2500,7 +2513,7 @@ class DbObject extends AppObject {
             "where" => "position < {$this->position} AND {$where_str}",
         ));
         $res = $this->run_select_query($query);
-        $row = $res->fetch();
+        $row = $res->fetch_next_row();
         return $row["prev_position"];
     }
 
@@ -2511,7 +2524,7 @@ class DbObject extends AppObject {
             "where" => "position > {$this->position} AND {$where_str}",
         ));
         $res = $this->run_select_query($query);
-        $row = $res->fetch();
+        $row = $res->fetch_next_row();
         return $row["next_position"];
     }
 

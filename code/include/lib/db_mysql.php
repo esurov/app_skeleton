@@ -124,11 +124,11 @@ class MySqlDb extends AppObject {
         if ($query->group_by == "" && !$query->distinct) {
             $count_query->select = "COUNT(*) AS n_rows";
             $res = $this->run_select_query($count_query);
-            $row = $res->fetch();
+            $row = $res->fetch_next_row();
             $n = (int) $row["n_rows"];
         } else {
             if (!$query->distinct) {
-            $count_query->select = "NULL";
+                $count_query->select = "NULL";
             }
             $res = $this->run_select_query($count_query);
             $n = $res->get_num_rows();
@@ -154,7 +154,7 @@ class MySqlDb extends AppObject {
         $table_names = array();
 
         $res = $this->run_query("SHOW TABLES");
-        while ($row = $res->fetch(true)) {
+        while ($row = $res->fetch_next_row(true)) {
             $table_name_with_prefix = $row[0];
             if (preg_match(
                 '/^' . $this->_table_prefix . '(\w+)$/', $table_name_with_prefix, $matches
@@ -173,7 +173,7 @@ class MySqlDb extends AppObject {
     function get_actual_table_fields_info($table_name) {
         $actual_fields_info = array();
         $res = $this->run_query("SHOW COLUMNS FROM {%{$table_name}_table%}");
-        while ($row = $res->fetch()) {
+        while ($row = $res->fetch_next_row()) {
             $actual_fields_info[$row["Field"]] = $row;
         }
         return $actual_fields_info;
@@ -182,7 +182,7 @@ class MySqlDb extends AppObject {
     function get_actual_table_indexes_info($table_name) {
         $indexes_info = array();
         $res = $this->run_query("SHOW INDEX FROM {%{$table_name}_table%}");
-        while ($row = $res->fetch()) {
+        while ($row = $res->fetch_next_row()) {
             $indexes_info[] = $row;
         }
         
@@ -233,8 +233,8 @@ class MySqlDbResult extends AppObject {
         return mysql_num_rows($this->_res);
     }
 
-    function fetch($with_numeric_keys = false) {
-        // Fetch data trom the result.
+    function fetch_next_row($with_numeric_keys = false) {
+        // Fetch data trom the result
         $row = ($with_numeric_keys) ?
             mysql_fetch_row($this->_res) :
             mysql_fetch_assoc($this->_res);
@@ -257,6 +257,15 @@ class MySqlDbResult extends AppObject {
             );
         }
         
+        return $row;
+    }
+
+    function fetch_next_row_to_db_object(&$obj) {
+        $row = $this->fetch_next_row();
+        if ($row === false) {
+            return false;
+        }
+        $obj->set_field_values_from_row($row);
         return $row;
     }
 

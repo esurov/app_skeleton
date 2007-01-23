@@ -1798,8 +1798,7 @@ class App extends AppObject {
             $field_names_to_not_select
         );
         $objects = array();
-        while ($row = $res->fetch()) {
-            $obj->fetch_row($row);
+        while ($row = $res->fetch_next_row_to_db_object($obj)) {
             $objects[] = $obj;
         }
         return $objects;
@@ -1808,7 +1807,7 @@ class App extends AppObject {
     function fetch_rows_list($query) {
         $res = $this->db->run_select_query($query);
         $rows = array();
-        while ($row = $res->fetch()) {
+        while ($row = $res->fetch_next_row()) {
             $rows[] = $row;
         }
         return $rows;

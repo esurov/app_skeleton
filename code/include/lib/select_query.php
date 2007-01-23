@@ -21,7 +21,7 @@ class SelectQueryEx {
         $this->limit    = isset($q["limit"   ]) ? $q["limit"   ] : "";
     }
 
-    // Expand select query sql clauses
+    // Expand SQL select query clauses
     function expand($query_ex) {
         if (is_array($query_ex)) {
 

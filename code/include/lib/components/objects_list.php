@@ -142,8 +142,7 @@ class QueryObjectsList extends _ObjectsList {
     }
 
     function &_fetch_list_object() {
-        if ($row = $this->_res->fetch()) {
-            $this->obj->fetch_row($row);
+        if ($row = $this->_res->fetch_next_row_to_db_object($this->obj)) {
             $obj =& $this->obj;
         } else {
             $obj = false;

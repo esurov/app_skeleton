@@ -73,7 +73,7 @@ class SampleApp extends CustomApp {
 /*
     function action_pg_sample_records_list_in_context1() {
         $this->print_many_objects_list_page(array(
-            "obj" => "_sample_table",
+            "obj" => "SampleTable",
             "templates_dir" => "_sample_table/list_context1",
             "context" => "context1",
             "custom_params" => array(
@@ -85,7 +85,7 @@ class SampleApp extends CustomApp {
 
     function action_pg_sample_records_list_in_context2() {
         $this->print_many_objects_list_page(array(
-            "obj" => "_sample_table",
+            "obj" => "SampleTable",
             "templates_dir" => "_sample_table/list_context2",
             "context" => "context2",
         ));

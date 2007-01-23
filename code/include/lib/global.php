@@ -236,12 +236,12 @@ function quote_string($str) {
     return "'{$str}'";
 }
 
-// Quote and escape string for MySql.
+// Quote and escape string for MySQL
 function qw($str) {
     return quote_string(mysql_escape_string($str));
 }
 
-// Quote and escape string for MySql LIKE expression.
+// Quote and escape string for MySQL LIKE expression
 function lqw($str, $prefix_str = "", $suffix_str = "") {
     $str = mysql_escape_string($str);
     $str = str_replace('%', '\%', $str);

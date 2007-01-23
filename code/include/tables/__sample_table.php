@@ -1,34 +1,33 @@
 <?php
 
-// These are parameters for insert_field():
+// Available parameters for insert_field():
+// "obj_class" - DbObject class name (makes "create" = 0), if not specified - current class name
+// "table_sql_alias" - SQL table name alias, if not specified - SQL table name of 'obj_class' used
+// "field" - Field name of 'obj_class'
+// "field_sql_alias" - SQL field name alias, if not specified - 'field' used
+// "type" - Field type (mapped to real db field type and affects reading, printing, saving)
+// "width" - SQL output width for field 
+// "prec" - SQL output decimal point precision for field
+// "select" - Field SQL SELECT expression without SQL field name alias (makes "create" = 0)
+// "attr" - Extra attributes of field CREATE TABLE SQL expression (rarely used)
 
-// "obj" - DbObject class name, if not specified - current class name
-// "table_alias" - table alias name, if not specified - table name of current DbObject class
-// "field" - field name
-// "field_alias" - field alias name, if not specified - field name
-// "type" - field type (type is then mapped to real database specific type)
-// "width" - output width for field
-// "prec" - output precision after decimal point for field
-// "select" - select sql expression for field (makes create = 0)
-// "attr" - attribute section of create table sql query, rarely used
+// "create" - Field should be created in db table
+// "read" - Field should be read from CGI by read()
+// "store" - Field should be stored to db by store()
+// "update" - Field should be updated in db by update()
 
-// "create" - field should be created in db table
-// "read" - field should be read from CGI by read()
-// "store" - field should be stored to db by store()
-// "update" - field should be updated to db by update()
+// "value" - Initial value of the field when DbObject created
+// "multilingual" - Is field multilingual (has additional fields for all languages)
 
-// "value" - initial value of the field when db_object created
-// "multilingual" - is field multilingual (has additional fields for all languages)
+// "input" - HTML control for field value editing
 
-// "input" - html control for field value editing
-
-// note that you may not specify for many field types:
-// "create" - default is true for all current DbObject's fields and false for another
-// "read" - default is true for all current DbObject's fields and false for another
-// "store" - field should be stored to db by store()
-// "update" - field should be updated to db by update()
-// "value" - default one will be used, its value depends on field type
-// "input" - default one will be used
+// Note: It is not always necessary to specify, defaults are enough almost all the time:
+// "create" - Default is true for all current DbObject fields and false if from another DbObject
+// "read" - Default is true for all current DbObject fields and false if from another DbObject
+// "store" - Field should be stored to db by store()
+// "update" - Field should be updated to db by update()
+// "value" - Value depends on field type, better to specify explicitly
+// "input" - Value depends on field type
 
 class SampleTable extends CustomDbObject {
 
@@ -49,7 +48,7 @@ class SampleTable extends CustomDbObject {
             // Join example in insert_field()
             "join" => array(
                 "type" => "left",
-                "obj" => "NewsArticleTable",
+                "obj_class" => "NewsArticleTable",
                 "field" => "id",
             ),
         ));
@@ -61,8 +60,8 @@ class SampleTable extends CustomDbObject {
             // One more join to the same table
             "join" => array(
                 "type" => "left",
-                "obj" => "NewsArticleTable",
-                "table_alias" => "news_article2",
+                "obj_class" => "NewsArticleTable",
+                "table_sql_alias" => "news_article2",
                 "field" => "id",
             ),
         ));
@@ -93,11 +92,11 @@ class SampleTable extends CustomDbObject {
         ));
 
         // Join example out of insert_field()
-        // Should be used for complex join conditions
-        // Current DbObject's table name is accessed by _table_name member var
+        // Should be used for complex join condition expressions
+        // Current DbObject table name is accessed by _table_name member var
         $this->insert_join(array(
             "type" => "left",
-            "obj" => "ImageTable",
+            "obj_class" => "ImageTable",
             
             // SQL string for join condition
             "condition" => "{$this->_table_name}.image_id = image.id",
@@ -109,8 +108,8 @@ class SampleTable extends CustomDbObject {
             "type" => "foreign_key",
             "join" => array(
                 "type" => "left",
-                "obj" => $this->get_class_name(),
-                "table_alias" => "{$this->_table_name}_alias",
+                "obj_class" => $this->get_class_name(),
+                "table_sql_alias" => "{$this->_table_name}_alias",
                 "field" => "id",
             ),
         ));
@@ -274,44 +273,43 @@ class SampleTable extends CustomDbObject {
         // Note: No need to specify type because it is taken from that field
         $this->insert_field(array(
             "field" => "field_varchar",
-            "field_alias" => "field_varchar_alias",
+            "field_sql_alias" => "field_varchar_alias",
         ));
 
-        // Field 'field_text' from self-joined table
-        // Note: Calculated fields cannot be got this way when table_alias specified
+        // Field 'field_text' from self-joined aliased table
+        // Note: Calculated fields cannot be got this way when 'table_sql_alias' specified
         $this->insert_field(array(
-            "table_alias" => "{$this->_table_name}_alias",
+            "table_sql_alias" => "{$this->_table_name}_alias",
             "field" => "field_text",
         ));
 
         // Alias field name 'field_text_alias' for the field 'field_text' from self-joined table
-        // Note: Calculated fields cannot be got this way when table_alias specified
+        // Note: Calculated fields cannot be got this way when 'table_sql_alias' specified
         $this->insert_field(array(
-            "table_alias" => "{$this->_table_name}_alias",
+            "table_sql_alias" => "{$this->_table_name}_alias",
             "field" => "field_text",
-            "field_alias" => "field_text_alias"
+            "field_sql_alias" => "field_text_alias"
         ));
 
-        // Calculated field from 'news_article' table
-        // Note: do not specify type because it is taken from another table
-        // NB: field commented because field was removed from 'news_article'
+        // Calculated field from NewsArticle
+        // Note: Type not specified because it is taken automatically from another DbObject
+        // NB: Field commented because field was removed from NewsArticle
 //        $this->insert_field(array(
-//            "obj" => "NewsArticleTable",
+//            "obj_class" => "NewsArticleTable",
 //            "field" => "full_text",
 //        ));
 
-        // Multilingual field from 'news_article' table
-        // Note: No need to specify type because it is taken from that table
-        // Note: Fields from another tables are never created in db table
+        // Multilingual field from NewsArticle table
+        // Note: Type not specified because it is taken automatically from another DbObject
         $this->insert_field(array(
-            "obj" => "NewsArticleTable",
+            "obj_class" => "NewsArticleTable",
             "field" => "title",
         ));
 
-        // Field from 'news_article' joined with alias name 'news_article2'
+        // Field from NewsArticle joined with SQL table alias 'news_article2'
         $this->insert_field(array(
-            "obj" => "NewsArticleTable",
-            "table_alias" => "news_article2",
+            "obj_class" => "NewsArticleTable",
+            "table_sql_alias" => "news_article2",
             "field" => "title",
         ));
 
