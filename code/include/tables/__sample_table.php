@@ -45,7 +45,7 @@ class SampleTable extends CustomDbObject {
             "field" => "news_article_id",
             "type" => "foreign_key",
             
-            // Join example in insert_field()
+            // Join example in insert_field() to NewsArticle
             "join" => array(
                 "type" => "left",
                 "obj_class" => "NewsArticleTable",
@@ -54,14 +54,15 @@ class SampleTable extends CustomDbObject {
         ));
 
         $this->insert_field(array(
-            "field" => "news_article2_id",
+            "field" => "news_article_alias_id",
             "type" => "foreign_key",
             
-            // One more join to the same table
+            // One more join example in insert_field() to NewsArticle
+            // with SQL table alias 'news_article_alias'
             "join" => array(
                 "type" => "left",
                 "obj_class" => "NewsArticleTable",
-                "table_sql_alias" => "news_article2",
+                "table_sql_alias" => "news_article_alias",
                 "field" => "id",
             ),
         ));
@@ -291,14 +292,6 @@ class SampleTable extends CustomDbObject {
             "field_sql_alias" => "field_text_alias"
         ));
 
-        // Calculated field from NewsArticle
-        // Note: Type not specified because it is taken automatically from another DbObject
-        // NB: Field commented because field was removed from NewsArticle
-//        $this->insert_field(array(
-//            "obj_class" => "NewsArticleTable",
-//            "field" => "full_text",
-//        ));
-
         // Multilingual field from NewsArticle table
         // Note: Type not specified because it is taken automatically from another DbObject
         $this->insert_field(array(
@@ -306,12 +299,20 @@ class SampleTable extends CustomDbObject {
             "field" => "title",
         ));
 
-        // Field from NewsArticle joined with SQL table alias 'news_article2'
+        // Field from NewsArticle joined with SQL table alias 'news_article_alias'
         $this->insert_field(array(
             "obj_class" => "NewsArticleTable",
-            "table_sql_alias" => "news_article2",
+            "table_sql_alias" => "news_article_alias",
             "field" => "title",
         ));
+
+        // Calculated field from NewsArticle
+        // Note: Type not specified because it is taken automatically from another DbObject
+        // NB: Field commented because field was removed from NewsArticle
+//        $this->insert_field(array(
+//            "obj_class" => "NewsArticleTable",
+//            "field" => "full_text",
+//        ));
 
         // Complex index example
         // Note: Fields should exist

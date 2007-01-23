@@ -50,6 +50,7 @@ class Config {
         while ($line = fgets($f, 1024)) {
             $line = rtrim($line);
 
+            // Comments and group specifiers may start only at the beginning of lines
             if (
                 preg_match('/^#.*$/', $line) ||
                 preg_match('/^\/\/.*$/', $line) ||

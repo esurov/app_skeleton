@@ -162,7 +162,24 @@ class MySqlDb extends AppObject {
         return $n;
     }
 
-    function create_table($table_name, $create_table_expression) {
+    function run_insert_query($table_name, $fields_expression) {
+        $this->run_query(
+            "INSERT INTO {%{$table_name}_table%}\n" .
+            "  SET\n" .
+            "    {$fields_expression}"
+        );
+    }
+
+    function run_update_query($table_name, $fields_expression, $where_str) {
+        $this->run_query(
+            "UPDATE {%{$table_name}_table%}\n" .
+            "  SET\n" .
+            "    {$fields_expression}\n" .
+            "  WHERE {$where_str}"
+        );
+    }
+
+    function run_create_table_query($table_name, $create_table_expression) {
         $this->run_query(
             "CREATE TABLE IF NOT EXISTS {%{$table_name}_table%} (\n" .
             "    {$create_table_expression}\n" .
@@ -170,14 +187,14 @@ class MySqlDb extends AppObject {
         );
     }
 
-    function update_table($table_name, $update_table_expression) {
+    function run_update_table_query($table_name, $update_table_expression) {
         $this->run_query(
             "ALTER TABLE {%{$table_name}_table%}\n" .
             "    {$update_table_expression}"
         );
     }
 
-    function drop_table($table_name) {
+    function run_drop_table_query($table_name) {
         $this->run_query("DROP TABLE IF EXISTS {%{$table_name}_table%}");
     }
 
@@ -275,17 +292,18 @@ class MySqlDbResult extends AppObject {
         // Logger optimization
         if ($this->get_log_debug_level() == DL_EXTRA_DEBUG) {
             if (is_array($row)) {
-                $field_value_pairs = array();
+                $log_str = "";
                 foreach ($row as $field => $value) {
-                    $value = qw(get_shortened_string($value, 300));
-                    $field_value_pairs[] = "{$field}={$value}";
+                    $value_str = (is_null($value)) ?
+                        "NULL" :
+                        qw(get_shortened_string($value, 300));
+                    $log_str .= "  {$field} = {$value_str},\n";
                 }
-                $log_str = join(", ", $field_value_pairs);
             } else {
                 $log_str = "no rows left";
             }
             $this->write_log(
-                "fetch(): {$log_str}",
+                "fetch():\n{$log_str}",
                 DL_EXTRA_DEBUG
             );
         }

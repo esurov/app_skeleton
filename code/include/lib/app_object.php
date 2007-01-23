@@ -25,6 +25,10 @@ class AppObject extends Object {
         parent::_init($params);
     }
 //
+    function set_app(&$app) {
+        $this->app =& $app;
+    }
+//
     function create_object($obj_class_name, $obj_params = array()) {
         return $this->app->create_object($obj_class_name, $obj_params);
     }

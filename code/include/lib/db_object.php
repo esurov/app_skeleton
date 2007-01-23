@@ -3,6 +3,8 @@
 // Base class for all MySQL table based classes
 class DbObject extends AppObject {
 
+    var $db; // Db (from app)
+
     var $_table_name;  // Db table name without db specific prefix
 
     var $_fields;
@@ -31,6 +33,12 @@ class DbObject extends AppObject {
         $this->_filters = array();
 
         $this->print_params = array();
+    }
+//
+    function set_app(&$app) {
+        parent::set_app($app);
+
+        $this->db =& $this->app->db;
     }
 //
     function get_plural_name() {
@@ -76,7 +84,7 @@ class DbObject extends AppObject {
     }
 //
     function get_full_table_name() {
-        return $this->app->db->get_full_table_name($this->_table_name);
+        return $this->db->get_full_table_name($this->_table_name);
     }
 
     function set_field_value($field_name, $field_value) {
@@ -590,11 +598,11 @@ class DbObject extends AppObject {
             $select_from;
     }
 
-    // Db tables maintenance functions (create, update, delete)
+    // Db table maintenance functions (create, update, delete)
     function create_table() {
         $create_table_expression = $this->get_create_table_expression();
         if ($create_table_expression != "") {
-            $this->app->db->create_table($this->_table_name, $create_table_expression);
+            $this->db->run_create_table_query($this->_table_name, $create_table_expression);
         }
     }
 
@@ -717,13 +725,13 @@ class DbObject extends AppObject {
     function update_table() {
         $update_table_expression = $this->get_update_table_expression();
         if ($update_table_expression != "") {
-            $this->app->db->update_table($this->_table_name, $update_table_expression);
+            $this->db->run_update_table_query($this->_table_name, $update_table_expression);
         }
     }
         
     function get_update_table_expression() {
         // Managing fields
-        $actual_fields_info = $this->app->db->get_actual_table_fields_info($this->_table_name);
+        $actual_fields_info = $this->db->get_actual_table_fields_info($this->_table_name);
         $actual_field_names = array_keys($actual_fields_info);
         $field_names = $this->get_field_names_without_multilingual_expansion();
 
@@ -803,7 +811,7 @@ class DbObject extends AppObject {
         }
 
         // Managing indexes
-        $actual_indexes_info = $this->app->db->get_actual_table_indexes_info($this->_table_name);
+        $actual_indexes_info = $this->db->get_actual_table_indexes_info($this->_table_name);
         $actual_index_names = array_keys($actual_indexes_info);
         $index_names = array_keys($this->_indexes);
 
@@ -885,7 +893,7 @@ class DbObject extends AppObject {
     }
 
     function delete_table() {
-        $this->app->db->drop_table($this->_table_name);
+        $this->db->run_drop_table_query($this->_table_name);
     }
 //
     function store(
@@ -905,7 +913,7 @@ class DbObject extends AppObject {
 
         $use_store_flag = (is_null($field_names_to_store));
 
-        $comma = "";
+        $delimiter_str = "";
         $fields_expression = "";
         foreach ($field_names as $field_name) {
             $field_info = $this->_fields[$field_name];
@@ -913,18 +921,15 @@ class DbObject extends AppObject {
                 continue;
             }
             
-            $fields_expression .= $comma;
-            $comma = ", ";
-            $fields_expression .= $this->get_update_field_expression($field_name);
+            $fields_expression .= $delimiter_str . $this->get_update_field_expression($field_name);
+            $delimiter_str = ",\n    ";
         }
 
-        $this->run_query(
-            "INSERT INTO {%{$this->_table_name}_table%} SET {$fields_expression}"
-        );
+        $this->db->run_insert_query($this->_table_name, $fields_expression);
 
         $pr_key_name = $this->get_primary_key_name();
         if ($this->_fields[$pr_key_name]["type"] == "primary_key") {
-            $this->set_field_value($pr_key_name, $this->app->db->get_last_autoincrement_id());
+            $this->set_field_value($pr_key_name, $this->db->get_last_autoincrement_id());
         }
     }
 
@@ -945,7 +950,7 @@ class DbObject extends AppObject {
 
         $use_update_flag = (is_null($field_names_to_update));
 
-        $comma = "";
+        $delimiter_str = "";
         $fields_expression = "";
         foreach ($field_names as $field_name) {
             $field_info = $this->_fields[$field_name];
@@ -953,13 +958,13 @@ class DbObject extends AppObject {
                 continue;
             }
             
-            $fields_expression .= $comma;
-            $comma = ", ";
-            $fields_expression .= $this->get_update_field_expression($field_name);
+            $fields_expression .= $delimiter_str . $this->get_update_field_expression($field_name);
+            $delimiter_str = ",\n    ";
         }
-        $where_str = $this->get_default_where_str(false);
-        $this->run_query(
-            "UPDATE {%{$this->_table_name}_table%} SET {$fields_expression} WHERE {$where_str}"
+        $this->db->run_update_query(
+            $this->_table_name,
+            $fields_expression,
+            $this->get_default_where_str(false)
         );
     }
 
@@ -988,7 +993,7 @@ class DbObject extends AppObject {
             break;
         }
         
-        return "{$field_name}={$field_value_str}";
+        return "{$field_name} = {$field_value_str}";
     }
 
     function save($refetch_after_save = false) {
@@ -2101,7 +2106,7 @@ class DbObject extends AppObject {
             "from" => "{%{$this->_table_name}_table%} AS {$this->_table_name}",
             "where" => $this->create_where_expression($field_names),
         ));
-        return $this->app->db->get_select_query_num_rows($query);
+        return $this->db->get_select_query_num_rows($query);
     }
 
     function create_where_expression($field_names) {
@@ -2240,7 +2245,7 @@ class DbObject extends AppObject {
                 "where"  => "{$key_field_name} = {$this->id}",
             ));
 
-            $n = $this->app->db->get_select_query_num_rows($query);
+            $n = $this->db->get_select_query_num_rows($query);
             if ($n > 0) {
                 if (isset($obj_dependency_counters[$dep_obj_class_name])) {
                     $obj_dependency_counters[$dep_obj_class_name] += $n;
@@ -2321,11 +2326,11 @@ class DbObject extends AppObject {
     }
 
     function run_query($query_str) {
-        return $this->app->db->run_query($query_str);    
+        return $this->db->run_query($query_str);    
     }
 
     function run_select_query($query) {
-        return $this->app->db->run_select_query($query);
+        return $this->db->run_select_query($query);
     }
 //
     function get_default_where_str($add_table_name_alias = true) {

@@ -37,7 +37,7 @@ class App extends AppObject {
 
     function App($app_class_name, $app_name) {
         $this->set_class_name($app_class_name); 
-        $this->app =& $this;
+        $this->set_app($this);
 
         $this->app_name = $app_name;
 
@@ -631,11 +631,11 @@ class App extends AppObject {
 //
     // Complex types template printing functions
     function print_primary_key_value($template_var, $value) {
-        $this->print_raw_value("{$template_var}", $value);
+        $this->print_raw_value($template_var, $value);
     }
 
     function print_foreign_key_value($template_var, $value) {
-        $this->print_raw_value("{$template_var}", $value);
+        $this->print_raw_value($template_var, $value);
     }
 
     function print_integer_value(
@@ -656,7 +656,7 @@ class App extends AppObject {
             }
         }
         $this->print_raw_values(array(
-            "{$template_var}" => $value_formatted,
+            $template_var => $value_formatted,
             "{$template_var}_orig" => $value,
             "{$template_var}_orig_with_nonset" => $value_with_nonset,
         ));
@@ -685,7 +685,7 @@ class App extends AppObject {
             }
         }
         $this->print_raw_values(array(
-            "{$template_var}" => $value_formatted,
+            $template_var => $value_formatted,
             "{$template_var}_2" => $value_formatted_2,
             "{$template_var}_5" => $value_formatted_5,
             "{$template_var}_orig" => $value,
@@ -721,7 +721,7 @@ class App extends AppObject {
             }
         }
         $this->print_raw_values(array(
-            "{$template_var}" => $value_formatted,
+            $template_var => $value_formatted,
             "{$template_var}_without_sign" => $value_formatted_without_sign,
             "{$template_var}_orig" => $value,
             "{$template_var}_orig_with_nonset" => $value_with_nonset,
@@ -739,7 +739,7 @@ class App extends AppObject {
             $value_caption_pairs,
             ((int) $value != 0) ? 1 : 0
         );
-        $this->print_value("{$template_var}", $caption);
+        $this->print_value($template_var, $caption);
         $this->print_raw_value("{$template_var}_orig", $value);
     }
 
@@ -750,40 +750,39 @@ class App extends AppObject {
             $enum_value
         );
         $enum_caption = is_null($enum_caption) ? "" : $enum_caption;
-        $this->print_value("{$template_var}", $enum_caption);
+        $this->print_value($template_var, $enum_caption);
         $this->print_raw_value("{$template_var}_caption_orig", $enum_caption);
         $this->print_raw_value("{$template_var}_orig", $enum_value);
     }
 
     function print_varchar_value($template_var, $value) {
-        $this->print_value("{$template_var}", $value);
-        $safe_value = get_html_safe_string($value);
+        $this->print_value($template_var, $value);
         $this->print_raw_value("{$template_var}_orig", $value);
     }
 
     function print_text_value($template_var, $value) {
-        $this->print_varchar_value("{$template_var}", $value);
+        $this->print_varchar_value($template_var, $value);
         $safe_value = get_html_safe_string($value);
         $this->print_raw_value("{$template_var}_lf2br", convert_lf2br($safe_value));
     }
 
     function print_datetime_value($template_var, $db_datetime) {
         $this->print_values(array(
-            "{$template_var}" => $this->get_app_datetime($db_datetime),
+            $template_var => $this->get_app_datetime($db_datetime),
             "{$template_var}_orig" => $db_datetime,
         ));
     }
 
     function print_date_value($template_var, $db_date) {
         $this->print_values(array(
-            "{$template_var}" => $this->get_app_date($db_date),
+            $template_var => $this->get_app_date($db_date),
             "{$template_var}_orig" => $db_date,
         ));
     }
 
     function print_time_value($template_var, $db_time) {
         $this->print_values(array(
-            "{$template_var}" => $this->get_app_time($db_time),
+            $template_var => $this->get_app_time($db_time),
             "{$template_var}_orig" => $db_time,
         ));
     }
@@ -1771,7 +1770,7 @@ class App extends AppObject {
                 $obj_params = $init_obj_params + $obj_params;
             }
             if (is_subclass_of($obj, "AppObject")) {
-                $obj->app =& $this;
+                $obj->set_app($this);
             }
         }
         if (method_exists($obj, "_init")) {
@@ -1908,7 +1907,7 @@ class App extends AppObject {
             $table_names_to_drop = $this->db->get_actual_table_names();
         }
         foreach ($table_names_to_drop as $table_name) {
-            $this->db->drop_table($table_name);
+            $this->db->run_drop_table_query($table_name);
         }
     }
 
