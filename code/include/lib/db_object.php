@@ -594,10 +594,7 @@ class DbObject extends AppObject {
     function create_table() {
         $create_table_expression = $this->get_create_table_expression();
         if ($create_table_expression != "") {
-            $this->run_query(
-                "CREATE TABLE IF NOT EXISTS {%{$this->_table_name}_table%} " .
-                "({$create_table_expression})"
-            );
+            $this->app->db->create_table($this->_table_name, $create_table_expression);
         }
     }
 
@@ -612,7 +609,7 @@ class DbObject extends AppObject {
         foreach (array_keys($this->_indexes) as $index_name) {
             $expressions[] = $this->get_create_index_expression($index_name);
         }
-        return join(", ", $expressions);
+        return join(",\n    ", $expressions);
     }
 
     function get_create_field_expression($field_name) {
@@ -720,10 +717,7 @@ class DbObject extends AppObject {
     function update_table() {
         $update_table_expression = $this->get_update_table_expression();
         if ($update_table_expression != "") {
-            $this->run_query(
-                "ALTER TABLE {%{$this->_table_name}_table%} " .
-                "{$update_table_expression}"
-            );
+            $this->app->db->update_table($this->_table_name, $update_table_expression);
         }
     }
         
@@ -832,7 +826,7 @@ class DbObject extends AppObject {
             $expressions[] = $create_expression;
         }
 
-        return join(", ", $expressions);
+        return join(",\n    ", $expressions);
     }
 
     function is_field_differ_from_actual_field($field_name, $actual_field_info) {

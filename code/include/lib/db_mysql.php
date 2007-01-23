@@ -26,7 +26,23 @@ class MySqlDb extends AppObject {
 
         $this->_has_connection = false;
     }
+//
+    function get_host() {
+        return $this->_host;
+    }
 
+    function get_database() {
+        return $this->_database;
+    }
+
+    function get_username() {
+        return $this->_username;
+    }
+
+    function get_password() {
+        return $this->_password;
+    }
+//    
     function connect() {
         $this->_connection = mysql_pconnect(
             $this->_host,
@@ -59,6 +75,16 @@ class MySqlDb extends AppObject {
 
     function get_full_table_name($table_name) {
         return "{$this->_table_prefix}{$table_name}";
+    }
+
+    // Return number of rows in last UPDATE or DELETE query.
+    function get_num_affected_rows() {
+        return mysql_affected_rows($this->_connection);
+    }
+
+    // Return id, generated in last INSERT query by field with type primary_key
+    function get_last_autoincrement_id() {
+        return mysql_insert_id($this->_connection);
     }
 
     // Run MySQL query
@@ -136,14 +162,19 @@ class MySqlDb extends AppObject {
         return $n;
     }
 
-    // Return number of rows in last UPDATE or DELETE query.
-    function get_num_affected_rows() {
-        return mysql_affected_rows($this->_connection);
+    function create_table($table_name, $create_table_expression) {
+        $this->run_query(
+            "CREATE TABLE IF NOT EXISTS {%{$table_name}_table%} (\n" .
+            "    {$create_table_expression}\n" .
+            "  )"
+        );
     }
 
-    // Return id, generated in last INSERT query by field with type primary_key
-    function get_last_autoincrement_id() {
-        return mysql_insert_id($this->_connection);
+    function update_table($table_name, $update_table_expression) {
+        $this->run_query(
+            "ALTER TABLE {%{$table_name}_table%}\n" .
+            "    {$update_table_expression}"
+        );
     }
 
     function drop_table($table_name) {
@@ -157,7 +188,9 @@ class MySqlDb extends AppObject {
         while ($row = $res->fetch_next_row(true)) {
             $table_name_with_prefix = $row[0];
             if (preg_match(
-                '/^' . $this->_table_prefix . '(\w+)$/', $table_name_with_prefix, $matches
+                '/^' . $this->_table_prefix . '(\w+)$/',
+                $table_name_with_prefix,
+                $matches
             )) {
                 if ($with_prefix) {
                     $table_names[] = $table_name_with_prefix;

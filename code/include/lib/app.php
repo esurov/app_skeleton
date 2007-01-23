@@ -1656,6 +1656,74 @@ class App extends AppObject {
         }
     }
 
+    // Setup app actions
+    function action_create_update_tables() {
+        $this->process_create_update_tables();
+        $this->add_session_status_message(new OkStatusMsg("tables_updated"));
+        $this->create_self_redirect_response();
+    }
+
+    function action_delete_tables() {
+        $this->process_delete_tables();
+        $this->add_session_status_message(new OkStatusMsg("tables_deleted"));
+        $this->create_self_redirect_response();
+    }
+//
+    function action_pg_tables_dump() {
+        $actual_table_names = $this->db->get_actual_table_names(true);
+        foreach ($actual_table_names as $actual_table_name) {
+            $this->print_varchar_value("table_name", $actual_table_name);
+            $this->print_file("tables_dump/tables_list/form_item.html", "form_items");
+        }
+        $this->print_file("tables_dump/tables_list/form.html", "body");
+    }
+
+    function action_pg_tables_dump_url() {
+        $table_names = param("table_names");
+        $table_names_str = join(" ", $table_names);
+        
+        $url = create_self_full_url(array(
+            "action" => "pg_tables_dump_view",
+            "table_names" => $table_names_str,
+        ));
+        $this->print_varchar_value("view_dump_url", $url);
+
+        $url = create_self_full_url(array(
+            "action" => "download_tables_dump",
+            "table_names" => $table_names_str,
+        ));
+        $this->print_varchar_value("download_dump_url", $url);
+
+        $this->print_file("tables_dump/url/body.html", "body");
+    }
+
+    function action_pg_tables_dump_view() {
+        $dump_text = $this->create_tables_dump(param("table_names"), false);
+        $n_dump_lines = count(explode("\n", $dump_text));
+        $this->print_varchar_value("dump_text", $dump_text);
+        $this->print_integer_value("n_dump_lines", $n_dump_lines);
+        $this->print_file("tables_dump/dump_text/body.html", "body");
+    }
+
+    function action_download_tables_dump() {
+        $dump_text = $this->create_tables_dump(param("table_names"), true);
+        $now_date_str = $this->get_db_now_date();
+        $this->create_binary_content_response($dump_text, "dump-{$now_date_str}.sql.bz2");
+    }
+
+    function create_tables_dump($table_names_str, $should_compress) {
+        $host = $this->db->get_host();
+        $database = $this->db->get_database();
+        $username = $this->db->get_username();
+        $password = $this->db->get_password();
+        $compress_subcmdline = ($should_compress) ?
+            " | bzip2 -" : "";
+        $cmdline =
+            "mysqldump --add-drop-table -u{$username} -p{$password} -h{$host} {$database} " .
+            "{$table_names_str}{$compress_subcmdline}";
+        return `{$cmdline}`;
+    }
+
     // App objects creation functions
     function create_object($obj_class_name, $obj_params = array()) {
         global $app_classes;
