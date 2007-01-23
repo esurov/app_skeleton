@@ -1478,16 +1478,24 @@ class DbObject extends AppObject {
         foreach ($this->_order_by as $order_by_info) {
             $order_by_values[] = "{$order_by_info['field_name']} {$order_by_info['direction']}";
         }
-        return array("order_by" => $order_by_values);
+        return array(
+            "order_by" => $order_by_values,
+        );
     }
 
     function get_order_by_query_ex() {
-        $order_by_sqls = array();
+        $order_by_query_ex = new SelectQueryEx();
         foreach ($this->_order_by as $order_by_info) {
-            $order_by_direction_sql = strtoupper($order_by_info["direction"]);
-            $order_by_sqls[] = "{$order_by_info['field_name']} {$order_by_direction_sql}";
+            $order_by_query_ex->expand($this->get_order_by_field_query_ex($order_by_info));
         }
-        return array("order_by" => join(", ", $order_by_sqls));
+        return $order_by_query_ex;
+    }
+
+    function get_order_by_field_query_ex($order_by_info) {
+        $order_by_direction_sql = strtoupper($order_by_info["direction"]);
+        return array(
+            "order_by" => "{$order_by_info['field_name']} {$order_by_direction_sql}",
+        );
     }
 //
     function init_print_param($params, $param_name, $default_value) {
