@@ -64,6 +64,8 @@ $app_classes = array(
             "filename" => "lang_menu.php",
             "required_classes" => array("TemplateComponent"),
         ),
+        
+        // Image
         "InMemoryImage" => array(
             "filename" => "image.php",
         ),
@@ -76,6 +78,20 @@ $app_classes = array(
         "ImageMagickWrapper" => array(
             "filename" => "image_processor.php",
             "required_classes" => array("AppComponent"),
+        ),
+
+        // File
+        "_File" => array(
+            "filename" => "file.php",
+        ),
+        "InMemoryFile" => array(
+            "filename" => "file.php",
+        ),
+        "File" => array(
+            "filename" => "file.php",
+        ),
+        "UploadedFile" => array(
+            "filename" => "file.php",
         ),
 
         // Third-party classes

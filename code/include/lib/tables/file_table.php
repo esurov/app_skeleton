@@ -67,21 +67,34 @@ class FileTable extends CustomDbObject {
         );
     }
 //
+    function was_updated_since_last_browser_request() {
+        $cached_gmt_str = (isset($_SERVER["HTTP_IF_MODIFIED_SINCE"])) ?
+            get_gmt_str_from_if_modified_since($_SERVER["HTTP_IF_MODIFIED_SINCE"]) :
+            "";
+        return ($this->get_updated_as_gmt_str() != $cached_gmt_str);
+    }
+
     function get_updated_as_gmt_str() {
         return get_gmt_str_from_timestamp(
             $this->app->get_timestamp_from_db_datetime($this->updated)
         );
     }
 //
-    function read_uploaded_info($input_name) {
-        $uploaded_file_info = get_uploaded_file_info($input_name);
+    // $uploaded_file here means UploadedFile-based class
+    function set_file_fields_from($uploaded_file) {
+        $this->type = $uploaded_file->get_type();
+        $this->content = $uploaded_file->get_content();
+        $this->content_length = $uploaded_file->get_content_length();
+    }
 
-        $this->filename = $uploaded_file_info["name"];
-        $this->type = $uploaded_file_info["type"];
-        
-        $filename = $uploaded_file_info["tmp_name"];
-        $this->content = file_get_contents($filename);
-        $this->content_length = $uploaded_file_info["size"];
+    function create_in_memory_file() {
+        return $this->create_object(
+            "InMemoryFile", 
+            array(
+                "type" => $this->type,
+                "content" => $this->content,
+            )
+        );
     }
 
 }

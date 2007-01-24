@@ -23,11 +23,10 @@ class ImageTable extends FileTable {
 //
     // $uploaded_image here means UploadedImage-based class
     function set_image_fields_from($uploaded_image) {
+        parent::set_file_fields_from($uploaded_image);
+
         $this->width = $uploaded_image->get_width();
         $this->height = $uploaded_image->get_height();
-        $this->type = $uploaded_image->get_type();
-        $this->content = $uploaded_image->get_content();
-        $this->content_length = $uploaded_image->get_content_length();
     }
 
     function create_in_memory_image() {

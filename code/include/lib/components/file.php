@@ -1,6 +1,6 @@
 <?php
 
-class _Image {
+class _File {
 
     function get_type() {
         return "";
@@ -18,55 +18,25 @@ class _Image {
         return 0;
     }
 
-    function get_width() {
-        return 0;
-    }
-
-    function get_height() {
-        return 0;
-    }
-
 }
 
-class InMemoryImage extends _Image {
+class InMemoryFile extends _File {
 
-    // Image dimensions
-    var $_width;
-    var $_height;
-    
-    // Type of image content (based on file extension)
+    // Type of file content (based on file extension)
     var $_type;
     
-    // Image binary content
+    // File binary content
     var $_content;
 
-    // Image binary content length in bytes, if null - autodetect
+    // File binary content length in bytes, if null - autodetect
     var $_content_length;
 
     function _init($params) {
-        $this->set_width(get_param_value($params, "width", 0));
-        $this->set_height(get_param_value($params, "height", 0));
         $this->set_type(get_param_value($params, "type", ""));
         $this->set_content(
             get_param_value($params, "content", ""),
             get_param_value($params, "content_length", null)
         );
-    }
-//
-    function get_width() {
-        return $this->_width;
-    }
-
-    function set_width($width) {
-        $this->_width = $width;
-    }
-
-    function get_height() {
-        return $this->_height;
-    }
-
-    function set_height($height) {
-        $this->_height = $height;
     }
 
     function get_type() {
@@ -94,7 +64,7 @@ class InMemoryImage extends _Image {
 
 }
 
-class FilesystemImage extends _Image {
+class File extends _File {
 
     var $_full_filename;
 
@@ -102,19 +72,8 @@ class FilesystemImage extends _Image {
         $this->set_full_filename(get_param_value($params, "filename", ""));
     }
 //
-    function get_width() {
-        $image_size_info = getimagesize($this->get_full_filename());
-        return $image_size_info[0];
-    }
-
-    function get_height() {
-        $image_size_info = getimagesize($this->get_full_filename());
-        return $image_size_info[1];
-    }
-
     function get_type() {
-        $image_size_info = getimagesize($this->get_full_filename());
-        return get_image_file_extension_by_type($image_size_info[2]);
+        return get_file_extension($this->get_full_filename());
     }
 
     function get_content() {
@@ -144,7 +103,7 @@ class FilesystemImage extends _Image {
 
 }
 
-class UploadedImage extends FilesystemImage {
+class UploadedFile extends File {
     
     var $_input_name;
     var $_uploaded_file_info;
@@ -152,7 +111,7 @@ class UploadedImage extends FilesystemImage {
     function _init($params) {
         parent::_init($params);
 
-        $this->_input_name = get_param_value($params, "input_name", "image_file");
+        $this->_input_name = get_param_value($params, "input_name", "file");
         $this->_uploaded_file_info = get_uploaded_file_info($this->_input_name);
         
         $this->set_full_filename($this->_uploaded_file_info["tmp_name"]);

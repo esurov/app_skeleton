@@ -101,17 +101,17 @@ class HttpResponse {
         $this->add_header(new HttpHeader("Location", "{$url}"));
     }
 
-    function add_content_type_header($mime_type, $charset = null) {
-        $charset_str = (is_null($charset)) ? "" : "; charset={$charset}";
-        $this->add_header(new HttpHeader("Content-Type", "{$mime_type}{$charset_str}"));
+    function add_content_type_header($content_type_str) {
+        $this->add_header(new HttpHeader("Content-Type", $content_type_str));
     }
 
     function add_content_length_header($length) {
         $this->add_header(new HttpHeader("Content-Length", $length));
     }
 
-    function add_content_disposition_header($filename, $disposition_type = "attachment") {
+    function add_content_disposition_header($filename, $is_attachment) {
         $filename_safe = rawurlencode($filename);
+        $disposition_type = ($is_attachment) ? "attachment" : "inline";
         $this->add_header(new HttpHeader(
             "Content-Disposition", "{$disposition_type}; filename=\"{$filename_safe}\""
         ));
@@ -167,40 +167,34 @@ class BinaryContentResponse extends HttpResponse {
 
     var $content;
 
-    function BinaryContentResponse(
-        $content,
-        $mime_type = null,
-        $content_length = null,
-        $should_cache = false
-    ) {
+    function BinaryContentResponse($content_type, $content, $content_length = null) {
         parent::HttpResponse();
 
         $this->content = $content;
-        
-        if (!is_null($mime_type)) {
-            $this->add_content_type_header($mime_type);
-        }
-
-        if (!$should_cache) {
-            $this->add_no_cache_headers();
-        }
 
         if (is_null($content_length)) {
-            if (!is_null($content)) {
-                $content_length = strlen($content);
-            }
+            $content_length = strlen($content);
         }
 
-        if (!is_null($content) && !is_null($content_length)) {
-            $this->add_content_length_header($content_length);
-        }
+        $this->add_content_type_header($content_type);
+        $this->add_content_length_header($content_length);
+    }
+    
+    function get_body() {
+        return $this->content;
     }
 
-    function get_body() {
-        if (is_null($this->content)) {
-            return "";
-        } else {
-            return $this->content;
+}
+
+class PlainTextDocumentResponse extends BinaryContentResponse {
+    
+    function PlainTextDocumentResponse($content, $filename, $is_attachment) {
+        parent::BinaryContentResponse("text/plain", $content);
+        
+        $this->add_no_cache_headers();
+
+        if ($filename != "") {
+            $this->add_content_disposition_header($filename, $is_attachment);
         }
     }
 
@@ -209,9 +203,9 @@ class BinaryContentResponse extends HttpResponse {
 class HtmlDocumentResponse extends BinaryContentResponse {
     
     function HtmlDocumentResponse($content, $charset) {
-        parent::BinaryContentResponse($content);
+        parent::BinaryContentResponse("text/html; charset={$charset}", $content);
 
-        $this->add_content_type_header("text/html", $charset);
+        $this->add_no_cache_headers();
     }
 
 }
@@ -219,77 +213,20 @@ class HtmlDocumentResponse extends BinaryContentResponse {
 class XmlDocumentResponse extends BinaryContentResponse {
     
     function XmlDocumentResponse($content) {
-        parent::BinaryContentResponse($content, "text/xml");
-    }
+        parent::BinaryContentResponse("text/xml", $content);
 
-}
-
-class PlainTextDocumentResponse extends BinaryContentResponse {
-    
-    function PlainTextDocumentResponse($content, $filename, $open_inline) {
-
-        parent::BinaryContentResponse($content, "plain/text");
-
-        if (!is_null($filename)) {
-            if ($filename == "") {
-                $filename = "text_document.txt";
-            }
-            $this->add_content_disposition_header(
-                $filename,
-                ($open_inline) ? "inline" : "attachment"
-            );
-        }
+        $this->add_no_cache_headers();
     }
 
 }
 
 class PdfDocumentResponse extends BinaryContentResponse {
     
-    function PdfDocumentResponse($content, $filename, $open_inline) {
-        
-        parent::BinaryContentResponse($content, "application/pdf", null, true);
+    function PdfDocumentResponse($content, $filename, $is_attachment) {
+        parent::BinaryContentResponse("application/pdf", $content);
 
-        if (!is_null($filename)) {
-            if ($filename == "") {
-                $filename = "pdf_document.pdf";
-            }
-            $this->add_content_disposition_header(
-                $filename,
-                ($open_inline) ? "inline" : "attachment"
-            );
-        }
-    }
-
-}
-
-class ImageResponse extends BinaryContentResponse {
-    
-    function ImageResponse($image, $image_filename, $updated_gmt_str) {
-        $cached_gmt_str = (isset($_SERVER["HTTP_IF_MODIFIED_SINCE"])) ?
-            get_gmt_str_from_if_modified_since($_SERVER["HTTP_IF_MODIFIED_SINCE"]) :
-            "";
-        $image_content = ($updated_gmt_str == $cached_gmt_str) ? null : $image->get_content();
-
-        parent::BinaryContentResponse(
-            $image_content,
-            $image->get_mime_type(),
-            $image->get_content_length(),
-            true
-        );
-
-        if (is_null($image_content)) {
-            $this->push_header(new HttpHeader("HTTP/1.1 304 Not Modified"));
-        } else {
-            if ($image_filename != "") {
-                $this->add_content_disposition_header($image_filename);
-            }
-            $this->add_headers(array(
-                new HttpHeader("Expires", "0"),
-                new HttpHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0"),
-            ));
-            if ($updated_gmt_str != "") {
-                $this->add_last_modified_header($updated_gmt_str);
-            }
+        if ($filename != "") {
+            $this->add_content_disposition_header($filename, $is_attachment);
         }
     }
 
@@ -297,14 +234,20 @@ class ImageResponse extends BinaryContentResponse {
 
 class FileResponse extends BinaryContentResponse {
     
-    function FileResponse($file, $open_inline) {
-        parent::BinaryContentResponse($file->content, $file->type, $file->content_length, true);
-
-        $this->add_content_disposition_header(
-            $file->filename,
-            $open_inline ? "inline" : "attachment"
+    function FileResponse($file, $filename, $updated_gmt_str, $is_attachment) {
+        parent::BinaryContentResponse(
+            $file->get_mime_type(),
+            $file->get_content(),
+            $file->get_content_length()
         );
-        $updated_gmt_str = $file->get_updated_as_gmt_str();
+
+        if ($filename != "") {
+            $this->add_content_disposition_header($filename, $is_attachment);
+        }
+        $this->add_headers(array(
+            new HttpHeader("Expires", "0"),
+            new HttpHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0"),
+        ));
         $this->add_last_modified_header($updated_gmt_str);
     }
 

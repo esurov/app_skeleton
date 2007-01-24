@@ -85,6 +85,34 @@ class NewsArticleTable extends CustomDbObject {
     function validate($old_obj = null, $context = "", $context_params = array()) {
         $messages = parent::validate($old_obj, $context, $context_params);
 
+        if (was_file_uploaded("image_file")) {
+            $this->validate_condition(
+                $messages,
+                array(
+                    "field" => "image_id",
+                    "type" => "uploaded_file_types",
+                    "param" => array(
+                        "input_name" => "image_file",
+                        "type" => "images",
+                    ),
+                    "message" => "news_article_image_bad",
+                ),
+                $old_obj
+            );
+
+            $uploaded_file_info = get_uploaded_file_info("file");
+            $filesize = $uploaded_file_info["size"];
+            if ($filesize > $this->get_config_value("news_article_file_max_size")) {
+                $messages[] = new ErrorStatusMsg("news_article_file_max_size_reached");
+            }
+            if (
+                $this->get_files_total_size("file_id") + $filesize >
+                    $this->get_config_value("news_article_files_max_total_size")
+            ) {
+                $messages[] = new ErrorStatusMsg("news_article_files_max_total_size_reached");
+            }
+        }
+
         if (was_file_uploaded("file")) {
             $this->validate_condition(
                 $messages,

@@ -133,9 +133,11 @@ class AdminApp extends CustomApp {
                 )
             );
 
-            if (was_file_uploaded("file")) {
-                $news_article->process_file_upload("file_id", "file");
-            }
+            $this->process_uploaded_file($news_article, "file_id", "file");
+
+//            if (was_file_uploaded("file")) {
+//                $news_article->process_file_upload("file_id", "file");
+//            }
 
             $news_article->save();
             $this->print_status_message_db_object_updated($news_article_old);

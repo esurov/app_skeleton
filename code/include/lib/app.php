@@ -365,6 +365,11 @@ class App extends AppObject {
         $this->response->add_header(new HttpHeader("HTTP/1.0 404 Not Found"));
     }
 
+    function create_http_not_modified_response() {
+        $this->response = new HttpResponse();
+        $this->response->add_header(new HttpHeader("HTTP/1.1 304 Not Modified"));
+    }
+
     function create_xml_document_response($content) {
         $this->response = new XmlDocumentResponse($content);
     }
@@ -1634,22 +1639,36 @@ class App extends AppObject {
     function action_get_image() {
         $image = $this->read_id_fetch_db_object("ImageTable");
         if ($image->is_definite()) {
-            $this->response = new ImageResponse(
-                $image->create_in_memory_image(),
-                $image->filename,
-                $image->get_updated_as_gmt_str()
-            );
+            $is_attachment = (bool) param("attachment");
+            if ($image->was_updated_since_last_browser_request()) {
+                $this->response = new FileResponse(
+                    $image->create_in_memory_image(),
+                    $image->filename,
+                    $image->get_updated_as_gmt_str(),
+                    $is_attachment
+                );
+            } else {
+                $this->create_http_not_modified_response();
+            }
         } else {
             $this->create_http_not_found_response();
         }
     }
 
     function action_get_file() {
-        $open_inline = (int) param("show");
-
         $file = $this->read_id_fetch_db_object("FileTable");
         if ($file->is_definite()) {
-            $this->response = new FileResponse($file, $open_inline);
+            $is_attachment = (bool) param("attachment");
+            if ($file->was_updated_since_last_browser_request()) {
+                $this->response = new FileResponse(
+                    $file->create_in_memory_file(),
+                    $file->filename,
+                    $file->get_updated_as_gmt_str(),
+                    $is_attachment
+                );
+            } else {
+                $this->create_http_not_modified_response();
+            }
         } else {
             $this->create_http_not_found_response();
         }
@@ -1983,6 +2002,45 @@ class App extends AppObject {
         }
         
         return true;
+    }
+
+    // Uploaded file
+    function process_uploaded_file(
+        &$obj,
+        $file_id_field_name,
+        $input_name,
+        $params = array()
+    ) {
+        if (!was_file_uploaded($input_name)) {
+            return true;
+        }
+    
+        $uploaded_file = $this->create_object(
+            "UploadedFile", 
+            array(
+                "input_name" => $input_name,
+            )
+        );
+        
+        $obj_file = $obj->fetch_file_without_content($file_id_field_name);
+
+        $obj_file->filename = $uploaded_file->get_orig_filename();
+        $obj_file->set_file_fields_from($uploaded_file);
+        
+        $obj_file->save();
+
+        $obj->set_field_value($file_id_field_name, $obj_file->id);
+        
+        return true;
+
+//    function process_file_upload($file_id_field_name, $input_name) {
+//        $file = $this->fetch_file_without_content($file_id_field_name);
+//
+//        $file->read_uploaded_info($input_name);
+//        $file->save();
+//
+//        $this->set_field_value($file_id_field_name, $file->id);
+//    }
     }
 
     function delete_db_object($params = array()) {

@@ -1964,9 +1964,11 @@ class DbObject extends AppObject {
             }
         } else {
             $resource = get_param_value($condition_info, "message", null);
-            $resource_params = get_param_value($condition_info, "message_params", array());
-            if (!is_null($lang_resource)) {
-                $messages[] = new ErrorStatusMsg($resource, $resource_params);
+            if (!is_null($resource)) {
+                $messages[] = new ErrorStatusMsg(
+                    $resource,
+                    get_param_value($condition_info, "message_params", array())
+                );
             }
         }
     }
@@ -2478,15 +2480,6 @@ class DbObject extends AppObject {
             $file = $this->create_db_object("FileTable");
             $file->del_where("id = {$file_id}");
         }
-    }
-
-    function process_file_upload($file_id_field_name, $input_name) {
-        $file = $this->fetch_file_without_content($file_id_field_name);
-
-        $file->read_uploaded_info($input_name);
-        $file->save();
-
-        $this->set_field_value($file_id_field_name, $file->id);
     }
 
     function get_files_total_size($file_id_field_name) {
