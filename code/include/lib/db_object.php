@@ -1660,7 +1660,7 @@ class DbObject extends AppObject {
             );
         }
 
-        $this->print_client_validation_js();        
+        $this->print_client_validation_js($this->_context, $this->_template_var_prefix);        
     }
 //
     function print_form_value(
@@ -1931,15 +1931,7 @@ class DbObject extends AppObject {
     }
 
 //  Objects validation for store/update and validation helpers
-    function get_validate_conditions($context, $context_params) {
-        return array();
-    }
-
-    function get_validate_context_field_names($context, $context_params) {
-        return null;
-    }
-
-    function validate($old_obj = null, $context = "", $context_params = array()) {
+    function validate($old_obj = null, $context = null, $context_params = array()) {
         $conditions = $this->get_validate_conditions($context, $context_params);
         $field_names_to_validate = $this->get_validate_context_field_names(
             $context,
@@ -1955,6 +1947,16 @@ class DbObject extends AppObject {
             $this->validate_condition($messages, $condition_info, $old_obj);
         }
         return $messages;
+    }
+
+    // Should be redefined in child class
+    function get_validate_conditions($context, $context_params) {
+        return array();
+    }
+
+    // Should be redefined in child class if fields are different in each context
+    function get_validate_context_field_names($context, $context_params) {
+        return null;
     }
 
     function validate_condition(&$messages, $condition_info, $old_obj) {
@@ -2151,12 +2153,9 @@ class DbObject extends AppObject {
         return (in_array(strtolower($type), $file_types_allowed));
     }
 //
-    function print_client_validation_js($template_var_prefix = null) {
-        if (is_null($template_var_prefix)) {
-            $template_var_prefix = $this->_template_var_prefix;
-        }
-        $conditions = $this->get_validate_conditions($this->_context, array());
-        $field_names_to_validate = $this->get_validate_context_field_names($this->_context, array());
+    function print_client_validation_js($context, $template_var_prefix) {
+        $conditions = $this->get_validate_conditions($context, array());
+        $field_names_to_validate = $this->get_validate_context_field_names($context, array());
         
         $client_validate_condition_strs = array();
         foreach ($conditions as $condition_info) {

@@ -82,7 +82,7 @@ class NewsArticleTable extends CustomDbObject {
         );
     }
 
-    function validate($old_obj = null, $context = "", $context_params = array()) {
+    function validate($old_obj = null, $context = null, $context_params = array()) {
         $messages = parent::validate($old_obj, $context, $context_params);
 
         if (was_file_uploaded("image_file")) {
