@@ -169,8 +169,8 @@ class PagedQueryObjectsList extends QueryObjectsList {
     var $pager_visible;
     var $pager;
 
-    var $_filters_params;
-    var $_order_by_params;
+    var $_filters_suburl_params;
+    var $_order_by_suburl_params;
 
     var $_action_suburl_params;
     var $_action_filters_suburl_params;
@@ -204,26 +204,25 @@ class PagedQueryObjectsList extends QueryObjectsList {
         $this->_action_filters_suburl_params = $action_suburl_param;
         $this->_action_filters_order_by_suburl_params = $action_suburl_param;
 
-        $this->_filters_params = array();
+        $this->_filters_suburl_params = array();
         if ($this->filter_form_visible) {
             // Apply filters to query
             $this->obj->read_filters();
-            $this->_filters_params = $this->obj->get_filters_params();
+            $this->_filters_suburl_params = $this->obj->get_filters_suburl_params();
             $this->query->expand($this->obj->get_filters_query_ex());
             
-            $this->_action_filters_suburl_params += $this->_filters_params;
-            $this->_action_filters_order_by_suburl_params += $this->_filters_params;
+            $this->_action_filters_suburl_params += $this->_filters_suburl_params;
+            $this->_action_filters_order_by_suburl_params += $this->_filters_suburl_params;
         }
 
-        $this->_order_by_params = array();
+        $this->_order_by_suburl_params = array();
         if (!is_null($this->default_order_by)) {
             // Apply ordering to query
             $this->obj->read_order_by($this->default_order_by);
-            $this->_order_by_params = $this->obj->get_order_by_params();
+            $this->_order_by_suburl_params = $this->obj->get_order_by_suburl_params();
             $this->query->expand($this->obj->get_order_by_query_ex());
 
-            $this->_action_filters_suburl_params += $this->_order_by_params;
-            $this->_action_filters_order_by_suburl_params += $this->_order_by_params;
+            $this->_action_filters_order_by_suburl_params += $this->_order_by_suburl_params;
         }
 
         if (!is_null($this->custom_params)) {
@@ -273,7 +272,7 @@ class PagedQueryObjectsList extends QueryObjectsList {
 
     function _print_list() {
         if ($this->filter_form_visible) {
-            $this->app->print_values($this->_filters_params);
+            $this->app->print_values($this->_filters_suburl_params);
             $this->obj->print_filter_form_values();
             $this->app->print_file_new(
                 "{$this->templates_dir}/{$this->filter_form_template_name}",

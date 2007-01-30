@@ -1421,18 +1421,19 @@ class DbObject extends AppObject {
         return $relation_sign;
     }
 
-    function get_filters_params() {
-        $params = array();
+    function get_filters_suburl_params() {
+        $suburl_params = array();
         foreach ($this->_filters as $filter_info) {
             $filter_name = $filter_info["name"];
             $filter_relation = $filter_info["relation"];
             $filter_value = $filter_info["value"];
             $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
             if ($filter_value != $nonset_filter_value) {
-                $params["{$this->_table_name}_{$filter_name}_{$filter_relation}"] = $filter_value;
+                $suburl_param_name = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
+                $suburl_params[$suburl_param_name] = $filter_value;
             }
         }
-        return $params;
+        return $suburl_params;
     }
 //
     function read_order_by($default_order_by_fields) {
@@ -1449,7 +1450,7 @@ class DbObject extends AppObject {
             if (!$this->is_field_exist($default_order_by_field_name)) {
                 $this->process_fatal_error(
                     "read_order_by(): Field '{$default_order_by_field_name}' " .
-                    "specified in 'default_order_by' not found!"
+                    "specified in 'default_order_by' not found in {$this->_table_name}!"
                 );
             }
         }
@@ -1483,13 +1484,16 @@ class DbObject extends AppObject {
         }
     }
 
-    function get_order_by_params() {
-        $order_by_values = array();
+    function get_order_by_suburl_params() {
+        $suburl_param_values = array();
         foreach ($this->_order_by as $order_by_info) {
-            $order_by_values[] = "{$order_by_info['field_name']} {$order_by_info['direction']}";
+            $suburl_param_values[] = "{$order_by_info['field_name']} {$order_by_info['direction']}";
+        }
+        if (count($suburl_param_values) == 1) {
+            $suburl_param_values = $suburl_param_values[0];
         }
         return array(
-            "order_by" => $order_by_values,
+            "order_by" => $suburl_param_values,
         );
     }
 
