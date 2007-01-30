@@ -15,7 +15,14 @@ class DbObject extends AppObject {
     var $_filters;
     var $_order_by;
 
-    var $print_params;
+    var $_templates_dir;
+    var $_template_var_prefix;
+
+    // Context name for print_values(), print_form_values()
+    var $_context;
+
+    // Custom params which depend on current context
+    var $_custom_params;
 
     function _init($params) {
         parent::_init($params);
@@ -32,7 +39,11 @@ class DbObject extends AppObject {
 
         $this->_filters = array();
 
-        $this->print_params = array();
+        $this->_templates_dir = $this->_table_name;
+        $this->_template_var_prefix = $this->_table_name;
+
+        $this->_context = null;
+        $this->_custom_params = null;
     }
 //
     function set_app(&$app) {
@@ -1497,30 +1508,22 @@ class DbObject extends AppObject {
         );
     }
 //
-    function init_print_param($params, $param_name, $default_value) {
-        $this->print_params[$param_name] = get_param_value(
-            $params,
-            $param_name,
-            $default_value
-        );
+    function _init_print_params($params) {
+        $this->_init_print_param($params, "templates_dir");
+        $this->_init_print_param($params, "template_var_prefix");
+        $this->_init_print_param($params, "context");
+        $this->_init_print_param($params, "custom_params");
     }
 
-    function init_print_params($params) {
-        $this->print_params = array();
-        $this->init_print_param($params, "templates_dir", $this->_table_name);
-        $this->init_print_param($params, "template_var_prefix", $this->_table_name);
-        $this->init_print_param($params, "context", "");
-        $this->init_print_param($params, "list_item_number", 0);
-        $this->init_print_param($params, "list_item_parity", 0);
-        $this->init_print_param($params, "list_item_class", "");
-        $this->init_print_param($params, "list_items_count", 0);
-        $this->init_print_param($params, "custom_params", array());
+    function _init_print_param($params, $param_name) {
+        $param_value = get_param_value($params, $param_name, null);
+        if (!is_null($param_value)) {
+            $this->{"_{$param_name}"} = $param_value;
+        }
     }
 
     function print_values($params = array()) {
-        $this->init_print_params($params);
-        
-        $template_var_prefix = $this->print_params["template_var_prefix"];
+        $this->_init_print_params($params);
 
         $field_names = $this->get_field_names();
         foreach ($field_names as $field_name) {
@@ -1529,7 +1532,7 @@ class DbObject extends AppObject {
                 $this->_fields[$field_name],
                 $field_name,
                 $field_value,
-                $template_var_prefix
+                $this->_template_var_prefix
             );
         }
     }
@@ -1642,8 +1645,6 @@ class DbObject extends AppObject {
     function print_form_values($params = array()) {
         $this->print_values($params);
 
-        $template_var_prefix = $this->print_params["template_var_prefix"];
-
         $field_names = $this->get_field_names();
         foreach ($field_names as $field_name) {
             $field_value = $this->{$field_name};
@@ -1651,7 +1652,7 @@ class DbObject extends AppObject {
                 $this->_fields[$field_name],
                 $field_name,
                 $field_value,
-                $template_var_prefix
+                $this->_template_var_prefix
             );
         }
 
@@ -2146,12 +2147,12 @@ class DbObject extends AppObject {
         return (in_array(strtolower($type), $file_types_allowed));
     }
 //
-    function print_client_validation_js() {
-        $context = $this->print_params["context"];
-        $template_var_prefix = $this->print_params["template_var_prefix"];
-
-        $conditions = $this->get_validate_conditions($context, array());
-        $field_names_to_validate = $this->get_validate_context_field_names($context, array());
+    function print_client_validation_js($template_var_prefix = null) {
+        if (is_null($template_var_prefix)) {
+            $template_var_prefix = $this->_template_var_prefix;
+        }
+        $conditions = $this->get_validate_conditions($this->_context, array());
+        $field_names_to_validate = $this->get_validate_context_field_names($this->_context, array());
         
         $client_validate_condition_strs = array();
         foreach ($conditions as $condition_info) {
@@ -2196,8 +2197,7 @@ class DbObject extends AppObject {
             }
         }
             
-        $template_var_prefix = $this->print_params["template_var_prefix"];
-        $input_name = "{$template_var_prefix}_{$field_name}";
+        $input_name = "{$this->_template_var_prefix}_{$field_name}";
         $type = $condition_info["type"];
         $resource = $condition_info["message"];
         $message_text = (is_null($resource)) ? null : $this->get_lang_str($resource);
@@ -2433,9 +2433,8 @@ class DbObject extends AppObject {
             "{$template_var}.html" :
             "{$template_var}_empty.html";
         
-        $templates_dir = $this->print_params["templates_dir"];
         $this->app->print_file_new_if_exists(
-            "{$templates_dir}/{$filename}",
+            "{$this->_templates_dir}/{$filename}",
             "{$this->_table_name}{$template_var}"
         );
     }
@@ -2467,9 +2466,8 @@ class DbObject extends AppObject {
             "{$template_var}.html" :
             "{$template_var}_empty.html";
         
-        $templates_dir = $this->print_params["templates_dir"];
         $this->app->print_file_new_if_exists(
-            "{$templates_dir}/{$filename}",
+            "{$this->_templates_dir}/{$filename}",
             "{$this->_table_name}{$template_var}"
         );
     }

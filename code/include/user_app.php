@@ -97,19 +97,41 @@ class UserApp extends CustomApp {
     }
 //
     function action_pg_contact_form() {
-        $contact_info = $this->create_db_object("ContactInfo");
-        $contact_info->print_form_values();
-        $this->print_file("contact_form/body.html", "body");
+        $templates_dir = "contact_form";
+
+        $contact_info = get_param_value($this->action_params, "contact_info", null);
+        if (is_null($contact_info)) {
+            $contact_info = $this->create_db_object("ContactInfo");
+        }
+        $contact_form = $this->create_object(
+            "ObjectEdit",
+            array(
+                "templates_dir" => "{$templates_dir}/contact_info_edit",
+                "template_var" => "contact_info_edit",
+                "obj" => $contact_info,
+            )
+        );
+        $contact_form->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
     }
 
     function action_process_contact_form() {
         $contact_info = $this->create_db_object("ContactInfo");
+        $contact_info_old = $contact_info;
         $contact_info->read();
-        
-        $this->send_email_contact_form_processed_to_admin($contact_info);
-        
-        $this->add_session_status_message(new OkStatusMsg("contact_form_processed"));
-        $this->create_self_redirect_response(array("action" => "pg_contact_form"));
+
+        $messages = $contact_info->validate($contact_info_old);
+
+        if (count($messages) != 0) {
+            $this->print_status_messages($messages);
+            $this->run_action("pg_contact_form", array("contact_info" => $contact_info));
+        } else {
+            $this->send_email_contact_form_processed_to_admin($contact_info);
+            
+            $this->add_session_status_message(new OkStatusMsg("contact_form_processed"));
+            $this->create_self_redirect_response(array("action" => "pg_contact_form"));
+        }
     }
 
     function send_email_contact_form_processed_to_admin($contact_info) {

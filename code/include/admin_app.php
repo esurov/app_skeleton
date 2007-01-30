@@ -79,7 +79,6 @@ class AdminApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-
     function action_update_news_article() {
         $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
         $news_article_old = $news_article;
@@ -134,10 +133,6 @@ class AdminApp extends CustomApp {
             );
 
             $this->process_uploaded_file($news_article, "file_id", "file");
-
-//            if (was_file_uploaded("file")) {
-//                $news_article->process_file_upload("file_id", "file");
-//            }
 
             $news_article->save();
             $this->print_status_message_db_object_updated($news_article_old);

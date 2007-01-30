@@ -151,9 +151,7 @@ class NewsArticleTable extends CustomDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        $context = $this->print_params["context"];
-
-        if ($context == "list_item" || $context == "list_item_admin") {
+        if ($this->_context == "list_item" || $this->_context == "list_item_admin") {
             $title_short_len = $this->get_config_value("news_article_title_short_length");
             $this->app->print_varchar_value(
                 "news_article_title_short",
@@ -167,12 +165,12 @@ class NewsArticleTable extends CustomDbObject {
             );
 
             $this->print_image_info("thumbnail_image_id", "_thumbnail_image");
-            if ($context == "list_item_admin") {
+            if ($this->_context == "list_item_admin") {
                 $this->print_file_info("file_id", "_file_info");
             }
         }
         
-        if ($context == "view" || $context == "edit") {
+        if ($this->_context == "view" || $this->_context == "edit") {
             $this->print_image_info("image_id", "_image");
             $this->print_file_info("file_id", "_file_info");
         }

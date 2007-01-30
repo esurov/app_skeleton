@@ -347,20 +347,23 @@ class SampleTable extends CustomDbObject {
         );
 
         // Context handling
-        switch ($this->print_params["context"]) {
+        switch ($this->_context) {
         case "context1":
             // Accessing templates directory for current list
             // May be used for printing inner lists
-            $templates_dir = $this->print_params["templates_dir"];
+            // $this->_templates_dir;
 
             // Accessing custom parameters of this list
             // May be used for creating complex links
-            $param1_value = $this->print_params["custom_params"]["param1"];
-            $param2_value = $this->print_params["custom_params"]["param2"];
+            // NB: Custom params 'param1' and 'param2' are accessible in this context only 
+            $custom_param1_value = $this->_custom_params["param1"];
+            $custom_param2_value = $this->_custom_params["param2"];
 
-            // Access to item number in the list and its parity
-            $list_item_number = $this->print_params["list_item_number"];
-            $list_item_parity = $this->print_params["list_item_parity"];
+            // Access to list-item-specific params
+            $list_item_number = get_param_value($params, "list_item_number", 0);
+            $list_item_parity = get_param_value($params, "list_item_parity", 0);
+            $list_item_class = get_param_value($params, "list_item_class", "");
+            $list_items_count = get_param_value($params, "list_items_count", 0);
 
             // Add context-specific template variable
             $this->app->print_varchar_value(

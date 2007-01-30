@@ -3,6 +3,7 @@
 class _ObjectsList extends ObjectTemplateComponent {
 
     var $_current_obj_idx;
+    var $_num_objects;
 
     function &_fetch_list_object() {
         $obj = false;
@@ -10,7 +11,7 @@ class _ObjectsList extends ObjectTemplateComponent {
     }
 
     function _get_num_objects() {
-        return null;
+        return $this->_num_objects;
     }
 //
     function _print_values() {
@@ -76,11 +77,14 @@ class _ObjectsList extends ObjectTemplateComponent {
              "templates_dir" => $this->templates_dir,
              "template_var_prefix" => $this->template_var_prefix,
              "context" => $this->context,
+             "custom_params" => $this->custom_params,
+             
+             // These params may be accessed in DbObject::print_values()
+             // using get_param_value() only when printing list item
              "list_item_number" => $this->_current_obj_idx + 1,
              "list_item_parity" => $list_item_parity,
              "list_item_class" => $list_item_class,
              "list_items_count" => $this->_get_num_objects(),
-             "custom_params" => $this->custom_params,
         ));
     }
 
@@ -102,6 +106,12 @@ class ObjectsList extends _ObjectsList {
         }
     }
 //
+    function _on_before_print_values() {
+        parent::_on_before_print_values();
+
+        $this->_num_objects = count($this->objects);
+    }
+
     function &_fetch_list_object() {
         if ($this->_current_obj_idx == $this->_get_num_objects()) {
             $obj = false;
@@ -109,10 +119,6 @@ class ObjectsList extends _ObjectsList {
             $obj =& $this->objects[$this->_current_obj_idx];
         }
         return $obj;
-    }
-
-    function _get_num_objects() {
-        return count($this->objects);
     }
 
 }
@@ -139,6 +145,7 @@ class QueryObjectsList extends _ObjectsList {
         parent::_on_before_print_values();
 
         $this->_res = $this->obj->run_select_query($this->query);
+        $this->_num_objects = $this->_res->get_num_rows();
     }
 
     function &_fetch_list_object() {
@@ -148,10 +155,6 @@ class QueryObjectsList extends _ObjectsList {
             $obj = false;
         }
         return $obj;
-    }
-
-    function _get_num_objects() {
-        return $this->_res->get_num_rows();
     }
 
 }
@@ -193,12 +196,23 @@ class PagedQueryObjectsList extends QueryObjectsList {
             "filter_form.html"
         );
 
+        // Make sub-URL params with all necessary parameters stored
+        $action_suburl_param = array("action" => $this->app->action);
+        $extra_suburl_params = $this->app->get_app_extra_suburl_params();
+
+        $this->_action_suburl_params = $action_suburl_param;
+        $this->_action_filters_suburl_params = $action_suburl_param;
+        $this->_action_filters_order_by_suburl_params = $action_suburl_param;
+
         $this->_filters_params = array();
         if ($this->filter_form_visible) {
             // Apply filters to query
             $this->obj->read_filters();
             $this->_filters_params = $this->obj->get_filters_params();
             $this->query->expand($this->obj->get_filters_query_ex());
+            
+            $this->_action_filters_suburl_params += $this->_filters_params;
+            $this->_action_filters_order_by_suburl_params += $this->_filters_params;
         }
 
         $this->_order_by_params = array();
@@ -207,29 +221,20 @@ class PagedQueryObjectsList extends QueryObjectsList {
             $this->obj->read_order_by($this->default_order_by);
             $this->_order_by_params = $this->obj->get_order_by_params();
             $this->query->expand($this->obj->get_order_by_query_ex());
+
+            $this->_action_filters_suburl_params += $this->_order_by_params;
+            $this->_action_filters_order_by_suburl_params += $this->_order_by_params;
         }
 
-        // Make sub-URL params with all necessary parameters stored
-        $action_suburl_param = array("action" => $this->app->action);
-        $extra_suburl_params = $this->app->get_app_extra_suburl_params();
+        if (!is_null($this->custom_params)) {
+            $this->_action_suburl_params += $this->custom_params;
+            $this->_action_filters_suburl_params += $this->custom_params;
+            $this->_action_filters_order_by_suburl_params += $this->custom_params;
+        }
 
-        $this->_action_suburl_params =
-            $action_suburl_param +
-            $this->custom_params +
-            $extra_suburl_params;
-               
-        $this->_action_filters_suburl_params =
-            $action_suburl_param +
-            $this->_filters_params +
-            $this->custom_params +
-            $extra_suburl_params;
-
-        $this->_action_filters_order_by_suburl_params =
-            $action_suburl_param +
-            $this->_filters_params +
-            $this->_order_by_params +
-            $this->custom_params +
-            $extra_suburl_params;
+        $this->_action_suburl_params += $extra_suburl_params;
+        $this->_action_filters_suburl_params += $extra_suburl_params;
+        $this->_action_filters_order_by_suburl_params += $extra_suburl_params;
 
         if ($this->pager_visible) {
             $n_objects_total = $this->app->db->get_select_query_num_rows($this->query);
