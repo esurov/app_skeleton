@@ -26,6 +26,10 @@ class SetupApp extends CustomApp {
         );
     }
 //
+    function get_page_templates_dir() {
+        return "templates/__setup";
+    }
+//
     function get_user_access_level($user = null) {
         return $this->get_http_auth_user_access_level();
     }

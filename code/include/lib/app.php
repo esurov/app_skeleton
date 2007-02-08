@@ -89,8 +89,15 @@ class App extends AppObject {
 
     function create_page_template() {
         $print_template_name = $this->get_config_value("print_template_name");
-        $this->page = new Template("templates/{$this->app_name}", $print_template_name);
+        $this->page = new Template(
+            $this->get_page_templates_dir(),
+            $print_template_name
+        );
         $this->page_template_name = "";
+    }
+
+    function get_page_templates_dir() {
+        return "templates";
     }
 
     function init_vars() {
