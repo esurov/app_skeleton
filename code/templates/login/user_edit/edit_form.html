@@ -1,0 +1,27 @@
+<form action="?" method="post" name="form">
+<input type="hidden" name="action" value="login">
+<table>
+<tr>
+    <th>{%str_login%}:</th>
+    <td>{%user_login_input%}</td>
+</tr>
+<tr>
+    <th>{%str_password%}:</th>
+    <td>{%user_password_input%}</td>
+</tr>
+<tr>
+    <th>{%str_user_should_remember%}:</th>
+    <td>{%user_should_remember_input%}</td>
+</tr>
+<tr>
+    <td colspan="2" align="center"
+        ><input name="submit_btn" type="submit" value="{%str_link_login%}"></td>
+</tr>
+</table>
+</form>
+
+<script language="JavaScript" type="text/javascript">
+focusFormElement("form", "user_login");
+</script>
+
+{%user_client_validation_js%}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<menu
+    name="admin_menu"
+    template="menu.html"
+    item_template="menu_item.html"
+    item_selected_template="menu_item_selected.html"
+    item_delimiter_template="menu_item_delimiter.html"
+    item_has_sub_menu_template="menu_item_has_sub_menu.html"
+>
+    <menu_item
+        name="index"
+        url="?"
+        contexts="pg_index"
+    />
+    <menu_item
+        name="users"
+        url="?action=pg_users"
+        contexts="pg_users, pg_user_edit"
+    />
+</menu>

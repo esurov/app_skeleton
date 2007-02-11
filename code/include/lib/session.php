@@ -3,14 +3,11 @@
 class Session {
 
     function &get_param($name) {
-        if (!Session::has_param($name)) {
-            Session::set_param($name, "");
-        }
         return $_SESSION[$name];
     }
 
-    function set_param($name, $value) {
-        $_SESSION[$name] = $value;
+    function set_param($name, &$value) {
+        $_SESSION[$name] =& $value;
     }
 
     function unset_param($name) {
@@ -28,45 +25,44 @@ class Session {
     }
 
     function &get_login_state() {
-        if (Session::has_param("login_state")) {
-            $login_state =& Session::get_param("login_state");        
-        } else {
-            $login_state = null;
-        }
-        return $login_state;
+        return Session::get_param("login_state");        
     }
 
-    function create_login_state($idle_timeout, $max_timeout, $login_id) {
-        Session::set_param(
-            "login_state",
-            new SessionLoginState($idle_timeout, $max_timeout, $login_id)
-        );
+    function &create_login_state($idle_timeout, $max_timeout, $login_id) {
+        $login_state = new SessionLoginState($idle_timeout, $max_timeout, $login_id);
+        Session::set_param("login_state", $login_state);
+        return $login_state;
     }
 
     function destroy_login_state() {
         Session::unset_param("login_state");
+        Session::destroy_saved_request_params();
     }
 
-    function save_request_data() {
-        Session::set_param("auto_login_get_vars", $_GET);
-        Session::set_param("auto_login_post_vars", $_POST);
+    function save_request_params() {
+        Session::set_param("saved_request_get_params", $_GET);
+        Session::set_param("saved_request_post_params", $_POST);
     }
 
-    function restore_request_data() {
-        $_GET = Session::get_param("auto_login_get_vars");
-        $_POST = Session::get_param("auto_login_post_vars");
-        Session::destroy_request_data();
+    function get_saved_request_params() {
+        return Session::get_saved_request_post_params() + Session::get_saved_request_get_params();
     }
 
-    function has_request_data() {
-        return
-            Session::has_param("auto_login_get_vars") &&
-            Session::has_param("auto_login_post_vars");
+    function get_saved_request_get_params() {
+        return (Session::has_param("saved_request_get_params")) ?
+            Session::get_param("saved_request_get_params") :
+            array();
     }
 
-    function destroy_request_data() {
-        Session::unset_param("auto_login_get_vars");
-        Session::unset_param("auto_login_post_vars");
+    function get_saved_request_post_params() {
+        return (Session::has_param("saved_request_post_params")) ?
+            Session::get_param("saved_request_post_params") :
+            array();
+    }
+
+    function destroy_saved_request_params() {
+        Session::unset_param("saved_request_get_params");
+        Session::unset_param("saved_request_post_params");
     }
 
 }

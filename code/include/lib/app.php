@@ -33,7 +33,6 @@ class App extends AppObject {
     var $actions;
     var $action;
     var $action_params;
-    var $user;
 
     function App($app_class_name, $app_name) {
         $this->set_class_name($app_class_name); 
@@ -46,7 +45,7 @@ class App extends AppObject {
 
         // One action defined, but nobody can access it
         $this->actions = array(
-            "pg_index" => array("valid_users" => array())
+            "pg_index" => array("roles" => array())
         );
 
         $this->write_log(
@@ -139,14 +138,12 @@ class App extends AppObject {
         if ($this->is_valid_action_name()) {
             // Ensure that current user is allowed to run this action
             // Validate user permission level
-            $user_level = $this->get_user_access_level();
-            $valid_levels = $this->actions[$this->action]["valid_users"];
-
-            if (in_array($user_level, $valid_levels)) {
+            $user_role = $this->get_user_role();
+            if (in_array($user_role, $this->actions[$this->action]["roles"])) {
                 $this->run_action();
             } else {
                 $this->write_log(
-                    "User level '{$user_level}' is denied to run action '{$this->action}'",
+                    "User in role '{$user_role}' is denied to run action '{$this->action}'",
                     LOG_WARNING
                 );
                 $this->run_access_denied_action();
@@ -187,8 +184,8 @@ class App extends AppObject {
         return null;
     }
 
-    function get_user_access_level($user = null) {
-        // Return user access level (string) for selecting allowed actions
+    function get_user_role($user = null) {
+        // Return user role (string) for selecting allowed actions
         // for previously created user by function create_current_user()
         return "guest";
     }
@@ -273,10 +270,10 @@ class App extends AppObject {
         }
     }
 //
-    function get_http_auth_user_access_level() {
+    function get_http_auth_user_role() {
         $login = $this->get_config_value("admin_login");
         $password = $this->get_config_value("admin_password");
-        return ($this->is_valid_http_auth_user($login, $password)) ? "user" : "guest";
+        return ($this->is_valid_http_auth_user($login, $password)) ? "admin" : "guest";
     }
 
     function is_valid_http_auth_user($login, $password) {
@@ -313,8 +310,8 @@ class App extends AppObject {
     }
 
     function create_binary_content_response($content, $filename) {
-        $this->response = new BinaryContentResponse($content, "application/octet-stream");
-        $this->response->add_content_disposition_header($filename);
+        $this->response = new BinaryContentResponse("application/octet-stream", $content);
+        $this->response->add_content_disposition_header($filename, true);
     }
 
     function create_html_document_response() {
@@ -961,7 +958,12 @@ class App extends AppObject {
         $input_attrs
     ) {
         $this->print_hidden_input_form_value($template_var, $value);
-        return $this->print_checkbox_input_form_value($template_var, $value, null, $input_attrs);
+        return $this->print_checkbox_input_form_value(
+            $template_var,
+            1,
+            ($value != 0),
+            $input_attrs
+        );
     }
 
     function print_enum_form_value(
@@ -1570,16 +1572,24 @@ class App extends AppObject {
     }
 
     // Static page
-    function print_static_page($page_name) {
-        $this->print_static_file($page_name, "body");
+    function print_static_page($page_name, $template_var) {
+        $full_page_name = "{$page_name}_{$this->lang}";
+        if (!$this->is_static_page_file_exist($full_page_name)) {
+            $full_page_name = $page_name;
+            if (!$this->is_static_page_file_exist($full_page_name)) {
+                $this->print_raw_value($template_var, "");
+                return "";
+            }
+        }
+        return $this->print_static_page_file($full_page_name, $template_var);
     }
 
-    function print_static_file($filename, $template_var) {
-        $file_path = "static/{$filename}_{$this->lang}.html";
-        if (!$this->is_file_exist($file_path)) {
-            $file_path = "static/{$filename}.html";
-        }
-        return $this->print_file_if_exists($file_path, $template_var);
+    function print_static_page_file($page_name, $template_var) {
+        return $this->print_file("static/{$page_name}.html", $template_var);
+    }
+
+    function is_static_page_file_exist($page_name) {
+        return $this->is_file_exist("static/{$page_name}.html");
     }
 
     // Main menu
@@ -1641,7 +1651,7 @@ class App extends AppObject {
     function action_pg_static() {
         $page_name = trim(param("page"));
         if (preg_match('/^\w+$/i', $page_name)) {
-            $this->print_static_page($page_name);
+            $this->print_static_page($page_name, "body");
         }
     }
 
@@ -1726,6 +1736,9 @@ class App extends AppObject {
 
     function action_pg_tables_dump_view() {
         $dump_text = $this->create_tables_dump(param("table_names"), false);
+        if (is_null($dump_text)) {
+            $dump_text = $this->get_lang_str("dump_creation_failed");
+        }
         $n_dump_lines = count(explode("\n", $dump_text));
         $this->print_varchar_value("dump_text", $dump_text);
         $this->print_integer_value("n_dump_lines", $n_dump_lines);
@@ -1734,8 +1747,12 @@ class App extends AppObject {
 
     function action_download_tables_dump() {
         $dump_text = $this->create_tables_dump(param("table_names"), true);
-        $now_date_str = $this->get_db_now_date();
-        $this->create_binary_content_response($dump_text, "dump-{$now_date_str}.sql.bz2");
+        if (is_null($dump_text)) {
+            $this->create_self_redirect_response(array("action" => "pg_tables_dump"));
+        } else {
+            $now_date_str = $this->get_db_now_date();
+            $this->create_binary_content_response($dump_text, "dump-{$now_date_str}.sql.bz2");
+        }
     }
 
     function create_tables_dump($table_names_str, $should_compress) {
@@ -1743,12 +1760,29 @@ class App extends AppObject {
         $database = $this->db->get_database();
         $username = $this->db->get_username();
         $password = $this->db->get_password();
-        $compress_subcmdline = ($should_compress) ?
-            " | bzip2 -" : "";
+        $compress_subcmdline = ($should_compress) ? " | bzip2" : "";
         $cmdline =
             "mysqldump --add-drop-table -u{$username} -p{$password} -h{$host} {$database} " .
             "{$table_names_str}{$compress_subcmdline}";
-        return `{$cmdline}`;
+        $this->write_log(
+            "Creating DB dump:\n" .
+            "Commandline: {$cmdline}",
+            DL_INFO
+        );
+        exec($cmdline, $returned_lines, $returned_value);
+
+        $output = join("\n", $returned_lines);
+        if ($returned_value != 0) {
+            $this->write_log(
+                "DB dump creation failed!\n" .
+                "Commandline: {$cmdline}\n" .
+                "Error #{$returned_value}. Output:\n" .
+                $output,
+                DL_ERROR
+            );
+            return null;
+        }
+        return $output;
     }
 
     // App objects creation functions

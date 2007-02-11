@@ -7,22 +7,22 @@ class SetupApp extends CustomApp {
 
         $this->set_current_lang($this->dlang);
 
-        $u = array("valid_users" => array("user"));
+        $a = array("roles" => array("admin"));
 
         $this->actions = array(
-            "pg_static" => $u,
+            "pg_static" => $a,
             
-            "pg_index" => $u,
+            "pg_index" => $a,
 
-            "create_update_tables" => $u,
-            "delete_tables" => $u,
-            "pg_tables_dump" => $u,
-            "pg_tables_dump_url" => $u,
-            "pg_tables_dump_view" => $u,
-            "download_tables_dump" => $u,
+            "create_update_tables" => $a,
+            "delete_tables" => $a,
+            "pg_tables_dump" => $a,
+            "pg_tables_dump_url" => $a,
+            "pg_tables_dump_view" => $a,
+            "download_tables_dump" => $a,
             
-            "insert_test_data" => $u,
-//            "insert_initial_data" => $u,
+            "insert_initial_data" => $a,
+            "insert_test_data" => $a,
         );
     }
 //
@@ -30,8 +30,8 @@ class SetupApp extends CustomApp {
         return "templates/__setup";
     }
 //
-    function get_user_access_level($user = null) {
-        return $this->get_http_auth_user_access_level();
+    function get_user_role($user = null) {
+        return $this->get_http_auth_user_role();
     }
 
     function run_access_denied_action() {
@@ -39,15 +39,69 @@ class SetupApp extends CustomApp {
     }
 //
     function action_pg_index() {
-        $this->print_static_page("index");
+        $this->print_static_page("index", "body");
+    }
+//
+    function action_insert_initial_data() {
+        $this->insert_initial_users();
+        $this->add_session_status_message(new OkStatusMsg("initial_data_inserted"));
+        $this->create_self_redirect_response();
+    }
+
+    function insert_initial_users() {
+        $user = $this->create_db_object("UserTable");
+
+        $user->login = "admin";
+        $user->password = "";
+        $user->first_name = "Admin";
+        $user->last_name = "";
+        $user->email = $this->get_config_value("admin_email_to");
+        $user->role = "admin";
+        $user->is_confirmed = 1;
+        $user->is_active = 1;
+        $user->store();
     }
 //
     function action_insert_test_data() {
+        $this->insert_test_users();
         $this->insert_test_news_articles();
         $this->add_session_status_message(new OkStatusMsg("test_data_inserted"));
         $this->create_self_redirect_response();
     }
 
+    function insert_test_users() {
+        $user = $this->create_db_object("UserTable");
+
+        $user->login = "user";
+        $user->password = "";
+        $user->first_name = "Fn";
+        $user->last_name = "Ln";
+        $user->email = $this->get_config_value("admin_email_to");
+        $user->role = "user";
+        $user->is_confirmed = 1;
+        $user->is_active = 1;
+        $user->store();
+
+        $user->login = "user_not_active";
+        $user->password = "";
+        $user->first_name = "FnNotActive";
+        $user->last_name = "LnNotActive";
+        $user->email = $this->get_config_value("admin_email_to");
+        $user->role = "user";
+        $user->is_confirmed = 1;
+        $user->is_active = 0;
+        $user->store();
+
+        $user->login = "user_not_confirmed";
+        $user->password = "";
+        $user->first_name = "FnNotConfirmed";
+        $user->last_name = "LnNotConfirmed";
+        $user->email = $this->get_config_value("admin_email_to");
+        $user->role = "user";
+        $user->is_confirmed = 0;
+        $user->is_active = 0;
+        $user->store();
+    }
     function insert_test_news_articles() {
         $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
         $news_article->created = "2004-06-20";
@@ -143,10 +197,6 @@ class SetupApp extends CustomApp {
             "Curabitur at odio. Sed vel justo. Aenean suscipit.";
         $news_article->store();
     }
-//    function action_insert_initial_data() {
-//        $this->add_session_status_message(new OkStatusMsg("initial_data_inserted"));
-//        $this->create_self_redirect_response();
-//    }
 
 }
 

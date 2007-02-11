@@ -5,6 +5,7 @@ php_flag session.use_cookies on
 php_flag session.use_only_cookies on
 php_value session.cache_limiter none
 
+DirectoryIndex index.php
 Options -Indexes
 
 <FilesMatch "^(\.svn|entries)$">

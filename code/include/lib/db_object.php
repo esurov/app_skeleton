@@ -1189,7 +1189,7 @@ class DbObject extends AppObject {
     }
 
     function get_boolean_field_value($param_value) {
-        return ((int) $param_value != 0) ? 1 : 0;
+        return (is_null($param_value)) ? 0 : 1;
     }
 
     function get_enum_field_value($enum_value, $enum_value_caption_pairs) {
@@ -1252,9 +1252,7 @@ class DbObject extends AppObject {
         $filter_relation = $filter_info["relation"];
         
         $param_value = param("{$this->_table_name}_{$filter_name}_{$filter_relation}");
-        if (is_null($param_value)) {
-            $filter_info["value"] = $this->get_nonset_filter_value($filter_info);
-        } else {
+        if (!is_null($param_value)) {
             $filter_info["value"] = $param_value;
         }
     }
@@ -1427,11 +1425,8 @@ class DbObject extends AppObject {
             $filter_name = $filter_info["name"];
             $filter_relation = $filter_info["relation"];
             $filter_value = $filter_info["value"];
-            $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
-            if ($filter_value != $nonset_filter_value) {
-                $suburl_param_name = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
-                $suburl_params[$suburl_param_name] = $filter_value;
-            }
+            $suburl_param_name = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
+            $suburl_params[$suburl_param_name] = $filter_value;
         }
         return $suburl_params;
     }
@@ -1834,7 +1829,7 @@ class DbObject extends AppObject {
         $filter_name = $filter_info["name"];
         $filter_relation = $filter_info["relation"];
         $filter_value = $filter_info["value"];
-        
+
         $filter_input_type = isset($filter_info["input"]["type"]) ?
             $filter_info["input"]["type"] :
             "text";

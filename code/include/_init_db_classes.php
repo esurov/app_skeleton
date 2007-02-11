@@ -23,6 +23,12 @@ $db_classes["classes"] = array(
     ),
 
     // DbObject-derived classes defined in app
+    "UserTable" => array(
+        "filename" => "user_table.php",
+        "required_classes" => array("CustomDbObject"),
+        "params" => array("table_name" => "user", "create" => true),
+    ),
+
     "NewsArticleTable" => array(
         "filename" => "news_article_table.php",
         "required_classes" => array("CustomDbObject"),

@@ -7,26 +7,26 @@ class AdminApp extends CustomApp {
 
         $this->set_current_lang($this->dlang);
 
-        $u = array("valid_users" => array("user"));
+        $a = array("roles" => array("admin"));
 
         $this->actions = array(
-            "pg_static" => $u,
-            "get_image" => $u,
-            "get_file" => $u,
+            "pg_static" => $a,
+            "get_image" => $a,
+            "get_file" => $a,
 
-            "pg_index" => $u,
+            "pg_index" => $a,
 
-            "pg_news_articles" => $u,
-            "pg_news_article_edit" => $u,
-            "update_news_article" => $u,
-            "delete_news_article" => $u,
-            "delete_news_article_image" => $u,
-            "delete_news_article_file" => $u,
+            "pg_news_articles" => $a,
+            "pg_news_article_edit" => $a,
+            "update_news_article" => $a,
+            "delete_news_article" => $a,
+            "delete_news_article_image" => $a,
+            "delete_news_article_file" => $a,
         );
     }
 //
-    function get_user_access_level($user = null) {
-        return $this->get_http_auth_user_access_level();
+    function get_user_role($user = null) {
+        return $this->get_http_auth_user_role();
     }
 
     function run_access_denied_action() {
@@ -34,7 +34,7 @@ class AdminApp extends CustomApp {
     }
 //
     function action_pg_index() {
-        $this->print_static_page("index");
+        $this->print_static_page("index", "body");
     }
 //
     function action_pg_news_articles() {

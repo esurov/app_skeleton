@@ -5,8 +5,9 @@ setup_area_head_title = !!AppSkeleton setup area
 ["status messages (setup area)"]
 tables_updated = Tables have been updated!
 tables_deleted = Tables have been deleted!
-test_data_inserted = Test data have been inserted!
 initial_data_inserted = Initial data have been inserted!
+test_data_inserted = Test data have been inserted!
+dump_creation_failed = Dump creation failed!
 
 ["page and head titles (admin area)"]
 admin_auth_realm = !!AppSkeleton area di amministrazione

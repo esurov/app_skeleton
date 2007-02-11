@@ -1,0 +1,14 @@
+<tr class="{%list_item_class%}">
+    <td>{%user_id%}</td>
+    <td>{%user_created%}</td>
+    <td>{%user_login%}</td>
+    <td>{%user_full_name_reversed%}</td>
+    <td>{%user_email%}</td>
+    <td>{%user_role%}</td>
+    <td>{%user_is_confirmed%}</td>
+    <td>{%user_is_active%}</td>
+    <td>[<a href="?action=pg_user_edit&amp;user_id={%user_id%}"
+        >{%str_link_edit%}</a>]&nbsp;[<a href="?action=delete_user&amp;user_id={%user_id%}"
+        onclick="return confirm('{%str_sure_delete%}')"
+        >{%str_link_delete%}</a>]</td>
+</tr>

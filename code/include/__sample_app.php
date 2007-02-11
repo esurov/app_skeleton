@@ -5,7 +5,7 @@ class SampleApp extends CustomApp {
     function SampleApp() {
         parent::CustomApp("SampleApp", "_sample");
 
-        $e = array("valid_users" => array("guest"));
+        $e = array("roles" => array("guest"));
 
         $this->actions = array(
             "pg_index" => $e,
@@ -22,6 +22,10 @@ class SampleApp extends CustomApp {
 
             "pg_component_view" => $e,
         );
+    }
+//
+    function get_page_templates_dir() {
+        return "templates/__sample";
     }
 //
     function action_pg_index() {
