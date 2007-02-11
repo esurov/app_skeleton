@@ -35,8 +35,9 @@ $db_classes["classes"] = array(
         "params" => array("table_name" => "news_article", "create" => true),
     ),
 
-    // These are fake tables, used because of their print_values/print_form_values feature
-    "ContactInfo" => array(
+    // These are fake tables (no '_table' suffix in filename),
+    // for now are just used here because of their print_values/print_form_values feature
+    "ContactInfoTable" => array(
         "filename" => "contact_info.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "contact_info", "create" => false),

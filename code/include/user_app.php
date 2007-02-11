@@ -48,7 +48,7 @@ class UserApp extends CustomApp {
     }
 //
     function create_current_user() {
-        $this->user = $this->create_db_object("UserTable");
+        $this->user = $this->create_db_object("User");
         $login_state =& Session::get_login_state();
 
         if (is_null($login_state)) {
@@ -190,7 +190,7 @@ class UserApp extends CustomApp {
     function action_pg_index() {
         $templates_dir = "index";
 
-        $news_article = $this->create_db_object("NewsArticleTable");
+        $news_article = $this->create_db_object("NewsArticle");
         $n_recent_news_articles = $this->get_config_value("recent_news_articles_number");
         $recent_news_articles_list = $this->create_object(
             "QueryObjectsList",
@@ -215,21 +215,17 @@ class UserApp extends CustomApp {
         switch ($user_role) {
         case "user":
         case "admin":
-            $this->{"print_{$user_role}_home_page"}();
+            $this->{"pg_{$user_role}_home_page"}();
             break;
         }
     }
 
-    function print_user_home_page() {
-    
+    function pg_user_home_page() {
+        $this->create_self_redirect_response(array("action" => "pg_user_edit"));
     }
 
-    function print_admin_home_page() {
-        $this->run_action("pg_users");
-    }
-
-    function pg_users() {
-    
+    function pg_admin_home_page() {
+        $this->create_self_redirect_response(array("action" => "pg_users"));
     }
 //
 /*
@@ -238,7 +234,7 @@ class UserApp extends CustomApp {
 
         $news_article = get_param_value($this->action_params, "news_article", null);
         if (is_null($news_article)) {
-            $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
+            $news_article = $this->read_id_fetch_db_object("NewsArticle");
         }
         $news_article_edit = $this->create_object(
             "ObjectEdit",
@@ -255,7 +251,7 @@ class UserApp extends CustomApp {
     }
 
     function action_update_news_article() {
-        $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
+        $news_article = $this->read_id_fetch_db_object("NewsArticle");
         $news_article_old = $news_article;
         $news_article->read();
 
@@ -320,7 +316,7 @@ class UserApp extends CustomApp {
 
         $user = get_param_value($this->action_params, "user", null);
         if (is_null($user)) {
-            $user = $this->read_id_fetch_db_object("UserTable");
+            $user = $this->read_id_fetch_db_object("User");
             $user->insert_login_form_extra_fields();
         } else {
             $user->login = "";
@@ -343,7 +339,7 @@ class UserApp extends CustomApp {
     function action_login() {
         $user = get_param_value($this->action_params, "user", null);
         if (is_null($user)) {
-            $user = $this->create_db_object("UserTable");
+            $user = $this->create_db_object("User");
             $user->insert_login_form_extra_fields();
             $user->read(array("login", "password", "should_remember"));
         }
@@ -417,8 +413,10 @@ class UserApp extends CustomApp {
             ));
         }
     }
-/*
+
     function action_pg_signup() {
+    }
+/*
         $supplier = get_param_value($this->action_params, "supplier", null);
         if (is_null($supplier)) {
             $supplier = $this->create_db_object("supplier");
@@ -508,42 +506,15 @@ class UserApp extends CustomApp {
             $this->config->get_value("email_signup_finished_to_admin_subject"),
             "signup/email_signup_finished_to_admin.html"
         );
-    }
 */
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    function action_pg_recover_password() {
+    }
 //
     function action_pg_news_articles() {
         $templates_dir = "news_articles";
         
-        $news_article = $this->create_db_object("NewsArticleTable");
+        $news_article = $this->create_db_object("NewsArticle");
         $news_articles_list = $this->create_object(
             "PagedQueryObjectsList",
             array(
@@ -565,7 +536,7 @@ class UserApp extends CustomApp {
     function action_pg_news_article_view() {
         $templates_dir = "news_article_view";
 
-        $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
+        $news_article = $this->read_id_fetch_db_object("NewsArticle");
         $news_article_view = $this->create_object(
             "ObjectView",
             array(
@@ -641,7 +612,7 @@ class UserApp extends CustomApp {
     function action_pg_users() {
         $templates_dir = "users";
         
-        $user = $this->create_db_object("UserTable");
+        $user = $this->create_db_object("User");
         $users_list = $this->create_object(
             "PagedQueryObjectsList",
             array(

@@ -1656,7 +1656,7 @@ class App extends AppObject {
     }
 
     function action_get_image() {
-        $image = $this->read_id_fetch_db_object("ImageTable");
+        $image = $this->read_id_fetch_db_object("Image");
         if ($image->is_definite()) {
             $is_attachment = (bool) param("attachment");
             if ($image->was_updated_since_last_browser_request()) {
@@ -1675,7 +1675,7 @@ class App extends AppObject {
     }
 
     function action_get_file() {
-        $file = $this->read_id_fetch_db_object("FileTable");
+        $file = $this->read_id_fetch_db_object("File");
         if ($file->is_definite()) {
             $is_attachment = (bool) param("attachment");
             if ($file->was_updated_since_last_browser_request()) {
@@ -1801,7 +1801,7 @@ class App extends AppObject {
         global $db_classes;
 
         return $this->_create_object(
-            $obj_class_name,
+            "{$obj_class_name}Table",
             $db_classes["classes"],
             $db_classes["class_paths"],
             $obj_params

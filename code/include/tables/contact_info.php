@@ -1,6 +1,6 @@
 <?php
 
-class ContactInfo extends CustomDbObject {
+class ContactInfoTable extends CustomDbObject {
 
     function _init($params) {
         parent::_init($params);

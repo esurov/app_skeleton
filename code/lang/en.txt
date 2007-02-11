@@ -169,6 +169,8 @@ user_should_accept_agreement = You should check "I accept" to continue
 ["confirm signup"]
 
 ["recover_password"]
+page_title_pg_recover_password = Recover password
+
 recover_password_login_empty = Specify login
 recover_password_email_empty = Specify email
 recover_password_login_or_email_empty = Specify login or email

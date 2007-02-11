@@ -51,7 +51,7 @@ class SampleApp extends CustomApp {
     }
 
     function action_get_news_articles_with_new_field_xml() {
-        $news_article = $this->create_db_object("NewsArticleTable");
+        $news_article = $this->create_db_object("NewsArticle");
         $news_article->insert_field(array(
             "field" => "new_field",
             "type" => "integer",
@@ -77,7 +77,7 @@ class SampleApp extends CustomApp {
 /*
     function action_pg_sample_records_list_in_context1() {
         $this->print_many_objects_list_page(array(
-            "obj" => "SampleTable",
+            "obj" => "Sample",
             "templates_dir" => "_sample_table/list_context1",
             "context" => "context1",
             "custom_params" => array(
@@ -89,7 +89,7 @@ class SampleApp extends CustomApp {
 
     function action_pg_sample_records_list_in_context2() {
         $this->print_many_objects_list_page(array(
-            "obj" => "SampleTable",
+            "obj" => "Sample",
             "templates_dir" => "_sample_table/list_context2",
             "context" => "context2",
         ));
@@ -97,7 +97,7 @@ class SampleApp extends CustomApp {
 
     function action_pg_sample_records_list_as_objects() {
         $objects = $this->fetch_db_objects_list(
-            "SampleTable",
+            "Sample",
             array("order_by" => "created DESC")
         );
         $this->print_many_objects_list(array(
@@ -108,7 +108,7 @@ class SampleApp extends CustomApp {
     }
 */
     function action_print_and_save_one_sample2_record() {
-        $obj = $this->fetch_db_object("Sample2Table", 1);
+        $obj = $this->fetch_db_object("Sample2", 1);
         $obj->print_values();
 
         $obj->field_currency = 99999999.99;

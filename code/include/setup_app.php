@@ -49,7 +49,7 @@ class SetupApp extends CustomApp {
     }
 
     function insert_initial_users() {
-        $user = $this->create_db_object("UserTable");
+        $user = $this->create_db_object("User");
 
         $user->login = "admin";
         $user->password = "";
@@ -70,7 +70,7 @@ class SetupApp extends CustomApp {
     }
 
     function insert_test_users() {
-        $user = $this->create_db_object("UserTable");
+        $user = $this->create_db_object("User");
 
         $user->login = "user";
         $user->password = "";
@@ -103,7 +103,7 @@ class SetupApp extends CustomApp {
         $user->store();
     }
     function insert_test_news_articles() {
-        $news_article = $this->read_id_fetch_db_object("NewsArticleTable");
+        $news_article = $this->read_id_fetch_db_object("NewsArticle");
         $news_article->created = "2004-06-20";
         $news_article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";
         $news_article->body_it =

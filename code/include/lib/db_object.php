@@ -2415,12 +2415,12 @@ class DbObject extends AppObject {
     // Uploaded image helper functions
     function fetch_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
-        return $this->fetch_db_object("ImageTable", $image_id);
+        return $this->fetch_db_object("Image", $image_id);
     }
 
     function fetch_image_without_content($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
-        return $this->fetch_db_object("ImageTable", $image_id, "1", null, array("content"));
+        return $this->fetch_db_object("Image", $image_id, "1", null, array("content"));
     }
 
     function print_image_info($image_id_field_name, $template_var) {
@@ -2440,7 +2440,7 @@ class DbObject extends AppObject {
     function del_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
         if ($image_id != 0) {
-            $image = $this->create_db_object("ImageTable");
+            $image = $this->create_db_object("Image");
             $image->del_where("id = {$image_id}");
         }
     }
@@ -2448,12 +2448,12 @@ class DbObject extends AppObject {
     // Uploaded file helper functions
     function fetch_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
-        return $this->fetch_db_object("FileTable", $file_id);
+        return $this->fetch_db_object("File", $file_id);
     }
 
     function fetch_file_without_content($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
-        return $this->fetch_db_object("FileTable", $file_id, "1", null, array("content"));
+        return $this->fetch_db_object("File", $file_id, "1", null, array("content"));
     }
 
     function print_file_info($file_id_field_name, $template_var) {
@@ -2473,7 +2473,7 @@ class DbObject extends AppObject {
     function del_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         if ($file_id != 0) {
-            $file = $this->create_db_object("FileTable");
+            $file = $this->create_db_object("File");
             $file->del_where("id = {$file_id}");
         }
     }
