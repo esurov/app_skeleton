@@ -11,25 +11,25 @@ $db_classes["classes"] = array(
     // DbObject-derived parent classes
 
     // DbObject-derived classes defined in lib
-    "FileTable" => array(
+    "File" => array(
         "filename" => "file_table.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "file", "create" => true),
     ),
-    "ImageTable" => array(
+    "Image" => array(
        "filename" => "image_table.php",
-       "required_classes" => array("FileTable"),
+       "required_classes" => array("File"),
        "params" => array("table_name" => "image", "create" => true),
     ),
 
     // DbObject-derived classes defined in app
-    "UserTable" => array(
+    "User" => array(
         "filename" => "user_table.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "user", "create" => true),
     ),
 
-    "NewsArticleTable" => array(
+    "NewsArticle" => array(
         "filename" => "news_article_table.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "news_article", "create" => true),
@@ -37,7 +37,7 @@ $db_classes["classes"] = array(
 
     // These are fake tables (no '_table' suffix in filename),
     // for now are just used here because of their print_values/print_form_values feature
-    "ContactInfoTable" => array(
+    "ContactInfo" => array(
         "filename" => "contact_info.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "contact_info", "create" => false),
@@ -45,14 +45,14 @@ $db_classes["classes"] = array(
 
     // Note: Declarations below are just for sample purposes and
     // should be removed in real app
-    "SampleTable" => array(
+    "Sample" => array(
         "filename" => "__sample_table.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "__sample", "create" => false),
     ),
-    "Sample2Table" => array(
+    "Sample2" => array(
         "filename" => "__sample2_table.php",
-        "required_classes" => array("SampleTable"),
+        "required_classes" => array("Sample"),
         "params" => array("table_name" => "__sample2", "create" => true),
     ),
 

@@ -52,6 +52,10 @@ class DbObject extends AppObject {
         $this->db =& $this->app->db;
     }
 //
+    function get_table_class_name() {
+        return $this->get_class_name_without_suffix();
+    }
+
     function get_plural_name() {
         return $this->get_lang_str($this->get_plural_lang_resource());
     }
@@ -235,7 +239,7 @@ class DbObject extends AppObject {
         $obj_class_name = get_param_value($field_info, "obj_class", null);
         $table_name_sql_alias = get_param_value($field_info, "table_sql_alias", null);
         
-        if (is_null($obj_class_name) || ($obj_class_name == $this->get_class_name())) {
+        if (is_null($obj_class_name) || ($obj_class_name == $this->get_table_class_name())) {
             if (is_null($table_name_sql_alias) && is_null($field_name_sql_alias)) {
                 // Case of real or calculated field from current DbObject
                 $multilingual = get_param_value($field_info, "multilingual", 0);
@@ -537,7 +541,7 @@ class DbObject extends AppObject {
                 "in join info{$field_name_error_str}!"
             );
         }
-        if ($joined_obj_class_name == $this->get_class_name()) {
+        if ($joined_obj_class_name == $this->get_table_class_name()) {
             $joined_obj = $this;
         } else {
             $joined_obj = $this->create_db_object($joined_obj_class_name);
@@ -2535,7 +2539,7 @@ class DbObject extends AppObject {
             return null;
         }
 
-        $neighbor_obj = $this->create_db_object($this->get_class_name());
+        $neighbor_obj = $this->create_db_object($this->get_table_class_name());
         if ($neighbor_obj->fetch("position = {$neighbor_obj_position} AND {$where_str}")) {
             return $neighbor_obj;
         } else {

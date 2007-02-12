@@ -1791,6 +1791,7 @@ class App extends AppObject {
 
         return $this->_create_object(
             $obj_class_name,
+            "",
             $app_classes["classes"],
             $app_classes["class_paths"],
             $obj_params
@@ -1801,32 +1802,43 @@ class App extends AppObject {
         global $db_classes;
 
         return $this->_create_object(
-            "{$obj_class_name}Table",
+            $obj_class_name,
+            "Table",
             $db_classes["classes"],
             $db_classes["class_paths"],
             $obj_params
         );
     }
 
-    function _create_object($class_name, $classes_info, $class_paths, $obj_params = array()) {
-        $class_info = get_param_value($classes_info, $class_name, null);
+    function _create_object(
+        $class_name_without_suffix,
+        $class_name_suffix,
+        $classes_info,
+        $class_paths,
+        $obj_params = array()
+    ) {
+        $class_info = get_param_value($classes_info, $class_name_without_suffix, null);
+        $class_name = "{$class_name_without_suffix}{$class_name_suffix}";
+        if ($class_name_suffix != "") {
+            $with_suffix_str = " with suffix '{$class_name_suffix}'";
+        }
         if (is_null($class_info)) {
             $this->process_fatal_error(
-                "Cannot find info about class '{$class_name}'!"
+                "Cannot find info about class '{$class_name_without_suffix}'{$with_suffix_str}!"
             );
         }
         
         if (!class_exists($class_name)) {
-            if (!$this->_load_class($class_name, $classes_info, $class_paths)) {
+            if (!$this->_load_class($class_name_without_suffix, $classes_info, $class_paths)) {
                 $this->process_fatal_error(
-                    "Cannot load class '{$class_name}'!"
+                    "Cannot load class '{$class_name_without_suffix}'{$with_suffix_str}!"
                 );
             }
         }
         
         $obj = new $class_name();
         if (is_subclass_of($obj, "Object")) {
-            $obj->set_class_name($class_name);
+            $obj->set_class_name($class_name_without_suffix, $class_name_suffix);
             $init_obj_params = get_param_value($class_info, "params", null);
             if (!is_null($init_obj_params)) {
                 $obj_params = $init_obj_params + $obj_params;
@@ -1842,7 +1854,11 @@ class App extends AppObject {
         return $obj;
     }
 
-    function _load_class($class_name, $classes_info, $class_paths) {
+    function _load_class(
+        $class_name,
+        $classes_info,
+        $class_paths
+    ) {
         $class_info = get_param_value($classes_info, $class_name, null);
         if (is_null($class_info)) {
             $this->process_fatal_error(
@@ -1852,7 +1868,11 @@ class App extends AppObject {
 
         $required_classes = get_param_value($class_info, "required_classes", array());
         foreach ($required_classes as $required_class_name) {
-            if (!$this->_load_class($required_class_name, $classes_info, $class_paths)) {
+            if (!$this->_load_class(
+                $required_class_name,
+                $classes_info,
+                $class_paths
+            )) {
                 return false;
             }
         }

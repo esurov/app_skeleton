@@ -150,7 +150,7 @@ page_title_pg_signup = Signup
 
 user_login_or_password_unknown = Bad login "{%login%}" or password
 user_disabled_by_admin = User "{%login%}" is currently disabled by site administrator
-user_not_confirmed_yet = User "{%login%}" is not confirmed yet. Use confirmation URL from your signup confirmation email.
+user_not_confirmed_yet = User "{%login%}" is not confirmed yet. Use confirmation link from your signup confirmation email.
 status_message_resource_access_denied = Requested page cannot be displayed. Please use your access info.
 status_message_logged_out = Logout completed successfully
 
@@ -164,6 +164,10 @@ login_status_not_logged_in = Non connesso
 user_should_remember = Remember me
 
 ["signup"]
+user_menu_item_signup = Signup
+
+page_title_pg_signup = Signup
+
 user_should_accept_agreement = You should check "I accept" to continue
 
 ["confirm signup"]

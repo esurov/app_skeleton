@@ -48,7 +48,7 @@ class SampleTable extends CustomDbObject {
             // Join example in insert_field() to NewsArticle
             "join" => array(
                 "type" => "left",
-                "obj_class" => "NewsArticleTable",
+                "obj_class" => "NewsArticle",
                 "field" => "id",
             ),
         ));
@@ -61,7 +61,7 @@ class SampleTable extends CustomDbObject {
             // with SQL table alias 'news_article_alias'
             "join" => array(
                 "type" => "left",
-                "obj_class" => "NewsArticleTable",
+                "obj_class" => "NewsArticle",
                 "table_sql_alias" => "news_article_alias",
                 "field" => "id",
             ),
@@ -97,7 +97,7 @@ class SampleTable extends CustomDbObject {
         // Current DbObject table name is accessed by _table_name member var
         $this->insert_join(array(
             "type" => "left",
-            "obj_class" => "ImageTable",
+            "obj_class" => "Image",
             
             // SQL string for join condition
             "condition" => "{$this->_table_name}.image_id = image.id",
@@ -109,7 +109,7 @@ class SampleTable extends CustomDbObject {
             "type" => "foreign_key",
             "join" => array(
                 "type" => "left",
-                "obj_class" => $this->get_class_name(),
+                "obj_class" => $this->get_table_class_name(),
                 "table_sql_alias" => "{$this->_table_name}_alias",
                 "field" => "id",
             ),
@@ -295,13 +295,13 @@ class SampleTable extends CustomDbObject {
         // Multilingual field from NewsArticle table
         // Note: Type not specified because it is taken automatically from another DbObject
         $this->insert_field(array(
-            "obj_class" => "NewsArticleTable",
+            "obj_class" => "NewsArticle",
             "field" => "title",
         ));
 
         // Field from NewsArticle joined with SQL table alias 'news_article_alias'
         $this->insert_field(array(
-            "obj_class" => "NewsArticleTable",
+            "obj_class" => "NewsArticle",
             "table_sql_alias" => "news_article_alias",
             "field" => "title",
         ));
@@ -310,7 +310,7 @@ class SampleTable extends CustomDbObject {
         // Note: Type not specified because it is taken automatically from another DbObject
         // NB: Field commented because field was removed from NewsArticle
 //        $this->insert_field(array(
-//            "obj_class" => "NewsArticleTable",
+//            "obj_class" => "NewsArticle",
 //            "field" => "full_text",
 //        ));
 

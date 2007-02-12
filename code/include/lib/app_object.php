@@ -3,18 +3,23 @@
 class Object {
     
     var $_class_name;
+    var $_class_name_without_suffix;
 
     function _init($params) {
     }
 
-    function set_class_name($class_name) {
-        $this->_class_name = $class_name;
+    function set_class_name($class_name_without_suffix, $class_name_suffix = "") {
+        $this->_class_name = "{$class_name_without_suffix}{$class_name_suffix}";
+        $this->_class_name_without_suffix = $class_name_without_suffix;
     }
 
     function get_class_name() {
         return $this->_class_name;
     }
 
+    function get_class_name_without_suffix() {
+        return $this->_class_name_without_suffix;
+    }
 }
 
 class AppObject extends Object {

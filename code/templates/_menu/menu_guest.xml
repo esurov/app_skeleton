@@ -92,4 +92,9 @@
             </menu_item>
         </menu>
     </menu_item>
+    <menu_item
+        name="signup"
+        url="?action=pg_signup"
+        contexts="pg_signup"
+    />
 </menu>

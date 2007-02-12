@@ -18,14 +18,14 @@ $db_classes = array(
         ),
 
         // Common DbObject classes
-        "FileTable" => array(
+        "File" => array(
             "filename" => "file_table.php",
             "required_classes" => array("CustomDbObject"),
             "params" => array("table_name" => "file", "create" => false),
         ),
-        "ImageTable" => array(
+        "Image" => array(
             "filename" => "image_table.php",
-            "required_classes" => array("FileTable"),
+            "required_classes" => array("File"),
             "params" => array("table_name" => "image", "create" => false),
         ),
     ),

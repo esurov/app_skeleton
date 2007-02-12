@@ -29,7 +29,6 @@ class UserTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "login",
             "type" => "varchar",
-            "width" => 20,
             "index" => "unique",
         ));
 
@@ -50,13 +49,11 @@ class UserTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "first_name",
             "type" => "varchar",
-            "width" => 16,
         ));
 
         $this->insert_field(array(
             "field" => "last_name",
             "type" => "varchar",
-            "width" => 20,
         ));
 
         $this->insert_field(array(
@@ -89,26 +86,6 @@ class UserTable extends CustomDbObject {
             "value" => 0,
         ));
 //
-/*
-        $this->insert_field(array(
-            "field" => "password_confirm",
-            "type" => "varchar",
-            "input" => array(
-                "type" => "password",
-                "type_attrs" => array(
-                    "maxlength" => 16,
-                ),
-            ),
-            "select" => "''",
-        ));
-
-        $this->insert_field(array(
-            "field" => "agreement_accepted",
-            "type" => "boolean",
-            "select" => "0",
-        ));
-*/
-
         $this->insert_filter(array(
             "name" => "login",
             "relation" => "like",
@@ -190,6 +167,24 @@ class UserTable extends CustomDbObject {
             "select" => "0",
         ));
     }
+
+    function insert_signup_form_extra_fields() {
+        $this->insert_field(array(
+            "field" => "password_confirm",
+            "type" => "varchar",
+            "width" => 16,
+            "input" => array(
+                "type" => "password",
+            ),
+            "select" => "''",
+        ));
+
+        $this->insert_field(array(
+            "field" => "agreement_accepted",
+            "type" => "boolean",
+            "select" => "0",
+        ));
+    }
 //
     function get_validate_conditions($context, $context_params) {
         switch ($context) {
@@ -220,11 +215,18 @@ class UserTable extends CustomDbObject {
                         "message" => "user_login_or_password_unknown",
                         "message_params" => array("login" => $login),
                         "dependency" => array(
-                            "field" => "is_active",
+                            "field" => "is_confirmed",
                             "type" => "not_equal",
                             "param" => 0,
-                            "message" => "user_disabled_by_admin",
+                            "message" => "user_not_confirmed_yet",
                             "message_params" => array("login" => $login),
+                            "dependency" => array(
+                                "field" => "is_active",
+                                "type" => "not_equal",
+                                "param" => 0,
+                                "message" => "user_disabled_by_admin",
+                                "message_params" => array("login" => $login),
+                            ),
                         ),
                     ),
                 ),

@@ -148,6 +148,7 @@ recent_news = Ultime novità
 page_title_pg_login = Log In
 
 user_login_or_password_unknown = Login "{%login%}" o password non corretti
+user_not_confirmed_yet = L'utente "{%login%}" non è ancora confermato. Utilizza il link di conferma che trovi all'interno della email di avvenuta iscrizione.
 user_disabled_by_admin = L'utente "{%login%}" è attualmente disabilitato dall'amministratore di sistema.
 status_message_resource_access_denied = La pagina richiesta non può essere visualizzata. Prego effettuare l'accesso mediante login/password
 status_message_logged_out = Logout effettuato con successo
@@ -162,6 +163,8 @@ login_status_not_logged_in = Non connesso
 user_should_remember = !!Remember me
 
 ["signup"]
+user_menu_item_signup = Iscriviti
+
 page_title_pg_signup = Iscriviti
 
 user_should_accept_agreement = !!You should check "I accept" to continue

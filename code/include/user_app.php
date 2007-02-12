@@ -415,6 +415,28 @@ class UserApp extends CustomApp {
     }
 
     function action_pg_signup() {
+        $templates_dir = "signup";
+
+        $user = get_param_value($this->action_params, "user", null);
+        if (is_null($user)) {
+            $user = $this->read_id_fetch_db_object("User");
+            $user->insert_signup_form_extra_fields();
+        } else {
+            $user->password = "";
+            $user->password_confirm = "";
+        }
+        $user_edit = $this->create_object(
+            "ObjectEdit",
+            array(
+                "templates_dir" => "{$templates_dir}/user_edit",
+                "template_var" => "user_edit",
+                "obj" => $user,
+                "context" => "signup_form",
+            )
+        );
+        $user_edit->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
     }
 /*
         $supplier = get_param_value($this->action_params, "supplier", null);
