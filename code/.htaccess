@@ -1,9 +1,11 @@
-php_flag magic_quotes_gpc      off
-php_flag magic_quotes_runtime  off
-php_flag session.use_trans_sid off
-php_flag session.use_cookies on
-php_flag session.use_only_cookies on
-php_value session.cache_limiter none
+php_flag magic_quotes_gpc Off
+php_flag magic_quotes_runtime Off
+php_flag session.use_trans_sid Off
+php_flag session.use_cookies On
+php_flag session.use_only_cookies On
+php_value session.cache_limiter None
+php_flag zend.ze1_compatibility_mode On
+php_flag allow_call_time_pass_reference On
 
 DirectoryIndex index.php
 Options -Indexes

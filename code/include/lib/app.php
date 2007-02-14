@@ -35,9 +35,9 @@ class App extends AppObject {
     var $action_params;
 
     function App($app_class_name, $app_name) {
-        $this->set_class_name($app_class_name); 
-        $this->set_app($this);
+        parent::AppObject();
 
+        $this->set_class_name($app_class_name); 
         $this->app_name = $app_name;
 
         $this->create_core_objects();
@@ -62,12 +62,12 @@ class App extends AppObject {
     }
 
     function create_config() {
-        $this->config = new Config();
+        $this->config =& new Config();
         $this->config->read("config/app.cfg");
     }
 
     function create_logger() {
-        $this->log = $this->create_object("Logger");
+        $this->log =& $this->create_object("Logger");
     }
 
     function create_db() {
@@ -88,7 +88,7 @@ class App extends AppObject {
 
     function create_page_template() {
         $print_template_name = $this->get_config_value("print_template_name");
-        $this->page = new Template(
+        $this->page =& new Template(
             $this->get_page_templates_dir(),
             $print_template_name
         );
@@ -114,9 +114,25 @@ class App extends AppObject {
     }
 
     function init_lang_resources() {
-        $this->lang_resources = new Config();
+        $this->lang_resources =& new Config();
         $this->lang_resources->read("lang/default.txt");
         $this->lang_resources->read("lang/{$this->lang}.txt");
+    }
+//
+    function get_config_value($name, $default_value = null) {
+        return $this->config->get_value($name, $default_value);
+    }
+//
+    function get_log_debug_level() {
+        return $this->log->get_debug_level();
+    }
+
+    function write_log($message, $debug_level, $class_name = null) {
+        $this->log->write(
+            is_null($class_name) ? $this->get_class_name() : $class_name,
+            $message,
+            $debug_level
+        );
     }
 //
     function run() {
@@ -1844,7 +1860,7 @@ class App extends AppObject {
                 $obj_params = $init_obj_params + $obj_params;
             }
             if (is_subclass_of($obj, "AppObject")) {
-                $obj->set_app($this);
+                $obj->set_app(&$this);
             }
         }
         if (method_exists($obj, "_init")) {

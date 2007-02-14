@@ -316,7 +316,7 @@ class UserApp extends CustomApp {
 
         $user = get_param_value($this->action_params, "user", null);
         if (is_null($user)) {
-            $user = $this->read_id_fetch_db_object("User");
+            $user = $this->create_db_object("User");
             $user->insert_login_form_extra_fields();
         } else {
             $user->login = "";
@@ -419,7 +419,7 @@ class UserApp extends CustomApp {
 
         $user = get_param_value($this->action_params, "user", null);
         if (is_null($user)) {
-            $user = $this->read_id_fetch_db_object("User");
+            $user = $this->create_db_object("User");
             $user->insert_signup_form_extra_fields();
         } else {
             $user->password = "";

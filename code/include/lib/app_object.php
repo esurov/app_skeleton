@@ -5,6 +5,9 @@ class Object {
     var $_class_name;
     var $_class_name_without_suffix;
 
+    function Object() {
+    }
+
     function _init($params) {
     }
 
@@ -26,6 +29,10 @@ class AppObject extends Object {
     
     var $app;
 
+    function AppObject() {
+        parent::Object();
+    }
+
     function _init($params) {
         parent::_init($params);
     }
@@ -39,15 +46,19 @@ class AppObject extends Object {
     }
 //
     function get_config_value($name, $default_value = null) {
-        return $this->app->config->get_value($name, $default_value);
+        return $this->app->get_config_value($name, $default_value);
     }
 //
     function get_log_debug_level() {
-        return $this->app->log->get_debug_level();
+        return $this->app->get_log_debug_level();
     }
 
-    function write_log($message, $debug_level) {
-        $this->app->log->write($this->get_class_name(), $message, $debug_level);
+    function write_log($message, $debug_level, $class_name = null) {
+        $this->app->write_log(
+            $message,
+            $debug_level,
+            is_null($class_name) ? $this->get_class_name() : $class_name
+        );
     }
 //
     function process_fatal_error($message) {
