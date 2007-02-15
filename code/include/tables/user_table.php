@@ -42,17 +42,17 @@ class UserTable extends CustomDbObject {
         ));
 
         $this->insert_field(array(
-            "field" => "email",
-            "type" => "varchar",
-        ));
-
-        $this->insert_field(array(
             "field" => "first_name",
             "type" => "varchar",
         ));
 
         $this->insert_field(array(
             "field" => "last_name",
+            "type" => "varchar",
+        ));
+
+        $this->insert_field(array(
+            "field" => "email",
             "type" => "varchar",
         ));
 
@@ -69,6 +69,7 @@ class UserTable extends CustomDbObject {
                             array("user", $this->get_lang_str("user_role_user")),
                             array("admin", $this->get_lang_str("user_role_admin")),
                         ),
+                        "delimiter" => "<br>",
                     ),
                 ),
             ),
@@ -188,6 +189,10 @@ class UserTable extends CustomDbObject {
 //
     function get_validate_conditions($context, $context_params) {
         switch ($context) {
+//        case "edit_user_form":
+//        case "recover_password_form":
+
+        
         case "login_form":
             $conditions = array(
                 array(
@@ -232,6 +237,53 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
+        case "signup_form":
+            $conditions = array(
+                array(
+                    "field" => "login",
+                    "type" => "not_empty",
+                    "message" => "user_login_empty",
+                    "dependency" => array(
+                        "field" => "login",
+                        "type" => "unique",
+                        "message" => "user_login_exists",
+                        "message_params" => array(
+                            "login" => $this->login,
+                        ),
+                    ),
+                ),
+                array(
+                    "field" => "password",
+                    "type" => "not_empty",
+                    "message" => "user_password_empty",
+                ),
+                array(
+                    "field" => "password_confirm",
+                    "type" => "not_empty",
+                    "message" => "user_password_empty",
+                ),
+                array(
+                    "field" => "first_name",
+                    "type" => "not_empty",
+                    "message" => "user_first_name_empty",
+                ),
+                array(
+                    "field" => "last_name",
+                    "type" => "not_empty",
+                    "message" => "user_last_name_empty",
+                ),
+                array(
+                    "field" => "email",
+                    "type" => "not_empty",
+                    "message" => "user_email_empty",
+                    "dependency" => array(
+                        "field" => "email",
+                        "type" => "email",
+                        "message" => "user_bad_email",
+                    ),
+                ),
+            );
+            break;
         case "edit_form":
             $conditions = array(
                 array(
@@ -263,8 +315,19 @@ class UserTable extends CustomDbObject {
     function validate($old_obj = null, $context = "", $context_params = array()) {
         $messages = parent::validate($old_obj, $context, $context_params);
 
-        if ($context == "edit_form" && is_value_not_empty($this->password)) {
+        if ($context == "signup_form") {
             $this->validate_passwords($messages);
+        }
+        if ($context == "edit_form") {
+            if (is_value_not_empty($this->password)) {
+                $this->validate_passwords($messages);
+            }
+        }
+
+        if ($context == "signup_form") {
+            if (!$this->agreement_accepted) {
+                $messages[] = new ErrorStatusMsg("user_should_accept_agreement");
+            }
         }
 
         return $messages;

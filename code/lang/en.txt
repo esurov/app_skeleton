@@ -3,6 +3,12 @@ app_head_title = !!AppSkeleton
 page_title_access_denied = Access denied!
 
 head_page_title_pg_index = Home
+
+page_title_pg_static_policy_terms_of_use = Terms of use
+page_title_pg_static_policy_terms_and_conditions = Terms and conditions
+page_title_pg_static_policy_privacy = Privacy policy
+page_title_pg_static_policy_disclaimer = Disclaimer
+
 page_title_pg_static_sample_page1 = SampleStaticSamplePage1
 page_title_pg_static_sample_page2 = SampleStaticSamplePage2
 page_title_pg_static_sample_page2_1 = SampleStaticPage2_1
@@ -66,6 +72,8 @@ no = No
 none = None
 other = Other
 not_specified = Not specified
+and = and
+or = or
 
 ["lang"]
 en = English
@@ -95,6 +103,7 @@ name = Name
 full_name = Full Name
 login = Login
 password = Password
+password_confirm = Confirm password
 role = Role
 is_confirmed = Confirmed?
 is_active = Active?
@@ -159,16 +168,31 @@ login_form_bottom_text_signup = Create it
 login_form_bottom_text_did_forget_password = Did you forget your password?
 login_form_bottom_text_recover_password = Recover it
 
-login_status_logged_in_as = Connesso come
-login_status_not_logged_in = Non connesso
+login_status_logged_in_as = Logged in as
+login_status_not_logged_in = Not logged in
 user_should_remember = Remember me
 
 ["signup"]
 user_menu_item_signup = Signup
 
 page_title_pg_signup = Signup
+page_title_pg_signup_almost_completed = Il nuovo account stato creato
 
-user_should_accept_agreement = You should check "I accept" to continue
+user_should_accept_agreement = You should check "Accept agreement" to continue
+
+signup_form_text1 = Fill out this signup form to create new account:
+signup_form_text2 = By submitting this signup form you indicate that you have read, understood and agreed on
+
+policy_terms_of_use = Terms of use
+policy_terms_and_conditions = Terms and conditions
+policy_privacy = Privacy policy
+policy_disclaimer = Disclaimer
+
+signup_form_accept_agreement = I accept
+
+signup_almost_completed_text1 = 
+signup_almost_completed_text2 = New account was created but it is not confirmed. Email with link to confirmation page was sent to the specified email address. Please wait until you get email and click that link to finish creation of your account.
+signup_almost_completed_text3 = When confirmation finished, please
 
 ["confirm signup"]
 

@@ -2,12 +2,11 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset={%html_charset%}">
-    <title>{%str_app_head_title%} - {%str_page_title_access_denied%}</title>
+    <title>{%str_app_head_title%} - {%head_page_title%}</title>
     <link rel="StyleSheet" href="css/user.css" type="text/css">
+    <script language="JavaScript" type="text/javascript" src="js/lib.js"></script>
 </head>
 <body>
-<center>
-<h1>{%str_page_title_access_denied%}</h1>
-</center>
+{%page_title%}{%status_messages%}{%body%}
 </body>
 </html>

@@ -59,7 +59,7 @@
             />
             <menu_item
                 name="sample_popup"
-                url="javascript:void(openPopup('?action=pg_static&amp;page=sample_page1&amp;popup=1', 600, 500, 'yes', ''));"
+                url="javascript:void(openPopupWindow('?action=pg_static&amp;page=sample_page1', 600, 500, 'yes', ''));"
             />
             <menu_item
                 name="sample_new_window"

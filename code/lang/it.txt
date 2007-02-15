@@ -3,6 +3,12 @@ app_head_title = !!AppSkeleton
 page_title_access_denied = Accesso non autorizzato!
 
 head_page_title_pg_index = Home
+
+page_title_pg_static_policy_terms_of_use = !!Terms of use
+page_title_pg_static_policy_terms_and_conditions = !!Terms and conditions
+page_title_pg_static_policy_privacy = !!Privacy policy
+page_title_pg_static_policy_disclaimer = !!Disclaimer
+
 page_title_pg_static_sample_page1 = SampleStaticPage1
 page_title_pg_static_sample_page2 = SampleStaticPage2
 page_title_pg_static_sample_page2_1 = SampleStaticPage2_1
@@ -66,6 +72,8 @@ no = No
 none = None
 other = Altro
 not_specified = Non specificato
+and = e
+or = o
 
 ["lang"]
 en = Inglese
@@ -95,6 +103,7 @@ name = Nome
 full_name = Nome
 login = Login
 password = Password
+password_confirm = Conferma password
 role = Ruolo
 is_confirmed = Confermato?
 is_active = Attivo?
@@ -166,8 +175,22 @@ user_should_remember = !!Remember me
 user_menu_item_signup = Iscriviti
 
 page_title_pg_signup = Iscriviti
+page_title_pg_signup_almost_completed = Il nuovo account stato creato
 
 user_should_accept_agreement = !!You should check "I accept" to continue
+
+signup_form_text1 = Compila il modulo per creare un nuovo account:
+signup_form_text2 = !!By submitting this signup form you indicate that you have read, understood and agreed on
+
+policy_terms_of_use = !!Terms of use
+policy_terms_and_conditions = !!Terms and conditions
+policy_privacy = !!Privacy policy
+policy_disclaimer = !!Disclaimer
+
+signup_form_accept_agreement = !!I accept
+
+signup_almost_completed = Il nuovo account stato creato ma non confermato. Una email con il link per la conferma dell'attivazione stata spedita all'indirizzo specificato. Quando ricevi l'email clicca sul link per completare la procedura di creazione dell'account.
+login_if_already_confirmed = A conferma avvenuta,
 
 ["confirm signup"]
 
@@ -215,9 +238,10 @@ user_login_exists = Il login inserito esiste già, specificarne un altro
 user_password_empty = Inserire password
 user_password_at_least_6_chars = !!Password must be at least 6 characters
 user_passwords_do_not_match = Le password inserite non corrispondono tra loro
-user_bad_email = !!Email is invalid
-user_first_name_empty = !!Specify first name
-user_last_name_empty = !!Specify last name
+user_email_empty = Inserire email
+user_bad_email = L'indirizzo email specificato non è corretto
+user_first_name_empty = Inserire nome
+user_last_name_empty = Inserire cognome
 user_role_empty = Specificare ruolo utente
 user_cannot_delete_main_admin = Impossibile cancellare l'account principale di amministrazione
 

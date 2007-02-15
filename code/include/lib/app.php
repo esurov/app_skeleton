@@ -151,6 +151,8 @@ class App extends AppObject {
             DL_INFO
         );
 
+        $this->on_before_validate_action();
+        
         if ($this->is_valid_action_name()) {
             // Ensure that current user is allowed to run this action
             // Validate user permission level
@@ -187,17 +189,13 @@ class App extends AppObject {
             DL_INFO
         );
     }
-    
-    function is_valid_action_name() {
-        return isset($this->actions[$this->action]);
-    }
-
-    function get_default_action_name($user = null) {
-        return "pg_index";
-    }
 
     function create_current_user() {
         return null;
+    }
+
+    function is_valid_action_name() {
+        return isset($this->actions[$this->action]);
     }
 
     function get_user_role($user = null) {
@@ -205,14 +203,34 @@ class App extends AppObject {
         // for previously created user by function create_current_user()
         return "guest";
     }
-//
+
+    function get_default_action_name($user = null) {
+        return "pg_index";
+    }
+
+    function on_before_validate_action() {
+        $this->print_raw_value("html_charset", $this->html_charset);
+
+        $this->print_lang_resources();
+    }
+
+    function print_lang_resources() {
+        foreach ($this->lang_resources->_params as $resource_name => $resource_value) {
+            $this->print_raw_value("str_{$resource_name}", $resource_value);
+        }
+        $this->print_raw_value("lang", $this->lang);
+    }
+    
     function run_action($action_name = null, $action_params = array()) {
         // Run action and return its response
         if (!is_null($action_name)) {
             $this->action = $action_name;
         }
         $this->action_params = $action_params;
-        $page_name = trim(get_param_value($action_params, "page", param("page")));
+        $page_name = get_param_value($action_params, "page", null);
+        if (is_null($page_name)) {
+            $page_name = trim(param("page"));
+        }
 
         $action_func_name = "action_{$this->action}";
         $action_name_expanded = ($page_name == "") ?
@@ -232,22 +250,20 @@ class App extends AppObject {
             "Running action '{$this->action}'",
             DL_INFO
         );
-        $this->{$action_func_name}();  // NB! Variable function
 
+        $this->{$action_func_name}();  // NB! Variable function
+        
         $this->on_after_run_action();
     }
 
     function on_before_run_action() {
-        $this->print_raw_value("html_charset", $this->html_charset);
-
-        $this->print_lang_resources();
-
         $this->popup = (int) param("popup");
-        $this->report = (int) param("report");
-        $this->printable = (int) param("printable");
-
         $this->print_custom_param("popup", $this->popup);
+
+        $this->report = (int) param("report");
         $this->print_custom_param("report", $this->report);
+        
+        $this->printable = (int) param("printable");
         $this->print_custom_param("printable", $this->printable);
 
         if (!$this->report && !$this->printable) {
@@ -258,13 +274,6 @@ class App extends AppObject {
     }
 
     function on_after_run_action() {
-    }
-
-    function print_lang_resources() {
-        foreach ($this->lang_resources->_params as $resource_name => $resource_value) {
-            $this->print_raw_value("str_{$resource_name}", $resource_value);
-        }
-        $this->print_raw_value("lang", $this->lang);
     }
 
     function run_access_denied_action() {

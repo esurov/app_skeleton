@@ -30,6 +30,7 @@ class UserApp extends CustomApp {
             "logout" => $e,
             "pg_signup" => $e,
             "signup" => $e,
+            "pg_signup_almost_completed" => $e,
             "confirm" => $e,
             "pg_recover_password" => $e,
             "recover_password" => $e,
@@ -438,98 +439,98 @@ class UserApp extends CustomApp {
 
         $this->print_file("{$templates_dir}/body.html", "body");
     }
-/*
-        $supplier = get_param_value($this->action_params, "supplier", null);
-        if (is_null($supplier)) {
-            $supplier = $this->create_db_object("supplier");
-        }
-        $company_contact_info = get_param_value(
-            $this->action_params,
-            "company_contact_info",
-            null
-        );
-        if (is_null($company_contact_info)) {
-            $company_contact_info = $this->create_db_object("contact_info");
-        }
-        $templates_dir = "signup";
-
-        $supplier->print_form_values(array("context" => "signup"));
-        $this->print_contact_info_subform(
-            $company_contact_info,
-            $templates_dir,
-            "_contact_info_company_subform.html",
-            "supplier_company_contact_info_subform",
-            "supplier_company_contact_info"
-        );
-        $this->print_file("{$templates_dir}/form.html", "signup_form");
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
 
     function action_signup() {
-        $supplier = $this->create_db_object("supplier");
-        $company_contact_info = $this->create_db_object("contact_info");
+        $user = $this->create_db_object("User");
+        $user->insert_signup_form_extra_fields();
+        $user->read();
 
-        $supplier->read();
-        $company_contact_info->read(
-            null,
-            null,
-            "supplier_company_contact_info"
-        );
-
-        $messages = array_merge(
-            $supplier->validate(null, "signup"),
-            $company_contact_info->validate()
-        );
-
+        $messages = $user->validate(null, "signup_form");
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
-            $this->run_action(
-                "pg_signup",
-                array(
-                    "supplier" => $supplier,
-                    "company_contact_info" => $company_contact_info,
-                )
-            );
+            $this->run_action("pg_signup", array("user" => $user));
         } else {
-            $company_contact_info->store();
-            $supplier->init_fields("guest_with_access_key", $company_contact_info);
-            $supplier->store();
+            $user->save(true);
 
-            $this->send_email_signup_finished_to_admin($supplier, $company_contact_info);
-
-            $this->create_self_redirect_response(array(
-                "action" => "pg_static",
-                "page" => "signup_finished",
-            ));
+//            $this->send_email_signup_form_processed_to_user($user);
+            $this->create_self_redirect_response(array("action" => "pg_signup_almost_completed"));
         }
     }
 
-    function send_email_signup_finished_to_admin($supplier, $company_contact_info) {
-        $supplier->print_values();
-        $this->print_contact_info(
-            $company_contact_info,
-            "signup",
-            "_email_contact_info_company.html",
-            "supplier_company_contact_info",
-            "supplier_company_contact_info"
-        );
+//    function send_email_signup_form_processed_to_user($user) {
+//        $user->print_values();
+//        $url = create_self_full_url(array(
+//            "action" => "confirm",
+//            "user_id" => $user->id,
+//        ));
+//        $this->print_value("confirmation_link", $url);
+//
+//        $email_from = is_value_empty($user->email) ?
+//            $this->get_config_value() :
+//            $user->email;
+//        $name_from = "{$contact_info->first_name} {$contact_info->last_name}";
+//        $email_to = $this->get_actual_email_to($this->get_config_value("contact_form_email_to"));
+//        $name_to = $this->get_config_value("contact_form_name_to");
+//        $subject = $this->get_config_value("email_contact_form_processed_subject");
+//        $contact_info->print_values();
+//        $body = $this->print_file("signup/email_confirmation_to_user.html");
+//
+//        $email_sender = $this->create_email_sender();
+//        $email_sender->From = $email_from;
+//        $email_sender->Sender = $email_from;
+//        $email_sender->FromName = trim($name_from);
+//        $email_sender->AddAddress($email_to, trim($name_to));
+//        $email_sender->Subject = $subject;
+//        $email_sender->Body = $body;
+//        $email_sender->Send();
+//    }
 
-        $url = create_self_full_url(array(
-            "action" => "pg_view_suppliers",
-            "supplier_status_equal" => "unverified",
-        ));
-        $this->print_value("url", $url);
+//    function send_signup_email($user) {
+//        $email_from = $this->config->value("signup_form_email_from");
+//        $name_from = $this->config->value("signup_form_name_from_{$this->lang}");
+//        $subject = $this->config->value("signup_form_subject_{$this->lang}");
+//
+//        $mailer = new PHPMailer();
+//        $mailer->IsSendmail();
+//        $mailer->IsHTML(true);
+//        $mailer->From = $email_from;
+//        $mailer->Sender = $email_from;
+//        $mailer->FromName = $name_from;
+//        $mailer->AddAddress($user->email, $user->full_name);
+//        $mailer->Subject = $subject;
+//
+//        $this->page->assign($user->write());
+//        $this->page->assign(array(
+//            "confirmation_url" =>
+//                "http://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}" .
+//                "?action=confirm&user_id={$user->id}&popup=1",
+//        ));
+//        $mailer->Body = $this->page->parse_file("email/signup.html");
+//        $mailer->Send();
+//    }
 
-        $this->send_email(
-            $this->config->get_value("website_email_from"),
-            $this->config->get_value("website_name_from"),
-            $this->config->get_value("admin_email_to"),
-            "",
-            $this->config->get_value("email_signup_finished_to_admin_subject"),
-            "signup/email_signup_finished_to_admin.html"
-        );
-*/
+    function action_pg_signup_almost_completed() {
+        $this->print_file("signup/almost_completed.html", "body");
+    }
 
+
+//    function confirm() {
+//        $user = $this->app->read_id_fetch_object("user", "", "1");
+//        if ($user->is_definite() && !$user->is_confirmed) {
+//            $user->confirm(1);
+//        }
+//        $this->page->parse_file("user/signup_confirmed.html", "body");
+//    }
+//
+//
+    function confirm() {
+        $user = $this->read_id_fetch_db_object("user");
+        if ($user->is_definite() && !$user->is_confirmed) {
+            $user->confirm(1);
+        }
+        $this->print_file("everyone/signup/confirmed.html", "body");
+    }
+        
     function action_pg_recover_password() {
     }
 //

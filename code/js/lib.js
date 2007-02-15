@@ -166,7 +166,7 @@ function copyToClipboard(element) {
     element.createTextRange().execCommand("Copy");
 }
 
-function openPopup(url, width, height, useScroll, windowName) {
+function openWindow(url, width, height, useScroll, windowName) {
     var cornerX = (screen.width - width) / 2;
     var cornerY = (screen.height - height) / 2 - 32;
     
@@ -185,6 +185,20 @@ function openPopup(url, width, height, useScroll, windowName) {
         w.focus();
     }
     return w;
+}
+
+function openPopupWindow(url, width, height, useScroll, windowName) {
+    return openWindow(url + '&popup=1', width, height, useScroll, windowName);
+}
+
+function closeWindow(w) {
+    if (w == null) {
+        w = window;
+    }
+    w.close();
+    if (w.opener != null) {
+        w.opener.focus();
+    }
 }
 
 function reloadParentWindow() {
@@ -520,50 +534,6 @@ function formatNumber(num, decimals, decPoint, thousandsSep) {
     return ((sign) ? '' : '-') + num + decPoint + dec;
 }
 
-function getJsIntegerStr(appIntegerStr) {
-    var str = appIntegerStr.replace(/\./g, '');
-    return str.replace(/\,/g, '.', str);
-}
-
-function getJsInteger(appIntegerStr) {
-    return parseInt(getJsIntegerStr(appIntegerStr));
-}
-
-function isInteger(appIntegerStr) {
-    return !isNaN(getJsIntegerStr(appIntegerStr));
-}
-
-function getJsDoubleStr(appDoubleStr) {
-    var str = appDoubleStr.replace(/\./g, '');
-    return str.replace(/\,/g, '.', str);
-}
-
-function getJsDouble(appDoubleStr) {
-    return parseFloat(getJsDoubleStr(appDoubleStr));
-}
-
-function isDouble(appDoubleStr) {
-    return !isNaN(getJsDoubleStr(appDoubleStr));
-}
-
-function getAppInteger(jsInteger) {
-    return formatNumber(jsInteger, 0, '', '.');
-}
-
-function getAppDouble(jsDouble) {
-    return formatNumber(jsDouble, 2, ',', '.');
-}
-
-function getAppCurrency(jsDouble) {
-    return formatNumber(jsDouble, 2, ',', '.');
-}
-
-function closeWindow() {
-    window.close();
-    if (window.opener) {
-        window.opener.focus();
-    }
-}
 //        case 'url':
 //            result = true;
 //                case 'date':
@@ -626,3 +596,78 @@ function closeWindow() {
 //function isCorrectCurrency(value) {
 //    return value.match(/^\d+(,\d{3})*(\.\d+)?$/);
 //}
+
+// App specific js functions
+function getJsIntegerStr(appIntegerStr) {
+    var str = appIntegerStr.replace(/\./g, '');
+    return str.replace(/\,/g, '.', str);
+}
+
+function getJsInteger(appIntegerStr) {
+    return parseInt(getJsIntegerStr(appIntegerStr));
+}
+
+function isInteger(appIntegerStr) {
+    return !isNaN(getJsIntegerStr(appIntegerStr));
+}
+
+function getJsDoubleStr(appDoubleStr) {
+    var str = appDoubleStr.replace(/\./g, '');
+    return str.replace(/\,/g, '.', str);
+}
+
+function getJsDouble(appDoubleStr) {
+    return parseFloat(getJsDoubleStr(appDoubleStr));
+}
+
+function isDouble(appDoubleStr) {
+    return !isNaN(getJsDoubleStr(appDoubleStr));
+}
+
+function getAppInteger(jsInteger) {
+    return formatNumber(jsInteger, 0, '', '.');
+}
+
+function getAppDouble(jsDouble) {
+    return formatNumber(jsDouble, 2, ',', '.');
+}
+
+function getAppCurrency(jsDouble) {
+    return formatNumber(jsDouble, 2, ',', '.');
+}
+//
+function openPolicyTermsOfUsePopupWindow() {
+    return openPopupWindow(
+        '?action=pg_static&page=policy_terms_of_use&popup=1',
+        600,
+        400,
+        'yes'
+    );
+}
+
+function openPolicyTermsAndConditionsPopupWindow() {
+    return openPopupWindow(
+        '?action=pg_static&page=policy_terms_and_conditions&popup=1',
+        600,
+        400,
+        'yes'
+    );
+}
+
+function openPolicyPrivacyPopupWindow() {
+    return openPopupWindow(
+        '?action=pg_static&page=policy_privacy&popup=1',
+        600,
+        400,
+        'yes'
+    );
+}
+
+function openPolicyDisclaimerPopupWindow() {
+    return openPopupWindow(
+        '?action=pg_static&page=policy_disclaimer&popup=1',
+        600,
+        400,
+        'yes'
+    );
+}

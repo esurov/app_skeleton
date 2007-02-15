@@ -1,0 +1,58 @@
+<p>{%str_signup_form_text1%}</p>
+
+<form action="?" method="post" name="form">
+<input type="hidden" name="action" value="signup">
+<table>
+<tr>
+    <th>{%str_login%}: *</th>
+    <td>{%user_login_input%}</td>
+</tr>
+<tr>
+    <th>{%str_password%}: *</th>
+    <td>{%user_password_input%}</td>
+</tr>
+<tr>
+    <th>{%str_password_confirm%}: *</th>
+    <td>{%user_password_confirm_input%}</td>
+</tr>
+<tr>
+    <th>{%str_first_name%}: *</th>
+    <td>{%user_first_name_input%}</td>
+</tr>
+<tr>
+    <th>{%str_last_name%}: *</th>
+    <td>{%user_last_name_input%}</td>
+</tr>
+<tr>
+    <th>{%str_email%}: *</th>
+    <td>{%user_email_input%}</td>
+</tr>
+<tr>
+    <td colspan="2">
+        {%str_signup_form_text2%}<br>
+        <a href="javascript:void(openPolicyTermsOfUsePopupWindow());"
+            >{%str_policy_terms_of_use%}</a>,
+        <a href="javascript:void(openPolicyTermsAndConditionsPopupWindow());"
+            >{%str_policy_terms_and_conditions%}</a>,
+        <a href="javascript:void(openPolicyPrivacyPopupWindow());"
+            >{%str_policy_privacy%}</a> {%str_and%}
+        <a href="javascript:void(openPolicyDisclaimerPopupWindow());"
+            >{%str_policy_disclaimer%}</a>.
+    </td>
+</tr>
+<tr>
+    <th>{%str_signup_form_accept_agreement%}: *</th>
+    <td>{%user_agreement_accepted_input%}</td>
+</tr>
+<tr>
+    <td colspan="2" align="center"
+        ><input name="submit_btn" type="submit" value="{%str_link_send%}"></td>
+</tr>
+</table>
+</form>
+
+<script language="JavaScript" type="text/javascript">
+focusFormElement("form", "user_login");
+</script>
+
+{%user_client_validation_js%}
