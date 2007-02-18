@@ -424,12 +424,20 @@ class App extends AppObject {
         return $this->get_config_value("app_datetime_format");
     }
 
+    function get_app_short_datetime_format() {
+        return $this->get_config_value("app_short_datetime_format");
+    }
+
     function get_app_date_format() {
         return $this->get_config_value("app_date_format");
     }
 
     function get_app_time_format() {
         return $this->get_config_value("app_time_format");
+    }
+
+    function get_app_short_time_format() {
+        return $this->get_config_value("app_short_time_format");
     }
 
     function get_db_datetime_format() {
@@ -453,6 +461,15 @@ class App extends AppObject {
         );
     }
 
+    function get_app_short_datetime($db_datetime, $date_if_unknown = "") {
+        $date_parts = parse_date_by_format($this->get_db_datetime_format(), $db_datetime);
+        return create_date_by_format(
+            $this->get_app_short_datetime_format(),
+            $date_parts,
+            $date_if_unknown
+        );
+    }
+
     function get_app_date($db_date, $date_if_unknown = "") {
         $date_parts = parse_date_by_format($this->get_db_date_format(), $db_date);
         return create_date_by_format(
@@ -466,6 +483,15 @@ class App extends AppObject {
         $date_parts = parse_date_by_format($this->get_db_time_format(), $db_time);
         return create_date_by_format(
             $this->get_app_time_format(),
+            $date_parts,
+            $date_if_unknown
+        );
+    }
+
+    function get_app_short_time($db_time, $date_if_unknown = "") {
+        $date_parts = parse_date_by_format($this->get_db_time_format(), $db_time);
+        return create_date_by_format(
+            $this->get_app_short_time_format(),
             $date_parts,
             $date_if_unknown
         );
@@ -805,6 +831,7 @@ class App extends AppObject {
     function print_datetime_value($template_var, $db_datetime) {
         $this->print_values(array(
             $template_var => $this->get_app_datetime($db_datetime),
+            "{$template_var}_short" => $this->get_app_short_datetime($db_datetime),
             "{$template_var}_orig" => $db_datetime,
         ));
     }
@@ -819,6 +846,7 @@ class App extends AppObject {
     function print_time_value($template_var, $db_time) {
         $this->print_values(array(
             $template_var => $this->get_app_time($db_time),
+            "{$template_var}_short" => $this->get_app_short_time($db_time),
             "{$template_var}_orig" => $db_time,
         ));
     }
