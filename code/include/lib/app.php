@@ -8,6 +8,7 @@ class App extends AppObject {
     // App core objects
     var $config;
     var $log;
+    var $session;
     var $db;
 
     // Html page template vars
@@ -40,8 +41,9 @@ class App extends AppObject {
         $this->set_class_name($app_class_name); 
         $this->app_name = $app_name;
 
+        $this->init_php_vars();
         $this->create_core_objects();
-        $this->init_vars();
+        $this->init_app();
 
         // One action defined, but nobody can access it
         $this->actions = array(
@@ -54,9 +56,17 @@ class App extends AppObject {
         );
     }
 //
+    function init_php_vars() {
+        ini_set("magic_quotes_gpc", 0);
+        ini_set("magic_quotes_runtime", 0);
+        ini_set("allow_call_time_pass_reference", 1);
+        ini_set("zend.ze1_compatibility_mode", 1);
+    }
+//
     function create_core_objects() {
         $this->create_config();
         $this->create_logger();
+        $this->create_session();
         $this->create_db();
         $this->create_page_template();
     }
@@ -68,6 +78,10 @@ class App extends AppObject {
 
     function create_logger() {
         $this->log =& $this->create_object("Logger");
+    }
+
+    function create_session() {
+        $this->session =& $this->create_object("Session");
     }
 
     function create_db() {
@@ -98,8 +112,8 @@ class App extends AppObject {
     function get_page_templates_dir() {
         return "templates";
     }
-
-    function init_vars() {
+//
+    function init_app() {
         $this->html_charset = $this->get_config_value("html_charset");
 
         $this->init_lang_vars();
@@ -162,7 +176,7 @@ class App extends AppObject {
             } else {
                 $this->write_log(
                     "User in role '{$user_role}' is denied to run action '{$this->action}'",
-                    LOG_WARNING
+                    DL_WARNING
                 );
                 $this->run_access_denied_action();
             }
@@ -1504,16 +1518,23 @@ class App extends AppObject {
     }
 
     function get_current_lang() {
-        $cur_lang = Session::get_param("current_language");
+        $cur_lang = $this->get_current_lang_from_session();
         if (!$this->is_valid_lang($cur_lang)) {
-            $cur_lang = $this->get_config_value("default_language");
+            $cur_lang = $this->dlang;
         }
         return $cur_lang;
     }
 
+    function get_current_lang_from_session() {
+        return (is_null($this->session)) ?
+            null :
+            $this->session->get_param("current_lang");
+    }
+
     function set_current_lang($new_lang) {
         if ($this->is_valid_lang($new_lang)) {
-            Session::set_param("current_language", $new_lang);
+            $this->session->set_param("current_lang", $new_lang);
+            $this->lang = $new_lang;
         }
     }
 
@@ -1605,21 +1626,21 @@ class App extends AppObject {
     }
 
     function add_session_status_message($new_msg) {
-        if (Session::has_param("status_messages")) {
-            $old_msgs = Session::get_param("status_messages");
+        if ($this->session->has_param("status_messages")) {
+            $old_msgs = $this->session->get_param("status_messages");
         } else {
             $old_msgs = array();
         }
         $msgs = array_merge($old_msgs, array($new_msg));
-        Session::set_param("status_messages", $msgs);
+        $this->session->set_param("status_messages", $msgs);
     }
 
     function get_and_delete_session_status_messages() {
-        if (!Session::has_param("status_messages")) {
+        if (!$this->session->has_param("status_messages")) {
             return array();
         } else {
-            $msgs = Session::get_param("status_messages");
-            Session::unset_param("status_messages");
+            $msgs = $this->session->get_param("status_messages");
+            $this->session->unset_param("status_messages");
             return $msgs;
         }
     }

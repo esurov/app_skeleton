@@ -20,7 +20,7 @@ class UserApp extends CustomApp {
             "get_image" => $e,
             "get_file" => $e,
 
-            // Index and home pages
+            // Index and Home pages
             "pg_index" => $e,
             "pg_home" => $u_a,
 
@@ -48,19 +48,38 @@ class UserApp extends CustomApp {
         );
     }
 //
+    function get_current_lang() {
+        $cur_lang = $this->get_current_lang_from_session();
+        if (is_null($cur_lang)) {
+            $cur_lang = $this->get_current_lang_from_cookie();
+        }
+        if (!$this->is_valid_lang($cur_lang)) {
+            $cur_lang = $this->dlang;
+        }
+        return $cur_lang;
+    }
+
+    function get_current_lang_from_cookie() {
+        return get_param_value($_COOKIE, "current_lang", null);
+    }
+
+    function create_session() {
+        $this->session =& $this->create_object("LoginSession");
+    }
+
     function create_current_user() {
         $this->user = $this->create_db_object("User");
-        $login_state =& Session::get_login_state();
 
+        $login_state =& $this->session->get_login_state();
         if (is_null($login_state)) {
-            if (isset($_COOKIE["user_id"]) && isset($_COOKIE["user_password_hash"])) {
+            // User checked "remember me" checkbox during login
+            if ($this->was_user_remembered()) {
                 $user_id = (int) $_COOKIE["user_id"];
-                $user_password_hash = $_COOKIE["user_password_hash"];
+                $user_password_hash = (string) $_COOKIE["user_password_hash"];
 
-                $this->user->fetch("user.id = {$user_id}");
-                if ($this->user->is_definite()) {
+                if ($this->user->fetch("user.id = {$user_id}")) {
                     if (sha1($this->user->password) == $user_password_hash) {
-                        $this->create_login_state($user_id);
+                        $this->create_login_state($this->user);
                     } else {
                         $this->user->set_indefinite();
                     }
@@ -68,25 +87,28 @@ class UserApp extends CustomApp {
             }
         } else {
             if (!$login_state->is_expired()) {
+                $login_state->update();
+
                 $user_id = (int) $login_state->get_login_id();
                 $this->user->fetch("user.id = {$user_id}");
             }
         }
     }
 
-    function &create_login_state($login_id) {
-        return Session::create_login_state(
-            $this->get_config_value("login_state_idle_timeout"),
-            $this->get_config_value("login_state_max_timeout"),
-            $login_id
-        );
+    function was_user_remembered() {
+        return (isset($_COOKIE["user_id"]) && isset($_COOKIE["user_password_hash"]));
     }
 
     function get_user_role($user = null) {
         if (is_null($user)) {
             $user = $this->user;
         }
-        if ($user->is_definite() && $user->is_active && $user->role != "") {
+        if (
+            $user->is_definite() &&
+            $user->is_confirmed &&
+            $user->is_active &&
+            $user->role != ""
+        ) {
             $user_role = $user->role;
         } else {
             $user_role = "guest";
@@ -98,21 +120,22 @@ class UserApp extends CustomApp {
         parent::on_before_run_action();
         
         $this->print_lang_menu();
-        $this->print_login_status();
+        $this->print_login_state();
     }
 
-    function print_login_status() {
-        if ($this->user->is_definite()) {
-            $this->user->print_values();
-            $template_name = "_login_status_logged_in.html";
+    function print_login_state() {
+        $user_role = $this->get_user_role();
+        if ($user_role == "guest") {
+            $template_name = "_not_logged_in.html";
         } else {
-            $template_name = "_login_status_not_logged_in.html";
+            $this->user->print_values();
+            $template_name = "_logged_in.html";
         }
-        $this->print_file_new("_login_status/{$template_name}", "login_status");
+        $this->print_file_new("_login_state/{$template_name}", "login_state");
     }
 
     function run_access_denied_action() {
-        Session::save_request_params();
+        $this->session->save_request_params();
 
         if ($this->action != "pg_home") {
             $this->add_session_status_message(
@@ -186,6 +209,12 @@ class UserApp extends CustomApp {
             }
         }
         return $this->print_static_page_file($full_page_name, $template_var);
+    }
+
+    function action_change_lang() {
+        parent::action_change_lang();
+
+        $this->add_current_lang_cookie();
     }
 //
     function action_pg_index() {
@@ -319,8 +348,10 @@ class UserApp extends CustomApp {
         if (is_null($user)) {
             $user = $this->create_db_object("User");
             $user->insert_login_form_extra_fields();
+            if ($this->was_user_remembered()) {
+                $user->should_remember = 1;
+            }
         } else {
-            $user->login = "";
             $user->password = "";
         }
         $user_edit = $this->create_object(
@@ -362,46 +393,60 @@ class UserApp extends CustomApp {
             $this->print_status_messages($messages);
             $this->run_action("pg_login", array("user" => $user));
         } else {
-            $this->create_login_state($user->id);
-
-            $saved_request_params = Session::get_saved_request_params();
+            $saved_request_params = $this->session->get_saved_request_params();
             if (is_null(get_param_value($saved_request_params, "action", null))) {
                 $saved_request_params = array("action" => "pg_home") + $saved_request_params;
             }
-            Session::destroy_saved_request_params();
+            $this->session->destroy_saved_request_params();
+            
             $this->create_self_redirect_response($saved_request_params);
+
+            $this->create_login_state($user);
             if ($should_remember) {
-                $this->add_remember_user_cookies($user->id, $user->password);
+                $this->add_remember_user_id_and_password_cookies($user);
+            } else {
+                $this->remove_remember_user_id_and_password_cookies();
             }
         }
     }
 
-    function add_remember_user_cookies($login_id, $password) {
-        $cookie_expiration_period_in_days = $this->get_config_value(
-            "remember_user_cookie_expiration_period"
+    function &create_login_state($user) {
+        return $this->session->create_login_state(
+            $this->get_config_value("login_state_idle_timeout"),
+            $this->get_config_value("login_state_max_timeout"),
+            $user->id
         );
-        $cookie_expiration_ts = time() + 60 * 60 * 24 * $cookie_expiration_period_in_days;
+    }
+
+    function destroy_login_state() {
+        $this->session->destroy_login_state();
+    }
+
+    function add_remember_user_id_and_password_cookies($user) {
+        $cookie_expiration_ts = $this->create_remember_user_cookie_expiration_ts();
         $this->response->add_cookie(new Cookie(
             "user_id",
-            $login_id,
+            $user->id,
             $cookie_expiration_ts
         ));
         $this->response->add_cookie(new Cookie(
             "user_password_hash",
-            sha1($password),
+            sha1($user->password),
             $cookie_expiration_ts
         ));
     }
 
-    function action_logout() {
-        Session::destroy_login_state();
-        $this->add_session_status_message(new OkStatusMsg("status_message_logged_out"));
-        $this->create_self_redirect_response(array("action" => "pg_login"));
-        $this->remove_remember_user_cookies();
+    function add_current_lang_cookie() {
+        $cookie_expiration_ts = $this->create_remember_user_cookie_expiration_ts();
+        $this->response->add_cookie(new Cookie(
+            "current_lang",
+            $this->lang,
+            $cookie_expiration_ts
+        ));
     }
 
-    function remove_remember_user_cookies() {
-        if (isset($_COOKIE["user_id"]) && isset($_COOKIE["user_password_hash"])) {
+    function remove_remember_user_id_and_password_cookies() {
+        if ($this->was_user_remembered()) {
             $this->response->add_cookie(new Cookie(
                 "user_id",
                 false,
@@ -415,6 +460,20 @@ class UserApp extends CustomApp {
         }
     }
 
+    function create_remember_user_cookie_expiration_ts() {
+        $cookie_expiration_period_in_days = $this->get_config_value(
+            "remember_user_cookie_expiration_period"
+        );
+        return time() + 60 * 60 * 24 * $cookie_expiration_period_in_days;
+    }
+
+    function action_logout() {
+        $this->add_session_status_message(new OkStatusMsg("status_message_logged_out"));
+        $this->create_self_redirect_response(array("action" => "pg_login"));
+        $this->destroy_login_state();
+        $this->remove_remember_user_id_and_password_cookies();
+    }
+//
     function action_pg_signup() {
         $templates_dir = "signup";
 

@@ -167,8 +167,8 @@ login_form_bottom_text_signup = Procedi all'iscrizione
 login_form_bottom_text_did_forget_password = Password dimenticata?
 login_form_bottom_text_recover_password = Ritrovala
 
-login_status_logged_in_as = Connesso come
-login_status_not_logged_in = Non connesso
+login_state_logged_in_as = Connesso come
+login_state_not_logged_in = Non connesso
 user_should_remember = !!Remember me
 
 ["signup"]
@@ -211,8 +211,8 @@ news_articles = notizie
 
 user_menu_item_news = News
 
-page_title_view_news_articles = News
-page_title_view_news_article = Visualizza notizia
+page_title_pg_news_articles = News
+page_title_pg_news_article_view = Visualizza notizia
 
 ["contact_form"]
 user_menu_item_contact_form = Contatti

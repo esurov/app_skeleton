@@ -6,7 +6,6 @@ define("_APP_LIB_DIR", dirname(__FILE__));
 require_once(_APP_LIB_DIR . "/global.php");
 
 // Core classes
-require_once(_APP_LIB_DIR . "/session.php");
 require_once(_APP_LIB_DIR . "/config.php");
 require_once(_APP_LIB_DIR . "/template.php");
 require_once(_APP_LIB_DIR . "/select_query.php");

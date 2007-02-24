@@ -92,22 +92,7 @@ function param($name) {
     } else {
         return null;
     }
-    if (get_magic_quotes_gpc()) {
-        if (is_array($param_value)) {
-            $param_values = array();
-            foreach ($param_value as $value) {
-                $param_values[] = stripslashes($value);
-            }
-            return $param_values;
-        } else {
-            return stripslashes($param_value);
-        }
-    }
     return $param_value;
-}
-
-function param_cookie($name) {
-    return isset($_COOKIE[$name]) ? $_COOKIE[$name] : "";
 }
 
 function params() {

@@ -10,6 +10,13 @@ $app_classes = array(
         "Logger" => array(
             "filename" => "logger.php",
         ),
+        "Session" => array(
+            "filename" => "session.php",
+        ),
+        "LoginSession" => array(
+            "filename" => "session.php",
+            "required_classes" => array("Session"),
+        ),
         "MySqlDb" => array(
             "filename" => "db_mysql.php",
         ),
