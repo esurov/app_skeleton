@@ -13,7 +13,6 @@ class UserTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "created",
             "type" => "datetime",
-            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
             "update" => 0,
             "index" => "index",
@@ -22,7 +21,6 @@ class UserTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "updated",
             "type" => "datetime",
-            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
         ));
 
@@ -76,6 +74,13 @@ class UserTable extends CustomDbObject {
         ));
 
         $this->insert_field(array(
+            "field" => "confirmation_date",
+            "type" => "datetime",
+            "read" => 0,
+            "update" => 0,
+        ));
+
+        $this->insert_field(array(
             "field" => "is_confirmed",
             "type" => "boolean",
             "value" => 0,
@@ -84,7 +89,7 @@ class UserTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "is_active",
             "type" => "boolean",
-            "value" => 0,
+            "value" => 1,
         ));
 //
         $this->insert_filter(array(
@@ -191,8 +196,6 @@ class UserTable extends CustomDbObject {
         switch ($context) {
 //        case "edit_user_form":
 //        case "recover_password_form":
-
-        
         case "login_form":
             $conditions = array(
                 array(
@@ -338,14 +341,47 @@ class UserTable extends CustomDbObject {
             $messages[] = new ErrorStatusMsg("user_passwords_do_not_match");
         }
     }
+//
+    function store(
+        $field_names_to_store = null,
+        $field_names_to_not_store = null
+    ) {
+        $this->created = $this->app->get_db_now_datetime();
+        $this->updated = $this->app->get_db_now_datetime();
+        if (!is_null($field_names_to_store)) {
+            $field_names_to_store[] = "created";
+            $field_names_to_store[] = "updated";
+        }
 
+        parent::store($field_names_to_store, $field_names_to_not_store);
+    }
+//
     function update(
         $field_names_to_update = null,
         $field_names_to_not_update = null
     ) {
         $this->updated = $this->app->get_db_now_datetime();
+        if (!is_null($field_names_to_update)) {
+            $field_names_to_update[] = "updated";
+        }
 
         parent::update($field_names_to_update, $field_names_to_not_update);
+    }
+
+    function confirm() {
+        $this->confirmation_date = $this->app->get_db_now_datetime();
+        $this->is_confirmed = 1;
+        $this->update(array("confirmation_date", "is_confirmed"));
+    }
+
+    function activate() {
+        $this->is_active = 1;
+        $this->update(array("is_active"));
+    }
+
+    function deactivate() {
+        $this->is_active = 0;
+        $this->update(array("is_active"));
     }
 //
     function print_values($params = array()) {

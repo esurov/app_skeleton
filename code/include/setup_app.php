@@ -78,6 +78,7 @@ class SetupApp extends CustomApp {
         $user->last_name = "Ln";
         $user->email = $this->get_config_value("admin_email_to");
         $user->role = "user";
+        $user->confirmation_date = $this->get_db_now_datetime();
         $user->is_confirmed = 1;
         $user->is_active = 1;
         $user->store();
@@ -88,6 +89,7 @@ class SetupApp extends CustomApp {
         $user->last_name = "LnNotActive";
         $user->email = $this->get_config_value("admin_email_to");
         $user->role = "user";
+        $user->confirmation_date = $this->get_db_now_datetime();
         $user->is_confirmed = 1;
         $user->is_active = 0;
         $user->store();
@@ -98,6 +100,7 @@ class SetupApp extends CustomApp {
         $user->last_name = "LnNotConfirmed";
         $user->email = $this->get_config_value("admin_email_to");
         $user->role = "user";
+        $user->confirmation_date = "0000-00-00 00:00:00";
         $user->is_confirmed = 0;
         $user->is_active = 0;
         $user->store();

@@ -190,10 +190,19 @@ policy_disclaimer = !!Disclaimer
 signup_form_accept_agreement = !!I accept
 
 signup_almost_completed = Il nuovo account stato creato ma non confermato. Una email con il link per la conferma dell'attivazione stata spedita all'indirizzo specificato. Quando ricevi l'email clicca sul link per completare la procedura di creazione dell'account.
-login_if_already_confirmed = A conferma avvenuta,
+signup_login_if_already_confirmed = A conferma avvenuta,
+
+email_signup_form_processed_subject = !!Welcome to !!AppSkeleton website
+email_signup_text1 = Questa l'email di conferma iscrizione ai servizi dello !!AppSkeleton sito web.
+email_signup_text2 = Dettagli account
+email_signup_text3 = Si raccomanda di conservare questa email in una posizione sicura in modo da avere i dettagli del proprio account intatti e a portata di mano quando necessario.
+email_signup_text4 = Per confermare la richiesta di iscrizione si prega di cliccare sul link di conferma:
 
 ["confirm signup"]
+page_title_confirm_signup = Account è stato confermato
 
+signup_confirmed_text1 = Il tuo account è stato confermato.
+signup_confirmed_text2 = Adesso è possibile effettuare il login.
 
 ["recover_password"]
 page_title_pg_recover_password = Ritrovamento password
@@ -204,6 +213,8 @@ recover_password_login_or_email_empty = !!Specify login or email
 recover_password_bad_email = !!Bad email specified
 recover_password_no_account_with_login = !!Cannot find account with login "{%login%}"
 recover_password_no_account_with_email = !!Cannot find account with email "{%email%}"
+
+email_recover_password_form_processed_subject = !!Password recovery for !!AppSkeleton website
 
 ["news_articles"]
 news_article = notizia

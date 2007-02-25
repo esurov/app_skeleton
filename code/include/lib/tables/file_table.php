@@ -13,7 +13,6 @@ class FileTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "created",
             "type" => "datetime",
-            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
             "update" => 0,
             "index" => "index",
@@ -22,7 +21,6 @@ class FileTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "updated",
             "type" => "datetime",
-            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
             "index" => "index",
         ));
@@ -49,13 +47,30 @@ class FileTable extends CustomDbObject {
         ));
     }
 //
+    function store(
+        $field_names_to_store = null,
+        $field_names_to_not_store = null
+    ) {
+        $this->created = $this->app->get_db_now_datetime();
+        $this->updated = $this->app->get_db_now_datetime();
+        if (!is_null($field_names_to_store)) {
+            $field_names_to_store[] = "created";
+            $field_names_to_store[] = "updated";
+        }
+
+        parent::store($field_names_to_store, $field_names_to_not_store);
+    }
+//
     function update(
-        $fields_names_to_update = null,
-        $fields_names_to_not_update = null
+        $field_names_to_update = null,
+        $field_names_to_not_update = null
     ) {
         $this->updated = $this->app->get_db_now_datetime();
+        if (!is_null($field_names_to_update)) {
+            $field_names_to_update[] = "updated";
+        }
         
-        parent::update($fields_names_to_update, $fields_names_to_not_update);
+        parent::update($field_names_to_update, $field_names_to_not_update);
     }
 //
     function print_values($params = array()) {
