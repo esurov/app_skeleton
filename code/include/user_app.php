@@ -280,8 +280,8 @@ class UserApp extends CustomApp {
         $user_edit = $this->create_object(
             "ObjectEdit",
             array(
-                "templates_dir" => "{$templates_dir}/user_edit",
-                "template_var" => "user_edit",
+                "templates_dir" => "{$templates_dir}/login_form",
+                "template_var" => "login_form",
                 "obj" => $user,
                 "context" => "login_form",
             )
@@ -411,8 +411,8 @@ class UserApp extends CustomApp {
         $user_edit = $this->create_object(
             "ObjectEdit",
             array(
-                "templates_dir" => "{$templates_dir}/user_edit",
-                "template_var" => "user_edit",
+                "templates_dir" => "{$templates_dir}/signup_form",
+                "template_var" => "signup_form",
                 "obj" => $user,
                 "context" => "signup_form",
             )
@@ -453,7 +453,7 @@ class UserApp extends CustomApp {
         ));
         $this->print_value("confirmation_link", $url);
         
-        $body = $this->print_file("signup/email_signup_confirmation_to_user.html");
+        $body = $this->print_file("signup/email_signup_confirmation_sent_to_user.html");
 
         $email_sender = $this->create_email_sender();
         $email_sender->From = $email_from;
@@ -466,7 +466,7 @@ class UserApp extends CustomApp {
     }
 
     function action_pg_signup_almost_completed() {
-        $this->print_file("signup/signup_almost_completed.html", "body");
+        $this->print_file("signup/body_signup_almost_completed.html", "body");
     }
 
     function action_confirm_signup() {
@@ -474,7 +474,7 @@ class UserApp extends CustomApp {
         if ($user->is_definite() && !$user->is_confirmed) {
             $user->confirm(1);
         }
-        $this->print_file("signup/signup_confirmed.html", "body");
+        $this->print_file("signup/body_signup_confirmed.html", "body");
     }
         
     function action_pg_recover_password() {
@@ -595,8 +595,8 @@ class UserApp extends CustomApp {
         $contact_form = $this->create_object(
             "ObjectEdit",
             array(
-                "templates_dir" => "{$templates_dir}/contact_info_edit",
-                "template_var" => "contact_info_edit",
+                "templates_dir" => "{$templates_dir}/contact_form",
+                "template_var" => "contact_form",
                 "obj" => $contact_info,
             )
         );
@@ -611,7 +611,6 @@ class UserApp extends CustomApp {
         $contact_info->read();
 
         $messages = $contact_info->validate($contact_info_old);
-
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
             $this->run_action("pg_contact_form", array("contact_info" => $contact_info));
@@ -629,8 +628,9 @@ class UserApp extends CustomApp {
         $email_to = $this->get_actual_email_to($this->get_config_value("contact_form_email_to"));
         $name_to = $this->get_config_value("contact_form_name_to");
         $subject = $this->get_config_value("email_contact_form_processed_subject");
+
         $contact_info->print_values();
-        $body = $this->print_file("contact_form/email.html");
+        $body = $this->print_file("contact_form/email_contact_info_sent_to_admin.html");
 
         $email_sender = $this->create_email_sender();
         $email_sender->From = $email_from;
@@ -689,7 +689,6 @@ class UserApp extends CustomApp {
         $news_article->read();
 
         $messages = $news_article->validate($news_article_old);
-
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
             $this->run_action("pg_news_article_edit", array("news_article" => $news_article));
