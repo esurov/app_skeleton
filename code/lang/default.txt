@@ -8,30 +8,3 @@ tables_deleted = Tables have been deleted!
 initial_data_inserted = Initial data have been inserted!
 test_data_inserted = Test data have been inserted!
 dump_creation_failed = Dump creation failed!
-
-["page and head titles (admin area)"]
-admin_auth_realm = !!AppSkeleton area di amministrazione
-admin_area_head_title = !!AppSkeleton area di amministrazione
-
-["menu items"]
-admin_menu_item_index = Home
-admin_menu_item_news_articles = Notizie
-admin_menu_item_app = App
-
-["news_articles"]
-page_title_pg_news_articles = Visualizza notizie
-page_title_pg_news_article_view = Visualizza notizia
-page_title_pg_news_article_edit_new = Aggiungi notizia
-page_title_pg_news_article_edit = Modifica notizia
-news_article_added = Aggiunta nuova notizia
-news_article_updated = Notizia è stata modificata
-news_article_deleted = Notizia è stata eliminata
-news_article_image_deleted = !!News article image deleted
-news_article_file_deleted = !!News article file deleted
-news_article_title_empty = Titolo assente
-news_article_image_empty = !!Please upload image
-news_article_image_bad = !!Please upload valid image
-news_article_file_empty = Prego caricare file
-news_article_file_bad = Prego caricare file valido
-news_article_file_max_size_reached = La dimensione del file caricato supera i 2 Mb
-news_article_files_max_total_size_reached = !!Total uploaded files size is more than 100 Mb

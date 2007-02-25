@@ -17,4 +17,9 @@
         url="?action=pg_users"
         contexts="pg_users, pg_user_edit"
     />
+    <menu_item
+        name="news"
+        url="?action=pg_news_articles"
+        contexts="pg_news_articles, pg_news_article_edit"
+    />
 </menu>

@@ -13,7 +13,7 @@
     contexts=""
 -->
 <menu
-    name="user_menu"
+    name="guest_menu"
     template="menu.html"
     item_template="menu_item.html"
     item_selected_template="menu_item_selected.html"
@@ -40,7 +40,7 @@
         url="?action=pg_static&amp;page=sample_page1"
     >
         <menu
-            name="user_sub_menu"
+            name="guest_sub_menu"
             template="sub_menu.html"
             item_template="sub_menu_item.html"
             item_selected_template="sub_menu_item_selected.html"
@@ -71,7 +71,7 @@
                 url="?action=pg_static&amp;page=sample_page2_1"
             >
                 <menu
-                    name="user_sub_sub_menu"
+                    name="guest_sub_sub_menu"
                     template="sub_sub_menu.html"
                     item_template="sub_sub_menu_item.html"
                     item_selected_template="sub_sub_menu_item_selected.html"

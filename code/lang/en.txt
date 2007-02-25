@@ -15,16 +15,16 @@ page_title_pg_static_sample_page2_1 = SampleStaticPage2_1
 page_title_pg_static_sample_page2_2 = SampleStaticPage2_2
 
 ["general menu items"]
-user_menu_item_index = Home
+guest_menu_item_index = Home
 
-user_menu_item_sample_static_pages = SampleStaticPages
-user_sub_menu_item_sample_static_page1 = SampleStaticPage1
-user_sub_menu_item_sample_static_page2 = SampleStaticPage2
-user_sub_menu_item_sample_popup = SamplePopup
-user_sub_menu_item_sample_new_window = SampleNewWindow
-user_sub_menu_item_sample_static_pages2 = SampleStaticPages2
-user_sub_sub_menu_item_sample_static_page2_1 = SampleStaticPage2_1
-user_sub_sub_menu_item_sample_static_page2_2 = SampleStaticPage2_2
+guest_menu_item_sample_static_pages = SampleStaticPages
+guest_sub_menu_item_sample_static_page1 = SampleStaticPage1
+guest_sub_menu_item_sample_static_page2 = SampleStaticPage2
+guest_sub_menu_item_sample_popup = SamplePopup
+guest_sub_menu_item_sample_new_window = SampleNewWindow
+guest_sub_menu_item_sample_static_pages2 = SampleStaticPages2
+guest_sub_sub_menu_item_sample_static_page2_1 = SampleStaticPage2_1
+guest_sub_sub_menu_item_sample_static_page2_2 = SampleStaticPage2_2
 
 admin_menu_item_index = Home
 
@@ -173,7 +173,7 @@ login_state_not_logged_in = Not logged in
 user_should_remember = Remember me
 
 ["signup"]
-user_menu_item_signup = Signup
+guest_menu_item_signup = Signup
 
 page_title_pg_signup = Signup
 page_title_pg_signup_almost_completed = Il nuovo account stato creato
@@ -210,13 +210,30 @@ recover_password_no_account_with_email = Cannot find account with email "{%email
 news_article = news article
 news_articles = news articles
 
-user_menu_item_news = News
+guest_menu_item_news = News
+admin_menu_item_news = News
 
 page_title_pg_news_articles = News
 page_title_pg_news_article_view = View news article
+page_title_pg_news_article_edit_new = Add news article
+page_title_pg_news_article_edit = Edit news article
+
+news_article_added = News article added
+news_article_updated = News article updated
+news_article_deleted = News article deleted
+news_article_image_deleted = News article image deleted
+news_article_file_deleted = News article file deleted
+
+news_article_title_empty = Specify title
+news_article_image_empty = Please upload image
+news_article_image_bad = Please upload valid image
+news_article_file_empty = Please upload file
+news_article_file_bad = Please upload valid file
+news_article_file_max_size_reached = Uploaded file size is more than 2 Mb
+news_article_files_max_total_size_reached = Total uploaded files size is more than 100 Mb
 
 ["contact_form"]
-user_menu_item_contact_form = Contacts
+guest_menu_item_contact_form = Contacts
 
 page_title_pg_contact_form = Contact form
 contact_form_processed = Your contact info was processed. Thank you!
