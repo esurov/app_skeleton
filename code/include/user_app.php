@@ -34,6 +34,7 @@ class UserApp extends CustomApp {
             "confirm_signup" => $e,
             "pg_recover_password" => $e,
             "recover_password" => $e,
+            "pg_recover_password_sent" => $e,
 
             // User management
             "pg_users" => $a,
@@ -439,19 +440,19 @@ class UserApp extends CustomApp {
     }
 
     function send_email_signup_form_processed_to_user($user) {
+        $email_from = $this->get_config_value("website_email_from");
+        $name_from = $this->get_config_value("website_name_from");
+        $email_to = $this->get_actual_email_to($user->email);
+        $name_to = $user->get_full_name();
+        $subject = $this->get_config_value("email_signup_form_processed_subject");
+
+        $user->print_values();
         $url = create_self_full_url(array(
             "action" => "confirm_signup",
             "user_id" => $user->id,
         ));
         $this->print_value("confirmation_link", $url);
-
-        $email_from = $this->get_config_value("website_email_from");
-        $name_from = $this->get_config_value("website_name_from");
-
-        $email_to = $this->get_actual_email_to($user->email);
-        $name_to = $user->get_full_name();
-        $subject = $this->get_config_value("email_signup_form_processed_subject");
-        $user->print_values();
+        
         $body = $this->print_file("signup/email_signup_confirmation_to_user.html");
 
         $email_sender = $this->create_email_sender();
@@ -477,6 +478,62 @@ class UserApp extends CustomApp {
     }
         
     function action_pg_recover_password() {
+        $templates_dir = "recover_password";
+
+        $user = get_param_value($this->action_params, "user", null);
+        if (is_null($user)) {
+            $user = $this->create_db_object("User");
+        }
+        $recover_password_form = $this->create_object(
+            "ObjectEdit",
+            array(
+                "templates_dir" => "{$templates_dir}/recover_password_form",
+                "template_var" => "recover_password_form",
+                "obj" => $user,
+                "context" => "recover_password_form",
+            )
+        );
+        $recover_password_form->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_recover_password() {
+        $user = $this->create_db_object("User");
+        $user->read(array("login", "email"));
+
+        $messages = $user->validate(null, "recover_password_form");
+        if (count($messages) != 0) {
+            $this->print_status_messages($messages);
+            $this->run_action("pg_recover_password", array("user" => $user));
+        } else {
+            $this->send_email_recover_password_form_processed_to_user($user);
+            $this->create_self_redirect_response(array("action" => "pg_recover_password_sent"));
+        }
+    }
+
+    function send_email_recover_password_form_processed_to_user($user) {
+        $email_from = $this->get_config_value("website_email_from");
+        $name_from = $this->get_config_value("website_name_from");
+        $email_to = $this->get_actual_email_to($user->email);
+        $name_to = $user->get_full_name();
+        $subject = $this->get_config_value("email_recover_password_form_processed_subject");
+        
+        $user->print_values();
+        $body = $this->print_file("recover_password/email_password_sent_to_user.html");
+
+        $email_sender = $this->create_email_sender();
+        $email_sender->From = $email_from;
+        $email_sender->Sender = $email_from;
+        $email_sender->FromName = trim($name_from);
+        $email_sender->AddAddress($email_to, trim($name_to));
+        $email_sender->Subject = $subject;
+        $email_sender->Body = $body;
+        $email_sender->Send();
+    }
+
+    function action_pg_recover_password_sent() {
+        $this->print_file("recover_password/body_password_sent.html", "body");
     }
 //
     function action_pg_news_articles() {

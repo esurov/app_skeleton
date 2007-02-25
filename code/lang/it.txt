@@ -112,7 +112,7 @@ company_type = Forma Societaria
 company_position = Ruolo aziendale
 piva = Partità IVA
 codice_fiscale = Codice Fiscale
-email = E-mail
+email = Email
 website = Sito Web
 country = Nazione
 province = Provincia
@@ -139,8 +139,8 @@ cannot_delete_record_because_it_has_restrict_relations = Impossibile eliminare {
 
 status_message_first_name_empty = Inserire il nome
 status_message_last_name_empty = Inserire il cognome
-status_message_email_empty = Inserire l'e-mail
-status_message_email_bad = Inserire un indirizzo e-mail valido
+status_message_email_empty = Inserire l'email
+status_message_email_bad = Inserire un indirizzo email valido
 status_message_zip_empty = Inserire il CAP
 status_message_zip_bad = Il CAP dovrebbe essere un numero di 5 cifre
 status_message_country_empty = Inserire la nazione
@@ -198,7 +198,7 @@ email_signup_text2 = Dettagli account
 email_signup_text3 = Si raccomanda di conservare questa email in una posizione sicura in modo da avere i dettagli del proprio account intatti e a portata di mano quando necessario.
 email_signup_text4 = Per confermare la richiesta di iscrizione si prega di cliccare sul link di conferma:
 
-["confirm signup"]
+["confirm_signup"]
 page_title_confirm_signup = Account è stato confermato
 
 signup_confirmed_text1 = Il tuo account è stato confermato.
@@ -207,14 +207,21 @@ signup_confirmed_text2 = Adesso è possibile effettuare il login.
 ["recover_password"]
 page_title_pg_recover_password = Ritrovamento password
 
-recover_password_login_empty = !!Specify login
-recover_password_email_empty = !!Specify email
-recover_password_login_or_email_empty = !!Specify login or email
-recover_password_bad_email = !!Bad email specified
-recover_password_no_account_with_login = !!Cannot find account with login "{%login%}"
-recover_password_no_account_with_email = !!Cannot find account with email "{%email%}"
+recover_password_login_or_email_empty = Login o indirizzo email non specificati
+recover_password_bad_email = Indirizzo email non corretto
+recover_password_no_account_with_login = Impossibile trovare l'account avente login "{%login%}"
+recover_password_no_account_with_email = Impossibile trovare l'account avente indirizzo email "{%email%}"
+
+recover_password_form_text1 = Specifica il login o l'indirizzo email usati durante l'iscrizione:
 
 email_recover_password_form_processed_subject = !!Password recovery for !!AppSkeleton website
+email_recover_password_text1 = Questa è una notifica via email per il recupero della password dimenticata per !!AppSkeleton sito web.
+email_recover_password_text2 = Ecco i tuoi dati di accesso:
+
+["recover_password_sent"]
+page_title_pg_recover_password_sent = Password è stata inviata
+
+recover_password_sent = La tua password è stata inviata. Controlla l'email e login.
 
 ["news_articles"]
 news_article = notizia
@@ -234,9 +241,9 @@ news_article_deleted = Notizia è stata eliminata
 news_article_image_deleted = !!News article image deleted
 news_article_file_deleted = !!News article file deleted
 
-news_article_title_empty = Titolo assente
-news_article_image_empty = !!Please upload image
-news_article_image_bad = !!Please upload valid image
+news_article_title_empty = !!Inserire titolo
+news_article_image_empty = !!Prego caricare immagine
+news_article_image_bad = !!Prego caricare immagine valido
 news_article_file_empty = Prego caricare file
 news_article_file_bad = Prego caricare file valido
 news_article_file_max_size_reached = La dimensione del file caricato supera i 2 Mb
@@ -267,7 +274,8 @@ user_password_empty = Inserire password
 user_password_at_least_6_chars = !!Password must be at least 6 characters
 user_passwords_do_not_match = Le password inserite non corrispondono tra loro
 user_email_empty = Inserire email
-user_bad_email = L'indirizzo email specificato non è corretto
+user_email_bad = L'indirizzo email specificato non è corretto
+user_email_exists = L'indirizzo email è attualmente in uso con ul altro account
 user_first_name_empty = Inserire nome
 user_last_name_empty = Inserire cognome
 user_role_empty = Specificare ruolo utente

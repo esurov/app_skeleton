@@ -112,7 +112,7 @@ company_type = Type
 company_position = Position
 piva = VAT No.
 codice_fiscale = Fiscal code
-email = E-mail
+email = Email
 website = Website
 country = Country
 province = Province
@@ -139,8 +139,8 @@ cannot_delete_record_because_it_has_restrict_relations = Cannot delete {%main_ob
 
 status_message_first_name_empty = Please input your first name
 status_message_last_name_empty = Please input your last name
-status_message_email_empty = Please input your e-mail
-status_message_bad_email = Please input correct e-mail address
+status_message_email_empty = Please input your email
+status_message_email_bad = Please input correct email address
 status_message_zip_empty = Please input ZIP Code 
 status_message_zip_bad = ZIP Code should be a number with minimum 5 digits
 status_message_country_empty = Please input country
@@ -199,7 +199,7 @@ email_signup_text2 = Account details
 email_signup_text3 = Please keep this mail in a safe place to have your account details safe and handy when you will need them.
 email_signup_text4 = In order to confirm your singup request, please click confirmation link:
 
-["confirm signup"]
+["confirm_signup"]
 page_title_confirm_signup = Account confirmed
 
 signup_confirmed_text1 = Your account is now confirmed.
@@ -208,14 +208,21 @@ signup_confirmed_text2 = Now you may login.
 ["recover_password"]
 page_title_pg_recover_password = Recover password
 
-recover_password_login_empty = Specify login
-recover_password_email_empty = Specify email
 recover_password_login_or_email_empty = Specify login or email
 recover_password_bad_email = Bad email specified
 recover_password_no_account_with_login = Cannot find account with login "{%login%}"
 recover_password_no_account_with_email = Cannot find account with email "{%email%}"
 
+recover_password_form_text1 = Please specify your account login or email address which you used during signup
+
 email_recover_password_form_processed_subject = Password recovery for !!AppSkeleton website
+email_recover_password_text1 = This is password recovery email for !!AppSkeleton website.
+email_recover_password_text2 = Here is your access info:
+
+["recover_password_sent"]
+page_title_pg_recover_password_sent = Password sent
+
+recover_password_sent = Your password was sent. Please check email and login.
 
 ["news_articles"]
 news_article = news article
@@ -267,7 +274,8 @@ user_login_exists = Login "{%login%}" already exists, specify another one
 user_password_empty = Specify password
 user_password_at_least_6_chars = Password must be at least 6 characters
 user_passwords_do_not_match = Entered passwords do not match
-user_bad_email = Email is invalid
+user_email_bad = Email is invalid
+user_email_exists = Email is already used with another account
 user_first_name_empty = Specify first name
 user_last_name_empty = Specify last name
 user_role_empty = Specify user role

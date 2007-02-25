@@ -52,6 +52,7 @@ class UserTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "email",
             "type" => "varchar",
+            "index" => "unique",
         ));
 
         $this->insert_field(array(
@@ -195,7 +196,6 @@ class UserTable extends CustomDbObject {
     function get_validate_conditions($context, $context_params) {
         switch ($context) {
 //        case "edit_user_form":
-//        case "recover_password_form":
         case "login_form":
             $conditions = array(
                 array(
@@ -282,7 +282,15 @@ class UserTable extends CustomDbObject {
                     "dependency" => array(
                         "field" => "email",
                         "type" => "email",
-                        "message" => "user_bad_email",
+                        "message" => "user_email_bad",
+                        "dependency" => array(
+                            "field" => "email",
+                            "type" => "unique",
+                            "message" => "user_email_exists",
+                            "message_params" => array(
+                                "email" => $this->email,
+                            ),
+                        ),
                     ),
                 ),
             );
@@ -309,6 +317,35 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
+        case "recover_password_form":
+            $conditions = array(
+                array(
+                    "field" => "email",
+                    "type" => "empty",
+                    "message" => null,
+                    "dependency" => array(
+                        "field" => "login",
+                        "type" => "not_empty",
+                        "message" => "recover_password_login_or_email_empty",
+                    ),
+                ),
+                array(
+                    "field" => "login",
+                    "type" => "empty",
+                    "message" => null,
+                    "dependency" => array(
+                        "field" => "email",
+                        "type" => "not_empty",
+                        "message" => "recover_password_login_or_email_empty",
+                        "dependency" => array(
+                            "field" => "email",
+                            "type" => "email",
+                            "message" => "recover_password_bad_email",
+                        ),
+                    ),
+                ),
+            );
+            break;
         default:
             $conditions = array();
         }
@@ -330,6 +367,26 @@ class UserTable extends CustomDbObject {
         if ($context == "signup_form") {
             if (!$this->agreement_accepted) {
                 $messages[] = new ErrorStatusMsg("user_should_accept_agreement");
+            }
+        }
+
+        if ($context == "recover_password_form" && count($messages) == 0) {
+            // NB: This part of code overwrites current user,
+            // it fetches user with current user's login or email
+            if (is_value_not_empty($this->login)) {
+                if (!$this->fetch("user.login = ". qw($this->login))) {
+                    $messages[] = new ErrorStatusMsg(
+                        "recover_password_no_account_with_login",
+                        array("login" => $this->login)
+                    );
+                }
+            } else if (is_value_not_empty($this->email)) {
+                if (!$this->fetch("user.email = ". qw($this->email))) {
+                    $messages[] = new ErrorStatusMsg(
+                        "recover_password_no_account_with_email",
+                        array("email" => $this->email)
+                    );
+                }
             }
         }
 

@@ -76,7 +76,7 @@ class SetupApp extends CustomApp {
         $user->password = "";
         $user->first_name = "Fn";
         $user->last_name = "Ln";
-        $user->email = $this->get_config_value("admin_email_to");
+        $user->email = "kay_test1@devel.basetre.com";
         $user->role = "user";
         $user->confirmation_date = $this->get_db_now_datetime();
         $user->is_confirmed = 1;
@@ -87,7 +87,7 @@ class SetupApp extends CustomApp {
         $user->password = "";
         $user->first_name = "FnNotActive";
         $user->last_name = "LnNotActive";
-        $user->email = $this->get_config_value("admin_email_to");
+        $user->email = "kay_test2@devel.basetre.com";
         $user->role = "user";
         $user->confirmation_date = $this->get_db_now_datetime();
         $user->is_confirmed = 1;
@@ -98,7 +98,7 @@ class SetupApp extends CustomApp {
         $user->password = "";
         $user->first_name = "FnNotConfirmed";
         $user->last_name = "LnNotConfirmed";
-        $user->email = $this->get_config_value("admin_email_to");
+        $user->email = "kay_test3@devel.basetre.com";
         $user->role = "user";
         $user->confirmation_date = "0000-00-00 00:00:00";
         $user->is_confirmed = 0;
