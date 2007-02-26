@@ -11,6 +11,7 @@ define("DL_EXTRA_DEBUG", 32);
 class Logger extends AppObject {
 
     var $_filename;
+    var $_file_exists;
 
     var $_truncate_always;
     var $_debug_level;
@@ -24,6 +25,7 @@ class Logger extends AppObject {
         $this->set_truncate_always($this->get_config_value("log_truncate_always", false));
 
         $this->set_filename("log/app.log");
+        $this->_file_exists = (is_file($this->_filename));
 
         if ($this->_truncate_always) {
             $this->truncate();
@@ -73,6 +75,9 @@ class Logger extends AppObject {
     }
 
     function _write_line($line_text) {
+        if (!$this->_file_exists) {
+            return;
+        }
         if ($this->_max_filesize > 0) {
             clearstatcache();
             if (filesize($this->_filename) > $this->_max_filesize) {
