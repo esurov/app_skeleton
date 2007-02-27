@@ -1,10 +1,12 @@
 <div>
-<form action="{%view_dump_url%}" method="get" name="form" onsubmit="onsubmitFormHandler(this);">
+<form action="?" method="get" name="form" onsubmit="onsubmitFormHandler(this);">
+<input type="hidden" name="action" value="pg_tables_dump_view">
+<input type="hidden" name="table_names" value="{%table_names_str%}">
 
 <table>
 <tr>
 <td align="center" colspan="2">
-<a href="{%download_dump_url%}">URL for dump download</a><br><br>
+<a href="{%download_dump_url%}">Download gzipped dump</a><br><br>
 <textarea name="url" cols="120" rows="9">{%download_dump_url%}</textarea>
 </td>
 </tr>

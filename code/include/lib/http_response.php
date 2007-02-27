@@ -186,6 +186,35 @@ class BinaryContentResponse extends HttpResponse {
 
 }
 
+class BinaryStreamResponse extends HttpResponse {
+    
+    var $stream;
+    var $stream_type;
+
+    function BinaryStreamResponse($content_type, $stream, $stream_type) {
+        parent::HttpResponse();
+
+        $this->stream = $stream;
+        $this->stream_type = $stream_type;
+
+        $this->add_content_type_header($content_type);
+    }
+
+    function send_body() {
+        fpassthru($this->stream);
+        switch ($this->stream_type) {
+        case "file":
+        case "socket":
+            fclose($this->stream);
+            break;
+        case "process":
+            pclose($this->stream);
+            break;
+        }
+    }
+
+}
+
 class PlainTextDocumentResponse extends BinaryContentResponse {
     
     function PlainTextDocumentResponse($content, $filename, $is_attachment) {

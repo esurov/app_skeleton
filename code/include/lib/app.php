@@ -348,9 +348,25 @@ class App extends AppObject {
         return $params;
     }
 
-    function create_binary_content_response($content, $filename) {
-        $this->response = new BinaryContentResponse("application/octet-stream", $content);
-        $this->response->add_content_disposition_header($filename, true);
+    function create_binary_content_response($content, $filename = null) {
+        $this->response = new BinaryContentResponse(
+            "application/octet-stream",
+            $content
+        );
+        if (!is_null($filename)) {
+            $this->response->add_content_disposition_header($filename, true);
+        }
+    }
+
+    function create_binary_stream_response($stream, $stream_type, $filename = null) {
+        $this->response = new BinaryStreamResponse(
+            "application/octet-stream",
+            $stream,
+            $stream_type
+        );
+        if (!is_null($filename)) {
+            $this->response->add_content_disposition_header($filename, true);
+        }
     }
 
     function create_html_document_response() {
@@ -1797,44 +1813,54 @@ class App extends AppObject {
             "action" => "pg_tables_dump_view",
             "table_names" => $table_names_str,
         ));
-        $this->print_varchar_value("view_dump_url", $url);
+        $this->print_value("view_dump_url", $url);
 
         $url = create_self_full_url(array(
             "action" => "download_tables_dump",
             "table_names" => $table_names_str,
         ));
-        $this->print_varchar_value("download_dump_url", $url);
+        $this->print_value("download_dump_url", $url);
 
         $this->print_file("tables_dump/url/body.html", "body");
     }
 
     function action_pg_tables_dump_view() {
-        $dump_text = $this->create_tables_dump(param("table_names"), false);
-        if (is_null($dump_text)) {
-            $dump_text = $this->get_lang_str("dump_creation_failed");
+        $stream = $this->_create_tables_dump_stream(param("table_names"), false);
+        if ($stream === false) {
+            $this->create_self_redirect_response(array("action" => "pg_tables_dump"));
+        } else {
+            $dump_text = stream_get_contents($stream);
+            pclose($stream);
+            if ($dump_text === false) {
+                $dump_text = $this->get_lang_str("dump_creation_failed");
+            }
+            $n_dump_lines = substr_count($dump_text, "\n") + 1;
+            $this->print_value("dump_text", $dump_text);
+            $this->print_integer_value("n_dump_lines", $n_dump_lines);
+            $this->print_file("tables_dump/dump_text/body.html", "body");
         }
-        $n_dump_lines = count(explode("\n", $dump_text));
-        $this->print_varchar_value("dump_text", $dump_text);
-        $this->print_integer_value("n_dump_lines", $n_dump_lines);
-        $this->print_file("tables_dump/dump_text/body.html", "body");
     }
 
     function action_download_tables_dump() {
-        $dump_text = $this->create_tables_dump(param("table_names"), true);
-        if (is_null($dump_text)) {
+        $stream = $this->_create_tables_dump_stream(param("table_names"), true);
+        if ($stream === false) {
             $this->create_self_redirect_response(array("action" => "pg_tables_dump"));
         } else {
             $now_date_str = $this->get_db_now_date();
-            $this->create_binary_content_response($dump_text, "dump-{$now_date_str}.sql.bz2");
+            $this->create_binary_stream_response(
+                $stream,
+                "process",
+                "dump-{$now_date_str}.sql.gz"
+            );
         }
     }
 
-    function create_tables_dump($table_names_str, $should_compress) {
+    function _create_tables_dump_stream($table_names_str, $should_compress) {
         $host = $this->db->get_host();
         $database = $this->db->get_database();
         $username = $this->db->get_username();
         $password = $this->db->get_password();
-        $compress_subcmdline = ($should_compress) ? " | bzip2" : "";
+        $compress_subcmdline = ($should_compress) ? " | gzip" : "";
         $cmdline =
             "mysqldump --add-drop-table -u{$username} -p{$password} -h{$host} {$database} " .
             "{$table_names_str}{$compress_subcmdline}";
@@ -1843,20 +1869,15 @@ class App extends AppObject {
             "Commandline: {$cmdline}",
             DL_INFO
         );
-        exec($cmdline, $returned_lines, $returned_value);
-
-        $output = join("\n", $returned_lines);
-        if ($returned_value != 0) {
+        $stream = popen($cmdline, "rb");
+        if ($stream === false) {
             $this->write_log(
-                "DB dump creation failed!\n" .
-                "Commandline: {$cmdline}\n" .
-                "Error #{$returned_value}. Output:\n" .
-                $output,
+                "DB dump stream creation failed! Couldn't run commandline:\n" .
+                "{$cmdline}\n",
                 DL_ERROR
             );
-            return null;
         }
-        return $output;
+        return $stream;
     }
 
     // App objects creation functions

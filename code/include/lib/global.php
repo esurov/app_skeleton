@@ -794,6 +794,22 @@ function file_put_contents($filename, $content, $should_append = false) {
 }
 }
 
+function stream_get_contents($resource) {
+    ob_start();
+    $result = fpassthru($resource);
+    $content = ob_get_contents();
+    ob_end_clean();
+    return ($result === false) ? false : $content;
+}
+
+function stream_get_contents2($resource) {
+    $content = "";
+    while (!feof($resource)) {
+        $content .= fread($resource, 8192);
+    }
+    return $content;
+}
+
 function get_uploaded_file_info($input_name) {
     return $_FILES[$input_name];
 }
