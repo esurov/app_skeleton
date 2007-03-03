@@ -1089,7 +1089,7 @@ class App extends AppObject {
         $input_attrs
     ) {
         $this->print_hidden_input_form_value($template_var, $value);
-        
+
         switch ($input_type) {
         case "text":
         case "password":
@@ -1809,6 +1809,8 @@ class App extends AppObject {
         $table_names = param("table_names");
         $table_names_str = join(" ", $table_names);
         
+        $this->print_value("table_names_str", $table_names_str);
+
         $url = create_self_full_url(array(
             "action" => "pg_tables_dump_view",
             "table_names" => $table_names_str,

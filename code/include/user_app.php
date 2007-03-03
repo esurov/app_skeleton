@@ -2,7 +2,7 @@
 
 class UserApp extends CustomApp {
 
-    // Current logged user
+    // Current logged in user
     var $user;
 
     function UserApp() {
@@ -38,6 +38,10 @@ class UserApp extends CustomApp {
 
             // User management
             "pg_users" => $a,
+            "pg_user_view" => $u_a,
+            "pg_user_edit" => $u_a,
+            "update_user" => $u_a,
+            "delete_user" => $a,
 
             // News articles
             "pg_news_articles" => $e,
@@ -257,7 +261,7 @@ class UserApp extends CustomApp {
     }
 
     function pg_user_home_page() {
-        $this->create_self_redirect_response(array("action" => "pg_user_edit"));
+        $this->create_self_redirect_response(array("action" => "pg_user_view"));
     }
 
     function pg_admin_home_page() {
@@ -432,6 +436,7 @@ class UserApp extends CustomApp {
             $this->print_status_messages($messages);
             $this->run_action("pg_signup", array("user" => $user));
         } else {
+            $user->is_active = 1;
             $user->save(true);
 
             $this->send_email_signup_form_processed_to_user($user);
@@ -567,23 +572,6 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_pg_news_article_view() {
-        $templates_dir = "news_article_view";
-
-        $news_article = $this->read_id_fetch_db_object("NewsArticle");
-        $news_article_view = $this->create_object(
-            "ObjectView",
-            array(
-                "templates_dir" => "{$templates_dir}/news_article_view",
-                "template_var" => "news_article_view",
-                "obj" => $news_article,
-                "context" => "view",
-            )
-        );
-        $news_article_view->print_values();
-
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
 //
     function action_pg_contact_form() {
         $templates_dir = "contact_form";
@@ -660,6 +648,156 @@ class UserApp extends CustomApp {
         $users_list->print_values();
 
         $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function read_id_fetch_user() {
+        $user_role = $this->get_user_role();
+        if ($user_role == "user") {
+            $user = $this->user;
+        } else {
+            $user = $this->read_id_fetch_db_object("User");
+        }
+        return $user;
+    }
+
+    function action_pg_user_view() {
+        $templates_dir = "user_view";
+
+        $user_role = $this->get_user_role();
+        if ($user_role == "admin") {
+            $context = "view_by_admin";
+        } else {
+            $context = "view_by_user";
+        }
+
+        $user = $this->read_id_fetch_user();
+        $user_view = $this->create_object(
+            "ObjectView",
+            array(
+                "templates_dir" => "{$templates_dir}/user_view",
+                "template_var" => "user_view",
+                "obj" => $user,
+                "context" => $context,
+            )
+        );
+        $user_view->print_values();
+
+        if ($user_role == "user") {
+            $this->print_page_title("page_title_pg_user_view_my_account");
+        }
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_pg_user_edit() {
+        $templates_dir = "user_edit";
+
+        $user_role = $this->get_user_role();
+        if ($user_role == "admin") {
+            $context = "edit_form_by_admin";
+        } else {
+            $context = "edit_form_by_user";
+        }
+
+        $user = get_param_value($this->action_params, "user", null);
+        if (is_null($user)) {
+            $user = $this->read_id_fetch_user();
+            $user->insert_edit_form_extra_fields();
+            if (!$user->is_definite()) {
+                // Set initial values for user which will be created by admin
+                $user->is_confirmed = 1;
+                $user->is_active = 1;
+            }
+        }
+        if ($user_role == "user" && $user->is_definite()) {
+            $field_info =& $user->get_field_info("login");
+            $field_info["input"]["type_attrs"] = array("disabled" => "disabled");
+        }
+        $user->password = "";
+        $user->password_confirm = "";
+
+        $user_edit = $this->create_object(
+            "ObjectEdit",
+            array(
+                "templates_dir" => "{$templates_dir}/user_edit",
+                "template_var" => "user_edit",
+                "obj" => $user,
+                "context" => $context,
+            )
+        );
+        $user_edit->print_values();
+
+        if ($user_role == "user") {
+            $this->print_page_title("page_title_pg_user_edit_my_account");
+        }
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_update_user() {
+        $user = $this->read_id_fetch_user();
+        $user->insert_edit_form_extra_fields();
+        $user_old = $user;
+
+        $field_names_to_not_read = array();
+        $user_role = $this->get_user_role();
+        if ($user_role == "admin") {
+            if ($user->is_definite()) {
+                $field_names_to_not_read[] = "role";
+            }
+            $context = "edit_form_by_admin";
+        } else {
+            $field_names_to_not_read = array("login", "role", "is_confirmed", "is_active");
+            $context = "edit_form_by_user";
+        }
+        $user->read(null, $field_names_to_not_read);
+
+        $messages = $user->validate($user_old, $context);
+        if (count($messages) != 0) {
+            $this->print_status_messages($messages);
+            $this->run_action("pg_user_edit", array("user" => $user));
+        } else {
+            $field_names_to_not_update = $field_names_to_not_read;
+            if (is_value_empty($user->password)) {
+                $field_names_to_not_update[] = "password";
+            }
+            
+            if ($user_old->is_definite()) {
+                $user->update(null, $field_names_to_not_update);
+            } else {
+                $user->store();
+            }
+
+            $this->print_status_message_db_object_updated($user_old);
+
+            if ($user_role == "admin") {
+                $this->create_self_redirect_response(array("action" => "pg_users"));
+            } else {
+                $this->create_self_redirect_response(array(
+                    "action" => "pg_user_view", 
+                    "user_id" => $user->id, 
+                ));
+            }
+        }
+    }
+
+    function action_delete_user() {
+        $user = $this->read_id_fetch_db_object("User");
+        if ($user->role == "admin") {
+            if ($user->get_num_admins() <= 1) {
+                $this->add_session_status_message(
+                    new ErrorStatusMsg("user_cannot_delete_main_admin")
+                );
+                $this->create_self_redirect_response(array("action" => "pg_users"));
+                return;
+            }
+        }
+        $return_url_params = array("action" => "pg_users");
+        $this->delete_db_object(array(
+            "obj" => $user,
+            "success_url_params" => $return_url_params,
+            "error_url_params" => $return_url_params,
+        ));
     }
 //
     function action_pg_news_article_edit() {

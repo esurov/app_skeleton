@@ -1,41 +1,41 @@
 <form action="?" method="post" name="form" enctype="multipart/form-data">
 <input type="hidden" name="action" value="update_news_article">
 {%news_article_id_hidden%}
-
 <table>
 <tr>
-    <th>{%str_date%}:</th>
+    <td>{%str_date%}:</td>
     <td>{%news_article_created_input%}</td>
 </tr>
 <tr>
-    <th>{%str_title%}: *</th>
+    <td>{%str_title%}: *</td>
     <td><span class="wide">{%news_article_title_input%}</span></td>
 </tr>
 <tr>
-    <th>{%str_body%}:</th>
+    <td>{%str_body%}:</td>
     <td>{%news_article_body_input%}</td>
 </tr>
 <tr>
-    <th>{%str_current_image%}:</th>
+    <td>{%str_current_image%}:</td>
     <td>{%news_article_image%}</td>
 </tr>
 <tr>
-    <th>{%str_upload_new_image%}:</th>
+    <td>{%str_upload_new_image%}:</td>
     <td><input type="file" name="image_file"></td>
 </tr>
 <tr>
-    <th valign="top">{%str_current_file%}:</th>
+    <td valign="top">{%str_current_file%}:</td>
     <td>{%news_article_file_info%}</td>
 </tr>
 <tr>
-    <th>{%str_upload_new_file%}:</th>
+    <td>{%str_upload_new_file%}:</td>
     <td><input type="file" name="file"></td>
 </tr>
 <tr>
-    <td colspan="2"><input type="submit" name="submit_btn" value="{%str_link_save%}"></td>
+    <td colspan="2">
+        <input type="submit" name="submit_btn" value="{%str_link_save%}">
+    </td>
 </tr>
 </table>
-
 </form>
 
 {%news_article_client_validation_js%}

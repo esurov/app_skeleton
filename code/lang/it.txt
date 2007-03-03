@@ -26,6 +26,8 @@ guest_sub_menu_item_sample_static_pages2 = SampleStaticPages2
 guest_sub_sub_menu_item_sample_static_page2_1 = SampleStaticPage2_1
 guest_sub_sub_menu_item_sample_static_page2_2 = SampleStaticPage2_2
 
+user_menu_item_index = Home
+
 admin_menu_item_index = Home
 
 ["link captions"]
@@ -91,6 +93,7 @@ title = Titolo
 body = Corpo
 text = Testo
 notes = Note
+extra_info = !!Extra info
 image = Immagine
 current_image = Immagine corrente
 upload_new_image = Carica nuova immagine
@@ -259,11 +262,15 @@ contact_form_processed = I suoi dati sono stati registrati. Grazie!
 user = utente
 users = utenti
 
+user_menu_item_user = !!My Account
 admin_menu_item_users = Utenti
 
 page_title_pg_users = Utenti
+page_title_pg_user_view = Visualizza utente
+page_title_pg_user_view_my_account = !!My Account
 page_title_pg_user_edit_new = Aggiungi utente
 page_title_pg_user_edit = Modifica utente
+page_title_pg_user_edit_my_account = !!Edit My Account
 
 user_added = Utente aggiunto
 user_updated = Utente aggiornato

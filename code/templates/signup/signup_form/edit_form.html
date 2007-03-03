@@ -4,28 +4,32 @@
 <input type="hidden" name="action" value="signup">
 <table>
 <tr>
-    <th>{%str_login%}: *</th>
+    <td>{%str_login%}: *</td>
     <td>{%user_login_input%}</td>
 </tr>
 <tr>
-    <th>{%str_password%}: *</th>
+    <td>{%str_password%}: *</td>
     <td>{%user_password_input%}</td>
 </tr>
 <tr>
-    <th>{%str_password_confirm%}: *</th>
+    <td>{%str_password_confirm%}: *</td>
     <td>{%user_password_confirm_input%}</td>
 </tr>
 <tr>
-    <th>{%str_first_name%}: *</th>
+    <td>{%str_first_name%}: *</td>
     <td>{%user_first_name_input%}</td>
 </tr>
 <tr>
-    <th>{%str_last_name%}: *</th>
+    <td>{%str_last_name%}: *</td>
     <td>{%user_last_name_input%}</td>
 </tr>
 <tr>
-    <th>{%str_email%}: *</th>
+    <td>{%str_email%}: *</td>
     <td>{%user_email_input%}</td>
+</tr>
+<tr>
+    <td>{%str_extra_info%}:</td>
+    <td>{%user_extra_info_input%}</td>
 </tr>
 <tr>
     <td colspan="2">
@@ -41,18 +45,15 @@
     </td>
 </tr>
 <tr>
-    <th>{%str_signup_form_accept_agreement%}: *</th>
+    <td>{%str_signup_form_accept_agreement%}: *</td>
     <td>{%user_agreement_accepted_input%}</td>
 </tr>
 <tr>
-    <td colspan="2" align="center"
-        ><input name="submit_btn" type="submit" value="{%str_link_send%}"></td>
+    <td colspan="2" align="center">
+        <input name="submit_btn" type="submit" value="{%str_link_send%}">
+    </td>
 </tr>
 </table>
 </form>
-
-<script language="JavaScript" type="text/javascript">
-focusFormElement("form", "user_login");
-</script>
 
 {%user_client_validation_js%}

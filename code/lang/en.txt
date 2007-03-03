@@ -26,6 +26,8 @@ guest_sub_menu_item_sample_static_pages2 = SampleStaticPages2
 guest_sub_sub_menu_item_sample_static_page2_1 = SampleStaticPage2_1
 guest_sub_sub_menu_item_sample_static_page2_2 = SampleStaticPage2_2
 
+user_menu_item_index = Home
+
 admin_menu_item_index = Home
 
 ["link captions"]
@@ -91,6 +93,7 @@ title = Title
 body = Body
 text = Text
 notes = Notes
+extra_info = Extra info
 image = Image
 current_image = Current image
 upload_new_image = Upload new image
@@ -160,7 +163,7 @@ page_title_pg_signup = Signup
 user_login_or_password_unknown = Bad login "{%login%}" or password
 user_disabled_by_admin = User "{%login%}" is currently disabled by site administrator
 user_not_confirmed_yet = User "{%login%}" is not confirmed yet. Use confirmation link from your signup confirmation email.
-status_message_resource_access_denied = Requested page cannot be displayed. Please use your access info.
+status_message_resource_access_denied = Requested page cannot be displayed. Please use your access info to login.
 status_message_logged_out = Logout completed successfully
 
 login_form_bottom_text_dont_have_account = If you don't have an account, please
@@ -260,11 +263,15 @@ contact_form_processed = Your contact info was processed. Thank you!
 user = user
 users = users
 
+user_menu_item_user = My Account
 admin_menu_item_users = Users
 
 page_title_pg_users = Users
+page_title_pg_user_view = View user
+page_title_pg_user_view_my_account = My Account
 page_title_pg_user_edit_new = Add user
 page_title_pg_user_edit = Edit user
+page_title_pg_user_edit_my_account = Edit My Account
 
 user_added = User added
 user_updated = User updated
@@ -274,6 +281,7 @@ user_login_exists = Login "{%login%}" already exists, specify another one
 user_password_empty = Specify password
 user_password_at_least_6_chars = Password must be at least 6 characters
 user_passwords_do_not_match = Entered passwords do not match
+user_email_empty = Specify email
 user_email_bad = Email is invalid
 user_email_exists = Email is already used with another account
 user_first_name_empty = Specify first name

@@ -56,6 +56,11 @@ class UserTable extends CustomDbObject {
         ));
 
         $this->insert_field(array(
+            "field" => "extra_info",
+            "type" => "text",
+        ));
+
+        $this->insert_field(array(
             "field" => "role",
             "type" => "enum",
             "value" => "user",
@@ -90,7 +95,7 @@ class UserTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "is_active",
             "type" => "boolean",
-            "value" => 1,
+            "value" => 0,
         ));
 //
         $this->insert_filter(array(
@@ -164,7 +169,6 @@ class UserTable extends CustomDbObject {
                 ),
             ),
         ));
-
     }
 
     function insert_login_form_extra_fields() {
@@ -176,6 +180,16 @@ class UserTable extends CustomDbObject {
     }
 
     function insert_signup_form_extra_fields() {
+        $this->insert_edit_form_extra_fields();
+
+        $this->insert_field(array(
+            "field" => "agreement_accepted",
+            "type" => "boolean",
+            "select" => "0",
+        ));
+    }
+
+    function insert_edit_form_extra_fields() {
         $this->insert_field(array(
             "field" => "password_confirm",
             "type" => "varchar",
@@ -185,17 +199,11 @@ class UserTable extends CustomDbObject {
             ),
             "select" => "''",
         ));
-
-        $this->insert_field(array(
-            "field" => "agreement_accepted",
-            "type" => "boolean",
-            "select" => "0",
-        ));
     }
+
 //
     function get_validate_conditions($context, $context_params) {
         switch ($context) {
-//        case "edit_user_form":
         case "login_form":
             $conditions = array(
                 array(
@@ -295,25 +303,41 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
-        case "edit_form":
+        case "edit_form_by_user":
+        case "edit_form_by_admin":
             $conditions = array(
                 array(
-                    "field" => "login",
-                    "type" => "not_empty",
-                    "message" => "user_login_empty",
-                    "dependency" => array(
-                        "field" => "login",
-                        "type" => "unique",
-                        "message" => "user_login_exists",
-                        "message_params" => array(
-                            "login" => $this->login,
-                        ),
-                    ),
-                ),
-                array(
-                    "field" => "user_role",
+                    "field" => "role",
                     "type" => "not_empty",
                     "message" => "user_role_empty",
+                ),
+                array(
+                    "field" => "first_name",
+                    "type" => "not_empty",
+                    "message" => "user_first_name_empty",
+                ),
+                array(
+                    "field" => "last_name",
+                    "type" => "not_empty",
+                    "message" => "user_last_name_empty",
+                ),
+                array(
+                    "field" => "email",
+                    "type" => "not_empty",
+                    "message" => "user_email_empty",
+                    "dependency" => array(
+                        "field" => "email",
+                        "type" => "email",
+                        "message" => "user_email_bad",
+                        "dependency" => array(
+                            "field" => "email",
+                            "type" => "unique",
+                            "message" => "user_email_exists",
+                            "message_params" => array(
+                                "email" => $this->email,
+                            ),
+                        ),
+                    ),
                 ),
             );
             break;
@@ -357,17 +381,36 @@ class UserTable extends CustomDbObject {
 
         if ($context == "signup_form") {
             $this->validate_passwords($messages);
-        }
-        if ($context == "edit_form") {
-            if (is_value_not_empty($this->password)) {
-                $this->validate_passwords($messages);
-            }
-        }
-
-        if ($context == "signup_form") {
             if (!$this->agreement_accepted) {
                 $messages[] = new ErrorStatusMsg("user_should_accept_agreement");
             }
+        }
+        
+        if ($context == "edit_form_by_admin") {
+            $this->validate_condition(
+                &$messages,
+                array(
+                    "field" => "login",
+                    "type" => "not_empty",
+                    "message" => "user_login_empty",
+                    "dependency" => array(
+                        "field" => "login",
+                        "type" => "unique",
+                        "message" => "user_login_exists",
+                        "message_params" => array(
+                            "login" => $this->login,
+                        ),
+                    ),
+                ),
+                $old_obj
+            );
+        }
+
+        if (
+            ($context == "edit_form_by_admin" || $context == "edit_form_by_user") &&
+            is_value_not_empty($this->password)
+        ) {
+            $this->validate_passwords($messages);
         }
 
         if ($context == "recover_password_form" && count($messages) == 0) {
@@ -471,6 +514,31 @@ class UserTable extends CustomDbObject {
                 return "{$this->last_name}, {$this->first_name}";
             }
         }
+    }
+//
+    function print_form_values($params = array()) {
+        parent::print_form_values($params);
+
+        if ($this->_context == "edit_form_by_admin") {
+            if (!$this->is_definite()) {
+                $this->app->print_file("{$this->_templates_dir}/_role.html", "_role");
+            }
+            $this->app->print_file("{$this->_templates_dir}/_is_active.html", "_is_active");
+            $this->app->print_file("{$this->_templates_dir}/_is_confirmed.html", "_is_confirmed");
+            $this->app->print_file("{$this->_templates_dir}/_link_back_admin.html", "_link_back");
+        }
+        if ($this->_context == "edit_form_by_user") {
+            $this->app->print_file("{$this->_templates_dir}/_link_back_user.html", "_link_back");
+        }
+    }
+//
+    function get_num_admins() {
+        $query = new SelectQuery(array(
+            "select" => "id",
+            "from"   => "{%user_table%}",
+            "where"  => "role = 'admin'",
+        ));
+        return $this->db->get_select_query_num_rows($query);
     }
 
 }

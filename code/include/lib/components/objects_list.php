@@ -210,7 +210,7 @@ class PagedQueryObjectsList extends QueryObjectsList {
             $this->obj->read_filters();
             $this->_filters_suburl_params = $this->obj->get_filters_suburl_params();
             $this->query->expand($this->obj->get_filters_query_ex());
-            
+
             $this->_action_filters_suburl_params += $this->_filters_suburl_params;
             $this->_action_filters_order_by_suburl_params += $this->_filters_suburl_params;
         }

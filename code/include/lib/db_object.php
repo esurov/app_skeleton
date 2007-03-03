@@ -102,6 +102,10 @@ class DbObject extends AppObject {
         return $this->db->get_full_table_name($this->_table_name);
     }
 
+    function &get_field_info($field_name) {
+        return $this->_fields[$field_name];
+    }
+
     function set_field_value($field_name, $field_value) {
         $this->{$field_name} = $field_value;
     }
@@ -1193,7 +1197,7 @@ class DbObject extends AppObject {
     }
 
     function get_boolean_field_value($param_value) {
-        return (is_null($param_value)) ? 0 : 1;
+        return ((int) $param_value == 0) ? 0 : 1;
     }
 
     function get_enum_field_value($enum_value, $enum_value_caption_pairs) {
