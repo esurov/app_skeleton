@@ -1,5 +1,5 @@
 <form action="?" method="post" name="form" enctype="multipart/form-data">
-<input type="hidden" name="action" value="update_news_article">
+<input type="hidden" name="action" value="update_news_article" />
 {%news_article_id_hidden%}
 <table>
 <tr>
@@ -8,7 +8,7 @@
 </tr>
 <tr>
     <td>{%str_title%}: *</td>
-    <td><span class="wide">{%news_article_title_input%}</span></td>
+    <td>{%news_article_title_input%}</td>
 </tr>
 <tr>
     <td>{%str_body%}:</td>
@@ -20,7 +20,7 @@
 </tr>
 <tr>
     <td>{%str_upload_new_image%}:</td>
-    <td><input type="file" name="image_file"></td>
+    <td><input type="file" name="image_file" /></td>
 </tr>
 <tr>
     <td valign="top">{%str_current_file%}:</td>
@@ -28,11 +28,11 @@
 </tr>
 <tr>
     <td>{%str_upload_new_file%}:</td>
-    <td><input type="file" name="file"></td>
+    <td><input type="file" name="file" /></td>
 </tr>
 <tr>
     <td colspan="2">
-        <input type="submit" name="submit_btn" value="{%str_link_save%}">
+        <input type="submit" name="submit_btn" value="{%str_link_save%}" />
     </td>
 </tr>
 </table>

@@ -73,7 +73,7 @@ class UserTable extends CustomDbObject {
                             array("user", $this->get_lang_str("user_role_user")),
                             array("admin", $this->get_lang_str("user_role_admin")),
                         ),
-                        "delimiter" => "<br>",
+                        "delimiter" => "<br />",
                     ),
                 ),
             ),

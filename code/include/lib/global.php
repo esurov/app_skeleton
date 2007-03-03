@@ -1,5 +1,6 @@
 <?php
 
+// Debug functions
 function v($obj) {
     var_dump($obj);
 }
@@ -15,75 +16,7 @@ function tx() {
     exit;
 }
 
-function get_backtrace_str($backtrace_info_array) {
-    $trace_body = "";
-    array_shift($backtrace_info_array);
-    foreach ($backtrace_info_array as $backtrace_item) {
-        $full_function_name_safe_str = htmlspecialchars(get_full_function_name_str($backtrace_item));
-        $function_args_safe_str = htmlspecialchars(get_backtrace_function_args_str($backtrace_item));
-        
-        $file_safe_str = htmlspecialchars($backtrace_item["file"]);
-        $line_num_safe_str = htmlspecialchars($backtrace_item["line"]);
-
-        $trace_body .= <<<TRACE_ITEM
-<b>{$full_function_name_safe_str}($function_args_safe_str)</b>
-({$file_safe_str}:&nbsp;<b>{$line_num_safe_str}</b>)<br>
-TRACE_ITEM;
-    }
-    return <<<TRACE_HEADER
-<b>Function call backtrace:</b>
-<div style="margin-top: 10px;">{$trace_body}</div>
-TRACE_HEADER;
-}
-
-function get_full_function_name_str($backtrace_item) {
-    $class_name = (isset($backtrace_item["class"])) ? $backtrace_item["class"] : "";
-    $function_name = (isset($backtrace_item["function"])) ? $backtrace_item["function"] : "";
-    $call_type = (isset($backtrace_item["type"])) ? $backtrace_item["type"] : "";
-    return ($call_type == "") ? $function_name : "{$class_name}{$call_type}{$function_name}";
-}
-
-function get_backtrace_function_args_str($backtrace_item) {
-    $args = (isset($backtrace_item["args"])) ? $backtrace_item["args"] : array();
-
-    $args_str = "";
-    foreach ($args as $arg) {
-        if ($args_str != "") {
-            $args_str .= ", ";
-        }
-        switch (gettype($arg)) {
-        case "integer":
-        case "double":
-            $args_str .= $arg;
-            break;
-        case "boolean":
-            $args_str .= $arg ? "true" : "false";
-            break;
-        case "string":
-            if (strlen($arg) > 64) {
-                $arg = substr($arg, 0, 64) . "...";
-            }
-            $args_str .= "\"$arg\"";
-            break;
-        case "array":
-            $args_str .= "array({count=" . count($arg) ."})";
-            break;
-        case "object":
-            $args_str .= "object(" . get_class($arg) . ")";
-            break;
-        case "resource":
-            $args_str .= "resource(" . strstr($arg, "#") . ")";
-            break;
-        case "NULL":
-            $args_str .= "null";
-            break;
-        default:
-            $args_str .= "UNKNOWN!";
-        }
-    }
-    return $args_str;
-}
-
+// CGI params handling
 function param($name) {
     if (isset($_GET[$name])) {
         $param_value = $_GET[$name];
@@ -99,6 +32,7 @@ function params() {
     return array_merge($_POST, $_GET);
 }
 
+// URL handling functions
 function create_suburl($params = array(), $params_delimiter = "&") {
     $pairs = array();
     foreach ($params as $name => $value) {
@@ -129,6 +63,7 @@ function create_self_full_url($params = array(), $protocol = "http") {
     return "{$protocol}://{$host}{$self_url}";
 }
 
+// Array functions
 function unset_array_value_if_exists($value, &$values) {
     $i = array_search($value, $values);
     if ($i !== false) {
@@ -144,7 +79,7 @@ function get_param_value($params, $param_name, $default_value) {
     }
 }
 
-//
+// Validation functions
 function is_value_empty($value) {
     return trim($value) == "";
 }
@@ -161,7 +96,7 @@ function is_php_number($value) {
     return (preg_match('/^\s*[-+]?(?:[0-9]*\.)?[0-9]*\s*$/', $value));
 }
 
-//
+// Formatting/Conversion functions
 function format_double_value($double_value, $decimals, $dec_point, $thousands_sep) {
     return number_format($double_value, $decimals, $dec_point, $thousands_sep);
 }
@@ -170,7 +105,7 @@ function format_integer_value($integer_value, $thousands_sep) {
     return number_format($integer_value, 0, "", $thousands_sep);
 }
 
-function convert_lf2br($str, $is_xhtml = false) {
+function convert_lf2br($str, $is_xhtml = true) {
     $br_tag = ($is_xhtml) ? "<br />" : "<br>";
     return str_replace("\n", $br_tag, convert_crlf2lf($str));
 }
@@ -256,10 +191,10 @@ function get_word_shortened_string($str, $max_length, $end_str = "") {
     }
 }
 
-// Print common HTML controls
+// HTML controls printing functions
 function print_raw_html_input($type, $name, $value, $attrs = array()) {
     $attrs_str = get_html_attrs_str($attrs);
-    return "<input type=\"{$type}\" name=\"{$name}\" value=\"{$value}\"{$attrs_str}>";
+    return "<input type=\"{$type}\" name=\"{$name}\" value=\"{$value}\"{$attrs_str} />";
 }
 
 function print_html_input($type, $name, $value, $attrs = array()) {
@@ -283,10 +218,10 @@ function print_html_checkbox(
 ) {
     if (is_null($checked)) {
         if ((int) $value != 0) {
-            $attrs["checked"] = null;
+            $attrs[] = "checked";
         }
     } else if ($checked) {
-        $attrs["checked"] = null;
+        $attrs[] = "checked";
     }
     return print_html_input("checkbox", $name, $value, $attrs);
 }
@@ -323,11 +258,11 @@ function print_html_select_options($value_caption_pairs, $current_value) {
         if (!is_null($selected_value)) {
             if (is_array($selected_value)) {
                 if (in_array($value, $selected_value)) {
-                    $option_attrs["selected"] = null;
+                    $option_attrs[] = "selected";
                 }
             } else {
                 if ((string) $value == (string) $selected_value) {
-                    $option_attrs["selected"] = null;
+                    $option_attrs[] = "selected";
                 }
             }
         }
@@ -360,7 +295,7 @@ function print_html_radio_group(
 
         $radio_attrs = $attrs;
         if (!is_null($checked_value) && ((string) $value == (string) $checked_value)) {
-            $radio_attrs["checked"] = null;
+            $radio_attrs[] = "checked";
         }
         $output .= $delimiter_str;
         $output .= print_html_radio($name, $value, $radio_attrs);
@@ -406,20 +341,18 @@ function get_actual_current_value($value_caption_pairs, $current_value) {
 //}
 
 function get_html_attrs_str($attrs) {
-    if (count($attrs) == 0) {
-        return "";
-    }
-    $attrs_lines = array();
+    $attrs_str = "";
     foreach ($attrs as $attr_name => $attr_value) {
-        $attr_name_safe = get_html_safe_string($attr_name);
-        if (is_null($attr_value)) {
-            $attrs_lines[] = get_html_safe_string($attr_name);
-        } else { 
+        if (is_numeric($attr_name)) {
             $attr_value_safe = get_html_safe_string($attr_value);
-            $attrs_lines[] = "{$attr_name_safe}=\"{$attr_value_safe}\"";
+            $attr_name_safe = $attr_value_safe;
+        } else {
+            $attr_name_safe = get_html_safe_string($attr_name);
+            $attr_value_safe = get_html_safe_string($attr_value);
         }
+        $attrs_str .= " {$attr_name_safe}=\"{$attr_value_safe}\"";
     }
-    return " " . join(" ", $attrs_lines);
+    return $attrs_str;
 }
 
 function get_value_from_value_caption_pair($value_caption_pair) {
@@ -458,7 +391,7 @@ function get_caption_by_value_from_value_caption_pairs($value_caption_pairs, $va
     return null;
 }
 
-//
+// JS helper functions
 function create_select_dependency_js(
     $form_name,
     $main_select_name,
@@ -543,7 +476,7 @@ new ValidateCondition(
 JS;
 }
 
-//
+// Date/Datetime/Time handling functions
 function parse_date_by_format($format, $value) {
     $regexp = create_date_regexp_by_format($format);
 
@@ -767,6 +700,7 @@ function get_gmt_str_from_if_modified_since($if_modified_since_str) {
     return $strs[0];
 }
 
+// Files handling functions
 function read_and_parse_csv_file($filepath, $separator = ";") {
     $f = fopen($filepath, "r");
     if (!$f) {
@@ -1002,6 +936,77 @@ function get_mime_type_by_file_extension($file_ext) {
         $mime_type = "application/octet-stream";
     }
     return $mime_type;
+}
+
+// Debug tracing functions
+// May be used if no x-debug support in php
+function get_backtrace_str($backtrace_info_array) {
+    $trace_body = "";
+    array_shift($backtrace_info_array);
+    foreach ($backtrace_info_array as $backtrace_item) {
+        $full_function_name_safe_str = htmlspecialchars(get_full_function_name_str($backtrace_item));
+        $function_args_safe_str = htmlspecialchars(get_backtrace_function_args_str($backtrace_item));
+        
+        $file_safe_str = htmlspecialchars($backtrace_item["file"]);
+        $line_num_safe_str = htmlspecialchars($backtrace_item["line"]);
+
+        $trace_body .= <<<TRACE_ITEM
+<b>{$full_function_name_safe_str}($function_args_safe_str)</b>
+({$file_safe_str}:&nbsp;<b>{$line_num_safe_str}</b>)<br />
+TRACE_ITEM;
+    }
+    return <<<TRACE_HEADER
+<b>Function call backtrace:</b>
+<div style="margin-top: 10px;">{$trace_body}</div>
+TRACE_HEADER;
+}
+
+function get_full_function_name_str($backtrace_item) {
+    $class_name = (isset($backtrace_item["class"])) ? $backtrace_item["class"] : "";
+    $function_name = (isset($backtrace_item["function"])) ? $backtrace_item["function"] : "";
+    $call_type = (isset($backtrace_item["type"])) ? $backtrace_item["type"] : "";
+    return ($call_type == "") ? $function_name : "{$class_name}{$call_type}{$function_name}";
+}
+
+function get_backtrace_function_args_str($backtrace_item) {
+    $args = (isset($backtrace_item["args"])) ? $backtrace_item["args"] : array();
+
+    $args_str = "";
+    foreach ($args as $arg) {
+        if ($args_str != "") {
+            $args_str .= ", ";
+        }
+        switch (gettype($arg)) {
+        case "integer":
+        case "double":
+            $args_str .= $arg;
+            break;
+        case "boolean":
+            $args_str .= $arg ? "true" : "false";
+            break;
+        case "string":
+            if (strlen($arg) > 64) {
+                $arg = substr($arg, 0, 64) . "...";
+            }
+            $args_str .= "\"$arg\"";
+            break;
+        case "array":
+            $args_str .= "array({count=" . count($arg) ."})";
+            break;
+        case "object":
+            $args_str .= "object(" . get_class($arg) . ")";
+            break;
+        case "resource":
+            $args_str .= "resource(" . strstr($arg, "#") . ")";
+            break;
+        case "NULL":
+            $args_str .= "null";
+            break;
+        default:
+            $args_str .= "UNKNOWN!";
+        }
+    }
+    return $args_str;
 }
 
 ?>
