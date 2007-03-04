@@ -90,9 +90,52 @@ input.time {
 }
 
 /* Menu */
-.menu-item {
+.menu {
+    float: left;
+    margin: 2px;
 }
 
-.menu-item-selected {
+.menu_item {
+    float: left;
+    padding: 2px;
+}
+
+.menu_item_selected {
+    float: left;
+    padding: 2px;
+    font-weight: bold;
+}
+
+.menu_item_delimiter {
+    float: left;
+    padding: 2px 2px;
+}
+
+.sub_menu {
+    border: 1px solid darkblue;
+    margin: 2px;
+}
+
+.sub_menu_item {
+    padding: 2px;
+}
+
+.sub_menu_item_selected {
+    padding: 2px;
+    font-weight: bold;
+}
+
+.sub_sub_menu {
+    border: 1px solid darkblue;
+    margin: 2px;
+    margin-left: 10px;
+}
+
+.sub_sub_menu_item {
+    padding: 2px;
+}
+
+.sub_sub_menu_item_selected {
+    padding: 2px;
     font-weight: bold;
 }
