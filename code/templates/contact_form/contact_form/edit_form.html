@@ -2,14 +2,14 @@
 <input type="hidden" name="action" value="process_contact_form" />
 <table>
 <tr>
-    <td>{%str_first_name%}: *</td>
+    <td>{%str_first_name%}:&nbsp;<span class="required">*</span></td>
     <td>{%contact_info_first_name_input%}</td>
 
-    <td>{%str_last_name%}: *</td>
+    <td>{%str_last_name%}:&nbsp;<span class="required">*</span></td>
     <td>{%contact_info_last_name_input%}</td>
 </tr>
 <tr>
-    <td>{%str_email%}: *</td>
+    <td>{%str_email%}:&nbsp;<span class="required">*</span></td>
     <td>{%contact_info_email_input%}</td>
     <td>{%str_company_name%}:</td>
     <td>{%contact_info_company_name_input%}</td>
@@ -27,7 +27,7 @@
     <td>{%contact_info_fax_input%}</td>
 </tr>
 <tr>
-    <td valign="middle">{%str_message_text%}: *</td>
+    <td valign="middle">{%str_message_text%}:&nbsp;<span class="required">*</span></td>
     <td colspan="3">{%contact_info_message_text_input%}</td>
 </tr>
 <tr>

@@ -65,7 +65,7 @@ class ContactInfoTable extends CustomDbObject {
             "input" => array(
                 "type" => "textarea",
                 "type_attrs" => array(
-                    "cols" => 60,
+                    "cols" => 80,
                     "rows" => 9,
                 ),
             ),

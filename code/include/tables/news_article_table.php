@@ -24,8 +24,8 @@ class NewsArticleTable extends CustomDbObject {
             "index" => "index",
             "input" => array(
                 "type_attrs" => array(
-                    "class" => "wide",
-                ),
+                    "class" => "varchar_wide",
+                )
             ),
         ));
 

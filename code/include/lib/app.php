@@ -1097,7 +1097,10 @@ class App extends AppObject {
                 $input_type,
                 $template_var,
                 $value,
-                $input_attrs
+                array_merge(
+                    array("class" => "varchar_normal"),
+                    $input_attrs
+                )
             );
             break;
         default:

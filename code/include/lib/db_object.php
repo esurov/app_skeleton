@@ -1866,7 +1866,10 @@ class DbObject extends AppObject {
             $this->app->print_text_input_form_value(
                 $template_var,
                 $filter_value,
-                $filter_input_attrs
+                array_merge(
+                    array("class" => "varchar_normal"),
+                    $filter_input_attrs
+                )
             );
             break;
         case "checkbox":

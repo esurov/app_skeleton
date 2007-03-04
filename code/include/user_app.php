@@ -541,38 +541,6 @@ class UserApp extends CustomApp {
         $this->print_file("recover_password/body_password_sent.html", "body");
     }
 //
-    function action_pg_news_articles() {
-        $templates_dir = "news_articles";
-
-        $user_role = $this->get_user_role();
-        if ($user_role == "admin") {
-            $templates_subdir = "news_articles_admin";
-            $context = "list_item_admin";
-        } else {
-            $templates_subdir = "news_articles";
-            $context = "list_item";
-        }
-        
-        $news_article = $this->create_db_object("NewsArticle");
-        $news_articles_list = $this->create_object(
-            "PagedQueryObjectsList",
-            array(
-                "templates_dir" => "{$templates_dir}/{$templates_subdir}",
-                "template_var" => "news_articles",
-                "obj" => $news_article,
-                "query_ex" => array(
-                    "order_by" => "created DESC, id DESC",
-                ),
-                "filter_form.visible" => true,
-                "context" => $context,
-            )
-        );
-        $news_articles_list->print_values();
-
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
-
-//
     function action_pg_contact_form() {
         $templates_dir = "contact_form";
 
@@ -800,6 +768,55 @@ class UserApp extends CustomApp {
         ));
     }
 //
+    function action_pg_news_articles() {
+        $templates_dir = "news_articles";
+
+        $user_role = $this->get_user_role();
+        if ($user_role == "admin") {
+            $templates_subdir = "news_articles_admin";
+            $context = "list_item_admin";
+        } else {
+            $templates_subdir = "news_articles";
+            $context = "list_item";
+        }
+        
+        $news_article = $this->create_db_object("NewsArticle");
+        $news_articles_list = $this->create_object(
+            "PagedQueryObjectsList",
+            array(
+                "templates_dir" => "{$templates_dir}/{$templates_subdir}",
+                "template_var" => "news_articles",
+                "obj" => $news_article,
+                "query_ex" => array(
+                    "order_by" => "created DESC, id DESC",
+                ),
+                "filter_form.visible" => true,
+                "context" => $context,
+            )
+        );
+        $news_articles_list->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_pg_news_article_view() {
+        $templates_dir = "news_article_view";
+
+        $news_article = $this->read_id_fetch_db_object("NewsArticle");
+        $news_article_view = $this->create_object(
+            "ObjectView",
+            array(
+                "templates_dir" => "{$templates_dir}/news_article_view",
+                "template_var" => "news_article_view",
+                "obj" => $news_article,
+                "context" => "view",
+            )
+        );
+        $news_article_view->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
     function action_pg_news_article_edit() {
         $templates_dir = "news_article_edit";
 

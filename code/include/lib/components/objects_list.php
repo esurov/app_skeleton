@@ -65,8 +65,8 @@ class _ObjectsList extends ObjectTemplateComponent {
     function _print_object_values(&$obj) {
         $list_item_parity = $this->_current_obj_idx % 2;
         $list_item_class = ($list_item_parity == 0) ?
-            "list-item-even" :
-            "list-item-odd";
+            "list_item_even" :
+            "list_item_odd";
 
         $this->app->print_raw_values(array(
             "list_item_parity" => $list_item_parity,
