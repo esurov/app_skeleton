@@ -1608,18 +1608,26 @@ class App extends AppObject {
 
     // Status messages
     function print_status_message($message) {
-        $status_message_text = $this->get_lang_str($message->resource, $message->resource_params);
-        $this->print_raw_values(array(
-            "text" => $status_message_text,
-            "type" => $message->type,
-        ));
-        return $this->print_file("_status_message.html", "status_messages");
+        $status_messages =& $this->create_object(
+            "StatusMessages",
+            array(
+                "templates_dir" => "_status_messages",
+                "template_var" => "status_messages",
+            )
+        );
+        if (is_array($message)) {
+            $messages = $message;
+            foreach ($messages as $message) {
+                $status_messages->add($message);
+            }
+        } else {
+            $status_messages->add($message);
+        }
+        $status_messages->print_values();
     }
 
     function print_status_messages($messages) {
-        foreach ($messages as $message) {
-            $this->print_status_message($message);
-        }    
+        $this->print_status_message($messages);
     }
 
     function print_status_message_db_object_updated($obj) {
@@ -1638,27 +1646,30 @@ class App extends AppObject {
     }
 
     function print_session_status_messages() {
-        $this->print_status_messages($this->get_and_delete_session_status_messages());
-    }
-
-    function add_session_status_message($new_msg) {
-        if ($this->session->has_param("status_messages")) {
-            $old_msgs = $this->session->get_param("status_messages");
-        } else {
-            $old_msgs = array();
+        $messages = $this->get_and_delete_session_status_messages();
+        if (count($messages) != 0) {
+            $this->print_status_messages($messages);
         }
-        $msgs = array_merge($old_msgs, array($new_msg));
-        $this->session->set_param("status_messages", $msgs);
     }
 
     function get_and_delete_session_status_messages() {
         if (!$this->session->has_param("status_messages")) {
             return array();
         } else {
-            $msgs = $this->session->get_param("status_messages");
+            $messages = $this->session->get_param("status_messages");
             $this->session->unset_param("status_messages");
-            return $msgs;
+            return $messages;
         }
+    }
+
+    function add_session_status_message($message) {
+        if ($this->session->has_param("status_messages")) {
+            $messages = $this->session->get_param("status_messages");
+        } else {
+            $messages = array();
+        }
+        $messages = array_merge($messages, array($message));
+        $this->session->set_param("status_messages", $messages);
     }
 
     // Static page

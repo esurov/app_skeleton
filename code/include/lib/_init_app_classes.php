@@ -63,6 +63,10 @@ $app_classes = array(
         "Xml" => array(
             "filename" => "xml.php",
         ),
+        "StatusMessages" => array(
+            "filename" => "status_messages.php",
+            "required_classes" => array("AppComponent"),
+        ),
         "Menu" => array(
             "filename" => "menu.php",
             "required_classes" => array("TemplateComponent", "Xml"),

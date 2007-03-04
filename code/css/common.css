@@ -1,0 +1,98 @@
+/* Global */
+body, form, input, textarea, select {
+    font-size: 11px;
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+    margin: 0px;
+}
+
+h1 {
+    font-size: 22px;
+}
+
+h2 {
+    font-size: 18px;
+}
+
+th {
+    font-size: 12px;
+}
+
+p {
+    margin: 5px;
+}
+
+.clear {
+    clear: both;
+}
+
+/* Status messages */
+.status_messages {
+    float: left;
+    padding: 5px;
+    margin-bottom: 5px;
+    border: 1px dashed black;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.err {
+    color: red;
+}
+
+.ok {
+    color: green;
+}
+
+/* Dimensions */
+.wide {
+    width: 400px;
+}
+
+.mid-wide {
+    width: 250px;
+}
+
+input.integer {
+    text-align: right;
+    width: 100px;
+}
+
+input.double {
+    text-align: right;
+    width: 100px;
+}
+
+input.currency {
+    text-align: right;
+    width: 100px;
+}
+
+input.date {
+    width: 80px;
+}
+
+input.datetime {
+    width: 130px;
+}
+
+input.time {
+    width: 80px;
+}
+
+/* for lines 0, 2 ... */
+.list-item-even {
+    background-color: #f0f0f0;
+}
+
+/* for lines 1, 3 ... */
+.list-item-odd {
+    background-color: #ffffff;
+}
+
+/* Menu */
+.menu-item {
+}
+
+.menu-item-selected {
+    font-weight: bold;
+}
