@@ -57,7 +57,6 @@ class App extends AppObject {
     }
 //
     function init_php_vars() {
-        ini_set("magic_quotes_gpc", 0);
         ini_set("magic_quotes_runtime", 0);
         ini_set("allow_call_time_pass_reference", 1);
         ini_set("zend.ze1_compatibility_mode", 1);
