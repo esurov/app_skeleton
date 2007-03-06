@@ -1811,7 +1811,7 @@ class App extends AppObject {
     }
 //
     function action_pg_tables_dump() {
-        $actual_table_names = $this->db->get_actual_table_names(true);
+        $actual_table_names = $this->db->get_actual_table_names(true, false);
         foreach ($actual_table_names as $actual_table_name) {
             $this->print_varchar_value("table_name", $actual_table_name);
             $this->print_file("tables_dump/tables_list/form_item.html", "form_items");
@@ -2074,7 +2074,7 @@ class App extends AppObject {
     }
 //
     function process_create_update_tables() {
-        $actual_table_names = $this->db->get_actual_table_names();
+        $actual_table_names = $this->db->get_actual_table_names(false, false);
         $all_creatable_db_objects_info = $this->get_all_creatable_db_objects_info();
         $all_table_names_to_create = array_keys($all_creatable_db_objects_info);
 
@@ -2097,7 +2097,7 @@ class App extends AppObject {
 
     function process_delete_tables($table_names_to_drop = null) {
         if (is_null($table_names_to_drop)) {
-            $table_names_to_drop = $this->db->get_actual_table_names();
+            $table_names_to_drop = $this->db->get_actual_table_names(false, false);
         }
         foreach ($table_names_to_drop as $table_name) {
             $this->db->run_drop_table_query($table_name);

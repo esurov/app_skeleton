@@ -198,10 +198,11 @@ class MySqlDb extends AppObject {
         $this->run_query("DROP TABLE IF EXISTS {%{$table_name}_table%}");
     }
 
-    function get_actual_table_names($with_prefix = false) {
+    function get_actual_table_names($get_table_names_with_prefix, $from_all_tables) {
         $table_names = array();
+        $like_str = ($from_all_tables) ? "" : " LIKE '{$this->_table_prefix}%'";
 
-        $res = $this->run_query("SHOW TABLES");
+        $res = $this->run_query("SHOW TABLES{$like_str}");
         while ($row = $res->fetch_next_row(true)) {
             $table_name_with_prefix = $row[0];
             if (preg_match(
@@ -209,7 +210,7 @@ class MySqlDb extends AppObject {
                 $table_name_with_prefix,
                 $matches
             )) {
-                if ($with_prefix) {
+                if ($get_table_names_with_prefix) {
                     $table_names[] = $table_name_with_prefix;
                 } else {
                     $table_names[] = $matches[1];
