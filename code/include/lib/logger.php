@@ -61,17 +61,21 @@ class Logger extends AppObject {
         }
 
         if (is_array($message)) {
-            $message_lines = array();
-            foreach ($message as $key => $value) {
-                $message_lines[] = "    '{$key}' => '{$value}',\n";
-            }
-            $line_text = "array(\n" . join("", $message_lines) . ")";
+            $line_text = $this->get_array_message_as_str($message);
         } else {
             $line_text = $message;
         }
 
         $datetime_str = date("Y-m-d H:i:s");
         $this->_write_line("{$datetime_str} - [{$header}] {$line_text}");
+    }
+
+    function get_array_message_as_str($message) {
+        $message_lines = array();
+        foreach ($message as $key => $value) {
+            $message_lines[] = "    '{$key}' => '{$value}',\n";
+        }
+        return "array(\n" . join("", $message_lines) . ")";
     }
 
     function _write_line($line_text) {

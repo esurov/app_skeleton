@@ -293,7 +293,7 @@ class MySqlDbResult extends AppObject {
         // Logger optimization
         if ($this->get_log_debug_level() == DL_EXTRA_DEBUG) {
             if (is_array($row)) {
-                $log_str = "";
+                $log_str = "\n";
                 foreach ($row as $field => $value) {
                     $value_str = (is_null($value)) ?
                         "NULL" :
@@ -301,10 +301,10 @@ class MySqlDbResult extends AppObject {
                     $log_str .= "  {$field} = {$value_str},\n";
                 }
             } else {
-                $log_str = "no rows left";
+                $log_str = " no rows left";
             }
             $this->write_log(
-                "fetch():\n{$log_str}",
+                "fetch():{$log_str}",
                 DL_EXTRA_DEBUG
             );
         }

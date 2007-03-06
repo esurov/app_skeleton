@@ -1094,15 +1094,33 @@ class DbObject extends AppObject {
 
         $use_read_flag = is_null($field_names_to_read);
 
+        // Logger optimization
+        $should_write_log = ($this->get_log_debug_level() >= DL_EXTRA_DEBUG);
         foreach ($field_names as $field_name) {
             $field_info = $this->_fields[$field_name];
             if ($use_read_flag && !$field_info["read"]) {
                 continue;
             }
 
-            $param_value = param("{$template_var_prefix}_{$field_name}");
-            $field_type = $field_info["type"];
+            $param_name = "{$template_var_prefix}_{$field_name}";
+            $param_value = param($param_name);
 
+            if ($should_write_log) {
+                if (is_null($param_value)) {
+                    $param_value_str = "<NULL: Using old value>";
+                } else if (is_array($param_value)) {
+                    $param_value_str = $this->app->log->get_array_message_as_str($param_value);
+                } else {
+                    $param_value_str = qw(get_shortened_string($param_value, 300));
+                }
+                $this->write_log(
+                    "Reading field '{$field_name}' from CGI param '{$param_name}'. " .
+                    "Updated value is: {$param_value_str}",
+                    DL_EXTRA_DEBUG
+                );
+            }
+            
+            $field_type = $field_info["type"];
             switch ($field_type) {
             case "primary_key":
             case "foreign_key":
