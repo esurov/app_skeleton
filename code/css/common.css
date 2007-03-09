@@ -148,3 +148,16 @@ p {
     padding: 2px;
     font-weight: bold;
 }
+
+/* Lang menu */
+.lang_menu {
+    font-weight: bold;
+}
+
+.lang_menu img {
+    vertical-align: middle;
+}
+
+.not_uploaded {
+    color: red;
+}

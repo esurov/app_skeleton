@@ -1,8 +1,10 @@
-<div>
-<b>{%news_article_created%}</b><br />
-<h1>{%news_article_title%}</h1><br />
-{%news_article_thumbnail_image%}
-{%news_article_body_short%} <a
-    href="?action=pg_news_article_view&amp;news_article_id={%news_article_id%}">&gt;&gt;&gt;</a>
+<div class="news_article">
+    <h1>{%news_article_title%}</h1>
+    <b>{%news_article_created%}</b><br />
+    {%news_article_thumbnail_image%}
+    <p>
+        {%news_article_body_short%}&nbsp;<a href="?action=pg_news_article_view&amp;news_article_id={%news_article_id%}"
+            >&gt;&gt;&gt;</a>
+    </p>
 </div>
-<hr style="clear: both;" />
+<hr class="clear" />

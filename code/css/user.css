@@ -2,8 +2,23 @@ body {
     margin: 5px;
 }
 
+/* Login state */
 .login_state {
     float: right;
     padding: 2px;
     border: 1px dotted black;
+}
+
+/* News articles */
+.news_article p {
+    margin: 0px;
+    padding-right: 10px;
+    text-align: justify;
+}
+
+.news_article img {
+    float: left;
+    padding-right: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
 }
