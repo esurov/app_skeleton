@@ -4,10 +4,10 @@ page_title_access_denied = Accesso non autorizzato!
 
 head_page_title_pg_index = Home
 
-page_title_pg_static_policy_terms_of_use = !!Terms of use
-page_title_pg_static_policy_terms_and_conditions = !!Terms and conditions
-page_title_pg_static_policy_privacy = !!Privacy policy
-page_title_pg_static_policy_disclaimer = !!Disclaimer
+page_title_pg_static_policy_terms_of_use = Condizioni di utilizzo
+page_title_pg_static_policy_terms_and_conditions = Termini e condizioni
+page_title_pg_static_policy_privacy = Politica sulla privacy
+page_title_pg_static_policy_disclaimer = Responsabilità
 
 page_title_pg_static_sample_page1 = SampleStaticPage1
 page_title_pg_static_sample_page2 = SampleStaticPage2
@@ -60,8 +60,8 @@ link_move_left = Sinistro
 link_move_right = Destro
 link_accept = Accetta
 link_reject = Rifiuta
-link_delete_image = !!Delete image
-link_delete_file = !!Delete file
+link_delete_image = Cancella immagine
+link_delete_file = Cancella file
 
 link_view_all_news = Tutte le News
 
@@ -93,7 +93,7 @@ title = Titolo
 body = Corpo
 text = Testo
 notes = Note
-extra_info = !!Extra info
+extra_info = Maggiori informazioni
 image = Immagine
 current_image = Immagine corrente
 upload_new_image = Carica nuova immagine
@@ -172,7 +172,7 @@ login_form_bottom_text_recover_password = Ritrovala
 
 login_state_logged_in_as = Connesso come
 login_state_not_logged_in = Non connesso
-user_should_remember = !!Remember me
+user_should_remember = Ricorda dati accesso
 
 ["signup"]
 guest_menu_item_signup = Iscriviti
@@ -180,22 +180,22 @@ guest_menu_item_signup = Iscriviti
 page_title_pg_signup = Iscriviti
 page_title_pg_signup_almost_completed = Il nuovo account stato creato
 
-user_should_accept_agreement = !!You should check "I accept" to continue
+user_should_accept_agreement = Devi selezionare "Accetta" per continuare
 
 signup_form_text1 = Compila il modulo per creare un nuovo account:
-signup_form_text2 = !!By submitting this signup form you indicate that you have read, understood and agreed on
+signup_form_text2 = Sottoscrivendo questo modulo significa che hai letto, capito e accettato le condizioni d'uso
 
-policy_terms_of_use = !!Terms of use
-policy_terms_and_conditions = !!Terms and conditions
-policy_privacy = !!Privacy policy
-policy_disclaimer = !!Disclaimer
+policy_terms_of_use = Condizioni di utilizzo
+policy_terms_and_conditions = Termini e condizioni
+policy_privacy = Politica sulla privacy
+policy_disclaimer = Responsabilità
 
-signup_form_accept_agreement = !!I accept
+signup_form_accept_agreement = Accetto
 
 signup_almost_completed = Il nuovo account stato creato ma non confermato. Una email con il link per la conferma dell'attivazione stata spedita all'indirizzo specificato. Quando ricevi l'email clicca sul link per completare la procedura di creazione dell'account.
 signup_login_if_already_confirmed = A conferma avvenuta,
 
-email_signup_form_processed_subject = !!Welcome to !!AppSkeleton website
+email_signup_form_processed_subject = Benvenuto al sito !!AppSkeleton
 email_signup_text1 = Questa l'email di conferma iscrizione ai servizi dello !!AppSkeleton sito web.
 email_signup_text2 = Dettagli account
 email_signup_text3 = Si raccomanda di conservare questa email in una posizione sicura in modo da avere i dettagli del proprio account intatti e a portata di mano quando necessario.
@@ -217,7 +217,7 @@ recover_password_no_account_with_email = Impossibile trovare l'account avente in
 
 recover_password_form_text1 = Specifica il login o l'indirizzo email usati durante l'iscrizione:
 
-email_recover_password_form_processed_subject = !!Password recovery for !!AppSkeleton website
+email_recover_password_form_processed_subject = Recupera la password per il sito !!AppSkeleton
 email_recover_password_text1 = Questa è una notifica via email per il recupero della password dimenticata per !!AppSkeleton sito web.
 email_recover_password_text2 = Ecco i tuoi dati di accesso:
 
@@ -241,16 +241,16 @@ page_title_pg_news_article_edit = Modifica notizia
 news_article_added = Aggiunta nuova notizia
 news_article_updated = Notizia è stata modificata
 news_article_deleted = Notizia è stata eliminata
-news_article_image_deleted = !!News article image deleted
-news_article_file_deleted = !!News article file deleted
+news_article_image_deleted = L'immagine relativa all'articolo è stata cancellata
+news_article_file_deleted = Il file relativo all'articolo è stata cancellato
 
-news_article_title_empty = !!Inserire titolo
-news_article_image_empty = !!Prego caricare immagine
-news_article_image_bad = !!Prego caricare immagine valido
+news_article_title_empty = Inserire titolo
+news_article_image_empty = Prego caricare immagine
+news_article_image_bad = Prego caricare immagine valida
 news_article_file_empty = Prego caricare file
 news_article_file_bad = Prego caricare file valido
 news_article_file_max_size_reached = La dimensione del file caricato supera i 2 Mb
-news_article_files_max_total_size_reached = !!Total uploaded files size is more than 100 Mb
+news_article_files_max_total_size_reached = La dimensione totale dei file caricati è maggiore di 100 Mb
 
 ["contact_form"]
 guest_menu_item_contact_form = Contatti
@@ -262,15 +262,15 @@ contact_form_processed = I suoi dati sono stati registrati. Grazie!
 user = utente
 users = utenti
 
-user_menu_item_user = !!My Account
+user_menu_item_user = Il mio account
 admin_menu_item_users = Utenti
 
 page_title_pg_users = Utenti
 page_title_pg_user_view = Visualizza utente
-page_title_pg_user_view_my_account = !!My Account
+page_title_pg_user_view_my_account = Il mio account
 page_title_pg_user_edit_new = Aggiungi utente
 page_title_pg_user_edit = Modifica utente
-page_title_pg_user_edit_my_account = !!Edit My Account
+page_title_pg_user_edit_my_account = Modifica account
 
 user_added = Utente aggiunto
 user_updated = Utente aggiornato
@@ -278,7 +278,7 @@ user_deleted = Utente cancellato
 user_login_empty = Inserire login
 user_login_exists = Il login inserito esiste già, specificarne un altro
 user_password_empty = Inserire password
-user_password_at_least_6_chars = !!Password must be at least 6 characters
+user_password_at_least_6_chars = La password deve essere almeno 6 caratteri
 user_passwords_do_not_match = Le password inserite non corrispondono tra loro
 user_email_empty = Inserire email
 user_email_bad = L'indirizzo email specificato non è corretto
