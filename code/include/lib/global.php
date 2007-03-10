@@ -740,12 +740,14 @@ function file_put_contents($filename, $content, $should_append = false) {
 }
 }
 
+if (!function_exists("stream_get_contents")) {
 function stream_get_contents($resource) {
     ob_start();
     $result = fpassthru($resource);
     $content = ob_get_contents();
     ob_end_clean();
     return ($result === false) ? false : $content;
+}
 }
 
 function stream_get_contents2($resource) {

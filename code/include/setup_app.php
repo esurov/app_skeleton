@@ -49,7 +49,7 @@ class SetupApp extends CustomApp {
     }
 
     function insert_initial_users() {
-        $user = $this->create_db_object("User");
+        $user =& $this->create_db_object("User");
 
         $user->login = "admin";
         $user->password = "";
@@ -70,7 +70,7 @@ class SetupApp extends CustomApp {
     }
 
     function insert_test_users() {
-        $user = $this->create_db_object("User");
+        $user =& $this->create_db_object("User");
 
         $user->login = "user";
         $user->password = "";

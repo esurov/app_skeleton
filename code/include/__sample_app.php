@@ -51,13 +51,13 @@ class SampleApp extends CustomApp {
     }
 
     function action_get_news_articles_with_new_field_xml() {
-        $news_article = $this->create_db_object("NewsArticle");
+        $news_article =& $this->create_db_object("NewsArticle");
         $news_article->insert_field(array(
             "field" => "new_field",
             "type" => "integer",
             "select" => "RAND(1000) * 1000",
         ));
-        $news_articles_list = $this->create_object(
+        $news_articles_list =& $this->create_object(
             "QueryObjectsList",
             array(
                 "templates_dir" => "news_article/xml",
@@ -119,7 +119,7 @@ class SampleApp extends CustomApp {
     function action_pg_component_view() {
         $templates_dir = "sample_component_view";
 
-        $component = $this->create_object(
+        $component =& $this->create_object(
             "SampleComponent2",
             array(
                 "templates_dir" => "{$templates_dir}/sample_component2",

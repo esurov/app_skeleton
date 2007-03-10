@@ -87,7 +87,7 @@ class App extends AppObject {
         $sql_config = new Config();
         $sql_config->read("config/sql.cfg");
 
-        $this->db = $this->create_object(
+        $this->db =& $this->create_object(
             "MySqlDb",
             array(
                 "host"     => $sql_config->get_value("host"),
@@ -1400,7 +1400,7 @@ class App extends AppObject {
         $captions_field_name
     ) {
         if (is_string($obj)) {
-            $obj = $this->create_db_object($obj);
+            $obj =& $this->create_db_object($obj);
         }
         $query = $obj->get_expanded_select_query(
             $query_ex,
@@ -1705,7 +1705,7 @@ class App extends AppObject {
         return $menu->print_values();
     }
 
-    function create_menu($params = array()) {
+    function &create_menu($params = array()) {
         return $this->create_object(
             "Menu",
             array(
@@ -1725,7 +1725,7 @@ class App extends AppObject {
         return $lang_menu->print_values();
     }
 
-    function create_lang_menu($params = array()) {
+    function &create_lang_menu($params = array()) {
         return $this->create_object(
             "LangMenu",
             array(
@@ -1896,7 +1896,7 @@ class App extends AppObject {
     }
 
     // App objects creation functions
-    function create_object($obj_class_name, $obj_params = array()) {
+    function &create_object($obj_class_name, $obj_params = array()) {
         global $app_classes;
 
         return $this->_create_object(
@@ -1908,7 +1908,7 @@ class App extends AppObject {
         );
     }
 
-    function create_db_object($obj_class_name, $obj_params = array()) {
+    function &create_db_object($obj_class_name, $obj_params = array()) {
         global $db_classes;
 
         return $this->_create_object(
@@ -1920,7 +1920,7 @@ class App extends AppObject {
         );
     }
 
-    function _create_object(
+    function &_create_object(
         $class_name_without_suffix,
         $class_name_suffix,
         $classes_info,
@@ -1946,7 +1946,7 @@ class App extends AppObject {
             }
         }
         
-        $obj = new $class_name();
+        $obj =& new $class_name();
         if (is_subclass_of($obj, "Object")) {
             $obj->set_class_name($class_name_without_suffix, $class_name_suffix);
             $init_obj_params = get_param_value($class_info, "params", null);
@@ -2011,7 +2011,7 @@ class App extends AppObject {
         // If no then instance should be created somewhere outside and passed to this function
         // In that case object could be expanded with new fields (using insert_field())
         if (is_string($obj)) {
-            $obj = $this->create_db_object($obj);
+            $obj =& $this->create_db_object($obj);
         }
         $obj->fetch(
             "{$obj->_table_name}.id = {$obj_id} AND {$where_str}",
@@ -2031,7 +2031,7 @@ class App extends AppObject {
         $field_names_to_select = null,
         $field_names_to_not_select = null
     ) {
-        $obj = $this->create_db_object($obj_class_name);
+        $obj =& $this->create_db_object($obj_class_name);
         $obj->read(array("id"));
         return $this->fetch_db_object(
             $obj,
@@ -2049,7 +2049,7 @@ class App extends AppObject {
         $field_names_to_not_select = null
     ) {
         if (is_string($obj)) {
-            $obj = $this->create_db_object($obj);
+            $obj =& $this->create_db_object($obj);
         }
         $res = $obj->run_expanded_select_query(
             $query_ex,
@@ -2082,12 +2082,12 @@ class App extends AppObject {
         $table_names_to_drop = array_diff($actual_table_names, $all_table_names_to_create);
 
         foreach ($table_names_to_create as $table_name) {
-            $obj = $this->create_db_object($all_creatable_db_objects_info[$table_name]);
+            $obj =& $this->create_db_object($all_creatable_db_objects_info[$table_name]);
             $obj->create_table();
         }
 
         foreach ($table_names_to_update as $table_name) {
-            $obj = $this->create_db_object($all_creatable_db_objects_info[$table_name]);
+            $obj =& $this->create_db_object($all_creatable_db_objects_info[$table_name]);
             $obj->update_table();
         }
 
@@ -2136,7 +2136,7 @@ class App extends AppObject {
             return true;
         }
 
-        $uploaded_image = $this->create_object(
+        $uploaded_image =& $this->create_object(
             "UploadedImage", 
             array(
                 "input_name" => $input_name,
@@ -2150,7 +2150,7 @@ class App extends AppObject {
             $image_processor_params = array(
                 "actions" => get_param_value($params, "image_processor.actions", array()),
             );
-            $image_processor = $this->create_object(
+            $image_processor =& $this->create_object(
                 $image_processor_class_name,
                 $image_processor_params
             );
@@ -2188,7 +2188,7 @@ class App extends AppObject {
             return true;
         }
     
-        $uploaded_file = $this->create_object(
+        $uploaded_file =& $this->create_object(
             "UploadedFile", 
             array(
                 "input_name" => $input_name,
@@ -2303,8 +2303,8 @@ class App extends AppObject {
     }
 
     // Email sender
-    function create_email_sender() {
-        $email_sender = $this->create_object("PHPMailer");
+    function &create_email_sender() {
+        $email_sender =& $this->create_object("PHPMailer");
         $email_sender->IsSendmail();
         $email_sender->IsHTML($this->get_config_value("email_is_html"));
         $email_sender->CharSet = $this->get_config_value("email_charset");

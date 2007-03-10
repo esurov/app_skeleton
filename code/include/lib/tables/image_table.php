@@ -29,7 +29,7 @@ class ImageTable extends FileTable {
         $this->height = $uploaded_image->get_height();
     }
 
-    function create_in_memory_image() {
+    function &create_in_memory_image() {
         return $this->create_object(
             "InMemoryImage", 
             array(

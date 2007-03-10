@@ -78,7 +78,7 @@ class UserApp extends CustomApp {
     }
 
     function create_current_user() {
-        $this->user = $this->create_db_object("User");
+        $this->user =& $this->create_db_object("User");
 
         $login_state =& $this->session->get_login_state();
         if (is_null($login_state)) {
@@ -230,9 +230,9 @@ class UserApp extends CustomApp {
     function action_pg_index() {
         $templates_dir = "index";
 
-        $news_article = $this->create_db_object("NewsArticle");
+        $news_article =& $this->create_db_object("NewsArticle");
         $n_recent_news_articles = $this->get_config_value("recent_news_articles_number");
-        $recent_news_articles_list = $this->create_object(
+        $recent_news_articles_list =& $this->create_object(
             "QueryObjectsList",
             array(
                 "templates_dir" => "{$templates_dir}/recent_news_articles",
@@ -273,7 +273,7 @@ class UserApp extends CustomApp {
 
         $user = get_param_value($this->action_params, "user", null);
         if (is_null($user)) {
-            $user = $this->create_db_object("User");
+            $user =& $this->create_db_object("User");
             $user->insert_login_form_extra_fields();
             if ($this->was_user_remembered()) {
                 $user->should_remember = 1;
@@ -281,7 +281,7 @@ class UserApp extends CustomApp {
         } else {
             $user->password = "";
         }
-        $user_edit = $this->create_object(
+        $user_edit =& $this->create_object(
             "ObjectEdit",
             array(
                 "templates_dir" => "{$templates_dir}/login_form",
@@ -298,7 +298,7 @@ class UserApp extends CustomApp {
     function action_login() {
         $user = get_param_value($this->action_params, "user", null);
         if (is_null($user)) {
-            $user = $this->create_db_object("User");
+            $user =& $this->create_db_object("User");
             $user->insert_login_form_extra_fields();
             $user->read(array("login", "password", "should_remember"));
         }
@@ -406,13 +406,13 @@ class UserApp extends CustomApp {
 
         $user = get_param_value($this->action_params, "user", null);
         if (is_null($user)) {
-            $user = $this->create_db_object("User");
+            $user =& $this->create_db_object("User");
             $user->insert_signup_form_extra_fields();
         } else {
             $user->password = "";
             $user->password_confirm = "";
         }
-        $user_edit = $this->create_object(
+        $user_edit =& $this->create_object(
             "ObjectEdit",
             array(
                 "templates_dir" => "{$templates_dir}/signup_form",
@@ -427,7 +427,7 @@ class UserApp extends CustomApp {
     }
 
     function action_signup() {
-        $user = $this->create_db_object("User");
+        $user =& $this->create_db_object("User");
         $user->insert_signup_form_extra_fields();
         $user->read(null, array("role", "is_confirmed", "is_active"));
 
@@ -460,7 +460,7 @@ class UserApp extends CustomApp {
         
         $body = $this->print_file("signup/email_signup_confirmation_sent_to_user.html");
 
-        $email_sender = $this->create_email_sender();
+        $email_sender =& $this->create_email_sender();
         $email_sender->From = $email_from;
         $email_sender->Sender = $email_from;
         $email_sender->FromName = trim($name_from);
@@ -487,9 +487,9 @@ class UserApp extends CustomApp {
 
         $user = get_param_value($this->action_params, "user", null);
         if (is_null($user)) {
-            $user = $this->create_db_object("User");
+            $user =& $this->create_db_object("User");
         }
-        $recover_password_form = $this->create_object(
+        $recover_password_form =& $this->create_object(
             "ObjectEdit",
             array(
                 "templates_dir" => "{$templates_dir}/recover_password_form",
@@ -504,7 +504,7 @@ class UserApp extends CustomApp {
     }
 
     function action_recover_password() {
-        $user = $this->create_db_object("User");
+        $user =& $this->create_db_object("User");
         $user->read(array("login", "email"));
 
         $messages = $user->validate(null, "recover_password_form");
@@ -527,7 +527,7 @@ class UserApp extends CustomApp {
         $user->print_values();
         $body = $this->print_file("recover_password/email_password_sent_to_user.html");
 
-        $email_sender = $this->create_email_sender();
+        $email_sender =& $this->create_email_sender();
         $email_sender->From = $email_from;
         $email_sender->Sender = $email_from;
         $email_sender->FromName = trim($name_from);
@@ -546,9 +546,9 @@ class UserApp extends CustomApp {
 
         $contact_info = get_param_value($this->action_params, "contact_info", null);
         if (is_null($contact_info)) {
-            $contact_info = $this->create_db_object("ContactInfo");
+            $contact_info =& $this->create_db_object("ContactInfo");
         }
-        $contact_form = $this->create_object(
+        $contact_form =& $this->create_object(
             "ObjectEdit",
             array(
                 "templates_dir" => "{$templates_dir}/contact_form",
@@ -562,7 +562,7 @@ class UserApp extends CustomApp {
     }
 
     function action_process_contact_form() {
-        $contact_info = $this->create_db_object("ContactInfo");
+        $contact_info =& $this->create_db_object("ContactInfo");
         $contact_info_old = $contact_info;
         $contact_info->read();
 
@@ -588,7 +588,7 @@ class UserApp extends CustomApp {
         $contact_info->print_values();
         $body = $this->print_file("contact_form/email_contact_info_sent_to_admin.html");
 
-        $email_sender = $this->create_email_sender();
+        $email_sender =& $this->create_email_sender();
         $email_sender->From = $email_from;
         $email_sender->Sender = $email_from;
         $email_sender->FromName = trim($name_from);
@@ -601,8 +601,8 @@ class UserApp extends CustomApp {
     function action_pg_users() {
         $templates_dir = "users";
         
-        $user = $this->create_db_object("User");
-        $users_list = $this->create_object(
+        $user =& $this->create_db_object("User");
+        $users_list =& $this->create_object(
             "PagedQueryObjectsList",
             array(
                 "templates_dir" => "{$templates_dir}/users",
@@ -639,7 +639,7 @@ class UserApp extends CustomApp {
         }
 
         $user = $this->read_id_fetch_user();
-        $user_view = $this->create_object(
+        $user_view =& $this->create_object(
             "ObjectView",
             array(
                 "templates_dir" => "{$templates_dir}/user_view",
@@ -684,7 +684,7 @@ class UserApp extends CustomApp {
         $user->password = "";
         $user->password_confirm = "";
 
-        $user_edit = $this->create_object(
+        $user_edit =& $this->create_object(
             "ObjectEdit",
             array(
                 "templates_dir" => "{$templates_dir}/user_edit",
@@ -780,8 +780,8 @@ class UserApp extends CustomApp {
             $context = "list_item";
         }
         
-        $news_article = $this->create_db_object("NewsArticle");
-        $news_articles_list = $this->create_object(
+        $news_article =& $this->create_db_object("NewsArticle");
+        $news_articles_list =& $this->create_object(
             "PagedQueryObjectsList",
             array(
                 "templates_dir" => "{$templates_dir}/{$templates_subdir}",
@@ -803,7 +803,7 @@ class UserApp extends CustomApp {
         $templates_dir = "news_article_view";
 
         $news_article = $this->read_id_fetch_db_object("NewsArticle");
-        $news_article_view = $this->create_object(
+        $news_article_view =& $this->create_object(
             "ObjectView",
             array(
                 "templates_dir" => "{$templates_dir}/news_article_view",
@@ -824,7 +824,7 @@ class UserApp extends CustomApp {
         if (is_null($news_article)) {
             $news_article = $this->read_id_fetch_db_object("NewsArticle");
         }
-        $news_article_edit = $this->create_object(
+        $news_article_edit =& $this->create_object(
             "ObjectEdit",
             array(
                 "templates_dir" => "{$templates_dir}/news_article_edit",

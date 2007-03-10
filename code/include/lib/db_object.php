@@ -414,7 +414,7 @@ class DbObject extends AppObject {
             }
         } else {
             // Insert info for field from another DbObject
-            $obj = $this->create_db_object($obj_class_name);
+            $obj =& $this->create_db_object($obj_class_name);
             if (!isset($obj->_fields[$field_name])) {
                 $this->process_fatal_error(
                     "Cannot find field '{$field_name}' in joined '{$obj_class_name}'!"
@@ -548,7 +548,7 @@ class DbObject extends AppObject {
         if ($joined_obj_class_name == $this->get_table_class_name()) {
             $joined_obj = $this;
         } else {
-            $joined_obj = $this->create_db_object($joined_obj_class_name);
+            $joined_obj =& $this->create_db_object($joined_obj_class_name);
         }
         $joined_table_name_sql_alias = get_param_value(
             $join_info,
@@ -1046,7 +1046,7 @@ class DbObject extends AppObject {
         $relations = $this->get_restrict_relations();
         foreach ($relations as $relation) {
             list($dep_obj_class_name, $key_field_name) = $relation;
-            $dep_obj = $this->create_db_object($dep_obj_class_name);
+            $dep_obj =& $this->create_db_object($dep_obj_class_name);
 
             $this->write_log(
                 "del_cascade(): Trying to delete from '{$dep_obj->_table_name}'",
@@ -2266,7 +2266,7 @@ class DbObject extends AppObject {
         $obj_dependency_counters = array();
         foreach ($this->get_restrict_relations() as $relation) {
             list($dep_obj_class_name, $key_field_name) = $relation;
-            $dep_obj = $this->create_db_object($dep_obj_class_name);
+            $dep_obj =& $this->create_db_object($dep_obj_class_name);
 
             $query = new SelectQuery(array(
                 "select" => "id",
@@ -2288,7 +2288,7 @@ class DbObject extends AppObject {
         if (count($obj_dependency_counters) != 0) {
             $dep_objs_data = array();
             foreach ($obj_dependency_counters as $dep_obj_class_name => $dependency_counter) {
-                $dep_obj = $this->create_db_object($dep_obj_class_name);
+                $dep_obj =& $this->create_db_object($dep_obj_class_name);
                 $dep_objs_data[] = $dep_obj->get_quantity_str($dependency_counter);
             }
             $messages[] = new ErrorStatusMsg(
@@ -2469,7 +2469,7 @@ class DbObject extends AppObject {
     function del_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
         if ($image_id != 0) {
-            $image = $this->create_db_object("Image");
+            $image =& $this->create_db_object("Image");
             $image->del_where("id = {$image_id}");
         }
     }
@@ -2502,7 +2502,7 @@ class DbObject extends AppObject {
     function del_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         if ($file_id != 0) {
-            $file = $this->create_db_object("File");
+            $file =& $this->create_db_object("File");
             $file->del_where("id = {$file_id}");
         }
     }
@@ -2564,7 +2564,7 @@ class DbObject extends AppObject {
             return null;
         }
 
-        $neighbor_obj = $this->create_db_object($this->get_table_class_name());
+        $neighbor_obj =& $this->create_db_object($this->get_table_class_name());
         if ($neighbor_obj->fetch("position = {$neighbor_obj_position} AND {$where_str}")) {
             return $neighbor_obj;
         } else {

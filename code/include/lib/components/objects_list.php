@@ -241,7 +241,7 @@ class PagedQueryObjectsList extends QueryObjectsList {
             if ($n_objects_total == 0) {
                 $this->pager_visible = false;
             } else {
-                $this->pager = $this->create_object(
+                $this->pager =& $this->create_object(
                     "Pager",
                     array(
                         "n_rows_per_page" => $pager_n_rows_per_page,
@@ -252,7 +252,6 @@ class PagedQueryObjectsList extends QueryObjectsList {
                 );
                 $this->pager->read();
                 $this->query->expand($this->pager->get_query_ex());
-
                 $this->_obj_quantity_str = $this->obj->get_quantity_str($n_objects_total);
             }
         }

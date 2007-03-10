@@ -102,7 +102,7 @@ class FileTable extends CustomDbObject {
         $this->content_length = $uploaded_file->get_content_length();
     }
 
-    function create_in_memory_file() {
+    function &create_in_memory_file() {
         return $this->create_object(
             "InMemoryFile", 
             array(

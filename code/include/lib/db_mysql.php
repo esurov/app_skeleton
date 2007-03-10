@@ -88,7 +88,7 @@ class MySqlDb extends AppObject {
     }
 
     // Run MySQL query
-    function run_query($query_str) {
+    function &run_query($query_str) {
         if (!$this->_has_connection) {
             $this->connect();
         }
