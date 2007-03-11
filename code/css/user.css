@@ -10,6 +10,10 @@ body {
 }
 
 /* News articles */
+.news_article {
+    clear: both;
+}
+
 .news_article p {
     margin: 0px;
     padding-right: 10px;
