@@ -41,7 +41,6 @@ class App extends AppObject {
         $this->set_class_name($app_class_name); 
         $this->app_name = $app_name;
 
-        $this->init_php_vars();
         $this->create_core_objects();
         $this->init_app();
 
@@ -54,12 +53,6 @@ class App extends AppObject {
             "App '{$this->app_name}' started",
             DL_INFO
         );
-    }
-//
-    function init_php_vars() {
-        ini_set("magic_quotes_runtime", 0);
-        ini_set("allow_call_time_pass_reference", 1);
-        ini_set("zend.ze1_compatibility_mode", 1);
     }
 //
     function create_core_objects() {

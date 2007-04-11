@@ -1,4 +1,8 @@
+php_flag zend.ze1_compatibility_mode On
+
 php_flag magic_quotes_gpc Off
+php_flag magic_quotes_runtime Off
+php_flag allow_call_time_pass_reference On
 
 DirectoryIndex index.php
 Options -Indexes
