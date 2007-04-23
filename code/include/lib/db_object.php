@@ -1096,6 +1096,7 @@ class DbObject extends AppObject {
 
         // Logger optimization
         $should_write_log = ($this->get_log_debug_level() >= DL_EXTRA_DEBUG);
+        
         foreach ($field_names as $field_name) {
             $field_info = $this->_fields[$field_name];
             if ($use_read_flag && !$field_info["read"]) {
@@ -1105,21 +1106,6 @@ class DbObject extends AppObject {
             $param_name = "{$template_var_prefix}_{$field_name}";
             $param_value = param($param_name);
 
-            if ($should_write_log) {
-                if (is_null($param_value)) {
-                    $param_value_str = "<NULL: Using old value>";
-                } else if (is_array($param_value)) {
-                    $param_value_str = $this->app->log->get_array_message_as_str($param_value);
-                } else {
-                    $param_value_str = qw(get_shortened_string($param_value, 300));
-                }
-                $this->write_log(
-                    "Reading field '{$field_name}' from CGI param '{$param_name}'. " .
-                    "Updated value is: {$param_value_str}",
-                    DL_EXTRA_DEBUG
-                );
-            }
-            
             $field_type = $field_info["type"];
             switch ($field_type) {
             case "primary_key":
@@ -1136,7 +1122,13 @@ class DbObject extends AppObject {
                 $field_value = $this->get_currency_field_value($param_value);
                 break;
             case "boolean":
-                $field_value = $this->get_boolean_field_value($param_value);
+                // Skip changing field value for boolean fields
+                // if no hidden value with '__sent' suffix was passed via CGI
+                if (is_null(param("{$param_name}__sent"))) {
+                    $field_value = null;
+                } else {
+                    $field_value = $this->get_boolean_field_value($param_value);    
+                }
                 break;
             case "enum":
                 $field_value = $this->get_enum_field_value(
@@ -1180,6 +1172,20 @@ class DbObject extends AppObject {
                 break;
             }
 
+            if ($should_write_log) {
+                if (is_null($field_value)) {
+                    $field_updated_str = "CGI param not found - field skipped from update!";
+                } else {
+                    $field_value_str = qw(get_shortened_string($field_value, 300));
+                    $field_updated_str = "Updated value is: {$field_value_str}";
+                }
+                $this->write_log(
+                    "Reading field '{$field_name}' from CGI param '{$param_name}'. " .
+                    "{$field_updated_str}",
+                    DL_EXTRA_DEBUG
+                );
+            }
+            
             if (!is_null($field_value)) {
                 $this->set_field_value($field_name, $field_value);
             }
@@ -1277,7 +1283,17 @@ class DbObject extends AppObject {
         $filter_name = $filter_info["name"];
         $filter_relation = $filter_info["relation"];
         
-        $param_value = param("{$this->_table_name}_{$filter_name}_{$filter_relation}");
+        $param_name = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
+        $param_sent_name = "{$param_name}__sent";
+        $param_value = param($param_name);
+
+        // Hack for boolean values represented by HTML checkbox
+        //
+        // TODO: Move to general function read_boolean_value
+        // and call it from read() and read_filter()
+        if (!is_null(param($param_sent_name))) {
+            $param_value = $this->get_boolean_field_value($param_value);
+        }
         if (!is_null($param_value)) {
             $filter_info["value"] = $param_value;
         }
@@ -1893,8 +1909,8 @@ class DbObject extends AppObject {
         case "checkbox":
             $this->app->print_checkbox_input_form_value(
                 $template_var,
-                $filter_value,
-                null,
+                1,
+                ($filter_value != 0),
                 $filter_input_attrs
             );
             break;

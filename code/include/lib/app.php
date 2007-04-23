@@ -1235,7 +1235,9 @@ class App extends AppObject {
         $checked = null,
         $input_attrs = array()
     ) {
-        $printed_value = print_html_checkbox($template_var, $value, $checked, $input_attrs);
+        $printed_value =
+            print_html_hidden("{$template_var}__sent", 1) .
+            print_html_checkbox($template_var, $value, $checked, $input_attrs);
         $this->print_raw_value("{$template_var}_input", $printed_value);
         return $printed_value;
     }
