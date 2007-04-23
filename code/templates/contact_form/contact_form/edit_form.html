@@ -2,37 +2,37 @@
 <input type="hidden" name="action" value="process_contact_form" />
 <table>
 <tr>
-    <td>{%str_first_name%}:&nbsp;<span class="required">*</span></td>
+    <td>{%lang:first_name%}:&nbsp;<span class="required">*</span></td>
     <td>{%contact_info_first_name_input%}</td>
 
-    <td>{%str_last_name%}:&nbsp;<span class="required">*</span></td>
+    <td>{%lang:last_name%}:&nbsp;<span class="required">*</span></td>
     <td>{%contact_info_last_name_input%}</td>
 </tr>
 <tr>
-    <td>{%str_email%}:&nbsp;<span class="required">*</span></td>
+    <td>{%lang:email%}:&nbsp;<span class="required">*</span></td>
     <td>{%contact_info_email_input%}</td>
-    <td>{%str_company_name%}:</td>
+    <td>{%lang:company_name%}:</td>
     <td>{%contact_info_company_name_input%}</td>
 </tr>
 <tr>
-    <td>{%str_city%}:</td>
+    <td>{%lang:city%}:</td>
     <td>{%contact_info_city_input%}</td>
-    <td>{%str_address%}:</td>
+    <td>{%lang:address%}:</td>
     <td>{%contact_info_address_input%}</td>
 </tr>
 <tr>
-    <td>{%str_phone%}:</td>
+    <td>{%lang:phone%}:</td>
     <td>{%contact_info_phone_input%}</td>
-    <td>{%str_fax%}:</td>
+    <td>{%lang:fax%}:</td>
     <td>{%contact_info_fax_input%}</td>
 </tr>
 <tr>
-    <td valign="middle">{%str_message_text%}:&nbsp;<span class="required">*</span></td>
+    <td valign="middle">{%lang:message_text%}:&nbsp;<span class="required">*</span></td>
     <td colspan="3">{%contact_info_message_text_input%}</td>
 </tr>
 <tr>
     <td colspan="4" align="center">
-        <input name="submit_btn" type="submit" value="{%str_link_send%}" />
+        <input name="submit_btn" type="submit" value="{%lang:link_send%}" />
     </td>
 </tr>
 </table>
@@ -44,4 +44,4 @@ focusFormElement('form', 'contact_info_first_name');
 
 {%contact_info_client_validation_js%}
 
-{{contact_form/contact_form/_notice_{%lang%}.html}}
+{{contact_form/contact_form/_notice_{%global:lang%}.html}}

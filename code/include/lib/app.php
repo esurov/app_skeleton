@@ -215,16 +215,16 @@ class App extends AppObject {
     }
 
     function on_before_validate_action() {
-        $this->print_raw_value("html_charset", $this->html_charset);
+        $this->print_raw_value("global:html_charset", $this->html_charset);
 
         $this->print_lang_resources();
     }
 
     function print_lang_resources() {
         foreach ($this->lang_resources->_params as $resource_name => $resource_value) {
-            $this->print_raw_value("str_{$resource_name}", $resource_value);
+            $this->print_raw_value("lang:{$resource_name}", $resource_value);
         }
-        $this->print_raw_value("lang", $this->lang);
+        $this->print_raw_value("global:lang", $this->lang);
     }
     
     function run_action($action_name = null, $action_params = array()) {
