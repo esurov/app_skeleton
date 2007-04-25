@@ -1,18 +1,18 @@
 ["general page and head titles"]
 app_head_title = !!AppSkeleton
-page_title_access_denied = Accesso non autorizzato!
+page_title.access_denied = Accesso non autorizzato!
 
-head_page_title_pg_index = Home
+head_page_title.pg_index = Home
 
-page_title_pg_static_policy_terms_of_use = Condizioni di utilizzo
-page_title_pg_static_policy_terms_and_conditions = Termini e condizioni
-page_title_pg_static_policy_privacy = Politica sulla privacy
-page_title_pg_static_policy_disclaimer = Responsabilità
+page_title.pg_static_policy_terms_of_use = Condizioni di utilizzo
+page_title.pg_static_policy_terms_and_conditions = Termini e condizioni
+page_title.pg_static_policy_privacy = Politica sulla privacy
+page_title.pg_static_policy_disclaimer = Responsabilità
 
-page_title_pg_static_sample_page1 = SampleStaticPage1
-page_title_pg_static_sample_page2 = SampleStaticPage2
-page_title_pg_static_sample_page2_1 = SampleStaticPage2_1
-page_title_pg_static_sample_page2_2 = SampleStaticPage2_2
+page_title.pg_static_sample_page1 = SampleStaticPage1
+page_title.pg_static_sample_page2 = SampleStaticPage2
+page_title.pg_static_sample_page2_1 = SampleStaticPage2_1
+page_title.pg_static_sample_page2_2 = SampleStaticPage2_2
 
 ["general menu items"]
 guest_menu_item_index = Home
@@ -157,7 +157,7 @@ no_file = No file
 recent_news = Ultime novità
 
 ["login/logout"]
-page_title_pg_login = Log In
+page_title.pg_login = Log In
 
 user_login_or_password_unknown = Login "{%login%}" o password non corretti
 user_not_confirmed_yet = L'utente "{%login%}" non è ancora confermato. Utilizza il link di conferma che trovi all'interno della email di avvenuta iscrizione.
@@ -177,8 +177,8 @@ user_should_remember = Ricorda dati accesso
 ["signup"]
 guest_menu_item_signup = Iscriviti
 
-page_title_pg_signup = Iscriviti
-page_title_pg_signup_almost_completed = Il nuovo account stato creato
+page_title.pg_signup = Iscriviti
+page_title.pg_signup_almost_completed = Il nuovo account stato creato
 
 user_should_accept_agreement = Devi selezionare "Accetta" per continuare
 
@@ -202,13 +202,13 @@ email_signup_text3 = Si raccomanda di conservare questa email in una posizione s
 email_signup_text4 = Per confermare la richiesta di iscrizione si prega di cliccare sul link di conferma:
 
 ["confirm_signup"]
-page_title_confirm_signup = Account è stato confermato
+page_title.confirm_signup = Account è stato confermato
 
 signup_confirmed_text1 = Il tuo account è stato confermato.
 signup_confirmed_text2 = Adesso è possibile effettuare il login.
 
 ["recover_password"]
-page_title_pg_recover_password = Ritrovamento password
+page_title.pg_recover_password = Ritrovamento password
 
 recover_password_login_or_email_empty = Login o indirizzo email non specificati
 recover_password_bad_email = Indirizzo email non corretto
@@ -222,7 +222,7 @@ email_recover_password_text1 = Questa è una notifica via email per il recupero 
 email_recover_password_text2 = Ecco i tuoi dati di accesso:
 
 ["recover_password_sent"]
-page_title_pg_recover_password_sent = Password è stata inviata
+page_title.pg_recover_password_sent = Password è stata inviata
 
 recover_password_sent = La tua password è stata inviata. Controlla l'email e login.
 
@@ -233,10 +233,10 @@ news_articles = notizie
 guest_menu_item_news = Notizie
 admin_menu_item_news = Notizie
 
-page_title_pg_news_articles = Notizie
-page_title_pg_news_article_view = Visualizza notizia
-page_title_pg_news_article_edit_new = Aggiungi notizia
-page_title_pg_news_article_edit = Modifica notizia
+page_title.pg_news_articles = Notizie
+page_title.pg_news_article_view = Visualizza notizia
+page_title.pg_news_article_edit_new = Aggiungi notizia
+page_title.pg_news_article_edit = Modifica notizia
 
 news_article_added = Aggiunta nuova notizia
 news_article_updated = Notizia è stata modificata
@@ -255,7 +255,7 @@ news_article_files_max_total_size_reached = La dimensione totale dei file carica
 ["contact_form"]
 guest_menu_item_contact_form = Contatti
 
-page_title_pg_contact_form = Contatti
+page_title.pg_contact_form = Contatti
 contact_form_processed = I suoi dati sono stati registrati. Grazie!
 
 ["users"]
@@ -265,12 +265,12 @@ users = utenti
 user_menu_item_user = Il mio account
 admin_menu_item_users = Utenti
 
-page_title_pg_users = Utenti
-page_title_pg_user_view = Visualizza utente
-page_title_pg_user_view_my_account = Il mio account
-page_title_pg_user_edit_new = Aggiungi utente
-page_title_pg_user_edit = Modifica utente
-page_title_pg_user_edit_my_account = Modifica account
+page_title.pg_users = Utenti
+page_title.pg_user_view = Visualizza utente
+page_title.pg_user_view_my_account = Il mio account
+page_title.pg_user_edit_new = Aggiungi utente
+page_title.pg_user_edit = Modifica utente
+page_title.pg_user_edit_my_account = Modifica account
 
 user_added = Utente aggiunto
 user_updated = Utente aggiornato

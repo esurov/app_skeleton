@@ -651,7 +651,7 @@ class UserApp extends CustomApp {
         $user_view->print_values();
 
         if ($user_role == "user") {
-            $this->print_page_title("page_title_pg_user_view_my_account");
+            $this->print_head_and_page_titles("pg_user_view_my_account");
         }
 
         $this->print_file("{$templates_dir}/body.html", "body");
@@ -696,7 +696,7 @@ class UserApp extends CustomApp {
         $user_edit->print_values();
 
         if ($user_role == "user") {
-            $this->print_page_title("page_title_pg_user_edit_my_account");
+            $this->print_head_and_page_titles("pg_user_edit_my_account");
         }
 
         $this->print_file("{$templates_dir}/body.html", "body");

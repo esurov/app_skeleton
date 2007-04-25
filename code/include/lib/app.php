@@ -1571,17 +1571,17 @@ class App extends AppObject {
     }
 
     function print_head_and_page_titles($resource) {
-        $this->print_raw_value("page_title_lang_resource", $resource);
         $this->print_page_title($resource);
         $this->print_head_page_title($resource);
     }
 
     function get_default_page_title_lang_resource() {
-        return "page_title_{$this->action}";
+        return $this->action;
     }
 
     function print_page_title($resource, $is_html = false) {
-        $page_title_text = $this->get_lang_str($resource);
+        $page_title_resource = "page_title.{$resource}";
+        $page_title_text = $this->get_lang_str($page_title_resource);
         if (!is_null($page_title_text)) {
             if ($is_html) {
                 $this->print_raw_value("page_title_text", $page_title_text);
@@ -1590,17 +1590,25 @@ class App extends AppObject {
             }
             $this->print_file_new_if_exists("_page_title.html", "page_title");
         }
+        $this->print_raw_value("page_title.lang_resource", $page_title_resource);
     }
 
-    function print_head_page_title($resource) {
-        $resource_text = $this->get_lang_str("head_{$resource}");
-        if (is_null($resource_text)) {
-            // If have no head_page_title use page_title instead
-            $resource_text = $this->get_lang_str($resource);
+    function print_head_page_title($resource, $is_html = false) {
+        $head_page_title_resource = "head_page_title.{$resource}";
+        $head_page_title_text = $this->get_lang_str($head_page_title_resource);
+        if (is_null($head_page_title_text)) {
+            // If have no head_page_title found in lang files then use page_title instead
+            $head_page_title_resource = "page_title.{$resource}";
+            $head_page_title_text = $this->get_lang_str($head_page_title_resource);
         }
-        if (!is_null($resource_text)) {
-            $this->print_raw_value("head_page_title", $resource_text);
+        if (!is_null($head_page_title_text)) {
+            if ($is_html) {
+                $this->print_raw_value("head_page_title", $head_page_title_text);
+            } else {
+                $this->print_value("head_page_title", $head_page_title_text);
+            }
         }
+        $this->print_raw_value("head_page_title.lang_resource", $head_page_title_resource);
     }
 
     // Status messages

@@ -1,18 +1,18 @@
 ["general page and head titles"]
 app_head_title = !!AppSkeleton
-page_title_access_denied = Access denied!
+page_title.access_denied = Access denied!
 
-head_page_title_pg_index = Home
+head_page_title.pg_index = Home
 
-page_title_pg_static_policy_terms_of_use = Terms of use
-page_title_pg_static_policy_terms_and_conditions = Terms and conditions
-page_title_pg_static_policy_privacy = Privacy policy
-page_title_pg_static_policy_disclaimer = Disclaimer
+page_title.pg_static_policy_terms_of_use = Terms of use
+page_title.pg_static_policy_terms_and_conditions = Terms and conditions
+page_title.pg_static_policy_privacy = Privacy policy
+page_title.pg_static_policy_disclaimer = Disclaimer
 
-page_title_pg_static_sample_page1 = SampleStaticSamplePage1
-page_title_pg_static_sample_page2 = SampleStaticSamplePage2
-page_title_pg_static_sample_page2_1 = SampleStaticPage2_1
-page_title_pg_static_sample_page2_2 = SampleStaticPage2_2
+page_title.pg_static_sample_page1 = SampleStaticSamplePage1
+page_title.pg_static_sample_page2 = SampleStaticSamplePage2
+page_title.pg_static_sample_page2_1 = SampleStaticPage2_1
+page_title.pg_static_sample_page2_2 = SampleStaticPage2_2
 
 ["general menu items"]
 guest_menu_item_index = Home
@@ -157,8 +157,8 @@ no_file = No file uploaded
 recent_news = Recent news
 
 ["login"]
-page_title_pg_login = Log In
-page_title_pg_signup = Signup
+page_title.pg_login = Log In
+page_title.pg_signup = Signup
 
 user_login_or_password_unknown = Bad login "{%login%}" or password
 user_disabled_by_admin = User "{%login%}" is currently disabled by site administrator
@@ -178,8 +178,8 @@ user_should_remember = Remember me
 ["signup"]
 guest_menu_item_signup = Signup
 
-page_title_pg_signup = Signup
-page_title_pg_signup_almost_completed = Il nuovo account stato creato
+page_title.pg_signup = Signup
+page_title.pg_signup_almost_completed = Il nuovo account stato creato
 
 user_should_accept_agreement = You should check "Accept agreement" to continue
 
@@ -203,13 +203,13 @@ email_signup_text3 = Please keep this mail in a safe place to have your account 
 email_signup_text4 = In order to confirm your singup request, please click confirmation link:
 
 ["confirm_signup"]
-page_title_confirm_signup = Account confirmed
+page_title.confirm_signup = Account confirmed
 
 signup_confirmed_text1 = Your account is now confirmed.
 signup_confirmed_text2 = Now you may login.
 
 ["recover_password"]
-page_title_pg_recover_password = Recover password
+page_title.pg_recover_password = Recover password
 
 recover_password_login_or_email_empty = Specify login or email
 recover_password_bad_email = Bad email specified
@@ -223,7 +223,7 @@ email_recover_password_text1 = This is password recovery email for !!AppSkeleton
 email_recover_password_text2 = Here is your access info:
 
 ["recover_password_sent"]
-page_title_pg_recover_password_sent = Password sent
+page_title.pg_recover_password_sent = Password sent
 
 recover_password_sent = Your password was sent. Please check email and login.
 
@@ -234,10 +234,10 @@ news_articles = news articles
 guest_menu_item_news = News
 admin_menu_item_news = News
 
-page_title_pg_news_articles = News
-page_title_pg_news_article_view = View news article
-page_title_pg_news_article_edit_new = Add news article
-page_title_pg_news_article_edit = Edit news article
+page_title.pg_news_articles = News
+page_title.pg_news_article_view = View news article
+page_title.pg_news_article_edit_new = Add news article
+page_title.pg_news_article_edit = Edit news article
 
 news_article_added = News article added
 news_article_updated = News article updated
@@ -256,7 +256,7 @@ news_article_files_max_total_size_reached = Total uploaded files size is more th
 ["contact_form"]
 guest_menu_item_contact_form = Contacts
 
-page_title_pg_contact_form = Contact form
+page_title.pg_contact_form = Contact form
 contact_form_processed = Your contact info was processed. Thank you!
 
 ["users"]
@@ -266,12 +266,12 @@ users = users
 user_menu_item_user = My Account
 admin_menu_item_users = Users
 
-page_title_pg_users = Users
-page_title_pg_user_view = View user
-page_title_pg_user_view_my_account = My Account
-page_title_pg_user_edit_new = Add user
-page_title_pg_user_edit = Edit user
-page_title_pg_user_edit_my_account = Edit My Account
+page_title.pg_users = Users
+page_title.pg_user_view = View user
+page_title.pg_user_view_my_account = My Account
+page_title.pg_user_edit_new = Add user
+page_title.pg_user_edit = Edit user
+page_title.pg_user_edit_my_account = Edit My Account
 
 user_added = User added
 user_updated = User updated
