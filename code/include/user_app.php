@@ -679,7 +679,7 @@ class UserApp extends CustomApp {
         }
         if ($user_role == "user" && $user->is_definite()) {
             $field_info =& $user->get_field_info("login");
-            $field_info["input"]["type_attrs"] = array("disabled" => "disabled");
+            $field_info["input"]["type_attrs"]["disabled"] = "disabled";
         }
         $user->password = "";
         $user->password_confirm = "";
