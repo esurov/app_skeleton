@@ -6,19 +6,44 @@ class Template {
     var $templates_dir;
     var $parsed_files;
     var $fillings;
-    var $print_template_name; // used for debug purposes
+    var $_is_verbose = false; // used for debug purposes
+    var $_is_verbose_saved;
     var $TEMPLATE_NAME_PATTERN;
 
-    function Template($templates_dir = "templates", $print_template_name = false) {
+    function Template($templates_dir = "templates", $is_verbose = false) {
         $this->templates_dir = $templates_dir;
         $this->parsed_files = array();
         $this->fillings = array();
-        $this->print_template_name = $print_template_name;
+
+        if ($is_verbose) {
+            $this->verbose_turn_on();
+        } else {
+            $this->verbose_turn_off();
+        }
 
         $this->TEMPLATE_NAME_PATTERN =
             "\n<!-- TEMPLATE BEGIN '%s' -->\n" .
             "%s" .
             "\n<!-- TEMPLATE END '%s' -->\n";
+    }
+//
+    function verbose_turn_on() {
+        $this->_is_verbose_saved = $this->_is_verbose;
+        $this->_is_verbose = true;
+        return $this->_is_verbose_saved;
+    }
+
+    function verbose_turn_off() {
+        $this->_is_verbose_saved = $this->_is_verbose;
+        $this->_is_verbose = false;
+        return $this->_is_verbose_saved;
+    }
+
+    function verbose_restore() {
+        $is_verbose = $this->_is_verbose;
+        $this->_is_verbose = $this->_is_verbose_saved;
+        $this->_is_verbose_saved = $is_verbose;
+        return $is_verbose;
     }
 //
     function get_filling_value($name) {
@@ -82,7 +107,7 @@ class Template {
     // Return filled template
     function parse_file($template_name, $append_to_name = null) {
         $template_text = $this->get_template_text($template_name);
-        if ($this->print_template_name) {
+        if ($this->_is_verbose) {
             $template_text = sprintf(
                 $this->TEMPLATE_NAME_PATTERN,
                 $template_name,

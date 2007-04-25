@@ -20,12 +20,11 @@ class Menu extends TemplateComponent {
     }
 //
     function load_from_xml($xml_filename) {
-        $old_print_template_name = $this->app->page->print_template_name;
-        $this->app->page->print_template_name = false;
+        $this->app->page->verbose_turn_off();
         $xml_file_content = $this->app->print_file_if_exists(
             "{$this->templates_dir}/{$xml_filename}"
         );
-        $this->app->page->print_template_name = $old_print_template_name;
+        $this->app->page->verbose_restore();
 
         $menu_xml = new MenuXml($this->app->html_charset);
         $menu_xml->menu =& $this;

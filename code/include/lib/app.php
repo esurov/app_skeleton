@@ -371,7 +371,12 @@ class App extends AppObject {
 
     function create_html_document_body_content() {
         $this->print_menu();
-        return $this->print_file($this->page_template_name);
+
+        $this->page->verbose_turn_off();
+        $html_document_body_content = $this->print_file($this->page_template_name);
+        $this->page->verbose_restore();
+
+        return $html_document_body_content;
     }
 
     function create_html_page_template_name() {
