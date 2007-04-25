@@ -1,5 +1,2 @@
-admin_login = admin
-admin_password =
-
 email_debug_mode = 1
 admin_email = vovkas@devel.basetre.com

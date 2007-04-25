@@ -1,8 +1,0 @@
-# SQL configuration file for 'test' version of project
-
-host     = localhost
-database = webdemo
-username = webdemo
-password = webdemo
-
-table_prefix = apsk_
