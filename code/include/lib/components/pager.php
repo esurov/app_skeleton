@@ -35,14 +35,20 @@ class Pager extends AppComponent {
         // Read current offset from CGI and ensure correct it if needed
         $offset = (int) param("offset");
 
-        if ($this->n_rows_per_page >= $this->n_total_rows) {
+        // Offset normalization
+        if ($offset < 0 || $this->n_rows_per_page >= $this->n_total_rows) {
+            // Making offset to first page
             $offset = 0;
+        } else {
+            // Making offset page aligned
+            $offset = ((int) ($offset / $this->n_rows_per_page)) * $this->n_rows_per_page;
+
+            // Making offset to last page
+            if ($offset >= $this->n_total_rows) {
+                $offset = $this->n_total_rows - $this->n_rows_per_page;
+            }
         }
-        if ($offset >= $this->n_total_rows) {
-            $offset = (int) (
-                (($this->n_total_rows - 1) / $this->n_rows_per_page) * $this->n_rows_per_page
-            );
-        }
+        
         $this->_offset = $offset;
     }
 
