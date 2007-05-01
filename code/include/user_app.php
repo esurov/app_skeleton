@@ -774,24 +774,32 @@ class UserApp extends CustomApp {
         $user_role = $this->get_user_role();
         if ($user_role == "admin") {
             $templates_subdir = "news_articles_admin";
+            $default_order_by = array(
+                "default_order_by" => array("created DESC", "id DESC"),    
+            );
             $context = "list_item_admin";
         } else {
             $templates_subdir = "news_articles";
+            $default_order_by = array(
+                "query_ex" => array(
+                    "order_by" => "created DESC, id DESC",
+                ),    
+            );
             $context = "list_item";
         }
         
         $news_article =& $this->create_db_object("NewsArticle");
         $news_articles_list =& $this->create_object(
             "PagedQueryObjectsList",
-            array(
-                "templates_dir" => "{$templates_dir}/{$templates_subdir}",
-                "template_var" => "news_articles",
-                "obj" => $news_article,
-                "query_ex" => array(
-                    "order_by" => "created DESC, id DESC",
+            array_merge(
+                array(
+                    "templates_dir" => "{$templates_dir}/{$templates_subdir}",
+                    "template_var" => "news_articles",
+                    "obj" => $news_article,
+                    "filter_form.visible" => true,
+                    "context" => $context,
                 ),
-                "filter_form.visible" => true,
-                "context" => $context,
+                $default_order_by
             )
         );
         $news_articles_list->print_values();
