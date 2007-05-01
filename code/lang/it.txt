@@ -133,7 +133,9 @@ status = Stato
 
 ["status/popup messages and parts of page"]
 ["common"]
-pager_pages_title = Pagine:
+pager.pages_title = Pagine:
+pager.prev_page = &lt;&lt;&nbsp;!!Precedente
+pager.next_page = !!Prossimo&nbsp;&gt;&gt;
 filter_by = Filtra per
 no_records_found = Non sono stati trovati dati
 
