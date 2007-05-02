@@ -15,20 +15,20 @@ page_title.pg_static_sample_page2_1 = SampleStaticPage2_1
 page_title.pg_static_sample_page2_2 = SampleStaticPage2_2
 
 ["general menu items"]
-guest_menu_item_index = Home
+guest_menu_item.index = Home
 
-guest_menu_item_sample_static_pages = SampleStaticPages
-guest_sub_menu_item_sample_static_page1 = SampleStaticPage1
-guest_sub_menu_item_sample_static_page2 = SampleStaticPage2
-guest_sub_menu_item_sample_popup = SamplePopup
-guest_sub_menu_item_sample_new_window = SampleNewWindow
-guest_sub_menu_item_sample_static_pages2 = SampleStaticPages2
-guest_sub_sub_menu_item_sample_static_page2_1 = SampleStaticPage2_1
-guest_sub_sub_menu_item_sample_static_page2_2 = SampleStaticPage2_2
+guest_menu_item.sample_static_pages = SampleStaticPages
+guest_sub_menu_item.sample_static_page1 = SampleStaticPage1
+guest_sub_menu_item.sample_static_page2 = SampleStaticPage2
+guest_sub_menu_item.sample_popup = SamplePopup
+guest_sub_menu_item.sample_new_window = SampleNewWindow
+guest_sub_menu_item.sample_static_pages2 = SampleStaticPages2
+guest_sub_sub_menu_item.sample_static_page2_1 = SampleStaticPage2_1
+guest_sub_sub_menu_item.sample_static_page2_2 = SampleStaticPage2_2
 
-user_menu_item_index = Home
+user_menu_item.index = Home
 
-admin_menu_item_index = Home
+admin_menu_item.index = Home
 
 ["link captions"]
 link_view = View
@@ -178,7 +178,7 @@ login_state_not_logged_in = Not logged in
 user_should_remember = Remember me
 
 ["signup"]
-guest_menu_item_signup = Signup
+guest_menu_item.signup = Signup
 
 page_title.pg_signup = Signup
 page_title.pg_signup_almost_completed = Il nuovo account stato creato
@@ -233,8 +233,8 @@ recover_password_sent = Your password was sent. Please check email and login.
 news_article = news article
 news_articles = news articles
 
-guest_menu_item_news = News
-admin_menu_item_news = News
+guest_menu_item.news = News
+admin_menu_item.news = News
 
 page_title.pg_news_articles = News
 page_title.pg_news_article_view = View news article
@@ -256,7 +256,7 @@ news_article_file_max_size_reached = Uploaded file size is more than 2 Mb
 news_article_files_max_total_size_reached = Total uploaded files size is more than 100 Mb
 
 ["contact_form"]
-guest_menu_item_contact_form = Contacts
+guest_menu_item.contact_form = Contacts
 
 page_title.pg_contact_form = Contact form
 contact_form_processed = Your contact info was processed. Thank you!
@@ -265,8 +265,8 @@ contact_form_processed = Your contact info was processed. Thank you!
 user = user
 users = users
 
-user_menu_item_user = My Account
-admin_menu_item_users = Users
+user_menu_item.user = My Account
+admin_menu_item.users = Users
 
 page_title.pg_users = Users
 page_title.pg_user_view = View user

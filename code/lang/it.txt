@@ -15,20 +15,20 @@ page_title.pg_static_sample_page2_1 = SampleStaticPage2_1
 page_title.pg_static_sample_page2_2 = SampleStaticPage2_2
 
 ["general menu items"]
-guest_menu_item_index = Home
+guest_menu_item.index = Home
 
-guest_menu_item_sample_static_pages = SampleStaticPages
-guest_sub_menu_item_sample_static_page1 = SampleStaticPage1
-guest_sub_menu_item_sample_static_page2 = SampleStaticPage2
-guest_sub_menu_item_sample_popup = SamplePopup
-guest_sub_menu_item_sample_new_window = SampleNewWindow
-guest_sub_menu_item_sample_static_pages2 = SampleStaticPages2
-guest_sub_sub_menu_item_sample_static_page2_1 = SampleStaticPage2_1
-guest_sub_sub_menu_item_sample_static_page2_2 = SampleStaticPage2_2
+guest_menu_item.sample_static_pages = SampleStaticPages
+guest_sub_menu_item.sample_static_page1 = SampleStaticPage1
+guest_sub_menu_item.sample_static_page2 = SampleStaticPage2
+guest_sub_menu_item.sample_popup = SamplePopup
+guest_sub_menu_item.sample_new_window = SampleNewWindow
+guest_sub_menu_item.sample_static_pages2 = SampleStaticPages2
+guest_sub_sub_menu_item.sample_static_page2_1 = SampleStaticPage2_1
+guest_sub_sub_menu_item.sample_static_page2_2 = SampleStaticPage2_2
 
-user_menu_item_index = Home
+user_menu_item.index = Home
 
-admin_menu_item_index = Home
+admin_menu_item.index = Home
 
 ["link captions"]
 link_view = Visualizza
@@ -177,7 +177,7 @@ login_state_not_logged_in = Non connesso
 user_should_remember = Ricorda dati accesso
 
 ["signup"]
-guest_menu_item_signup = Iscriviti
+guest_menu_item.signup = Iscriviti
 
 page_title.pg_signup = Iscriviti
 page_title.pg_signup_almost_completed = Il nuovo account stato creato
@@ -232,8 +232,8 @@ recover_password_sent = La tua password è stata inviata. Controlla l'email e lo
 news_article = notizia
 news_articles = notizie
 
-guest_menu_item_news = Notizie
-admin_menu_item_news = Notizie
+guest_menu_item.news = Notizie
+admin_menu_item.news = Notizie
 
 page_title.pg_news_articles = Notizie
 page_title.pg_news_article_view = Visualizza notizia
@@ -255,7 +255,7 @@ news_article_file_max_size_reached = La dimensione del file caricato supera i 2 
 news_article_files_max_total_size_reached = La dimensione totale dei file caricati è maggiore di 100 Mb
 
 ["contact_form"]
-guest_menu_item_contact_form = Contatti
+guest_menu_item.contact_form = Contatti
 
 page_title.pg_contact_form = Contatti
 contact_form_processed = I suoi dati sono stati registrati. Grazie!
@@ -264,8 +264,8 @@ contact_form_processed = I suoi dati sono stati registrati. Grazie!
 user = utente
 users = utenti
 
-user_menu_item_user = Il mio account
-admin_menu_item_users = Utenti
+user_menu_item.user = Il mio account
+admin_menu_item.users = Utenti
 
 page_title.pg_users = Utenti
 page_title.pg_user_view = Visualizza utente

@@ -52,7 +52,7 @@ class Menu extends TemplateComponent {
             }
             $caption = $menu_item->caption;
             if (is_null($caption)) {
-                $caption_resource = "{$menu->name}_item_{$menu_item->name}";
+                $caption_resource = "{$menu->name}_item.{$menu_item->name}";
                 $caption = $this->get_lang_str($caption_resource);
                 if (is_null($caption)) {
                     $this->process_fatal_error(
