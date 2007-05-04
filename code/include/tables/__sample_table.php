@@ -342,7 +342,7 @@ class SampleTable extends CustomDbObject {
 
         // This template variable is expansion of default printed variables for all contexts
         $this->app->print_raw_value(
-            "{$this->_table_name}_field_double_decorated",
+            "{$this->_table_name}_field_double.decorated",
             "!!" . $this->app->page->get_filling_value("{$this->_table_name}_field_double") . "!!"
         );
 

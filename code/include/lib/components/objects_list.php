@@ -273,9 +273,9 @@ class PagedQueryObjectsList extends QueryObjectsList {
         parent::_print_custom_params();
 
         $this->app->print_values(array(
-            "action_suburl" => create_suburl($this->_action_suburl_params),
-            "action_filters_suburl" => create_suburl($this->_action_filters_suburl_params),
-            "action_filters_order_by_suburl" => create_suburl(
+            "action.suburl" => create_suburl($this->_action_suburl_params),
+            "action_filters.suburl" => create_suburl($this->_action_filters_suburl_params),
+            "action_filters_order_by.suburl" => create_suburl(
                 $this->_action_filters_order_by_suburl_params
             ),
         ));

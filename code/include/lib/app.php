@@ -690,9 +690,9 @@ class App extends AppObject {
 
     function print_custom_param($param_name, $param_value) {
         $this->print_value($param_name, $param_value);
-        $this->print_raw_value("{$param_name}_orig", $param_value);
+        $this->print_raw_value("{$param_name}.orig", $param_value);
         $this->print_value(
-            "{$param_name}_suburl",
+            "{$param_name}.suburl",
             create_suburl(array($param_name => $param_value))
         );
         $this->print_hidden_input_form_value($param_name, $param_value);
@@ -746,8 +746,8 @@ class App extends AppObject {
         }
         $this->print_raw_values(array(
             $template_var => $value_formatted,
-            "{$template_var}_orig" => $value,
-            "{$template_var}_orig_with_nonset" => $value_with_nonset,
+            "{$template_var}.orig" => $value,
+            "{$template_var}.orig_with_nonset" => $value_with_nonset,
         ));
     }
 
@@ -775,10 +775,10 @@ class App extends AppObject {
         }
         $this->print_raw_values(array(
             $template_var => $value_formatted,
-            "{$template_var}_2" => $value_formatted_2,
-            "{$template_var}_5" => $value_formatted_5,
-            "{$template_var}_orig" => $value,
-            "{$template_var}_orig_with_nonset" => $value_with_nonset,
+            "{$template_var}.2" => $value_formatted_2,
+            "{$template_var}.5" => $value_formatted_5,
+            "{$template_var}.orig" => $value,
+            "{$template_var}.orig_with_nonset" => $value_with_nonset,
         ));
     }
 
@@ -811,9 +811,9 @@ class App extends AppObject {
         }
         $this->print_raw_values(array(
             $template_var => $value_formatted,
-            "{$template_var}_without_sign" => $value_formatted_without_sign,
-            "{$template_var}_orig" => $value,
-            "{$template_var}_orig_with_nonset" => $value_with_nonset,
+            "{$template_var}.without_sign" => $value_formatted_without_sign,
+            "{$template_var}.orig" => $value,
+            "{$template_var}.orig_with_nonset" => $value_with_nonset,
         ));
     }
 
@@ -829,7 +829,7 @@ class App extends AppObject {
             ((int) $value != 0) ? 1 : 0
         );
         $this->print_value($template_var, $caption);
-        $this->print_raw_value("{$template_var}_orig", $value);
+        $this->print_raw_value("{$template_var}.orig", $value);
     }
 
     function print_enum_value($template_var, $enum_value, $value_caption_pairs) {
@@ -840,41 +840,41 @@ class App extends AppObject {
         );
         $enum_caption = is_null($enum_caption) ? "" : $enum_caption;
         $this->print_value($template_var, $enum_caption);
-        $this->print_raw_value("{$template_var}_caption_orig", $enum_caption);
-        $this->print_raw_value("{$template_var}_orig", $enum_value);
+        $this->print_raw_value("{$template_var}.caption_orig", $enum_caption);
+        $this->print_raw_value("{$template_var}.orig", $enum_value);
     }
 
     function print_varchar_value($template_var, $value) {
         $this->print_value($template_var, $value);
-        $this->print_raw_value("{$template_var}_orig", $value);
+        $this->print_raw_value("{$template_var}.orig", $value);
     }
 
     function print_text_value($template_var, $value) {
         $this->print_varchar_value($template_var, $value);
         $safe_value = get_html_safe_string($value);
-        $this->print_raw_value("{$template_var}_lf2br", convert_lf2br($safe_value));
+        $this->print_raw_value("{$template_var}.lf2br", convert_lf2br($safe_value));
     }
 
     function print_datetime_value($template_var, $db_datetime) {
         $this->print_values(array(
             $template_var => $this->get_app_datetime($db_datetime),
-            "{$template_var}_short" => $this->get_app_short_datetime($db_datetime),
-            "{$template_var}_orig" => $db_datetime,
+            "{$template_var}.short" => $this->get_app_short_datetime($db_datetime),
+            "{$template_var}.orig" => $db_datetime,
         ));
     }
 
     function print_date_value($template_var, $db_date) {
         $this->print_values(array(
             $template_var => $this->get_app_date($db_date),
-            "{$template_var}_orig" => $db_date,
+            "{$template_var}.orig" => $db_date,
         ));
     }
 
     function print_time_value($template_var, $db_time) {
         $this->print_values(array(
             $template_var => $this->get_app_time($db_time),
-            "{$template_var}_short" => $this->get_app_short_time($db_time),
-            "{$template_var}_orig" => $db_time,
+            "{$template_var}.short" => $this->get_app_short_time($db_time),
+            "{$template_var}.orig" => $db_time,
         ));
     }
 //
@@ -1018,7 +1018,7 @@ class App extends AppObject {
             )
         );
         $this->print_raw_value(
-            "{$template_var}_input",
+            "{$template_var}.input",
             $this->append_currency_sign($printed_value, $sign, $sign_at_start)
         );
         $this->print_text_input_form_value(
@@ -1134,7 +1134,7 @@ class App extends AppObject {
         $lang_inputs_with_captions_str = "";
         foreach ($this->avail_langs as $lang) {
             $lang_str = $this->get_lang_str($lang);
-            $lang_input = $this->page->get_filling_value("{$template_var}_{$lang}_input");
+            $lang_input = $this->page->get_filling_value("{$template_var}_{$lang}.input");
             $lang_inputs_with_captions_str .=
                 "<tr>\n" .
                 "<th>{$lang_str}:</th>\n" .
@@ -1146,9 +1146,10 @@ class App extends AppObject {
             $lang_inputs_with_captions_str .
             "</table>\n";
         $this->print_raw_values(array(
-            "{$template_var}_input" => $printed_value,
-            "{$template_var}_hidden" =>
-                $this->page->get_filling_value("{$template_var}_{$this->lang}_hidden"),
+            "{$template_var}.input" => $printed_value,
+            "{$template_var}.hidden" => $this->page->get_filling_value(
+                "{$template_var}_{$this->lang}.hidden"
+            ),
         ));
         return $printed_value;
     }
@@ -1199,7 +1200,7 @@ class App extends AppObject {
         $input_attrs = array()
     ) {
         $printed_value = print_raw_html_input($input_type, $template_var, $value, $input_attrs);
-        $this->print_raw_value("{$template_var}_input", $printed_value);
+        $this->print_raw_value("{$template_var}.input", $printed_value);
         return $printed_value;
     }
 
@@ -1214,13 +1215,13 @@ class App extends AppObject {
         $input_attrs = array()
     ) {
         $printed_value = print_html_input($input_type, $template_var, $value, $input_attrs);
-        $this->print_raw_value("{$template_var}_input", $printed_value);
+        $this->print_raw_value("{$template_var}.input", $printed_value);
         return $printed_value;
     }
 
     function print_hidden_input_form_value($template_var, $value) {
         $printed_value = print_html_hidden($template_var, $value);
-        $this->print_raw_value("{$template_var}_hidden", $printed_value);
+        $this->print_raw_value("{$template_var}.hidden", $printed_value);
         return $printed_value;
     }
 
@@ -1230,7 +1231,7 @@ class App extends AppObject {
 
     function print_textarea_input_form_value($template_var, $value, $input_attrs = array()) {
         $printed_value = print_html_textarea($template_var, $value, $input_attrs);
-        $this->print_raw_value("{$template_var}_input", $printed_value);
+        $this->print_raw_value("{$template_var}.input", $printed_value);
         return $printed_value;
     }
 
@@ -1243,7 +1244,7 @@ class App extends AppObject {
         $printed_value =
             print_html_hidden("{$template_var}__sent", 1) .
             print_html_checkbox($template_var, $value, $checked, $input_attrs);
-        $this->print_raw_value("{$template_var}_input", $printed_value);
+        $this->print_raw_value("{$template_var}.input", $printed_value);
         return $printed_value;
     }
 
@@ -1266,7 +1267,7 @@ class App extends AppObject {
             $input_attrs,
             $delimiter
         );
-        $this->print_raw_value("{$template_var}_input", $printed_value);
+        $this->print_raw_value("{$template_var}.input", $printed_value);
         return $printed_value;
     }
 
@@ -1285,7 +1286,7 @@ class App extends AppObject {
             $value,
             $input_attrs
         );
-        $this->print_raw_value("{$template_var}_input", $printed_value);
+        $this->print_raw_value("{$template_var}.input", $printed_value);
         return $printed_value;
     }
 
@@ -1333,8 +1334,8 @@ class App extends AppObject {
             $input_attrs
         );
         $this->print_raw_values(array(
-            "{$template_var}_input" => $printed_value,
-            "{$template_var}_dependency_js" => $dependency_js,
+            "{$template_var}.input" => $printed_value,
+            "{$template_var}.dependency_js" => $dependency_js,
         ));
         return $printed_value;
     }
@@ -2213,15 +2214,6 @@ class App extends AppObject {
         $obj->set_field_value($file_id_field_name, $obj_file->id);
         
         return true;
-
-//    function process_file_upload($file_id_field_name, $input_name) {
-//        $file = $this->fetch_file_without_content($file_id_field_name);
-//
-//        $file->read_uploaded_info($input_name);
-//        $file->save();
-//
-//        $this->set_field_value($file_id_field_name, $file->id);
-//    }
     }
 
     function delete_db_object($params = array()) {
