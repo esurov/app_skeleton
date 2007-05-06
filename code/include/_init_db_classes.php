@@ -28,11 +28,25 @@ $db_classes["classes"] = array(
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "user", "create" => true),
     ),
-
     "NewsArticle" => array(
         "filename" => "news_article_table.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "news_article", "create" => true),
+    ),
+    "Category1" => array(
+        "filename" => "category1_table.php",
+        "required_classes" => array("OrderedDbObject"),
+        "params" => array("table_name" => "category1", "create" => true),
+    ),
+    "Category2" => array(
+        "filename" => "category2_table.php",
+        "required_classes" => array("OrderedDbObject"),
+        "params" => array("table_name" => "category2", "create" => true),
+    ),
+    "Category3" => array(
+        "filename" => "category3_table.php",
+        "required_classes" => array("OrderedDbObject"),
+        "params" => array("table_name" => "category3", "create" => true),
     ),
 
     // These are fake tables (no '_table' suffix in filename),

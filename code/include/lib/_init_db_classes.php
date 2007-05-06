@@ -16,6 +16,11 @@ $db_classes = array(
             "required_classes" => array("DbObject"),
             "params" => array("create" => false),
         ),
+        "OrderedDbObject" => array(
+            "filename" => "_ordered_db_object.php",
+            "required_classes" => array("CustomDbObject"),
+            "params" => array("create" => false),
+        ),
 
         // Common DbObject classes
         "File" => array(

@@ -98,6 +98,10 @@ p {
     background-color: #ffffff;
 }
 
+.list_item_odd_selected, .list_item_even_selected {
+    background-color: #cccccc;
+}
+
 /* Menu */
 .menu {
     float: left;

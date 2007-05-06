@@ -36,6 +36,10 @@ class UserApp extends CustomApp {
             "recover_password" => $e,
             "pg_recover_password_sent" => $e,
 
+            // Contact form
+            "pg_contact_form" => $e,
+            "process_contact_form" => $e,
+
             // User management
             "pg_users" => $a,
             "pg_user_view" => $u_a,
@@ -52,9 +56,20 @@ class UserApp extends CustomApp {
             "delete_news_article_image" => $a,
             "delete_news_article_file" => $a,
 
-            // Contact form
-            "pg_contact_form" => $e,
-            "process_contact_form" => $e,
+            // Categories management
+            "pg_categories" => $a,
+            "pg_category1_edit" => $a,
+            "update_category1" => $a,
+            "delete_category1" => $a,
+            "move_category1" => $a,
+            "pg_category2_edit" => $a,
+            "update_category2" => $a,
+            "delete_category2" => $a,
+            "move_category2" => $a,
+            "pg_category3_edit" => $a,
+            "update_category3" => $a,
+            "delete_category3" => $a,
+            "move_category3" => $a,
         );
     }
 //
@@ -475,7 +490,7 @@ class UserApp extends CustomApp {
     }
 
     function action_confirm_signup() {
-        $user = $this->read_id_fetch_db_object("User");
+        $user =& $this->read_id_fetch_db_object("User");
         if ($user->is_definite() && !$user->is_confirmed) {
             $user->confirm(1);
         }
@@ -621,9 +636,9 @@ class UserApp extends CustomApp {
     function read_id_fetch_user() {
         $user_role = $this->get_user_role();
         if ($user_role == "user") {
-            $user = $this->user;
+            $user =& $this->user;
         } else {
-            $user = $this->read_id_fetch_db_object("User");
+            $user =& $this->read_id_fetch_db_object("User");
         }
         return $user;
     }
@@ -750,7 +765,7 @@ class UserApp extends CustomApp {
     }
 
     function action_delete_user() {
-        $user = $this->read_id_fetch_db_object("User");
+        $user =& $this->read_id_fetch_db_object("User");
         if ($user->role == "admin") {
             if ($user->get_num_admins() <= 1) {
                 $this->add_session_status_message(
@@ -810,7 +825,7 @@ class UserApp extends CustomApp {
     function action_pg_news_article_view() {
         $templates_dir = "news_article_view";
 
-        $news_article = $this->read_id_fetch_db_object("NewsArticle");
+        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
         $news_article_view =& $this->create_object(
             "ObjectView",
             array(
@@ -830,7 +845,7 @@ class UserApp extends CustomApp {
 
         $news_article = get_param_value($this->action_params, "news_article", null);
         if (is_null($news_article)) {
-            $news_article = $this->read_id_fetch_db_object("NewsArticle");
+            $news_article =& $this->read_id_fetch_db_object("NewsArticle");
         }
         $news_article_edit =& $this->create_object(
             "ObjectEdit",
@@ -847,7 +862,7 @@ class UserApp extends CustomApp {
     }
 
     function action_update_news_article() {
-        $news_article = $this->read_id_fetch_db_object("NewsArticle");
+        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
         $news_article_old = $news_article;
         $news_article->read();
 
@@ -907,7 +922,7 @@ class UserApp extends CustomApp {
     }
 
     function action_delete_news_article() {
-        $news_article = $this->read_id_fetch_db_object("NewsArticle");
+        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
 
         $this->delete_db_object(array(
             "obj" => $news_article,
@@ -917,7 +932,7 @@ class UserApp extends CustomApp {
     }
 
     function action_delete_news_article_image() {
-        $news_article = $this->read_id_fetch_db_object("NewsArticle");
+        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
 
         $this->delete_db_object_image($news_article, "image_id");
         
@@ -929,7 +944,7 @@ class UserApp extends CustomApp {
     }
 
     function action_delete_news_article_file() {
-        $news_article = $this->read_id_fetch_db_object("NewsArticle");
+        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
 
         $this->delete_db_object_file($news_article, "file_id");
         
@@ -939,6 +954,263 @@ class UserApp extends CustomApp {
             "news_article_id" => $news_article->id,
         ));
     }
+//
+//    function read_and_print_current_category_ids() {
+//        $category_ids = array(
+//            "current_category1_id" => (int) param("current_category1_id"),
+//            "current_category2_id" => (int) param("current_category2_id"),
+//        );
+//        foreach ($category_ids as $category_id_name => $category_id) {
+//            $this->print_primary_key_value($category_id_name, $category_id);
+//        }
+//        $this->print_value("current_category_ids_suburl", create_suburl($category_ids));
+//        return $category_ids;
+//    }
+
+    function action_pg_categories() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+
+        $templates_dir = "categories";
+        
+        $command = (string) param("command");
+        switch ($command) {
+        case "move_obj":
+            $obj_name = (string) param("obj");
+            $avail_obj_names = array(
+                "category1" => "Category1",
+                "category2" => "Category2",
+                "category3" => "Category3",
+            );
+            if (in_array($obj_name, array_keys($avail_obj_names))) {
+                $obj =& $this->read_id_fetch_db_object(
+                    $avail_obj_names[$obj_name],
+                    "1",
+                    "obj_id"
+                );
+                $obj->update_position((string) param("to"));
+            }
+            break;
+        }
+        
+        $category_browser =& $this->create_object(
+            "CategoryBrowser",
+            array(
+                "templates_dir" => "{$templates_dir}/category_browser",
+                "template_var" => "category_browser",
+            )
+        );
+        $category_browser->read();
+        $category_browser->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+//    function pg_category1_edit() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//
+//        $category1 = get_param_value($this->action_params, "category1", null);
+//        $this->print_object_edit_page(array(
+//            "obj" => $category1,
+//            "obj_name" => "category1",
+//            "templates_dir" => "category1_edit",
+//        ));
+//    }
+//
+//    function update_category1() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//        
+//        $category1 =& $this->read_id_fetch_db_object("category1");
+//        $category1_old = $category1;
+//        $category1->read();
+//
+//        $messages = $category1->validate($category1_old);
+//
+//        if (count($messages) != 0) {
+//            $this->print_status_messages($messages);
+//            $this->run_action("pg_edit_category1", array("category1" => $category1));
+//        } else {
+//            $category1->save();
+//
+//            $this->print_status_message_object_updated($category1_old);
+//            $this->create_self_redirect_response(array(
+//                "action" => "pg_view_categories",
+//                "current_category1_id" => $category1->id,
+//                "current_category2_id" => $current_category_ids["current_category2_id"],
+//            ));
+//        }
+//    }
+//
+//    function delete_category1() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//        
+//        $return_url_params = array_merge(
+//            array("action" => "pg_view_categories"),
+//            $current_category_ids
+//        );
+//        $this->delete_object(array(
+//            "obj_name" => "category1",
+//            "success_url_params" => $return_url_params,
+//            "error_url_params" => $return_url_params,
+//        ));
+//    }
+
+    function action_move_category1() {
+        $current_category_ids = $this->read_and_print_current_category_ids();
+        
+        $this->move_db_object(
+            $this->read_id_fetch_db_object("category1"),
+            (string) param("to")
+        );
+        
+        $this->create_self_redirect_response(
+            array_merge(
+                array("action" => "pg_view_categories"),
+                $current_category_ids
+            )
+        );
+    }
+//
+//    function pg_category2_edit() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//
+//        $category2 = get_param_value($this->action_params, "category2", null);
+//        $this->print_object_edit_page(array(
+//            "obj" => $category2,
+//            "obj_name" => "category2",
+//            "templates_dir" => "category2_edit",
+//        ));
+//    }
+//
+//    function update_category2() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//        
+//        $category2 =& $this->read_id_fetch_db_object("category2");
+//        if (!$category2->is_definite()) {
+//            $category2->category1_id = $current_category_ids["current_category1_id"];
+//        }
+//        $category2_old = $category2;
+//        $category2->read();
+//
+//        $messages = $category2->validate($category2_old);
+//
+//        if (count($messages) != 0) {
+//            $this->print_status_messages($messages);
+//            $this->run_action("pg_edit_category2", array("category2" => $category2));
+//        } else {
+//            $category2->save();
+//
+//            $this->print_status_message_object_updated($category2_old);
+//            $this->create_self_redirect_response(array(
+//                "action" => "pg_view_categories",
+//                "current_category1_id" => $current_category_ids["current_category1_id"],
+//                "current_category2_id" => $category2->id,
+//            ));
+//        }
+//    }
+//
+//    function delete_category2() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//        
+//        $return_url_params = array_merge(
+//            array("action" => "pg_view_categories"),
+//            $current_category_ids
+//        );
+//        $this->delete_object(array(
+//            "obj_name" => "category2",
+//            "success_url_params" => $return_url_params,
+//            "error_url_params" => $return_url_params,
+//        ));
+//    }
+//
+//    function move_category2() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//        
+//        $current_category1_id = $current_category_ids["current_category1_id"];
+//        $where_str = "category1_id = {$current_category1_id}";
+//        $this->move_db_object(
+//            $this->read_id_fetch_db_object("category2", $where_str),
+//            (string) param("to"),
+//            $where_str
+//        );
+//        
+//        $this->create_self_redirect_response(
+//            array_merge(
+//                array("action" => "pg_view_categories"),
+//                $current_category_ids
+//            )
+//        );
+//    }
+//
+//    function pg_category3_edit() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//
+//        $category3 = get_param_value($this->action_params, "category3", null);
+//        $this->print_object_edit_page(array(
+//            "obj" => $category3,
+//            "obj_name" => "category3",
+//            "templates_dir" => "category3_edit",
+//        ));
+//    }
+//
+//    function update_category3() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//        
+//        $category3 =& $this->read_id_fetch_db_object("category3");
+//        if (!$category3->is_definite()) {
+//            $category3->category2_id = $current_category_ids["current_category2_id"];
+//        }
+//        $category3_old = $category3;
+//        $category3->read();
+//
+//        $messages = $category3->validate($category3_old);
+//
+//        if (count($messages) != 0) {
+//            $this->print_status_messages($messages);
+//            $this->run_action("pg_edit_category3", array("category3" => $category3));
+//        } else {
+//            $category3->save();
+//
+//            $this->print_status_message_object_updated($category3_old);
+//            $this->create_self_redirect_response(array(
+//                "action" => "pg_view_categories",
+//                "current_category1_id" => $current_category_ids["current_category1_id"],
+//                "current_category2_id" => $current_category_ids["current_category2_id"],
+//            ));
+//        }
+//    }
+//
+//    function delete_category3() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//        
+//        $return_url_params = array_merge(
+//            array("action" => "pg_view_categories"),
+//            $current_category_ids
+//        );
+//        $this->delete_object(array(
+//            "obj_name" => "category3",
+//            "success_url_params" => $return_url_params,
+//            "error_url_params" => $return_url_params,
+//        ));
+//    }
+//
+//    function move_category3() {
+//        $current_category_ids = $this->read_and_print_current_category_ids();
+//        
+//        $current_category2_id = $current_category_ids["current_category2_id"];
+//        $where_str = "category2_id = {$current_category2_id}";
+//        $this->move_db_object(
+//            $this->read_id_fetch_db_object("category3", $where_str),
+//            (string) param("to"),
+//            $where_str
+//        );
+//        
+//        $this->create_self_redirect_response(
+//            array_merge(
+//                array("action" => "pg_view_categories"),
+//                $current_category_ids
+//            )
+//        );
+//    }
 
 }
 

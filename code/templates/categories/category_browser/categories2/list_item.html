@@ -1,0 +1,18 @@
+<tr>
+    <td class="{%list_item_class%}">
+        <a href="?action=pg_categories&amp;current_category1_id={%current_category1_id%}&amp;current_category2_id={%category2_id%}"
+            >{%category2_name%}</a>
+    </td>
+    <td>
+        [<a
+        href="?action=pg_categories&amp;command=move_obj&amp;to=prev&amp;obj=category2&amp;obj_id={%category2_id%}&amp;{%current_category_ids_suburl%}"
+        >{%lang:link_move_up%}</a>]&nbsp;[<a
+        href="?action=pg_categories&amp;command=move_obj&amp;to=next&amp;obj=category2&amp;obj_id={%category2_id%}&amp;{%current_category_ids_suburl%}"
+        >{%lang:link_move_down%}</a>]&nbsp;[<a
+        href="?action=pg_category2_edit&amp;category2_id={%category2_id%}&amp;current_category1_id={%current_category1_id%}&amp;current_category2_id={%category2_id%}"
+        >{%lang:link_edit%}</a>]&nbsp;[<a
+        href="?action=delete_category2&amp;category2_id={%category2_id%}&amp;{%current_category_ids_suburl%}"
+        onclick="return confirm('{%str_sure_delete%}')"
+        >{%lang:link_delete%}</a>]
+    </td>
+</tr>

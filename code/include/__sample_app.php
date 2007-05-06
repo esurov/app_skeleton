@@ -108,7 +108,7 @@ class SampleApp extends CustomApp {
     }
 */
     function action_print_and_save_one_sample2_record() {
-        $obj = $this->fetch_db_object("Sample2", 1);
+        $obj =& $this->fetch_db_object("Sample2", 1);
         $obj->print_values();
 
         $obj->field_currency = 99999999.99;

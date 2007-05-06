@@ -292,3 +292,41 @@ user_cannot_delete_main_admin = Impossibile cancellare l'account principale di a
 
 user_role_user = Utente
 user_role_admin = Amministratore
+
+["categories"]
+category1 = categoria1
+category1s = categorie1
+category2 = categoria2
+category2s = categorie2
+category3 = categoria3
+category3s = categorie3
+
+admin_menu_item.categories = Categorie
+
+page_title.pg_categories = Categorie
+page_title.pg_category1_edit_new = Aggiungi categoria1
+page_title.pg_category1_edit = Modifica categoria1
+page_title.pg_category2_edit_new = Aggiungi categoria2
+page_title.pg_category2_edit = Modifica categoria2
+page_title.pg_category3_edit_new = Aggiungi categoria3
+page_title.pg_category3_edit = Modifica categoria3
+
+category1_added = Categoria1 aggiunta
+category1_updated = Categoria1 aggiornata
+category1_deleted = Categoria1 cancellata
+category1_name_empty = Inserire il nome della categoria1
+category2_added = Categoria2 aggiunta
+category2_updated = Categoria2 aggiornata
+category2_deleted = Categoria2 cancellata
+category2_name_empty = Inserire il nome della categoria2
+category3_added = Categoria3 aggiunta
+category3_updated = Categoria3 aggiornata
+category3_deleted = Categoria3 cancellata
+category3_name_empty = Inserire il nome della categoria3
+
+category1_title = Categoria1
+category2_title = Categoria2
+category3_title = Categoria3
+
+no_category1_selected = !!No category1 selected
+no_category2_selected = !!No category2 selected

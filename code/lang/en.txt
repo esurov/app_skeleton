@@ -293,3 +293,41 @@ user_cannot_delete_main_admin = Cannot delete main administrator account
 
 user_role_user = User
 user_role_admin = Administrator
+
+["categories"]
+category1 = category1
+category1s = categories1
+category2 = category2
+category2s = categories2
+category3 = category3
+category3s = categories3
+
+admin_menu_item.categories = Categories
+
+page_title.pg_categories = Categories
+page_title.pg_category1_edit_new = Add category1
+page_title.pg_category1_edit = Edit category1
+page_title.pg_category2_edit_new = Add subcategory2
+page_title.pg_category2_edit = Edit subcategory2
+page_title.pg_category3_edit_new = Add subsubcategory3
+page_title.pg_category3_edit = Edit subsubcategory3
+
+category1_added = Category1 added
+category1_updated = Category1 updated
+category1_deleted = Category1 deleted
+category1_name_empty = Specify category1 name
+category2_added = Category2 added
+category2_updated = Category2 updated
+category2_deleted = Category2 deleted
+category2_name_empty = Specify category2 name
+category3_added = Category3 added
+category3_updated = Category3 updated
+category3_deleted = Category3 deleted
+category3_name_empty = Specify category3 name
+
+category1_title = Category1
+category2_title = Category2
+category3_title = Category3
+
+no_category1_selected = No category1 selected
+no_category2_selected = No category2 selected

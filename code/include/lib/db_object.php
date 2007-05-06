@@ -546,7 +546,7 @@ class DbObject extends AppObject {
             );
         }
         if ($joined_obj_class_name == $this->get_table_class_name()) {
-            $joined_obj = $this;
+            $joined_obj =& $this;
         } else {
             $joined_obj =& $this->create_db_object($joined_obj_class_name);
         }
@@ -2419,11 +2419,11 @@ class DbObject extends AppObject {
         return true;
     }
 
-    function create_db_object($obj_class_name, $obj_params = array()) {
+    function &create_db_object($obj_class_name, $obj_params = array()) {
         return $this->app->create_db_object($obj_class_name, $obj_params);
     }
 
-    function fetch_db_object(
+    function &fetch_db_object(
         $obj,
         $obj_id,
         $where_str = "1",
@@ -2458,18 +2458,18 @@ class DbObject extends AppObject {
     }
 //
     // Uploaded image helper functions
-    function fetch_image($image_id_field_name) {
+    function &fetch_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
         return $this->fetch_db_object("Image", $image_id);
     }
 
-    function fetch_image_without_content($image_id_field_name) {
+    function &fetch_image_without_content($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
         return $this->fetch_db_object("Image", $image_id, "1", null, array("content"));
     }
 
     function print_image_info($image_id_field_name, $template_var) {
-        $image = $this->fetch_image_without_content($image_id_field_name);
+        $image =& $this->fetch_image_without_content($image_id_field_name);
         $image->print_values();
         
         $filename = ($image->is_definite()) ?
@@ -2491,18 +2491,18 @@ class DbObject extends AppObject {
     }
 
     // Uploaded file helper functions
-    function fetch_file($file_id_field_name) {
+    function &fetch_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         return $this->fetch_db_object("File", $file_id);
     }
 
-    function fetch_file_without_content($file_id_field_name) {
+    function &fetch_file_without_content($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         return $this->fetch_db_object("File", $file_id, "1", null, array("content"));
     }
 
     function print_file_info($file_id_field_name, $template_var) {
-        $file = $this->fetch_file_without_content($file_id_field_name);
+        $file =& $this->fetch_file_without_content($file_id_field_name);
         $file->print_values();
         
         $filename = ($file->is_definite()) ?
@@ -2534,58 +2534,6 @@ class DbObject extends AppObject {
         $res = $this->run_select_query($query);
         $row = $res->fetch_next_row();
         return $row["total_size"];
-    }
-//
-    function fetch_last_db_object_position($where_str = "1") {
-        $query = new SelectQuery(array(
-            "select" => "IFNULL(MAX(position), 0) as last_position",
-            "from" => "{%{$this->_table_name}_table%}",
-            "where" => $where_str,
-        ));
-        $res = $this->run_select_query($query);
-        $row = $res->fetch_next_row();
-        return $row["last_position"];
-    }
-
-    function fetch_prev_db_object_position($where_str = "1") {
-        $query = new SelectQuery(array(
-            "select" => "IFNULL(MAX(position), 0) AS prev_position",
-            "from" => "{%{$this->_table_name}_table%}",
-            "where" => "position < {$this->position} AND {$where_str}",
-        ));
-        $res = $this->run_select_query($query);
-        $row = $res->fetch_next_row();
-        return $row["prev_position"];
-    }
-
-    function fetch_next_db_object_position($where_str = "1") {
-        $query = new SelectQuery(array(
-            "select" => "IFNULL(MIN(position), 0) AS next_position",
-            "from" => "{%{$this->_table_name}_table%}",
-            "where" => "position > {$this->position} AND {$where_str}",
-        ));
-        $res = $this->run_select_query($query);
-        $row = $res->fetch_next_row();
-        return $row["next_position"];
-    }
-
-    function fetch_neighbor_db_object($type, $where_str = "1") {
-        if ($type == "prev") {
-            $neighbor_obj_position = $this->fetch_prev_db_object_position($where_str);
-        } else {
-            $neighbor_obj_position = $this->fetch_next_db_object_position($where_str);
-        }
-
-        if ($neighbor_obj_position == 0) {
-            return null;
-        }
-
-        $neighbor_obj =& $this->create_db_object($this->get_table_class_name());
-        if ($neighbor_obj->fetch("position = {$neighbor_obj_position} AND {$where_str}")) {
-            return $neighbor_obj;
-        } else {
-            return null;
-        }
     }
 
 }

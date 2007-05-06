@@ -63,8 +63,9 @@ class SetupApp extends CustomApp {
     }
 //
     function action_insert_test_data() {
-        $this->insert_test_users();
         $this->insert_test_news_articles();
+        $this->insert_test_categories();
+        $this->insert_test_users();
         $this->add_session_status_message(new OkStatusMsg("test_data_inserted"));
         $this->create_self_redirect_response();
     }
@@ -106,7 +107,7 @@ class SetupApp extends CustomApp {
         $user->store();
     }
     function insert_test_news_articles() {
-        $news_article = $this->read_id_fetch_db_object("NewsArticle");
+        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
         $news_article->created = "2004-06-20";
         $news_article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";
         $news_article->body_it =
@@ -199,6 +200,48 @@ class SetupApp extends CustomApp {
             "Morbi eros. Quisque luctus neque et justo. Nullam facilisis velit. " .
             "Curabitur at odio. Sed vel justo. Aenean suscipit.";
         $news_article->store();
+    }
+
+    function insert_test_categories() {
+        $lines = read_and_parse_csv_file("data/categories.csv");
+        $category1 =& $this->create_db_object("Category1");
+        $category2 =& $this->create_db_object("Category2");
+        $category3 =& $this->create_db_object("Category3");
+        $category1_name_old = "";
+        $category2_name_old = "";
+        $category3_name_old = "";
+        foreach ($lines as $line_values) {
+            $category1_name = $line_values[0];
+            $category2_name = $line_values[1];
+            $category3_name = $line_values[2];
+
+            if ($category1_name != $category1_name_old) {
+                $category1->id = 0;
+                $category1->name = $category1_name;
+                $category1->position = 0;
+                $category1->store();
+            }
+
+            if ($category2_name != $category2_name_old) {
+                $category2->id = 0;
+                $category2->category1_id = $category1->id;
+                $category2->name = $category2_name;
+                $category2->position = 0;
+                $category2->store();
+            }
+
+            if ($category3_name != $category3_name_old) {
+                $category3->id = 0;
+                $category3->category2_id = $category2->id;
+                $category3->name = $category3_name;
+                $category3->position = 0;
+                $category3->store();
+            }
+
+            $category1_name_old = $category1_name;
+            $category2_name_old = $category2_name;
+            $category3_name_old = $category3_name;
+        }
     }
 
 }

@@ -1768,7 +1768,7 @@ class App extends AppObject {
     }
 
     function action_get_image() {
-        $image = $this->read_id_fetch_db_object("Image");
+        $image =& $this->read_id_fetch_db_object("Image");
         if ($image->is_definite()) {
             $is_attachment = (bool) param("attachment");
             if ($image->was_updated_since_last_browser_request()) {
@@ -1787,7 +1787,7 @@ class App extends AppObject {
     }
 
     function action_get_file() {
-        $file = $this->read_id_fetch_db_object("File");
+        $file =& $this->read_id_fetch_db_object("File");
         if ($file->is_definite()) {
             $is_attachment = (bool) param("attachment");
             if ($file->was_updated_since_last_browser_request()) {
@@ -2009,7 +2009,7 @@ class App extends AppObject {
     }
     
     // Action helper functions
-    function fetch_db_object(
+    function &fetch_db_object(
         $obj,
         $obj_id,
         $where_str = "1",
@@ -2033,7 +2033,7 @@ class App extends AppObject {
     // Create new object, read it's PRIMARY KEY from CGI
     // (using CGI variable with name $id_param_name),
     // then fetch object from db table
-    function read_id_fetch_db_object(
+    function &read_id_fetch_db_object(
         $obj_class_name,
         $where_str = "1",
         $id_param_name = null,
@@ -2041,10 +2041,14 @@ class App extends AppObject {
         $field_names_to_not_select = null
     ) {
         $obj =& $this->create_db_object($obj_class_name);
-        $obj->read(array("id"));
+
+        if (is_null($id_param_name)) {
+            $id_param_name = "{$obj->_table_name}_id";
+        }
+        $id_param_value = (int) param($id_param_name);
         return $this->fetch_db_object(
             $obj,
-            $obj->id,
+            $id_param_value,
             $where_str,
             $field_names_to_select,
             $field_names_to_not_select
@@ -2284,22 +2288,6 @@ class App extends AppObject {
 
             $obj->update($field_names_to_update);
         }
-    }
-
-    function move_db_object($obj, $move_to, $where_str = "1") {
-        if (!$obj->is_definite()) {
-            return;
-        }
-        $neighbor_obj = $obj->fetch_neighbor_db_object($move_to, $where_str);
-        if (is_null($neighbor_obj)) {
-            return;
-        }
-        $tmp_position = $obj->position;
-        $obj->position = $neighbor_obj->position;
-        $neighbor_obj->position = $tmp_position;
-
-        $obj->update(array("position"));
-        $neighbor_obj->update(array("position"));
     }
 
     // Email sender

@@ -22,4 +22,9 @@
         url="?action=pg_news_articles"
         contexts="pg_news_articles, pg_news_article_edit"
     />
+    <menu_item
+        name="categories"
+        url="?action=pg_categories"
+        contexts="pg_categories"
+    />
 </menu>
