@@ -31,39 +31,39 @@ user_menu_item.index = Home
 admin_menu_item.index = Home
 
 ["link captions"]
-link_view = View
-link_view_short = View
-link_edit = Edit
-link_edit_short = Edit
-link_add = Add
-link_add_short = Add
-link_delete = Delete
-link_delete_short = Del
-link_select = Select
-link_back = Back
-link_send = Send
-link_save = Save
-link_filter = Filter
-link_show = Show
-link_show_all = Show all
-link_login = Login
-link_logout = Logout
-link_signup = Signup
-link_confirm = Confirm
-link_unconfirm = Undo confirm
-link_deactivate = Deactivate
-link_activate = Activate
-link_proceed = Proceed
-link_move_up = Up
-link_move_down = Down
-link_move_left = Left
-link_move_right = Right
-link_accept = Accept
-link_reject = Reject
-link_delete_image = Delete image
-link_delete_file = Delete file
+link.view = View
+link.view_short = View
+link.edit = Edit
+link.edit_short = Edit
+link.add = Add
+link.add_short = Add
+link.delete = Delete
+link.delete_short = Del
+link.select = Select
+link.back = Back
+link.send = Send
+link.save = Save
+link.filter = Filter
+link.show = Show
+link.show_all = Show all
+link.login = Login
+link.logout = Logout
+link.signup = Signup
+link.confirm = Confirm
+link.unconfirm = Undo confirm
+link.deactivate = Deactivate
+link.activate = Activate
+link.proceed = Proceed
+link.move_up = Up
+link.move_down = Down
+link.move_left = Left
+link.move_right = Right
+link.accept = Accept
+link.reject = Reject
+link.delete_image = Delete image
+link.delete_file = Delete file
 
-link_view_all_news = View all news
+link.view_all_news = View all news
 
 ["parts of controls"]
 any = Any
@@ -142,17 +142,17 @@ no_records_found = No records found
 sure_delete = Are you sure you want to delete record?
 cannot_delete_record_because_it_has_restrict_relations = Cannot delete {%main_obj_name%} because it has links to {%dep_objs_info_str%}
 
-status_message_first_name_empty = Please input your first name
-status_message_last_name_empty = Please input your last name
-status_message_email_empty = Please input your email
-status_message_email_bad = Please input correct email address
-status_message_zip_empty = Please input ZIP Code 
-status_message_zip_bad = ZIP Code should be a number with minimum 5 digits
-status_message_country_empty = Please input country
-status_message_city_empty = Please input city
-status_message_phone_empty = Please input contact phone
-status_message_phone_bad = Bad phone number format
-status_message_message_text_empty = Input message
+status_message.first_name_empty = Please input your first name
+status_message.last_name_empty = Please input your last name
+status_message.email_empty = Please input your email
+status_message.email_bad = Please input correct email address
+status_message.zip_empty = Please input ZIP Code 
+status_message.zip_bad = ZIP Code should be a number with minimum 5 digits
+status_message.country_empty = Please input country
+status_message.city_empty = Please input city
+status_message.phone_empty = Please input contact phone
+status_message.phone_bad = Bad phone number format
+status_message.message_text_empty = Input message
 
 no_image = No image uploaded
 no_file = No file uploaded
@@ -162,11 +162,11 @@ recent_news = Recent news
 page_title.pg_login = Log In
 page_title.pg_signup = Signup
 
-user_login_or_password_unknown = Bad login "{%login%}" or password
-user_disabled_by_admin = User "{%login%}" is currently disabled by site administrator
-user_not_confirmed_yet = User "{%login%}" is not confirmed yet. Use confirmation link from your signup confirmation email.
-status_message_resource_access_denied = Requested page cannot be displayed. Please use your access info to login.
-status_message_logged_out = Logout completed successfully
+user.login_or_password_unknown = Bad login "{%login%}" or password
+user.disabled_by_admin = User "{%login%}" is currently disabled by site administrator
+user.not_confirmed_yet = User "{%login%}" is not confirmed yet. Use confirmation link from your signup confirmation email.
+status_message.resource_access_denied = Requested page cannot be displayed. Please use your access info to login.
+status_message.logged_out = Logout completed successfully
 
 login_form_bottom_text_dont_have_account = If you don't have an account, please
 login_form_bottom_text_signup = Create it
@@ -183,7 +183,7 @@ guest_menu_item.signup = Signup
 page_title.pg_signup = Signup
 page_title.pg_signup_almost_completed = Il nuovo account stato creato
 
-user_should_accept_agreement = You should check "Accept agreement" to continue
+user.should_accept_agreement = You should check "Accept agreement" to continue
 
 signup_form_text1 = Fill out this signup form to create new account:
 signup_form_text2 = By submitting this signup form you indicate that you have read, understood and agreed on
@@ -213,10 +213,10 @@ signup_confirmed_text2 = Now you may login.
 ["recover_password"]
 page_title.pg_recover_password = Recover password
 
-recover_password_login_or_email_empty = Specify login or email
-recover_password_bad_email = Bad email specified
-recover_password_no_account_with_login = Cannot find account with login "{%login%}"
-recover_password_no_account_with_email = Cannot find account with email "{%email%}"
+recover_password.login_or_email_empty = Specify login or email
+recover_password.bad_email = Bad email specified
+recover_password.no_account_with_login = Cannot find account with login "{%login%}"
+recover_password.no_account_with_email = Cannot find account with email "{%email%}"
 
 recover_password_form_text1 = Please specify your account login or email address which you used during signup
 
@@ -241,19 +241,19 @@ page_title.pg_news_article_view = View news article
 page_title.pg_news_article_edit_new = Add news article
 page_title.pg_news_article_edit = Edit news article
 
-news_article_added = News article added
-news_article_updated = News article updated
-news_article_deleted = News article deleted
-news_article_image_deleted = News article image deleted
-news_article_file_deleted = News article file deleted
+news_article.added = News article added
+news_article.updated = News article updated
+news_article.deleted = News article deleted
+news_article.image_deleted = News article image deleted
+news_article.file_deleted = News article file deleted
 
-news_article_title_empty = Specify title
-news_article_image_empty = Please upload image
-news_article_image_bad = Please upload valid image
-news_article_file_empty = Please upload file
-news_article_file_bad = Please upload valid file
-news_article_file_max_size_reached = Uploaded file size is more than 2 Mb
-news_article_files_max_total_size_reached = Total uploaded files size is more than 100 Mb
+news_article.title_empty = Specify title
+news_article.image_empty = Please upload image
+news_article.image_bad = Please upload valid image
+news_article.file_empty = Please upload file
+news_article.file_bad = Please upload valid file
+news_article.file_max_size_reached = Uploaded file size is more than 2 Mb
+news_article.files_max_total_size_reached = Total uploaded files size is more than 100 Mb
 
 ["contact_form"]
 guest_menu_item.contact_form = Contacts
@@ -275,24 +275,24 @@ page_title.pg_user_edit_new = Add user
 page_title.pg_user_edit = Edit user
 page_title.pg_user_edit_my_account = Edit My Account
 
-user_added = User added
-user_updated = User updated
-user_deleted = User deleted
-user_login_empty = Specify login
-user_login_exists = Login "{%login%}" already exists, specify another one
-user_password_empty = Specify password
-user_password_at_least_6_chars = Password must be at least 6 characters
-user_passwords_do_not_match = Entered passwords do not match
-user_email_empty = Specify email
-user_email_bad = Email is invalid
-user_email_exists = Email is already used with another account
-user_first_name_empty = Specify first name
-user_last_name_empty = Specify last name
-user_role_empty = Specify user role
-user_cannot_delete_main_admin = Cannot delete main administrator account
+user.added = User added
+user.updated = User updated
+user.deleted = User deleted
+user.login_empty = Specify login
+user.login_exists = Login "{%login%}" already exists, specify another one
+user.password_empty = Specify password
+user.password_at_least_6_chars = Password must be at least 6 characters
+user.passwords_do_not_match = Entered passwords do not match
+user.email_empty = Specify email
+user.email_bad = Email is invalid
+user.email_exists = Email is already used with another account
+user.first_name_empty = Specify first name
+user.last_name_empty = Specify last name
+user.role_empty = Specify user role
+user.cannot_delete_main_admin = Cannot delete main administrator account
 
-user_role_user = User
-user_role_admin = Administrator
+user_role.user = User
+user_role.admin = Administrator
 
 ["categories"]
 category1 = category1
@@ -312,18 +312,18 @@ page_title.pg_category2_edit = Edit subcategory2
 page_title.pg_category3_edit_new = Add subsubcategory3
 page_title.pg_category3_edit = Edit subsubcategory3
 
-category1_added = Category1 added
-category1_updated = Category1 updated
-category1_deleted = Category1 deleted
-category1_name_empty = Specify category1 name
-category2_added = Category2 added
-category2_updated = Category2 updated
-category2_deleted = Category2 deleted
-category2_name_empty = Specify category2 name
-category3_added = Category3 added
-category3_updated = Category3 updated
-category3_deleted = Category3 deleted
-category3_name_empty = Specify category3 name
+category1.added = Category1 added
+category1.updated = Category1 updated
+category1.deleted = Category1 deleted
+category1.name_empty = Specify category1 name
+category2.added = Category2 added
+category2.updated = Category2 updated
+category2.deleted = Category2 deleted
+category2.name_empty = Specify category2 name
+category3.added = Category3 added
+category3.updated = Category3 updated
+category3.deleted = Category3 deleted
+category3.name_empty = Specify category3 name
 
 category1_title = Category1
 category2_title = Category2

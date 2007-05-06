@@ -1643,11 +1643,11 @@ class App extends AppObject {
 
     function print_status_message_db_object_updated($obj) {
         $action_done = ($obj->is_definite()) ? "updated" : "added";
-        $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}_{$action_done}"));
+        $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}.{$action_done}"));
     }
         
     function print_status_message_db_object_deleted($obj) {
-        $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}_deleted"));
+        $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}.deleted"));
     }
 
     function print_status_messages_cannot_delete_db_object($messages) {

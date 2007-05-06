@@ -31,39 +31,39 @@ user_menu_item.index = Home
 admin_menu_item.index = Home
 
 ["link captions"]
-link_view = Visualizza
-link_view_short = Vis
-link_edit = Modifica
-link_edit_short = Mod
-link_add = Aggiungi
-link_add_short = Agg
-link_delete = Cancella
-link_delete_short = Canc
-link_select = Seleziona
-link_back = Indietro
-link_send = Invia
-link_save = Salva
-link_filter = Filtra
-link_show = Invio
-link_show_all = Mostra Tutto
-link_login = Login
-link_logout = Logout
-link_signup = Iscriviti
-link_confirm = Conferma
-link_unconfirm = Rimuovi conferma
-link_deactivate = Disattiva
-link_activate = Activate
-link_proceed = Procedi
-link_move_up = Su
-link_move_down = Giù
-link_move_left = Sinistro
-link_move_right = Destro
-link_accept = Accetta
-link_reject = Rifiuta
-link_delete_image = Cancella immagine
-link_delete_file = Cancella file
+link.view = Visualizza
+link.view_short = Vis
+link.edit = Modifica
+link.edit_short = Mod
+link.add = Aggiungi
+link.add_short = Agg
+link.delete = Cancella
+link.delete_short = Canc
+link.select = Seleziona
+link.back = Indietro
+link.send = Invia
+link.save = Salva
+link.filter = Filtra
+link.show = Invio
+link.show_all = Mostra Tutto
+link.login = Login
+link.logout = Logout
+link.signup = Iscriviti
+link.confirm = Conferma
+link.unconfirm = Rimuovi conferma
+link.deactivate = Disattiva
+link.activate = Activate
+link.proceed = Procedi
+link.move_up = Su
+link.move_down = Giù
+link.move_left = Sinistro
+link.move_right = Destro
+link.accept = Accetta
+link.reject = Rifiuta
+link.delete_image = Cancella immagine
+link.delete_file = Cancella file
 
-link_view_all_news = Tutte le News
+link.view_all_news = Tutte le News
 
 ["parts of controls"]
 any = Qualsiasi
@@ -142,17 +142,17 @@ no_records_found = Non sono stati trovati dati
 sure_delete = Sei sicuro di voler cancellare l\'informazione?
 cannot_delete_record_because_it_has_restrict_relations = Impossibile eliminare {%main_obj_name%} perché in relazione con {%dep_objs_info_str%}
 
-status_message_first_name_empty = Inserire il nome
-status_message_last_name_empty = Inserire il cognome
-status_message_email_empty = Inserire l'email
-status_message_email_bad = Inserire un indirizzo email valido
-status_message_zip_empty = Inserire il CAP
-status_message_zip_bad = Il CAP dovrebbe essere un numero di 5 cifre
-status_message_country_empty = Inserire la nazione
-status_message_city_empty = Inserire la città
-status_message_phone_empty = Inserire il nr. di telefono
-status_message_phone_bad = Nr. di telefono non valido
-status_message_message_text_empty = Inserire il messaggio
+status_message.first_name_empty = Inserire il nome
+status_message.last_name_empty = Inserire il cognome
+status_message.email_empty = Inserire l'email
+status_message.email_bad = Inserire un indirizzo email valido
+status_message.zip_empty = Inserire il CAP
+status_message.zip_bad = Il CAP dovrebbe essere un numero di 5 cifre
+status_message.country_empty = Inserire la nazione
+status_message.city_empty = Inserire la città
+status_message.phone_empty = Inserire il nr. di telefono
+status_message.phone_bad = Nr. di telefono non valido
+status_message.message_text_empty = Inserire il messaggio
 
 no_image = No immagine
 no_file = No file
@@ -161,11 +161,11 @@ recent_news = Ultime novità
 ["login/logout"]
 page_title.pg_login = Log In
 
-user_login_or_password_unknown = Login "{%login%}" o password non corretti
-user_not_confirmed_yet = L'utente "{%login%}" non è ancora confermato. Utilizza il link di conferma che trovi all'interno della email di avvenuta iscrizione.
-user_disabled_by_admin = L'utente "{%login%}" è attualmente disabilitato dall'amministratore di sistema.
-status_message_resource_access_denied = La pagina richiesta non può essere visualizzata. Prego effettuare l'accesso mediante login/password.
-status_message_logged_out = Logout effettuato con successo
+user.login_or_password_unknown = Login "{%login%}" o password non corretti
+user.not_confirmed_yet = L'utente "{%login%}" non è ancora confermato. Utilizza il link di conferma che trovi all'interno della email di avvenuta iscrizione.
+user.disabled_by_admin = L'utente "{%login%}" è attualmente disabilitato dall'amministratore di sistema.
+status_message.resource_access_denied = La pagina richiesta non può essere visualizzata. Prego effettuare l'accesso mediante login/password.
+status_message.logged_out = Logout effettuato con successo
 
 login_form_bottom_text_dont_have_account = Se non disponi di un account,
 login_form_bottom_text_signup = Procedi all'iscrizione
@@ -182,7 +182,7 @@ guest_menu_item.signup = Iscriviti
 page_title.pg_signup = Iscriviti
 page_title.pg_signup_almost_completed = Il nuovo account stato creato
 
-user_should_accept_agreement = Devi selezionare "Accetta" per continuare
+user.should_accept_agreement = Devi selezionare "Accetta" per continuare
 
 signup_form_text1 = Compila il modulo per creare un nuovo account:
 signup_form_text2 = Sottoscrivendo questo modulo significa che hai letto, capito e accettato le condizioni d'uso
@@ -212,10 +212,10 @@ signup_confirmed_text2 = Adesso è possibile effettuare il login.
 ["recover_password"]
 page_title.pg_recover_password = Ritrovamento password
 
-recover_password_login_or_email_empty = Login o indirizzo email non specificati
-recover_password_bad_email = Indirizzo email non corretto
-recover_password_no_account_with_login = Impossibile trovare l'account avente login "{%login%}"
-recover_password_no_account_with_email = Impossibile trovare l'account avente indirizzo email "{%email%}"
+recover_password.login_or_email_empty = Login o indirizzo email non specificati
+recover_password.bad_email = Indirizzo email non corretto
+recover_password.no_account_with_login = Impossibile trovare l'account avente login "{%login%}"
+recover_password.no_account_with_email = Impossibile trovare l'account avente indirizzo email "{%email%}"
 
 recover_password_form_text1 = Specifica il login o l'indirizzo email usati durante l'iscrizione:
 
@@ -240,19 +240,19 @@ page_title.pg_news_article_view = Visualizza notizia
 page_title.pg_news_article_edit_new = Aggiungi notizia
 page_title.pg_news_article_edit = Modifica notizia
 
-news_article_added = Aggiunta nuova notizia
-news_article_updated = Notizia è stata modificata
-news_article_deleted = Notizia è stata eliminata
-news_article_image_deleted = L'immagine relativa all'articolo è stata cancellata
-news_article_file_deleted = Il file relativo all'articolo è stata cancellato
+news_article.added = Aggiunta nuova notizia
+news_article.updated = Notizia è stata modificata
+news_article.deleted = Notizia è stata eliminata
+news_article.image_deleted = L'immagine relativa all'articolo è stata cancellata
+news_article.file_deleted = Il file relativo all'articolo è stata cancellato
 
-news_article_title_empty = Inserire titolo
-news_article_image_empty = Prego caricare immagine
-news_article_image_bad = Prego caricare immagine valida
-news_article_file_empty = Prego caricare file
-news_article_file_bad = Prego caricare file valido
-news_article_file_max_size_reached = La dimensione del file caricato supera i 2 Mb
-news_article_files_max_total_size_reached = La dimensione totale dei file caricati è maggiore di 100 Mb
+news_article.title_empty = Inserire titolo
+news_article.image_empty = Prego caricare immagine
+news_article.image_bad = Prego caricare immagine valida
+news_article.file_empty = Prego caricare file
+news_article.file_bad = Prego caricare file valido
+news_article.file_max_size_reached = La dimensione del file caricato supera i 2 Mb
+news_article.files_max_total_size_reached = La dimensione totale dei file caricati è maggiore di 100 Mb
 
 ["contact_form"]
 guest_menu_item.contact_form = Contatti
@@ -274,24 +274,24 @@ page_title.pg_user_edit_new = Aggiungi utente
 page_title.pg_user_edit = Modifica utente
 page_title.pg_user_edit_my_account = Modifica account
 
-user_added = Utente aggiunto
-user_updated = Utente aggiornato
-user_deleted = Utente cancellato
-user_login_empty = Inserire login
-user_login_exists = Il login inserito esiste già, specificarne un altro
-user_password_empty = Inserire password
-user_password_at_least_6_chars = La password deve essere almeno 6 caratteri
-user_passwords_do_not_match = Le password inserite non corrispondono tra loro
-user_email_empty = Inserire email
-user_email_bad = L'indirizzo email specificato non è corretto
-user_email_exists = L'indirizzo email è attualmente in uso con ul altro account
-user_first_name_empty = Inserire nome
-user_last_name_empty = Inserire cognome
-user_role_empty = Specificare ruolo utente
-user_cannot_delete_main_admin = Impossibile cancellare l'account principale di amministrazione
+user.added = Utente aggiunto
+user.updated = Utente aggiornato
+user.deleted = Utente cancellato
+user.login_empty = Inserire login
+user.login_exists = Il login inserito esiste già, specificarne un altro
+user.password_empty = Inserire password
+user.password_at_least_6_chars = La password deve essere almeno 6 caratteri
+user.passwords_do_not_match = Le password inserite non corrispondono tra loro
+user.email_empty = Inserire email
+user.email_bad = L'indirizzo email specificato non è corretto
+user.email_exists = L'indirizzo email è attualmente in uso con ul altro account
+user.first_name_empty = Inserire nome
+user.last_name_empty = Inserire cognome
+user.role_empty = Specificare ruolo utente
+user.cannot_delete_main_admin = Impossibile cancellare l'account principale di amministrazione
 
-user_role_user = Utente
-user_role_admin = Amministratore
+user_role.user = Utente
+user_role.admin = Amministratore
 
 ["categories"]
 category1 = categoria1
@@ -311,18 +311,18 @@ page_title.pg_category2_edit = Modifica categoria2
 page_title.pg_category3_edit_new = Aggiungi categoria3
 page_title.pg_category3_edit = Modifica categoria3
 
-category1_added = Categoria1 aggiunta
-category1_updated = Categoria1 aggiornata
-category1_deleted = Categoria1 cancellata
-category1_name_empty = Inserire il nome della categoria1
-category2_added = Categoria2 aggiunta
-category2_updated = Categoria2 aggiornata
-category2_deleted = Categoria2 cancellata
-category2_name_empty = Inserire il nome della categoria2
-category3_added = Categoria3 aggiunta
-category3_updated = Categoria3 aggiornata
-category3_deleted = Categoria3 cancellata
-category3_name_empty = Inserire il nome della categoria3
+category1.added = Categoria1 aggiunta
+category1.updated = Categoria1 aggiornata
+category1.deleted = Categoria1 cancellata
+category1.name_empty = Inserire il nome della categoria1
+category2.added = Categoria2 aggiunta
+category2.updated = Categoria2 aggiornata
+category2.deleted = Categoria2 cancellata
+category2.name_empty = Inserire il nome della categoria2
+category3.added = Categoria3 aggiunta
+category3.updated = Categoria3 aggiornata
+category3.deleted = Categoria3 cancellata
+category3.name_empty = Inserire il nome della categoria3
 
 category1_title = Categoria1
 category2_title = Categoria2

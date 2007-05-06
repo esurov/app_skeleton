@@ -39,7 +39,7 @@ class Category2Table extends OrderedDbObject {
             array(
                 "field" => "name",
                 "type" => "not_empty",
-                "message" => "category2_name_empty",
+                "message" => "category2.name_empty",
             ),
         );
     }

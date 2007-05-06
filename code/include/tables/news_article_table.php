@@ -77,7 +77,7 @@ class NewsArticleTable extends CustomDbObject {
             array(
                 "field" => "title",
                 "type" => "not_empty",
-                "message" => "news_article_title_empty",
+                "message" => "news_article.title_empty",
             ),
         );
     }
@@ -95,7 +95,7 @@ class NewsArticleTable extends CustomDbObject {
                         "input_name" => "image_file",
                         "type" => "images",
                     ),
-                    "message" => "news_article_image_bad",
+                    "message" => "news_article.image_bad",
                 ),
                 $old_obj
             );
@@ -103,13 +103,13 @@ class NewsArticleTable extends CustomDbObject {
             $uploaded_file_info = get_uploaded_file_info("file");
             $filesize = $uploaded_file_info["size"];
             if ($filesize > $this->get_config_value("news_article_file_max_size")) {
-                $messages[] = new ErrorStatusMsg("news_article_file_max_size_reached");
+                $messages[] = new ErrorStatusMsg("news_article.file_max_size_reached");
             }
             if (
                 $this->get_files_total_size("file_id") + $filesize >
                     $this->get_config_value("news_article_files_max_total_size")
             ) {
-                $messages[] = new ErrorStatusMsg("news_article_files_max_total_size_reached");
+                $messages[] = new ErrorStatusMsg("news_article.files_max_total_size_reached");
             }
         }
 
@@ -123,7 +123,7 @@ class NewsArticleTable extends CustomDbObject {
                         "input_name" => "file",
                         "type" => "files",
                     ),
-                    "message" => "news_article_file_bad",
+                    "message" => "news_article.file_bad",
                 ),
                 $old_obj
             );
@@ -131,17 +131,17 @@ class NewsArticleTable extends CustomDbObject {
             $uploaded_file_info = get_uploaded_file_info("file");
             $filesize = $uploaded_file_info["size"];
             if ($filesize > $this->get_config_value("news_article_file_max_size")) {
-                $messages[] = new ErrorStatusMsg("news_article_file_max_size_reached");
+                $messages[] = new ErrorStatusMsg("news_article.file_max_size_reached");
             }
             if (
                 $this->get_files_total_size("file_id") + $filesize >
                     $this->get_config_value("news_article_files_max_total_size")
             ) {
-                $messages[] = new ErrorStatusMsg("news_article_files_max_total_size_reached");
+                $messages[] = new ErrorStatusMsg("news_article.files_max_total_size_reached");
             }
         } /* else {
             if ($old_obj->file_id == 0) {
-                $messages[] = new ErrorStatusMsg("news_article_file_empty");
+                $messages[] = new ErrorStatusMsg("news_article.file_empty");
             }
         } */
 

@@ -164,7 +164,7 @@ class UserApp extends CustomApp {
 
         if ($this->action != "pg_home") {
             $this->add_session_status_message(
-                new ErrorStatusMsg("status_message_resource_access_denied")
+                new ErrorStatusMsg("status_message.resource_access_denied")
             );
         }
         
@@ -410,7 +410,7 @@ class UserApp extends CustomApp {
     }
 
     function action_logout() {
-        $this->add_session_status_message(new OkStatusMsg("status_message_logged_out"));
+        $this->add_session_status_message(new OkStatusMsg("status_message.logged_out"));
         $this->create_self_redirect_response(array("action" => "pg_login"));
         $this->destroy_login_state();
         $this->remove_remember_user_id_and_password_cookies();
@@ -769,7 +769,7 @@ class UserApp extends CustomApp {
         if ($user->role == "admin") {
             if ($user->get_num_admins() <= 1) {
                 $this->add_session_status_message(
-                    new ErrorStatusMsg("user_cannot_delete_main_admin")
+                    new ErrorStatusMsg("user.cannot_delete_main_admin")
                 );
                 $this->create_self_redirect_response(array("action" => "pg_users"));
                 return;
@@ -936,7 +936,7 @@ class UserApp extends CustomApp {
 
         $this->delete_db_object_image($news_article, "image_id");
         
-        $this->add_session_status_message(new OkStatusMsg("news_article_image_deleted"));
+        $this->add_session_status_message(new OkStatusMsg("news_article.image_deleted"));
         $this->create_self_redirect_response(array(
             "action" => "pg_news_article_edit",
             "news_article_id" => $news_article->id,
@@ -948,7 +948,7 @@ class UserApp extends CustomApp {
 
         $this->delete_db_object_file($news_article, "file_id");
         
-        $this->add_session_status_message(new OkStatusMsg("news_article_file_deleted"));
+        $this->add_session_status_message(new OkStatusMsg("news_article.file_deleted"));
         $this->create_self_redirect_response(array(
             "action" => "pg_news_article_edit",
             "news_article_id" => $news_article->id,

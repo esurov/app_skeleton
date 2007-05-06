@@ -2,13 +2,13 @@
     <td>{%user_id%}</td>
     <td>{%user_created%}</td>
     <td>{%user_login%}</td>
-    <td>{%user_full_name_reversed%}</td>
+    <td>{%user_full_name.reversed%}</td>
     <td>{%user_email%}</td>
     <td>{%user_role%}</td>
     <td>{%user_is_confirmed%}</td>
     <td>{%user_is_active%}</td>
     <td>[<a href="?action=pg_user_edit&amp;user_id={%user_id%}"
-        >{%lang:link_edit%}</a>]&nbsp;[<a href="?action=delete_user&amp;user_id={%user_id%}"
+        >{%lang:link.edit%}</a>]&nbsp;[<a href="?action=delete_user&amp;user_id={%user_id%}"
         onclick="return confirm('{%lang:sure_delete%}')"
-        >{%lang:link_delete%}</a>]</td>
+        >{%lang:link.delete%}</a>]</td>
 </tr>

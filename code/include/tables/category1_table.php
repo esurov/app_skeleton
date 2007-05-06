@@ -32,7 +32,7 @@ class Category1Table extends OrderedDbObject {
             array(
                 "field" => "name",
                 "type" => "not_empty",
-                "message" => "category1_name_empty",
+                "message" => "category1.name_empty",
             ),
         );
     }

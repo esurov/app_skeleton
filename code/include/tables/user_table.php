@@ -70,8 +70,8 @@ class UserTable extends CustomDbObject {
                     "source" => "array",
                     "data" => array(
                         "array" => array(
-                            array("user", $this->get_lang_str("user_role_user")),
-                            array("admin", $this->get_lang_str("user_role_admin")),
+                            array("user", $this->get_lang_str("user_role.user")),
+                            array("admin", $this->get_lang_str("user_role.admin")),
                         ),
                         "delimiter" => "<br />",
                     ),
@@ -209,7 +209,7 @@ class UserTable extends CustomDbObject {
                 array(
                     "field" => "login",
                     "type" => "not_empty",
-                    "message" => "user_login_empty",
+                    "message" => "user.login_empty",
                 ),
             );
             break;
@@ -222,25 +222,25 @@ class UserTable extends CustomDbObject {
                     "field" => "id",
                     "type" => "not_equal",
                     "param" => 0,
-                    "message" => "user_login_or_password_unknown",
+                    "message" => "user.login_or_password_unknown",
                     "message_params" => array("login" => $login),
                     "dependency" => array(
                         "field" => "password",
                         "type" => "equal",
                         "param" => $password,
-                        "message" => "user_login_or_password_unknown",
+                        "message" => "user.login_or_password_unknown",
                         "message_params" => array("login" => $login),
                         "dependency" => array(
                             "field" => "is_confirmed",
                             "type" => "not_equal",
                             "param" => 0,
-                            "message" => "user_not_confirmed_yet",
+                            "message" => "user.not_confirmed_yet",
                             "message_params" => array("login" => $login),
                             "dependency" => array(
                                 "field" => "is_active",
                                 "type" => "not_equal",
                                 "param" => 0,
-                                "message" => "user_disabled_by_admin",
+                                "message" => "user.disabled_by_admin",
                                 "message_params" => array("login" => $login),
                             ),
                         ),
@@ -253,11 +253,11 @@ class UserTable extends CustomDbObject {
                 array(
                     "field" => "login",
                     "type" => "not_empty",
-                    "message" => "user_login_empty",
+                    "message" => "user.login_empty",
                     "dependency" => array(
                         "field" => "login",
                         "type" => "unique",
-                        "message" => "user_login_exists",
+                        "message" => "user.login_exists",
                         "message_params" => array(
                             "login" => $this->login,
                         ),
@@ -266,35 +266,35 @@ class UserTable extends CustomDbObject {
                 array(
                     "field" => "password",
                     "type" => "not_empty",
-                    "message" => "user_password_empty",
+                    "message" => "user.password_empty",
                 ),
                 array(
                     "field" => "password_confirm",
                     "type" => "not_empty",
-                    "message" => "user_password_empty",
+                    "message" => "user.password_empty",
                 ),
                 array(
                     "field" => "first_name",
                     "type" => "not_empty",
-                    "message" => "user_first_name_empty",
+                    "message" => "user.first_name_empty",
                 ),
                 array(
                     "field" => "last_name",
                     "type" => "not_empty",
-                    "message" => "user_last_name_empty",
+                    "message" => "user.last_name_empty",
                 ),
                 array(
                     "field" => "email",
                     "type" => "not_empty",
-                    "message" => "user_email_empty",
+                    "message" => "user.email_empty",
                     "dependency" => array(
                         "field" => "email",
                         "type" => "email",
-                        "message" => "user_email_bad",
+                        "message" => "user.email_bad",
                         "dependency" => array(
                             "field" => "email",
                             "type" => "unique",
-                            "message" => "user_email_exists",
+                            "message" => "user.email_exists",
                             "message_params" => array(
                                 "email" => $this->email,
                             ),
@@ -309,30 +309,30 @@ class UserTable extends CustomDbObject {
                 array(
                     "field" => "role",
                     "type" => "not_empty",
-                    "message" => "user_role_empty",
+                    "message" => "user.role_empty",
                 ),
                 array(
                     "field" => "first_name",
                     "type" => "not_empty",
-                    "message" => "user_first_name_empty",
+                    "message" => "user.first_name_empty",
                 ),
                 array(
                     "field" => "last_name",
                     "type" => "not_empty",
-                    "message" => "user_last_name_empty",
+                    "message" => "user.last_name_empty",
                 ),
                 array(
                     "field" => "email",
                     "type" => "not_empty",
-                    "message" => "user_email_empty",
+                    "message" => "user.email_empty",
                     "dependency" => array(
                         "field" => "email",
                         "type" => "email",
-                        "message" => "user_email_bad",
+                        "message" => "user.email_bad",
                         "dependency" => array(
                             "field" => "email",
                             "type" => "unique",
-                            "message" => "user_email_exists",
+                            "message" => "user.email_exists",
                             "message_params" => array(
                                 "email" => $this->email,
                             ),
@@ -350,7 +350,7 @@ class UserTable extends CustomDbObject {
                     "dependency" => array(
                         "field" => "login",
                         "type" => "not_empty",
-                        "message" => "recover_password_login_or_email_empty",
+                        "message" => "recover_password.login_or_email_empty",
                     ),
                 ),
                 array(
@@ -360,11 +360,11 @@ class UserTable extends CustomDbObject {
                     "dependency" => array(
                         "field" => "email",
                         "type" => "not_empty",
-                        "message" => "recover_password_login_or_email_empty",
+                        "message" => "recover_password.login_or_email_empty",
                         "dependency" => array(
                             "field" => "email",
                             "type" => "email",
-                            "message" => "recover_password_bad_email",
+                            "message" => "recover_password.bad_email",
                         ),
                     ),
                 ),
@@ -382,7 +382,7 @@ class UserTable extends CustomDbObject {
         if ($context == "signup_form") {
             $this->validate_passwords($messages);
             if (!$this->agreement_accepted) {
-                $messages[] = new ErrorStatusMsg("user_should_accept_agreement");
+                $messages[] = new ErrorStatusMsg("user.should_accept_agreement");
             }
         }
         
@@ -392,11 +392,11 @@ class UserTable extends CustomDbObject {
                 array(
                     "field" => "login",
                     "type" => "not_empty",
-                    "message" => "user_login_empty",
+                    "message" => "user.login_empty",
                     "dependency" => array(
                         "field" => "login",
                         "type" => "unique",
-                        "message" => "user_login_exists",
+                        "message" => "user.login_exists",
                         "message_params" => array(
                             "login" => $this->login,
                         ),
@@ -419,14 +419,14 @@ class UserTable extends CustomDbObject {
             if (is_value_not_empty($this->login)) {
                 if (!$this->fetch("user.login = ". qw($this->login))) {
                     $messages[] = new ErrorStatusMsg(
-                        "recover_password_no_account_with_login",
+                        "recover_password.no_account_with_login",
                         array("login" => $this->login)
                     );
                 }
             } else if (is_value_not_empty($this->email)) {
                 if (!$this->fetch("user.email = ". qw($this->email))) {
                     $messages[] = new ErrorStatusMsg(
-                        "recover_password_no_account_with_email",
+                        "recover_password.no_account_with_email",
                         array("email" => $this->email)
                     );
                 }
@@ -438,7 +438,7 @@ class UserTable extends CustomDbObject {
 
     function validate_passwords(&$messages) {
         if ($this->password != $this->password_confirm) {
-            $messages[] = new ErrorStatusMsg("user_passwords_do_not_match");
+            $messages[] = new ErrorStatusMsg("user.passwords_do_not_match");
         }
     }
 //
@@ -490,7 +490,7 @@ class UserTable extends CustomDbObject {
         if ($this->_context == "list_item") {
             $this->app->print_varchar_value("user_full_name", $this->get_full_name());
             $this->app->print_varchar_value(
-                "user_full_name_reversed",
+                "user_full_name.reversed",
                 $this->get_full_name_reversed()
             );
         }
