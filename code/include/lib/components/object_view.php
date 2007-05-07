@@ -2,12 +2,20 @@
 
 class ObjectView extends ObjectTemplateComponent {
 
+    var $_page_title_resource;
+
     function _init($params) {
         parent::_init($params);
     
         if (is_null($this->obj)) {
             $this->process_fatal_error_required_param_not_found("obj");
         }
+
+        $this->_page_title_resource = get_param_value(
+            $params,
+            "page_title_resource",
+            null
+        );
     }
 //
     function _print_values() {
@@ -17,6 +25,8 @@ class ObjectView extends ObjectTemplateComponent {
     }
 
     function _print_object_view() {
+        $this->_print_page_titles();
+
         $this->_print_object_values($this->obj);
 
         $this->app->print_file_new(
@@ -27,6 +37,12 @@ class ObjectView extends ObjectTemplateComponent {
             "{$this->templates_dir}/view.{$this->templates_ext}",
             $this->template_var
         );
+    }
+
+    function _print_page_titles() {
+        if (!is_null($this->_page_title_resource)) {
+            $this->app->print_head_and_page_titles($this->_page_title_resource);
+        }
     }
 
     function _print_object_values(&$obj) {

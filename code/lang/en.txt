@@ -305,12 +305,12 @@ category3s = categories3
 admin_menu_item.categories = Categories
 
 page_title.pg_categories = Categories
-page_title.pg_category1_edit_new = Add category1
-page_title.pg_category1_edit = Edit category1
-page_title.pg_category2_edit_new = Add subcategory2
-page_title.pg_category2_edit = Edit subcategory2
-page_title.pg_category3_edit_new = Add subsubcategory3
-page_title.pg_category3_edit = Edit subsubcategory3
+page_title.pg_categories_category1_edit_new = Add category1
+page_title.pg_categories_category1_edit = Edit category1
+page_title.pg_categories_category2_edit_new = Add category2
+page_title.pg_categories_category2_edit = Edit category2
+page_title.pg_categories_category3_edit_new = Add category3
+page_title.pg_categories_category3_edit = Edit category3
 
 category1.added = Category1 added
 category1.updated = Category1 updated

@@ -4,39 +4,18 @@ class CategoryBrowser extends TemplateComponent {
     
     var $current_category1_id;
     var $current_category2_id;
+    var $current_category3_id;
 
     function _init($params) {
         parent::_init($params);
 
         $this->current_category1_id = 0;
         $this->current_category2_id = 0;
-    }
-
-    function read() {
-        $this->current_category1_id = (int) param("current_category1_id");
-        $this->current_category2_id = (int) param("current_category2_id");
+        $this->current_category3_id = 0;
     }
 
     function _print_values() {
         parent::_print_values();
-
-        $this->app->print_primary_key_value(
-            "current_category1_id",
-            $this->current_category1_id
-        );
-        $this->app->print_primary_key_value(
-            "current_category2_id",
-            $this->current_category2_id
-        );
-        $this->app->print_value(
-            "current_category_ids_suburl",
-            create_suburl(
-                array(
-                    "current_category1_id" => $this->current_category1_id,
-                    "current_category2_id" => $this->current_category2_id,
-                )
-            )
-        );
 
         $categories1_list =& $this->create_object(
             "ObjectsList",
@@ -89,6 +68,9 @@ class CategoryBrowser extends TemplateComponent {
                     "template_var_prefix" => "category3",
                     "objects" => $this->fetch_categories3(),
                     "context" => "list_item_category_browser",
+                    "custom_params" => array(
+                        "selected_item_id" => $this->current_category3_id,
+                    ),
                 )
             );
             $categories3_list->print_values();

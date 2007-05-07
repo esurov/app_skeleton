@@ -23,7 +23,7 @@ class Category1Table extends OrderedDbObject {
 //
     function get_restrict_relations() {
         return array(
-            array("category2", "category1_id"),
+            array("Category2", "category1_id"),
         );
     }
 //

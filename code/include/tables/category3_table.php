@@ -41,6 +41,19 @@ class Category3Table extends OrderedDbObject {
     function get_position_where_str() {
         return "category2_id = {$this->category2_id}";
     }
+//
+    function print_values($params = array()) {
+        parent::print_values($params);
+
+        if ($this->_context == "list_item_category_browser") {
+            if ($this->id == $this->_custom_params["selected_item_id"]) {
+                $this->app->print_raw_value(
+                    "list_item_class",
+                    "{$params['list_item_class']}_selected"
+                );
+            }
+        }
+    }
 
 }
 

@@ -2226,21 +2226,26 @@ class App extends AppObject {
             $this->process_fatal_error_required_param_not_found("obj", "delete_db_object()");
         }
 
-        $success_url_params = get_param_value($params, "success_url_params", null);
-        if (is_null($success_url_params)) {
-            $this->process_fatal_error_required_param_not_found(
-                "success_url_params",
-                "delete_db_object()"
-            );
+        $should_redirect = get_param_value($params, "should_redirect", true);
+
+        if ($should_redirect) {
+            $success_url_params = get_param_value($params, "success_url_params", null);
+            if (is_null($success_url_params)) {
+                $this->process_fatal_error_required_param_not_found(
+                    "success_url_params",
+                    "delete_db_object()"
+                );
+            }
+
+            $error_url_params = get_param_value($params, "error_url_params", null);
+            if (is_null($error_url_params)) {
+                $this->process_fatal_error_required_param_not_found(
+                    "error_url_params",
+                    "delete_db_object()"
+                );
+            }
         }
 
-        $error_url_params = get_param_value($params, "error_url_params", null);
-        if (is_null($error_url_params)) {
-            $this->process_fatal_error_required_param_not_found(
-                "error_url_params",
-                "delete_db_object()"
-            );
-        }
         $del_cascade = get_param_value($params, "cascade", false);
 
         if ($del_cascade) {
@@ -2250,14 +2255,18 @@ class App extends AppObject {
             
             if (count($messages) != 0) {
                 $this->print_status_messages_cannot_delete_db_object($messages);
-                $this->create_self_redirect_response($error_url_params);
+                if ($should_redirect) {
+                    $this->create_self_redirect_response($error_url_params);
+                }
                 return;
             } else {
                 $obj->del();
             }
         }
         $this->print_status_message_db_object_deleted($obj);
-        $this->create_self_redirect_response($success_url_params);
+        if ($should_redirect) {
+            $this->create_self_redirect_response($success_url_params);
+        }
     }
 
     function delete_db_object_image($obj, $image_id_field_name, $delete_thumbnail = true) {
