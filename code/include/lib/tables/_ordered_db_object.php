@@ -15,6 +15,24 @@ class OrderedDbObject extends CustomDbObject {
         ));
     }
 //
+    function create_table() {
+        $this->_move_position_field_to_end();
+
+        parent::create_table();
+    }
+
+    function update_table() {
+        $this->_move_position_field_to_end();
+
+        parent::update_table();
+    }
+
+    function _move_position_field_to_end() {
+        $position_field_info = $this->_fields["position"];
+        unset($this->_fields["position"]);
+        $this->_fields["position"] = $position_field_info;
+    }
+//
     function store(
         $field_names_to_store = null,
         $field_names_to_not_store = null
