@@ -20,12 +20,19 @@ class Category3Table extends OrderedDbObject {
         $this->insert_field(array(
             "field" => "name",
             "type" => "varchar",
+            "multilingual" => 1,
             "input" => array(
                 "type_attrs" => array(
                     "class" => "wide",
                 ),
             ),
         ));
+    }
+//
+    function get_restrict_relations() {
+        return array(
+            array("Product", "category3_id"),
+        );
     }
 //
     function get_validate_conditions($context, $context_params) {

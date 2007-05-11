@@ -1,0 +1,41 @@
+<form action="?" method="get" name="form" onsubmit="onsubmitFormHandler(this);">
+<input type="hidden" name="action" value="pg_products" />
+
+<table>
+<tr>
+    <td colspan="2"><b>{%lang:filter_by%}:</b></td>
+</tr>
+<tr>
+    <td>{%lang:keywords%}:</td>
+    <td>{%product_keywords_like_many.input%}</td>
+</tr>
+<tr>
+    <td>{%lang:category1_title%}:</td>
+    <td>{%product_category2_category1_id_equal.input%}</td>
+</tr>
+<tr>
+    <td>{%lang:category2_title%}:</td>
+    <td>{%product_category3_category2_id_equal.input%}</td>
+</tr>
+<tr>
+    <td>{%lang:category3_title%}:</td>
+    <td>{%product_category3_id_equal.input%}</td>
+</tr>
+<tr>
+    <td colspan="2">{%lang:price%}&nbsp;{%lang:from%}:&nbsp;{%product_price_greater_equal.input%}&nbsp;{%lang:to%}:&nbsp;{%product_price_less_equal.input%}</td>
+</tr>
+<tr>
+    <td colspan="2" align="center">
+        <input type="submit" name="submit_btn" value="{%lang:link.filter%}" />
+    </td>
+</tr>
+</table>
+
+</form>
+
+{%product_category3_category2_id_equal.dependency_js%}
+{%product_category2_category1_id_equal.dependency_js%}
+
+<script type="text/javascript">
+initDependencies();
+</script>

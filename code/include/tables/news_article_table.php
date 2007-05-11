@@ -72,7 +72,7 @@ class NewsArticleTable extends CustomDbObject {
         parent::del();
     }
 //
-    function get_validate_conditions() {
+    function get_validate_conditions($context, $context_params) {
         return array(
             array(
                 "field" => "title",

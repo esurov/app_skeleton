@@ -1,0 +1,18 @@
+<tr class="{%list_item_class%}">
+    <td>{%product_id%}</td>
+    <td>
+        <strong>{%product_category1_name%}</strong><br />
+        &nbsp;&nbsp;{%product_category2_name%}<br />
+        &nbsp;&nbsp;&nbsp;&nbsp;{%product_category3_name%}
+    </td>
+    <td>{%product_name%}</td>
+    <td>{%product_price%}</td>
+    <td>
+        [<a
+            href="?action=pg_product_edit&amp;product_id={%product_id%}"
+        >{%lang:link.edit%}</a>]&nbsp;[<a
+            href="?action=delete_product&amp;product_id={%product_id%}"
+            onclick="return confirm('{%lang:sure_delete%}')"
+        >{%lang:link.delete%}</a>]
+    </td>
+</tr>

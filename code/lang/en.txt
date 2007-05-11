@@ -87,12 +87,14 @@ de_native = Deutsch
 
 ["table headers and form fields captions"]
 actions = Actions
+id = ID
 date = Date
 date_created = Creation date
 title = Title
 body = Body
 text = Text
 notes = Notes
+description = Description
 extra_info = Extra info
 image = Image
 current_image = Current image
@@ -130,6 +132,9 @@ keywords = Keywords
 bank_name = Bank
 bank_office_name = Branch
 status = Status
+price = Price
+from = from
+to = to
 
 ["status/popup messages and parts of page"]
 ["common"]
@@ -325,9 +330,29 @@ category3.updated = Category3 updated
 category3.deleted = Category3 deleted
 category3.name_empty = Specify category3 name
 
+category_title = Category
 category1_title = Category1
 category2_title = Category2
 category3_title = Category3
 
 no_category1_selected = No category1 selected
 no_category2_selected = No category2 selected
+
+["products"]
+product = product
+products = products
+
+admin_menu_item.products = Products
+
+page_title.pg_products = Products
+page_title.pg_product_edit_new = Add product
+page_title.pg_product_edit = Edit product
+
+product.added = Product added
+product.updated = Product updated
+product.deleted = Product deleted
+
+product.category1_empty = Category1 empty
+product.category2_empty = Category2 empty
+product.category3_empty = Category3 empty
+product.name_empty = Specify product name

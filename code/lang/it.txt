@@ -76,6 +76,8 @@ other = Altro
 not_specified = Non specificato
 and = e
 or = o
+from = dal
+to = al
 
 ["lang"]
 en = Inglese
@@ -87,12 +89,14 @@ de_native = Deutsch
 
 ["table headers and form fields captions"]
 actions = Azioni
+id = ID
 date = Data
 date_created = Data Creato
 title = Titolo
 body = Corpo
 text = Testo
 notes = Note
+description = Descrizione
 extra_info = Maggiori informazioni
 image = Immagine
 current_image = Immagine corrente
@@ -130,6 +134,7 @@ keywords = Parole Chiavi
 bank_name = Banca
 bank_office_name = Filiale
 status = Stato
+price = Prezzo
 
 ["status/popup messages and parts of page"]
 ["common"]
@@ -324,9 +329,29 @@ category3.updated = Categoria3 aggiornata
 category3.deleted = Categoria3 cancellata
 category3.name_empty = Inserire il nome della categoria3
 
+category_title = Categoria
 category1_title = Categoria1
 category2_title = Categoria2
 category3_title = Categoria3
 
 no_category1_selected = !!No category1 selected
 no_category2_selected = !!No category2 selected
+
+["products"]
+product = prodotto
+products = prodotti
+
+admin_menu_item.products = Prodotti
+
+page_title.pg_products = Prodotti
+page_title.pg_product_edit_new = !!Add product
+page_title.pg_product_edit = !!Edit product
+
+product.added = !!Product added
+product.updated = !!Product updated
+product.deleted = !!Product deleted
+
+product.category1_empty = !!Category1 empty
+product.category2_empty = !!Category2 empty
+product.category3_empty = !!Category3 empty
+product.name_empty = !!Specify product name

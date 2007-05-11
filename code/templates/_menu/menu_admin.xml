@@ -27,4 +27,9 @@
         url="?action=pg_categories"
         contexts="pg_categories"
     />
+    <menu_item
+        name="products"
+        url="?action=pg_products"
+        contexts="pg_products, pg_product_edit"
+    />
 </menu>

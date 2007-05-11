@@ -417,7 +417,9 @@ dependencies[dependencies.length] = new Dependency(
     '{$form_name}',
     '{$main_select_name}',
     '{$dependent_select_name}',
-    new Array({$dependency_str})
+    new Array(
+{$dependency_str}
+    )
 );
 </script>
 
@@ -429,11 +431,10 @@ function create_select_dependency_str($dependency_array) {
     foreach ($dependency_array as $dependent_select_values) {
         $dependent_select_values_str = join("', '", $dependent_select_values);
         $lines[] = <<<JS
-new Array('{$dependent_select_values_str}')
-
+        new Array('{$dependent_select_values_str}')
 JS;
     }
-    return join(",\n", $lines) . "\n";
+    return join(",\n", $lines);
 }
 
 function create_client_validation_js($client_validate_condition_strs) {
@@ -483,7 +484,7 @@ new ValidateCondition(
     '{$condition_type}',
     {$message_text_param},
     new Array({$params_str}),
-{$dependent_validate_condition_str}
+    {$dependent_validate_condition_str}
 )
 JS;
 }

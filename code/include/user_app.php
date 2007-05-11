@@ -70,6 +70,10 @@ class UserApp extends CustomApp {
             "update_category3" => $a,
             "delete_category3" => $a,
             "move_category3" => $a,
+
+            "pg_products" => $a,
+            "pg_product_edit" => $a,
+            "delete_product" => $a,
         );
     }
 //
@@ -1072,6 +1076,80 @@ class UserApp extends CustomApp {
         }
         $this->print_value("current_category_ids_suburl", create_suburl($category_ids));
         return $category_ids;
+    }
+//
+    function action_pg_products() {
+        $templates_dir = "products";
+
+        $product =& $this->create_db_object("Product");
+
+        $products_list =& $this->create_object(
+            "PagedQueryObjectsList",
+            array(
+                "templates_dir" => "{$templates_dir}/products",
+                "template_var" => "products",
+                "obj" => $product,
+                "default_order_by" => array(
+                    "category1_position ASC",
+                    "category2_position ASC",
+                    "category3_position ASC",
+                ),
+                "filter_form.visible" => true,
+                "context" => "list_item_admin",
+            )
+        );
+        $products_list->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_pg_product_edit() {
+        $templates_dir = "product_edit";
+
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "update":
+            $product =& $this->read_id_fetch_db_object("Product");
+
+            if ($command == "update") {
+                $product_old = $product;
+                $product->read();
+
+                $messages = $product->validate($product_old);
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+                } else {
+                    $product->save();
+                    $this->print_status_message_db_object_updated($product_old);
+
+                    $this->create_self_redirect_response(array("action" => "pg_products"));
+                    break;
+                }
+            }
+
+            $product_edit =& $this->create_object(
+                "ObjectEdit",
+                array(
+                    "templates_dir" => "{$templates_dir}/product_edit",
+                    "template_var" => "product_edit",
+                    "obj" => $product,
+                )
+            );
+            $product_edit->print_values();
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
+        }
+    }
+
+    function action_delete_product() {
+        $product =& $this->read_id_fetch_db_object("Product");
+
+        $this->delete_db_object(array(
+            "obj" => $product,
+            "success_url_params" => array("action" => "pg_products"),
+            "error_url_params" => array("action" => "pg_products"),
+        ));
     }
 
 }

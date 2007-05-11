@@ -7,8 +7,12 @@
     <td>{%user_role%}</td>
     <td>{%user_is_confirmed%}</td>
     <td>{%user_is_active%}</td>
-    <td>[<a href="?action=pg_user_edit&amp;user_id={%user_id%}"
-        >{%lang:link.edit%}</a>]&nbsp;[<a href="?action=delete_user&amp;user_id={%user_id%}"
-        onclick="return confirm('{%lang:sure_delete%}')"
-        >{%lang:link.delete%}</a>]</td>
+    <td>
+        [<a
+            href="?action=pg_user_edit&amp;user_id={%user_id%}"
+        >{%lang:link.edit%}</a>]&nbsp;[<a
+            href="?action=delete_user&amp;user_id={%user_id%}"
+            onclick="return confirm('{%lang:sure_delete%}')"
+        >{%lang:link.delete%}</a>]
+    </td>
 </tr>

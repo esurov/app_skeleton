@@ -2087,6 +2087,7 @@ class App extends AppObject {
 //
     function process_create_update_tables() {
         $actual_table_names = $this->db->get_actual_table_names(false, false);
+
         $all_creatable_db_objects_info = $this->get_all_creatable_db_objects_info();
         $all_table_names_to_create = array_keys($all_creatable_db_objects_info);
 

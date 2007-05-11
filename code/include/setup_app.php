@@ -65,6 +65,7 @@ class SetupApp extends CustomApp {
     function action_insert_test_data() {
         $this->insert_test_news_articles();
         $this->insert_test_categories();
+        $this->insert_test_products();
         $this->insert_test_users();
         $this->add_session_status_message(new OkStatusMsg("test_data_inserted"));
         $this->create_self_redirect_response();
@@ -217,7 +218,8 @@ class SetupApp extends CustomApp {
 
             if ($category1_name != $category1_name_old) {
                 $category1->id = 0;
-                $category1->name = $category1_name;
+                $category1->name_it = $category1_name;
+                $category1->name_en = $category1_name;
                 $category1->position = 0;
                 $category1->store();
             }
@@ -225,7 +227,8 @@ class SetupApp extends CustomApp {
             if ($category2_name != $category2_name_old) {
                 $category2->id = 0;
                 $category2->category1_id = $category1->id;
-                $category2->name = $category2_name;
+                $category2->name_it = $category2_name;
+                $category2->name_en = $category2_name;
                 $category2->position = 0;
                 $category2->store();
             }
@@ -233,7 +236,8 @@ class SetupApp extends CustomApp {
             if ($category3_name != $category3_name_old) {
                 $category3->id = 0;
                 $category3->category2_id = $category2->id;
-                $category3->name = $category3_name;
+                $category3->name_it = $category3_name;
+                $category3->name_en = $category3_name;
                 $category3->position = 0;
                 $category3->store();
             }
@@ -241,6 +245,20 @@ class SetupApp extends CustomApp {
             $category1_name_old = $category1_name;
             $category2_name_old = $category2_name;
             $category3_name_old = $category3_name;
+        }
+    }
+
+    function insert_test_products() {
+        $lines = read_and_parse_csv_file("data/products.csv");
+
+        $product =& $this->create_db_object("Product");
+        foreach ($lines as $line_values) {
+            $product->id = 0;
+            $product->category3_id = $line_values[0];
+            $product->name_it = $line_values[2];
+            $product->name_en = $line_values[2];
+            $product->price = $line_values[3];
+            $product->store();
         }
     }
 

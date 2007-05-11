@@ -13,6 +13,7 @@ class Category1Table extends OrderedDbObject {
         $this->insert_field(array(
             "field" => "name",
             "type" => "varchar",
+            "multilingual" => 1,
             "input" => array(
                 "type_attrs" => array(
                     "class" => "wide",

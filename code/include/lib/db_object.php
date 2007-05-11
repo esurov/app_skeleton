@@ -448,8 +448,8 @@ class DbObject extends AppObject {
             $store = 0;
             $update = 0;
 
-            $read = $field_info2["read"];
-            $input = $field_info2["input"];
+            $read = get_param_value($field_info, "read", 0);
+            $input = get_param_value($field_info, "input", $field_info2["input"]);
 
             $multilingual = 0;
             $multilingual_child = 0;
@@ -1487,7 +1487,7 @@ class DbObject extends AppObject {
             if (!$this->is_field_exist($default_order_by_field_name)) {
                 $this->process_fatal_error(
                     "read_order_by(): Field '{$default_order_by_field_name}' " .
-                    "specified in 'default_order_by' not found in {$this->_table_name}!"
+                    "specified in 'default_order_by' not found in '{$this->_table_name}'!"
                 );
             }
         }

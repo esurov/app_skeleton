@@ -1,6 +1,7 @@
 <form action="?" method="post" name="form">
 <input type="hidden" name="action" value="update_user" />
-{%user_id_hidden%}
+<input type="hidden" name="user_id" value="{%user_id%}" />
+
 <table>
 {%_role%}
 <tr>
@@ -39,6 +40,7 @@
     </td>
 </tr>
 </table>
+
 </form>
 
 {%user_client_validation_js%}

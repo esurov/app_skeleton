@@ -72,7 +72,7 @@ class ContactInfoTable extends CustomDbObject {
         ));
     }
 //
-    function get_validate_conditions() {
+    function get_validate_conditions($context, $context_params) {
         return array(
             array(
                 "field" => "first_name",
