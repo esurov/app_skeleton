@@ -63,8 +63,8 @@ class ObjectTemplateComponent extends TemplateComponent {
             is_null($this->obj) ? "" : $this->obj->_table_name
         );
         
-        $this->context = get_param_value($params, "context", null);
-        $this->custom_params = get_param_value($params, "custom_params", null);
+        $this->context = get_param_value($params, "context", "");
+        $this->custom_params = get_param_value($params, "custom_params", array());
     }
 
     function _print_values() {

@@ -13,3 +13,6 @@ dump_creation_failed = Dump creation failed!
 pager.page_begin = [
 pager.page_end = ]
 pager.delimiter = ...
+
+["other"]
+email_contact_form_processed_subject = Contatti

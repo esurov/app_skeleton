@@ -6,31 +6,31 @@
 <table>
 <tr>
     <td>{%lang:login%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_login.input%}</td>
+    <td>{%user.login.input%}</td>
 </tr>
 <tr>
     <td>{%lang:password%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_password.input%}</td>
+    <td>{%user.password.input%}</td>
 </tr>
 <tr>
     <td>{%lang:password_confirm%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_password_confirm.input%}</td>
+    <td>{%user.password_confirm.input%}</td>
 </tr>
 <tr>
     <td>{%lang:first_name%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_first_name.input%}</td>
+    <td>{%user.first_name.input%}</td>
 </tr>
 <tr>
     <td>{%lang:last_name%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_last_name.input%}</td>
+    <td>{%user.last_name.input%}</td>
 </tr>
 <tr>
     <td>{%lang:email%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_email.input%}</td>
+    <td>{%user.email.input%}</td>
 </tr>
 <tr>
     <td>{%lang:extra_info%}:</td>
-    <td>{%user_extra_info.input%}</td>
+    <td>{%user.extra_info.input%}</td>
 </tr>
 <tr>
     <td colspan="2">
@@ -47,7 +47,7 @@
 </tr>
 <tr>
     <td>{%lang:signup_form_accept_agreement%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_agreement_accepted.input%}</td>
+    <td>{%user.agreement_accepted.input%}</td>
 </tr>
 <tr>
     <td colspan="2" align="center">
@@ -58,4 +58,6 @@
 
 </form>
 
-{%user_client_validation_js%}
+<script type="text/javascript">
+{%user.client_validation_js%}
+</script>

@@ -283,7 +283,6 @@ class PagedQueryObjectsList extends QueryObjectsList {
 
     function _print_list() {
         if ($this->filter_form_visible) {
-            $this->app->print_values($this->_filters_suburl_params);
             $this->obj->print_filter_form_values();
             $this->app->print_file_new(
                 "{$this->templates_dir}/{$this->filter_form_template_name}",

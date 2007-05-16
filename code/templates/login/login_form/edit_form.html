@@ -4,15 +4,15 @@
 <table>
 <tr>
     <td>{%lang:login%}:</td>
-    <td>{%user_login.input%}</td>
+    <td>{%user.login.input%}</td>
 </tr>
 <tr>
     <td>{%lang:password%}:</td>
-    <td>{%user_password.input%}</td>
+    <td>{%user.password.input%}</td>
 </tr>
 <tr>
     <td>{%lang:user_should_remember%}:</td>
-    <td>{%user_should_remember.input%}</td>
+    <td>{%user.should_remember.input%}</td>
 </tr>
 <tr>
     <td colspan="2" align="center">
@@ -24,7 +24,10 @@
 </form>
 
 <script type="text/javascript">
-focusFormElement("form", "user_login");
+focusFormElement('form', '{%user.login.input_name%}');
 </script>
 
-{%user_client_validation_js%}
+<script type="text/javascript">
+{%user.client_validation_js%}
+</script>
+

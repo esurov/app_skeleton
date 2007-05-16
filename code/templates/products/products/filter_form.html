@@ -7,22 +7,22 @@
 </tr>
 <tr>
     <td>{%lang:keywords%}:</td>
-    <td>{%product_keywords_like_many.input%}</td>
+    <td>{%product.keywords.like_many.input%}</td>
 </tr>
 <tr>
     <td>{%lang:category1_title%}:</td>
-    <td>{%product_category2_category1_id_equal.input%}</td>
+    <td>{%product.category2_category1_id.equal.input%}</td>
 </tr>
 <tr>
     <td>{%lang:category2_title%}:</td>
-    <td>{%product_category3_category2_id_equal.input%}</td>
+    <td>{%product.category3_category2_id.equal.input%}</td>
 </tr>
 <tr>
     <td>{%lang:category3_title%}:</td>
-    <td>{%product_category3_id_equal.input%}</td>
+    <td>{%product.category3_id.equal.input%}</td>
 </tr>
 <tr>
-    <td colspan="2">{%lang:price%}&nbsp;{%lang:from%}:&nbsp;{%product_price_greater_equal.input%}&nbsp;{%lang:to%}:&nbsp;{%product_price_less_equal.input%}</td>
+    <td colspan="2">{%lang:price%}&nbsp;{%lang:from%}:&nbsp;{%product.price.greater_equal.input%}&nbsp;{%lang:to%}:&nbsp;{%product.price.less_equal.input%}</td>
 </tr>
 <tr>
     <td colspan="2" align="center">
@@ -33,8 +33,8 @@
 
 </form>
 
-{%product_category3_category2_id_equal.dependency_js%}
-{%product_category2_category1_id_equal.dependency_js%}
+{%product.category3_category2_id_equal.dependency_js%}
+{%product.category2_category1_id_equal.dependency_js%}
 
 <script type="text/javascript">
 initDependencies();

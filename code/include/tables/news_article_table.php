@@ -154,13 +154,13 @@ class NewsArticleTable extends CustomDbObject {
         if ($this->_context == "list_item" || $this->_context == "list_item_admin") {
             $title_short_len = $this->get_config_value("news_article_title_short_length");
             $this->app->print_varchar_value(
-                "news_article_title.short",
+                "news_article.title.short",
                 get_word_shortened_string(strip_tags($this->title), $title_short_len, "...")
             );
             
             $body_short_len = $this->get_config_value("news_article_body_short_length");
             $this->app->print_varchar_value(
-                "news_article_body.short",
+                "news_article.body.short",
                 get_word_shortened_string(strip_tags($this->body), $body_short_len, "...")
             );
 

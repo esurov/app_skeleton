@@ -77,7 +77,7 @@ class FileTable extends CustomDbObject {
         parent::print_values($params);
 
         $this->app->print_varchar_value(
-            "file_filesize_formatted",
+            "file.filesize.formatted",
             get_formatted_filesize_str($this->content_length)
         );
     }

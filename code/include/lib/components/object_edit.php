@@ -2,6 +2,9 @@
 
 class ObjectEdit extends ObjectTemplateComponent {
 
+    var $input_name_prefix;
+    var $input_name_suffix;
+
     var $_page_title_resource;
 
     function _init($params) {
@@ -10,6 +13,17 @@ class ObjectEdit extends ObjectTemplateComponent {
         if (is_null($this->obj)) {
             $this->process_fatal_error_required_param_not_found("obj");
         }
+
+        $this->input_name_prefix = get_param_value(
+            $params,
+            "input_name_prefix",
+            $this->obj->_table_name
+        );
+        $this->input_name_suffix = get_param_value(
+            $params,
+            "input_name_suffix",
+            ""
+        );
         
         $this->_page_title_resource = get_param_value(
             $params,
@@ -54,6 +68,8 @@ class ObjectEdit extends ObjectTemplateComponent {
             "template_var_prefix" => $this->template_var_prefix,
             "context" => $this->context,
             "custom_params" => $this->custom_params,
+            "input_name_prefix" => $this->input_name_prefix,
+            "input_name_suffix" => $this->input_name_suffix,
         ));
     }
 

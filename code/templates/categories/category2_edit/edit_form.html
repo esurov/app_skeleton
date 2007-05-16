@@ -1,12 +1,12 @@
 <form action="?action=pg_categories&amp;{%current_category_ids_suburl%}" method="post" name="form">
 <input type="hidden" name="command" value="update_obj" />
 <input type="hidden" name="obj" value="category2" />
-<input type="hidden" name="obj_id" value="{%category2_id%}" />
+<input type="hidden" name="obj_id" value="{%category2.id%}" />
 
 <table>
 <tr>
     <th>{%lang:name%}:&nbsp;<span class="required">*</span></th>
-    <td>{%category2_name.input%}</td>
+    <td>{%category2.name.input%}</td>
 </tr>
 <tr>
     <td colspan="2" align="center">
@@ -17,4 +17,6 @@
 
 </form>
 
-{%category2_client_validation_js%}
+<script type="text/javascript">
+{%category2.client_validation_js%}
+</script>

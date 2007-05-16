@@ -468,7 +468,7 @@ class UserApp extends CustomApp {
         $name_from = $this->get_config_value("website_name_from");
         $email_to = $this->get_actual_email_to($user->email);
         $name_to = $user->get_full_name();
-        $subject = $this->get_config_value("email_signup_form_processed_subject");
+        $subject = $this->get_lang_str("email_signup_form_processed_subject");
 
         $user->print_values();
         $url = create_self_full_url(array(
@@ -541,7 +541,7 @@ class UserApp extends CustomApp {
         $name_from = $this->get_config_value("website_name_from");
         $email_to = $this->get_actual_email_to($user->email);
         $name_to = $user->get_full_name();
-        $subject = $this->get_config_value("email_recover_password_form_processed_subject");
+        $subject = $this->get_lang_str("email_recover_password_form_processed_subject");
         
         $user->print_values();
         $body = $this->print_file("recover_password/email_password_sent_to_user.html");
@@ -602,7 +602,7 @@ class UserApp extends CustomApp {
         $name_from = "{$contact_info->first_name} {$contact_info->last_name}";
         $email_to = $this->get_actual_email_to($this->get_config_value("contact_form_email_to"));
         $name_to = $this->get_config_value("contact_form_name_to");
-        $subject = $this->get_config_value("email_contact_form_processed_subject");
+        $subject = $this->get_lang_str("email_contact_form_processed_subject");
 
         $contact_info->print_values();
         $body = $this->print_file("contact_form/email_contact_info_sent_to_admin.html");

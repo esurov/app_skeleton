@@ -1,23 +1,23 @@
 <form action="?" method="post" name="form" enctype="multipart/form-data">
 <input type="hidden" name="action" value="update_news_article" />
-<input type="hidden" name="news_article_id" value="{%news_article_id%}" />
+<input type="hidden" name="news_article_id" value="{%news_article.id%}" />
 
 <table>
 <tr>
     <td>{%lang:date%}:</td>
-    <td>{%news_article_created.input%}</td>
+    <td>{%news_article.created.input%}</td>
 </tr>
 <tr>
     <td>{%lang:title%}:&nbsp;<span class="required">*</span></td>
-    <td>{%news_article_title.input%}</td>
+    <td>{%news_article.title.input%}</td>
 </tr>
 <tr>
     <td>{%lang:body%}:</td>
-    <td>{%news_article_body.input%}</td>
+    <td>{%news_article.body.input%}</td>
 </tr>
 <tr>
     <td>{%lang:current_image%}:</td>
-    <td>{%news_article_image%}</td>
+    <td>{%news_article.image%}</td>
 </tr>
 <tr>
     <td>{%lang:upload_new_image%}:</td>
@@ -25,7 +25,7 @@
 </tr>
 <tr>
     <td valign="top">{%lang:current_file%}:</td>
-    <td>{%news_article_file_info%}</td>
+    <td>{%news_article.file_info%}</td>
 </tr>
 <tr>
     <td>{%lang:upload_new_file%}:</td>
@@ -40,4 +40,6 @@
 
 </form>
 
-{%news_article_client_validation_js%}
+<script type="text/javascript">
+{%news_article.client_validation_js%}
+</script>

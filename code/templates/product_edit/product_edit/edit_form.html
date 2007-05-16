@@ -1,31 +1,31 @@
 <form action="?action=pg_product_edit" method="post" name="form">
 <input type="hidden" name="command" value="update" />
-<input type="hidden" name="product_id" value="{%product_id%}" />
+<input type="hidden" name="product_id" value="{%product.id%}" />
 
 <table>
 <tr>
     <td>{%lang:category1_title%}:&nbsp;<span class="required">*</span></td>
-    <td>{%product_category2_category1_id.input%}</td>
+    <td>{%product.category2_category1_id.input%}</td>
 </tr>
 <tr>
     <td>{%lang:category2_title%}:&nbsp;<span class="required">*</span></td>
-    <td>{%product_category3_category2_id.input%}</td>
+    <td>{%product.category3_category2_id.input%}</td>
 </tr>
 <tr>
     <td>{%lang:category3_title%}:&nbsp;<span class="required">*</span></td>
-    <td>{%product_category3_id.input%}</td>
+    <td>{%product.category3_id.input%}</td>
 </tr>
 <tr>
     <td>{%lang:name%}:&nbsp;<span class="required">*</span></td>
-    <td>{%product_name.input%}</td>
+    <td>{%product.name.input%}</td>
 </tr>
 <tr>
     <td>{%lang:description%}:</td>
-    <td>{%product_description.input%}</td>
+    <td>{%product.description.input%}</td>
 </tr>
 <tr>
     <td>{%lang:price%}:</td>
-    <td>{%product_price.input%}</td>
+    <td>{%product.price.input%}</td>
 </tr>
 <tr>
     <td colspan="2">
@@ -36,11 +36,13 @@
 
 </form>
 
-{%product_category3_category2_id.dependency_js%}
-{%product_category2_category1_id.dependency_js%}
+{%product.category3_category2_id.dependency_js%}
+{%product.category2_category1_id.dependency_js%}
 
 <script type="text/javascript">
 initDependencies();
 </script>
 
-{%product_client_validation_js%}
+<script type="text/javascript">
+{%product.client_validation_js%}
+</script>

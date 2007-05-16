@@ -6,10 +6,10 @@
 <table>
 <tr>
     <td>{%lang:login%}:</td>
-    <td>{%user_login.input%}</td>
+    <td>{%user.login.input%}</td>
     <td>&nbsp;&nbsp;&nbsp;</td>
     <td>{%lang:email%}:</td>
-    <td>{%user_email.input%}</td>
+    <td>{%user.email.input%}</td>
 </tr>
 <tr>
     <td colspan="5" align="center">
@@ -21,7 +21,9 @@
 </form>
 
 <script type="text/javascript">
-focusFormElement("form", "user_login");
+focusFormElement('form', '{%user.login.input_name%}');
 </script>
 
-{%user_client_validation_js%}
+<script type="text/javascript">
+{%user.client_validation_js%}
+</script>

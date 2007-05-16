@@ -1,17 +1,17 @@
 <tr class="{%list_item_class%}">
-    <td>{%user_id%}</td>
-    <td>{%user_created%}</td>
-    <td>{%user_login%}</td>
-    <td>{%user_full_name.reversed%}</td>
-    <td>{%user_email%}</td>
-    <td>{%user_role%}</td>
-    <td>{%user_is_confirmed%}</td>
-    <td>{%user_is_active%}</td>
+    <td>{%user.id%}</td>
+    <td>{%user.created%}</td>
+    <td>{%user.login%}</td>
+    <td>{%user.full_name.reversed%}</td>
+    <td>{%user.email%}</td>
+    <td>{%user.role%}</td>
+    <td>{%user.is_confirmed%}</td>
+    <td>{%user.is_active%}</td>
     <td>
         [<a
-            href="?action=pg_user_edit&amp;user_id={%user_id%}"
+            href="?action=pg_user_edit&amp;user_id={%user.id%}"
         >{%lang:link.edit%}</a>]&nbsp;[<a
-            href="?action=delete_user&amp;user_id={%user_id%}"
+            href="?action=delete_user&amp;user_id={%user.id%}"
             onclick="return confirm('{%lang:sure_delete%}')"
         >{%lang:link.delete%}</a>]
     </td>

@@ -488,9 +488,9 @@ class UserTable extends CustomDbObject {
         parent::print_values($params);
 
         if ($this->_context == "list_item") {
-            $this->app->print_varchar_value("user_full_name", $this->get_full_name());
+            $this->app->print_varchar_value("user.full_name", $this->get_full_name());
             $this->app->print_varchar_value(
-                "user_full_name.reversed",
+                "user.full_name.reversed",
                 $this->get_full_name_reversed()
             );
         }

@@ -17,6 +17,8 @@ class DbObject extends AppObject {
 
     var $_templates_dir;
     var $_template_var_prefix;
+    var $_input_name_prefix;
+    var $_input_name_suffix;
 
     // Context name for print_values(), print_form_values()
     var $_context;
@@ -38,12 +40,6 @@ class DbObject extends AppObject {
         $this->insert_select_from();
 
         $this->_filters = array();
-
-        $this->_templates_dir = $this->_table_name;
-        $this->_template_var_prefix = $this->_table_name;
-
-        $this->_context = null;
-        $this->_custom_params = null;
     }
 //
     function set_app(&$app) {
@@ -1123,8 +1119,8 @@ class DbObject extends AppObject {
                 break;
             case "boolean":
                 // Skip changing field value for boolean fields
-                // if no hidden value with '__sent' suffix was passed via CGI
-                if (is_null(param("{$param_name}__sent"))) {
+                // if no hidden value with '__sent' prefix was passed via CGI
+                if (is_null(param("__sent_{$param_name}"))) {
                     $field_value = null;
                 } else {
                     $field_value = $this->get_boolean_field_value($param_value);    
@@ -1549,40 +1545,30 @@ class DbObject extends AppObject {
         );
     }
 //
-    function _init_print_params($params) {
-        $this->_init_print_param($params, "templates_dir");
-        $this->_init_print_param($params, "template_var_prefix");
-        $this->_init_print_param($params, "context");
-        $this->_init_print_param($params, "custom_params");
-    }
-
-    function _init_print_param($params, $param_name) {
-        $param_value = get_param_value($params, $param_name, null);
-        if (!is_null($param_value)) {
-            $this->{"_{$param_name}"} = $param_value;
-        }
+    function _init_print_param($params, $param_name, $default_value) {
+        $this->{"_{$param_name}"} = get_param_value($params, $param_name, $default_value);
     }
 
     function print_values($params = array()) {
-        $this->_init_print_params($params);
+        $this->_init_print_param($params, "templates_dir", "");
+        $this->_init_print_param($params, "template_var_prefix", $this->_table_name);
+        $this->_init_print_param($params, "context", "");
+        $this->_init_print_param($params, "custom_params", array());
 
         $field_names = $this->get_field_names();
         foreach ($field_names as $field_name) {
-            $field_value = $this->{$field_name};
             $this->print_value(
-                $this->_fields[$field_name],
-                $field_name,
-                $field_value,
-                $this->_template_var_prefix
+                "{$this->_template_var_prefix}.{$field_name}",
+                $this->{$field_name},
+                $this->_fields[$field_name]
             );
         }
     }
 
     function print_value(
-        $field_info,
-        $field_name = null,
-        $field_value = null,
-        $template_var_prefix = null
+        $template_var,
+        $field_value,
+        $field_info
     ) {
         $field_type = $field_info["type"];
         if ($field_type == "blob") {
@@ -1591,8 +1577,6 @@ class DbObject extends AppObject {
         $values_info = (isset($field_info["input"]["values"])) ?
             $field_info["input"]["values"] :
             array();
-
-        $template_var = "{$template_var_prefix}_{$field_name}";
 
         switch ($field_type) {
         case "primary_key":
@@ -1686,43 +1670,31 @@ class DbObject extends AppObject {
     function print_form_values($params = array()) {
         $this->print_values($params);
 
+        $this->_init_print_param($params, "input_name_prefix", $this->_table_name);
+        $this->_init_print_param($params, "input_name_suffix", "");
+
         $field_names = $this->get_field_names();
         foreach ($field_names as $field_name) {
-            $field_value = $this->{$field_name};
             $this->print_form_value(
-                $this->_fields[$field_name],
-                $field_name,
-                $field_value,
-                $this->_template_var_prefix
+                "{$this->_template_var_prefix}.{$field_name}",
+                "{$this->_input_name_prefix}_{$field_name}{$this->_input_name_suffix}",
+                $this->{$field_name},
+                $this->_fields[$field_name]
             );
         }
 
-        $this->print_client_validation_js($this->_context, $this->_template_var_prefix);        
+        $this->print_client_validation_js();
     }
 //
     function print_form_value(
-        $field_info,
-        $field_name = null,
-        $field_value = null,
-        $template_var_prefix = null
+        $template_var,
+        $input_name,
+        $field_value,
+        $field_info
     ) {
         $field_type = $field_info["type"];
         if ($field_type == "blob") {
             return;
-        }
-
-        if (is_null($field_name)) {
-            $field_name = $field_info["field"];
-        }
-        if (is_null($field_value)) {
-            $field_value = $field_info["value"];
-        }
-        if (is_null($template_var_prefix)) {
-            $template_var_prefix = get_param_value(
-                $field_info,
-                "template_var_prefix",
-                $this->_table_name
-            );
         }
 
         $input_type = isset($field_info["input"]["type"]) ?
@@ -1735,11 +1707,13 @@ class DbObject extends AppObject {
             $field_info["input"]["values"] :
             array();
 
-        $template_var = "{$template_var_prefix}_{$field_name}";
-
         switch ($field_type) {
         case "primary_key":
-            $this->app->print_primary_key_form_value($template_var, $field_value);
+            $this->app->print_primary_key_form_value(
+                $template_var,
+                $input_name,
+                $field_value
+            );
             break;
         case "foreign_key":
             $dependency_info = get_param_value($values_info, "dependency", null);
@@ -1748,7 +1722,9 @@ class DbObject extends AppObject {
             } else {
                 $dependent_field_name = $dependency_info["field"];
                 $input_type_params = array(
-                    "dependent_select_name" => "{$template_var_prefix}_{$dependent_field_name}",
+                    "dependent_select_name" =>
+                        "{$this->_input_name_prefix}_" .
+                        "{$dependent_field_name}{$this->_input_name_suffix}",
                     "dependency_info" => $dependency_info,
                     "dependent_values_info" =>
                         $this->_fields[$dependent_field_name]["input"]["values"],
@@ -1756,6 +1732,7 @@ class DbObject extends AppObject {
             }
             $this->app->print_foreign_key_form_value(
                 $template_var,
+                $input_name,
                 $field_value,
                 $input_type,
                 $input_attrs,
@@ -1767,6 +1744,7 @@ class DbObject extends AppObject {
             $input_info = get_param_value($field_info, "input", array());
             $this->app->print_integer_form_value(
                 $template_var,
+                $input_name,
                 $field_value,
                 $input_attrs,
                 get_param_value($input_info, "nonset_value_caption_pair", null)
@@ -1776,6 +1754,7 @@ class DbObject extends AppObject {
             $input_info = get_param_value($field_info, "input", array());
             $this->app->print_double_form_value(
                 $template_var,
+                $input_name,
                 $field_value,
                 $field_info["prec"],
                 $input_attrs,
@@ -1785,6 +1764,7 @@ class DbObject extends AppObject {
         case "currency":
             $this->app->print_currency_form_value(
                 $template_var,
+                $input_name,
                 $field_value,
                 $field_info["prec"],
                 $input_attrs,
@@ -1794,6 +1774,7 @@ class DbObject extends AppObject {
         case "boolean":
             $this->app->print_boolean_form_value(
                 $template_var,
+                $input_name,
                 $field_value,
                 $input_attrs
             );
@@ -1801,6 +1782,7 @@ class DbObject extends AppObject {
         case "enum":
             $this->app->print_enum_form_value(
                 $template_var,
+                $input_name,
                 $field_value,
                 $input_type,
                 $input_attrs,
@@ -1809,13 +1791,11 @@ class DbObject extends AppObject {
             break;
         case "varchar":
             if ($this->is_field_multilingual(null, $field_info)) {
-                $this->app->print_multilingual_form_value(
-                    $template_var,
-                    $field_value
-                );
+                $this->app->print_multilingual_form_value($template_var);
             } else {
                 $this->app->print_varchar_form_value(
                     $template_var,
+                    $input_name,
                     $field_value,
                     $input_type,
                     $input_attrs
@@ -1824,13 +1804,11 @@ class DbObject extends AppObject {
             break;
         case "text":
             if ($this->is_field_multilingual(null, $field_info)) {
-                $this->app->print_multilingual_form_value(
-                    $template_var,
-                    $field_value
-                );
+                $this->app->print_multilingual_form_value($template_var);
             } else {
                 $this->app->print_text_form_value(
                     $template_var,
+                    $input_name,
                     $field_value,
                     $input_type,
                     $input_attrs
@@ -1840,6 +1818,7 @@ class DbObject extends AppObject {
         case "datetime":
             $this->app->print_datetime_form_value(
                 $template_var,
+                $input_name,
                 $field_value,
                 $input_attrs
             );
@@ -1847,6 +1826,7 @@ class DbObject extends AppObject {
         case "date":
             $this->app->print_date_form_value(
                 $template_var,
+                $input_name,
                 $field_value,
                 $input_attrs
             );
@@ -1854,6 +1834,7 @@ class DbObject extends AppObject {
         case "time":
             $this->app->print_time_form_value(
                 $template_var,
+                $input_name,
                 $field_value,
                 $input_attrs
             );
@@ -1891,14 +1872,17 @@ class DbObject extends AppObject {
             }
         }
 
-        $template_var = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
+        $template_var = "{$this->_table_name}.{$filter_name}.{$filter_relation}";
+        $filter_input_name = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
 
-        $this->app->print_hidden_input_form_value($template_var, $filter_value);
+        $this->app->print_value($template_var, $filter_value);
+        $this->app->print_hidden_input_form_value($template_var, $filter_input_name, $filter_value);
 
         switch ($filter_input_type) {
         case "text":
             $this->app->print_text_input_form_value(
                 $template_var,
+                $filter_input_name,
                 $filter_value,
                 array_merge(
                     array("class" => "varchar_normal"),
@@ -1909,6 +1893,7 @@ class DbObject extends AppObject {
         case "checkbox":
             $this->app->print_checkbox_input_form_value(
                 $template_var,
+                $filter_input_name,
                 1,
                 ($filter_value != 0),
                 $filter_input_attrs
@@ -1917,6 +1902,7 @@ class DbObject extends AppObject {
         case "radio":
             $this->app->print_radio_group_input_form_value(
                 $template_var,
+                $filter_input_name,
                 $filter_value,
                 $filter_input_attrs,
                 $values_info,
@@ -1926,6 +1912,7 @@ class DbObject extends AppObject {
         case "select":
             $this->app->print_select_input_form_value(
                 $template_var,
+                $filter_input_name,
                 $filter_value,
                 $filter_input_attrs,
                 $values_info,
@@ -1936,6 +1923,7 @@ class DbObject extends AppObject {
             $filter_input_attrs["multiple"] = null;
             $this->app->print_select_input_form_value(
                 $template_var,
+                $filter_input_name,
                 $filter_value,
                 $filter_input_attrs,
                 $values_info,
@@ -1958,6 +1946,7 @@ class DbObject extends AppObject {
                 "{$this->_table_name}_{$dependent_filter_name}_{$filter_relation}";
             $this->app->print_main_select_input_form_value(
                 $template_var,
+                $filter_input_name,
                 $filter_value,
                 $filter_input_attrs,
                 $values_info,
@@ -1973,7 +1962,7 @@ class DbObject extends AppObject {
 //  Objects validation for store/update and validation helpers
     function validate($old_obj = null, $context = null, $context_params = array()) {
         $conditions = $this->get_validate_conditions($context, $context_params);
-        $field_names_to_validate = $this->get_validate_context_field_names(
+        $field_names_to_validate = $this->get_validate_field_names_for_context(
             $context,
             $context_params
         );
@@ -1995,7 +1984,7 @@ class DbObject extends AppObject {
     }
 
     // Should be redefined in child class if fields are different in each context
-    function get_validate_context_field_names($context, $context_params) {
+    function get_validate_field_names_for_context($context, $context_params) {
         return null;
     }
 
@@ -2193,9 +2182,12 @@ class DbObject extends AppObject {
         return (in_array(strtolower($type), $file_types_allowed));
     }
 //
-    function print_client_validation_js($context, $template_var_prefix) {
-        $conditions = $this->get_validate_conditions($context, array());
-        $field_names_to_validate = $this->get_validate_context_field_names($context, array());
+    function print_client_validation_js() {
+        $conditions = $this->get_validate_conditions($this->_context, array());
+        $field_names_to_validate = $this->get_validate_field_names_for_context(
+            $this->_context,
+            array()
+        );
         
         $client_validate_condition_strs = array();
         foreach ($conditions as $condition_info) {
@@ -2221,7 +2213,7 @@ class DbObject extends AppObject {
             }
         }
         $this->app->print_raw_value(
-            "{$template_var_prefix}_client_validation_js",
+            "{$this->_template_var_prefix}.client_validation_js",
             create_client_validation_js($client_validate_condition_strs)
         );
     }
@@ -2240,7 +2232,7 @@ class DbObject extends AppObject {
             }
         }
             
-        $input_name = "{$this->_template_var_prefix}_{$field_name}";
+        $input_name = "{$this->_input_name_prefix}_{$field_name}{$this->_input_name_suffix}";
         $type = $condition_info["type"];
         $resource = $condition_info["message"];
         $message_text = (is_null($resource)) ? null : $this->get_lang_str($resource);
@@ -2274,6 +2266,7 @@ class DbObject extends AppObject {
         default:
             $validate_condition_str = null;
         }
+        
         return $validate_condition_str;
     }
 //

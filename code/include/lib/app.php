@@ -695,7 +695,7 @@ class App extends AppObject {
             "{$param_name}.suburl",
             create_suburl(array($param_name => $param_value))
         );
-        $this->print_hidden_input_form_value($param_name, $param_value);
+        $this->print_hidden_input_form_value($param_name, $param_name, $param_value);
     }
 
     function print_file($template_name, $append_to_name = null) {
@@ -879,25 +879,31 @@ class App extends AppObject {
     }
 //
     // Form values template printing functions
-    function print_primary_key_form_value($template_var, $value) {
-        $this->print_hidden_input_form_value($template_var, $value);
-        $this->print_text_input_form_value($template_var, $value);
+    function print_primary_key_form_value(
+        $template_var,
+        $input_name,
+        $value
+    ) {
+        $this->print_hidden_input_form_value($template_var, $input_name, $value);
+        $this->print_text_input_form_value($template_var, $input_name, $value);
     }
 
     function print_foreign_key_form_value(
         $template_var,
+        $input_name,
         $value,
         $input_type,
         $input_attrs,
         $values_info,
         $input_type_params
     ) {
-        $this->print_hidden_input_form_value($template_var, $value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $value);
 
         switch ($input_type) {
         case "text":
             $printed_value = $this->print_text_input_form_value(
                 $template_var,
+                $input_name,
                 $value,
                 $input_attrs
             );
@@ -905,6 +911,7 @@ class App extends AppObject {
         case "radio":
             $printed_value = $this->print_radio_group_input_form_value(
                 $template_var,
+                $input_name,
                 $value,
                 $input_attrs,
                 $values_info
@@ -913,6 +920,7 @@ class App extends AppObject {
         case "select":
             $printed_value = $this->print_select_input_form_value(
                 $template_var,
+                $input_name,
                 $value,
                 $input_attrs,
                 $values_info
@@ -921,6 +929,7 @@ class App extends AppObject {
         case "main_select":
             $printed_value = $this->print_main_select_input_form_value(
                 $template_var,
+                $input_name,
                 $value,
                 $input_attrs,
                 $values_info,
@@ -938,12 +947,13 @@ class App extends AppObject {
 
     function print_integer_form_value(
         $template_var,
+        $input_name,
         $value,
         $input_attrs,
         $nonset_value_caption_pair = null
     ) {
         $value_formatted = $this->get_app_integer_value($value);
-        $this->print_hidden_input_form_value($template_var, $value_formatted);
+        $this->print_hidden_input_form_value($template_var, $input_name, $value_formatted);
 
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
@@ -955,6 +965,7 @@ class App extends AppObject {
         
         return $this->print_text_input_form_value(
             $template_var,
+            $input_name,
             $value_formatted,
             array_merge(
                 array("class" => "integer"),
@@ -965,13 +976,14 @@ class App extends AppObject {
     
     function print_double_form_value(
         $template_var,
+        $input_name,
         $value,
         $decimals,
         $input_attrs,
         $nonset_value_caption_pair = null
     ) {
         $value_formatted = $this->get_app_double_value($value, $decimals);
-        $this->print_hidden_input_form_value($template_var, $value_formatted);
+        $this->print_hidden_input_form_value($template_var, $input_name, $value_formatted);
         
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
@@ -983,6 +995,7 @@ class App extends AppObject {
 
         return $this->print_text_input_form_value(
             $template_var,
+            $input_name,
             $value_formatted,
             array_merge(
                 array("class" => "double"),
@@ -993,6 +1006,7 @@ class App extends AppObject {
 
     function print_currency_form_value(
         $template_var,
+        $input_name,
         $value,
         $decimals,
         $input_attrs,
@@ -1007,10 +1021,15 @@ class App extends AppObject {
         );
 
         $value_formatted_without_sign = $this->get_app_currency_value($value, $decimals);
-        $this->print_hidden_input_form_value($template_var, $value_formatted_without_sign);
+        $this->print_hidden_input_form_value(
+            $template_var,
+            $input_name,
+            $value_formatted_without_sign
+        );
         
         $printed_value = $this->print_text_input_form_value(
             $template_var,
+            $input_name,
             $value_formatted_without_sign,
             array_merge(
                 array("class" => "currency"),
@@ -1022,24 +1041,28 @@ class App extends AppObject {
             $this->append_currency_sign($printed_value, $sign, $sign_at_start)
         );
         $this->print_text_input_form_value(
-            "{$template_var}_without_sign",
+            "{$template_var}.without_sign",
             $value_formatted_without_sign,
             array_merge(
                 array("class" => "currency"),
                 $input_attrs
             )
         );
+        
         return $printed_value;
     }
 
     function print_boolean_form_value(
         $template_var,
+        $input_name,
         $value,
         $input_attrs
     ) {
-        $this->print_hidden_input_form_value($template_var, $value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $value);
+        
         return $this->print_checkbox_input_form_value(
             $template_var,
+            $input_name,
             1,
             ($value != 0),
             $input_attrs
@@ -1048,17 +1071,19 @@ class App extends AppObject {
 
     function print_enum_form_value(
         $template_var,
+        $input_name,
         $enum_value,
         $input_type,
         $input_attrs,
         $values_info
     ) {
-        $this->print_hidden_input_form_value($template_var, $enum_value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $enum_value);
 
         switch ($input_type) {
         case "radio":
             $printed_value = $this->print_radio_group_input_form_value(
                 $template_var,
+                $input_name,
                 $enum_value,
                 $input_attrs,
                 $values_info
@@ -1067,6 +1092,7 @@ class App extends AppObject {
         case "select":
             $printed_value = $this->print_select_input_form_value(
                 $template_var,
+                $input_name,
                 $enum_value,
                 $input_attrs,
                 $values_info
@@ -1081,11 +1107,12 @@ class App extends AppObject {
 
     function print_varchar_form_value(
         $template_var,
+        $input_name,
         $value,
         $input_type,
         $input_attrs
     ) {
-        $this->print_hidden_input_form_value($template_var, $value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $value);
 
         switch ($input_type) {
         case "text":
@@ -1093,6 +1120,7 @@ class App extends AppObject {
             $printed_value = $this->print_input_form_value(
                 $input_type,
                 $template_var,
+                $input_name,
                 $value,
                 array_merge(
                     array("class" => "varchar_normal"),
@@ -1109,16 +1137,18 @@ class App extends AppObject {
 
     function print_text_form_value(
         $template_var,
+        $input_name,
         $value,
         $input_type,
         $input_attrs
     ) {
-        $this->print_hidden_input_form_value($template_var, $value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $value);
         
         switch ($input_type) {
         case "textarea":
             $printed_value = $this->print_textarea_input_form_value(
                 $template_var,
+                $input_name,
                 $value,
                 $input_attrs
             );
@@ -1130,7 +1160,7 @@ class App extends AppObject {
         return $printed_value;
     }
 
-    function print_multilingual_form_value($template_var, $value) {
+    function print_multilingual_form_value($template_var) {
         $lang_inputs_with_captions_str = "";
         foreach ($this->avail_langs as $lang) {
             $lang_str = $this->get_lang_str($lang);
@@ -1145,20 +1175,28 @@ class App extends AppObject {
             "<table>\n" .
             $lang_inputs_with_captions_str .
             "</table>\n";
-        $this->print_raw_values(array(
-            "{$template_var}.input" => $printed_value,
-            "{$template_var}.hidden" => $this->page->get_filling_value(
-                "{$template_var}_{$this->lang}.hidden"
-            ),
-        ));
+
+        $this->print_raw_value(
+            "{$template_var}.hidden",
+            $this->page->get_filling_value("{$template_var}_{$this->lang}.hidden")
+        );
+        $this->print_raw_value("{$template_var}.input", $printed_value);
+        
         return $printed_value;
     }
 
-    function print_datetime_form_value($template_var, $db_datetime, $input_attrs) {
+    function print_datetime_form_value(
+        $template_var,
+        $input_name,
+        $db_datetime,
+        $input_attrs
+    ) {
         $app_datetime = $this->get_app_datetime($db_datetime);
-        $this->print_hidden_input_form_value($template_var, $app_datetime);
+        $this->print_hidden_input_form_value($template_var, $input_name, $app_datetime);
+
         return $this->print_text_input_form_value(
             $template_var,
+            $input_name,
             $app_datetime,
             array_merge(
                 array("class" => "datetime"),
@@ -1167,11 +1205,18 @@ class App extends AppObject {
         );
     }
 
-    function print_date_form_value($template_var, $db_date, $input_attrs) {
+    function print_date_form_value(
+        $template_var,
+        $input_name,
+        $db_date,
+        $input_attrs
+    ) {
         $app_date = $this->get_app_date($db_date);
-        $this->print_hidden_input_form_value($template_var, $app_date);
+        $this->print_hidden_input_form_value($template_var, $input_name, $app_date);
+
         return $this->print_text_input_form_value(
             $template_var,
+            $input_name,
             $app_date,
             array_merge(
                 array("class" => "date"),
@@ -1180,11 +1225,18 @@ class App extends AppObject {
         );
     }
 
-    function print_time_form_value($template_var, $db_time, $input_attrs) {
+    function print_time_form_value(
+        $template_var,
+        $input_name,
+        $db_time,
+        $input_attrs
+    ) {
         $app_time = $this->get_app_time($db_time);
-        $this->print_hidden_input_form_value($template_var, $app_time);
+        $this->print_hidden_input_form_value($template_var, $input_name, $app_time);
+
         return $this->print_text_input_form_value(
             $template_var,
+            $input_name,
             $app_time,
             array_merge(
                 array("class" => "time"),
@@ -1193,64 +1245,116 @@ class App extends AppObject {
         );
     }
 //
+    function print_input_name($template_var, $input_name) {
+        $this->print_raw_value("{$template_var}.input_name", $input_name);
+    }
+
     function print_raw_input_form_value(
         $input_type,
         $template_var,
-        $value,
+        $input_name,
+        $input_value,
         $input_attrs = array()
     ) {
-        $printed_value = print_raw_html_input($input_type, $template_var, $value, $input_attrs);
+        $printed_value = print_raw_html_input($input_type, $input_name, $input_value, $input_attrs);
+
+        $this->print_input_name($template_var, $input_name);
         $this->print_raw_value("{$template_var}.input", $printed_value);
+        
         return $printed_value;
     }
 
-    function print_raw_hidden_form_value($template_var, $value) {
-        return $this->print_raw_input_form_value("hidden", $template_var, $value);
+    function print_raw_hidden_input_form_value(
+        $template_var,
+        $input_name,
+        $input_value
+    ) {
+        $printed_value = print_raw_html_input("hidden", $input_name, $input_value);
+        
+        $this->print_raw_value("{$template_var}.hidden", $printed_value);
+        
+        return $printed_value;
     }
 
     function print_input_form_value(
         $input_type,
         $template_var,
-        $value,
+        $input_name,
+        $input_value,
         $input_attrs = array()
     ) {
-        $printed_value = print_html_input($input_type, $template_var, $value, $input_attrs);
+        $printed_value = print_html_input($input_type, $input_name, $input_value, $input_attrs);
+        
+        $this->print_input_name($template_var, $input_name);
         $this->print_raw_value("{$template_var}.input", $printed_value);
+        
         return $printed_value;
     }
 
-    function print_hidden_input_form_value($template_var, $value) {
-        $printed_value = print_html_hidden($template_var, $value);
+    function print_hidden_input_form_value(
+        $template_var,
+        $input_name,
+        $input_value
+    ) {
+        $printed_value = print_html_hidden($input_name, $input_value);
+        
         $this->print_raw_value("{$template_var}.hidden", $printed_value);
+        
         return $printed_value;
     }
 
-    function print_text_input_form_value($template_var, $value, $input_attrs = array()) {
-        return $this->print_input_form_value("text", $template_var, $value, $input_attrs);
+    function print_text_input_form_value(
+        $template_var,
+        $input_name,
+        $input_value,
+        $input_attrs = array()
+    ) {
+        $this->print_input_name($template_var, $input_name);
+        
+        return $this->print_input_form_value(
+            "text",
+            $template_var,
+            $input_name,
+            $input_value,
+            $input_attrs
+        );
     }
 
-    function print_textarea_input_form_value($template_var, $value, $input_attrs = array()) {
-        $printed_value = print_html_textarea($template_var, $value, $input_attrs);
+    function print_textarea_input_form_value(
+        $template_var,
+        $input_name,
+        $input_value,
+        $input_attrs = array()
+    ) {
+        $printed_value = print_html_textarea($input_name, $input_value, $input_attrs);
+        
+        $this->print_input_name($template_var, $input_name);
         $this->print_raw_value("{$template_var}.input", $printed_value);
+        
         return $printed_value;
     }
 
     function print_checkbox_input_form_value(
         $template_var,
-        $value,
+        $input_name,
+        $input_value,
         $checked = null,
         $input_attrs = array()
     ) {
         $printed_value =
-            print_html_hidden("{$template_var}__sent", 1) .
-            print_html_checkbox($template_var, $value, $checked, $input_attrs);
+            print_html_hidden("__sent_{$input_name}", 1) .
+            print_html_checkbox($input_name, $input_value, $checked, $input_attrs);
+        
+        $this->print_input_name($template_var, $input_name);
         $this->print_raw_value("{$template_var}.input", $printed_value);
+        
         return $printed_value;
     }
 
     function print_radio_group_input_form_value(
         $template_var,
-        $value,
+        $input_name,
+        $input_value,
         $input_attrs,
         $values_info,
         $alt_values_info = null
@@ -1261,19 +1365,23 @@ class App extends AppObject {
         $delimiter = get_param_value($values_data_info, "delimiter", "");
 
         $printed_value = print_html_radio_group(
-            $template_var,
+            $input_name,
             $value_caption_pairs,
-            $value,
+            $input_value,
             $input_attrs,
             $delimiter
         );
+        
+        $this->print_input_name($template_var, $input_name);
         $this->print_raw_value("{$template_var}.input", $printed_value);
+        
         return $printed_value;
     }
 
     function print_select_input_form_value(
         $template_var,
-        $value,
+        $input_name,
+        $input_value,
         $input_attrs,
         $values_info,
         $alt_values_info = null
@@ -1281,18 +1389,22 @@ class App extends AppObject {
         $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
 
         $printed_value = print_html_select(
-            $template_var,
+            $input_name,
             $value_caption_pairs,
-            $value,
+            $input_value,
             $input_attrs
         );
+        
+        $this->print_input_name($template_var, $input_name);
         $this->print_raw_value("{$template_var}.input", $printed_value);
+        
         return $printed_value;
     }
 
     function print_main_select_input_form_value(
         $template_var,
-        $value,
+        $input_name,
+        $input_value,
         $input_attrs,
         $values_info,
         $dependent_select_name,
@@ -1303,7 +1415,7 @@ class App extends AppObject {
         $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
 
         $form_name = get_param_value($dependency_info, "form_name", "form");
-        $main_select_name = $template_var;
+        $main_select_name = $input_name;
         $dependency_key_field_name = $dependency_info["key_field_name"];
         $dependency_query_ex = get_param_value($dependency_info, "query_ex", array());
 
@@ -1328,15 +1440,16 @@ class App extends AppObject {
         );
 
         $printed_value = print_html_select(
-            $template_var,
+            $input_name,
             $value_caption_pairs,
-            $value,
+            $input_value,
             $input_attrs
         );
-        $this->print_raw_values(array(
-            "{$template_var}.input" => $printed_value,
-            "{$template_var}.dependency_js" => $dependency_js,
-        ));
+        
+        $this->print_input_name($template_var, $input_name);
+        $this->print_raw_value("{$template_var}.input", $printed_value);
+        $this->print_raw_value("{$template_var}.dependency_js", $dependency_js);
+        
         return $printed_value;
     }
 
@@ -1893,7 +2006,10 @@ class App extends AppObject {
             "Commandline: {$cmdline}",
             DL_INFO
         );
-        $stream = popen($cmdline, "rb");
+        //'b' parameter removed temporarily to work with php 4.3.9-centos4
+        // Doesn't work on windows
+        // Was: $stream = popen($cmdline, "rb");
+        $stream = popen($cmdline, "r");
         if ($stream === false) {
             $this->write_log(
                 "DB dump stream creation failed! Couldn't run commandline:\n" .

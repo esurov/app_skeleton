@@ -1,36 +1,36 @@
 <form action="?" method="post" name="form">
 <input type="hidden" name="action" value="update_user" />
-<input type="hidden" name="user_id" value="{%user_id%}" />
+<input type="hidden" name="user_id" value="{%user.id%}" />
 
 <table>
 {%_role%}
 <tr>
     <td>{%lang:login%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_login.input%}</td>
+    <td>{%user.login.input%}</td>
 </tr>
 <tr>
     <td>{%lang:password%}:</td>
-    <td>{%user_password.input%}</td>
+    <td>{%user.password.input%}</td>
 </tr>
 <tr>
     <td>{%lang:password_confirm%}:</td>
-    <td>{%user_password_confirm.input%}</td>
+    <td>{%user.password_confirm.input%}</td>
 </tr>
 <tr>
     <td>{%lang:first_name%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_first_name.input%}</td>
+    <td>{%user.first_name.input%}</td>
 </tr>
 <tr>
     <td>{%lang:last_name%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_last_name.input%}</td>
+    <td>{%user.last_name.input%}</td>
 </tr>
 <tr>
     <td>{%lang:email%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user_email.input%}</td>
+    <td>{%user.email.input%}</td>
 </tr>
 <tr>
     <td valign="middle">{%lang:extra_info%}:</td>
-    <td>{%user_extra_info.input%}</td>
+    <td>{%user.extra_info.input%}</td>
 </tr>
 {%_is_confirmed%}
 {%_is_active%}
@@ -43,4 +43,6 @@
 
 </form>
 
-{%user_client_validation_js%}
+<script type="text/javascript">
+{%user.client_validation_js%}
+</script>

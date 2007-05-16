@@ -438,15 +438,16 @@ JS;
 }
 
 function create_client_validation_js($client_validate_condition_strs) {
-    $client_validate_conditions_str = join(",\n", $client_validate_condition_strs);
-    return <<<JS
-<script type="text/javascript">
-conditions = new Array(
-{$client_validate_conditions_str}
-);
-document.forms['form'].onsubmit = onsubmitValidateFormHandler;
-</script>
+    $client_validate_conditions_str = "";
+    foreach ($client_validate_condition_strs as $client_validate_condition_str) {
+        $client_validate_conditions_str .= <<<JS
+validateConditions[validateConditions.length] = {$client_validate_condition_str};
 
+JS;
+    }
+    return <<<JS
+document.forms['form'].onsubmit = onsubmitValidateFormHandler;
+{$client_validate_conditions_str}
 JS;
 }
 

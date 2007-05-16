@@ -235,6 +235,8 @@ function getCurrentYear() {
 
 //
 
+dependencies = new Array();
+
 function Dependency(formName, mainSelectName, dependentSelectName, dependencyArray) {
     this.formName = formName;
     this.mainSelectName = mainSelectName;
@@ -375,9 +377,10 @@ function initDependencies() {
     }
 }
 
-dependencies = new Array();
-
 //
+
+validateConditions = new Array();
+
 function validateForm(form, conditions) {
     var elements = form.elements;
     for (var i = 0; i < conditions.length; i++) {
@@ -504,7 +507,7 @@ function onsubmitValidateFormHandler(form) {
     } else if (form.target) {
         form = form.target;
     }
-    if (validateForm(form, conditions)) {
+    if (validateForm(form, validateConditions)) {
         return onsubmitFormHandler(form);
     } else {
         return false;

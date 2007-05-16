@@ -1,8 +1,8 @@
 <list_item
-    id="{%news_article_id%}"
-    created="{%news_article_created%}"
-    title="{%news_article_title%}"
-    body="{%news_article_body%}"
-    image_id="{%news_article_image_id%}"
-    new_field="{%news_article_new_field%}"
+    id="{%news_article.id%}"
+    created="{%news_article.created%}"
+    title="{%news_article.title%}"
+    body="{%news_article.body%}"
+    image_id="{%news_article.image_id%}"
+    new_field="{%news_article.new_field%}"
 />
