@@ -22,7 +22,7 @@
 >
     <menu_item
         name="index"
-        url="?"
+        url="./"
         contexts="pg_index"
     />
     <menu_item
@@ -50,12 +50,12 @@
             <menu_item
                 name="sample_static_page1"
                 url="?action=pg_static&amp;page=sample_page1"
-                contexts="pg_static_sample_page1"
+                contexts="pg_static.sample_page1"
             />
             <menu_item
                 name="sample_static_page2"
                 url="?action=pg_static&amp;page=sample_page2"
-                contexts="pg_static_sample_page2"
+                contexts="pg_static.sample_page2"
             />
             <menu_item
                 name="sample_popup"
@@ -81,12 +81,12 @@
                     <menu_item
                         name="sample_static_page2_1"
                         url="?action=pg_static&amp;page=sample_page2_1"
-                        contexts="pg_static_sample_page2_1"
+                        contexts="pg_static.sample_page2_1"
                     />
                     <menu_item
                         name="sample_static_page2_2"
                         url="?action=pg_static&amp;page=sample_page2_2"
-                        contexts="pg_static_sample_page2_2"
+                        contexts="pg_static.sample_page2_2"
                     />
                 </menu>
             </menu_item>

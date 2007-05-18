@@ -4,15 +4,15 @@ page_title.access_denied = Access denied!
 
 head_page_title.pg_index = Home
 
-page_title.pg_static_policy_terms_of_use = Terms of use
-page_title.pg_static_policy_terms_and_conditions = Terms and conditions
-page_title.pg_static_policy_privacy = Privacy policy
-page_title.pg_static_policy_disclaimer = Disclaimer
+page_title.pg_static.policy_terms_of_use = Terms of use
+page_title.pg_static.policy_terms_and_conditions = Terms and conditions
+page_title.pg_static.policy_privacy = Privacy policy
+page_title.pg_static.policy_disclaimer = Disclaimer
 
-page_title.pg_static_sample_page1 = SampleStaticSamplePage1
-page_title.pg_static_sample_page2 = SampleStaticSamplePage2
-page_title.pg_static_sample_page2_1 = SampleStaticPage2_1
-page_title.pg_static_sample_page2_2 = SampleStaticPage2_2
+page_title.pg_static.sample_page1 = SampleStaticSamplePage1
+page_title.pg_static.sample_page2 = SampleStaticSamplePage2
+page_title.pg_static.sample_page2_1 = SampleStaticPage2_1
+page_title.pg_static.sample_page2_2 = SampleStaticPage2_2
 
 ["general menu items"]
 guest_menu_item.index = Home

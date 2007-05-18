@@ -779,11 +779,11 @@ class UserApp extends CustomApp {
                 return;
             }
         }
-        $return_url_params = array("action" => "pg_users");
+        $redirect_url_params = array("action" => "pg_users");
         $this->delete_db_object(array(
             "obj" => $user,
-            "success_url_params" => $return_url_params,
-            "error_url_params" => $return_url_params,
+            "success_url_params" => $redirect_url_params,
+            "error_url_params" => $redirect_url_params,
         ));
     }
 //

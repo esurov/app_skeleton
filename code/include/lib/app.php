@@ -214,6 +214,17 @@ class App extends AppObject {
         return "pg_index";
     }
 
+    function get_action_lang_resource() {
+        $resource = $this->action;
+        if ($this->action == "pg_static") {
+            $page_name = $this->read_static_page_name();
+            if ($page_name != "") {
+                $resource = "{$this->action}.{$page_name}";
+            }
+        }
+        return $resource;
+    }
+
     function on_before_validate_action() {
         $this->print_raw_value("global:html_charset", $this->html_charset);
 
@@ -228,27 +239,13 @@ class App extends AppObject {
     }
     
     function run_action($action_name = null, $action_params = array()) {
-        // Run action and return its response
+        // If optional action name was given then use it else default one is used
         if (!is_null($action_name)) {
             $this->action = $action_name;
         }
         $this->action_params = $action_params;
-        $page_name = get_param_value($action_params, "page", null);
-        if (is_null($page_name)) {
-            $page_name = trim(param("page"));
-        }
 
-        $action_func_name = "action_{$this->action}";
-        $action_name_expanded = ($page_name == "") ?
-            $this->action :
-            "{$this->action}_{$page_name}";
-        
-        $this->print_values(array(
-            "action" => $this->action,
-            "action_expanded" => $action_name_expanded,
-            "page" => $page_name,
-        ));
-        $this->action = $action_name_expanded;
+        $this->print_value("action", $this->action);
 
         $this->on_before_run_action();
 
@@ -257,7 +254,7 @@ class App extends AppObject {
             DL_INFO
         );
 
-        $this->{$action_func_name}();  // NB! Variable function
+        $this->{"action_{$this->action}"}();  // NB! Variable function
         
         $this->on_after_run_action();
     }
@@ -1686,16 +1683,12 @@ class App extends AppObject {
 
     // Page titles
     function print_page_titles() {
-        $this->print_head_and_page_titles($this->get_default_page_title_lang_resource());
+        $this->print_head_and_page_titles($this->get_action_lang_resource());
     }
 
     function print_head_and_page_titles($resource) {
         $this->print_page_title($resource);
         $this->print_head_page_title($resource);
-    }
-
-    function get_default_page_title_lang_resource() {
-        return $this->action;
     }
 
     function print_page_title($resource, $is_html = false) {
@@ -1796,34 +1789,15 @@ class App extends AppObject {
         $this->session->set_param("status_messages", $messages);
     }
 
-    // Static page
-    function print_static_page($page_name, $template_var) {
-        $full_page_name = "{$page_name}_{$this->lang}";
-        if (!$this->is_static_page_file_exist($full_page_name)) {
-            $full_page_name = $page_name;
-            if (!$this->is_static_page_file_exist($full_page_name)) {
-                $this->print_raw_value($template_var, "");
-                return "";
-            }
-        }
-        return $this->print_static_page_file($full_page_name, $template_var);
-    }
-
-    function print_static_page_file($page_name, $template_var) {
-        return $this->print_file("static/{$page_name}.html", $template_var);
-    }
-
-    function is_static_page_file_exist($page_name) {
-        return $this->is_file_exist("static/{$page_name}.html");
-    }
-
     // Main menu
     function print_menu($params = array()) {
         $menu =& $this->create_menu($params);
         
         $menu->load_from_xml(get_param_value($params, "xml_filename", "menu.xml"));
-        $menu->select_items_by_context(get_param_value($params, "context", $this->action));
-        
+        $menu->select_items_by_context(
+            get_param_value($params, "context", $this->get_action_lang_resource())
+        );
+
         return $menu->print_values();
     }
 
@@ -1844,6 +1818,15 @@ class App extends AppObject {
         $lang_menu->avail_langs = $this->get_avail_langs();
         $lang_menu->current_lang = $this->lang;
 
+        $redirect_url_params = array();
+        if ($this->action != $this->get_default_action_name()) {
+            $redirect_url_params["action"] = $this->action;
+            if ($this->action == "pg_static") {
+                $redirect_url_params["page"] = $this->read_static_page_name();
+            }
+        }
+        $lang_menu->redirect_url = create_self_full_url($redirect_url_params);
+
         return $lang_menu->print_values();
     }
 
@@ -1860,26 +1843,45 @@ class App extends AppObject {
     // Common actions
     function action_change_lang() {
         $this->set_current_lang(trim(param("new_lang")));
-        $cur_action = trim(param("cur_action"));
-        $cur_page = trim(param("cur_page"));
-        
-        $suburl_params = array();
-        if ($cur_action != "") {
-            $suburl_params["action"] = $cur_action;
-        }
-        if ($cur_page != "") {
-            $suburl_params["page"] = $cur_page;
-        }
-        $this->create_self_redirect_response($suburl_params);
-    }
 
+        $this->create_redirect_response((string) param("redirect_url"));
+    }
+//
     function action_pg_static() {
-        $page_name = trim(param("page"));
-        if (preg_match('/^\w+$/i', $page_name)) {
+        $page_name = $this->read_static_page_name();
+        if ($page_name != "") {
             $this->print_static_page($page_name, "body");
         }
     }
 
+    function read_static_page_name() {
+        $page_name = trim(param("page"));
+        if (!preg_match('/^\w+$/i', $page_name)) {
+            $page_name = "";
+        }
+        return $page_name;
+    }
+
+    function print_static_page($page_name, $template_var) {
+        $full_page_name = "{$page_name}_{$this->lang}";
+        if (!$this->is_static_page_file_exist($full_page_name)) {
+            $full_page_name = $page_name;
+            if (!$this->is_static_page_file_exist($full_page_name)) {
+                $this->print_raw_value($template_var, "");
+                return "";
+            }
+        }
+        return $this->print_static_page_file($full_page_name, $template_var);
+    }
+
+    function print_static_page_file($page_name, $template_var) {
+        return $this->print_file("static/{$page_name}.html", $template_var);
+    }
+
+    function is_static_page_file_exist($page_name) {
+        return $this->is_file_exist("static/{$page_name}.html");
+    }
+//
     function action_get_image() {
         $image =& $this->read_id_fetch_db_object("Image");
         if ($image->is_definite()) {
@@ -1898,7 +1900,7 @@ class App extends AppObject {
             $this->create_http_not_found_response();
         }
     }
-
+//
     function action_get_file() {
         $file =& $this->read_id_fetch_db_object("File");
         if ($file->is_definite()) {
@@ -1917,7 +1919,7 @@ class App extends AppObject {
             $this->create_http_not_found_response();
         }
     }
-
+//
     // Setup app actions
     function action_create_update_tables() {
         $this->process_create_update_tables();

@@ -9,7 +9,7 @@
 >
     <menu_item
         name="index"
-        url="?"
+        url="./"
         contexts="pg_index"
     />
     <menu_item

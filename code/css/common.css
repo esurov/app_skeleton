@@ -111,6 +111,7 @@ p {
 .menu_item {
     float: left;
     padding: 2px;
+    font-weight: normal;
 }
 
 .menu_item_selected {
@@ -131,6 +132,7 @@ p {
 
 .sub_menu_item {
     padding: 2px;
+    font-weight: normal;
 }
 
 .sub_menu_item_selected {
@@ -146,6 +148,7 @@ p {
 
 .sub_sub_menu_item {
     padding: 2px;
+    font-weight: normal;
 }
 
 .sub_sub_menu_item_selected {

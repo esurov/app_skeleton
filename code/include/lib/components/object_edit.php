@@ -28,7 +28,7 @@ class ObjectEdit extends ObjectTemplateComponent {
         $this->_page_title_resource = get_param_value(
             $params,
             "page_title_resource",
-            $this->app->get_default_page_title_lang_resource()
+            $this->app->get_action_lang_resource()
         );
         if (!is_null($this->_page_title_resource) && !$this->obj->is_definite()) {
             $this->_page_title_resource .= "_new";
