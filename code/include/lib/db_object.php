@@ -2451,30 +2451,6 @@ class DbObject extends AppObject {
     }
 //
     // Uploaded image helper functions
-    function &fetch_image($image_id_field_name) {
-        $image_id = $this->{$image_id_field_name};
-        return $this->fetch_db_object("Image", $image_id);
-    }
-
-    function &fetch_image_without_content($image_id_field_name) {
-        $image_id = $this->{$image_id_field_name};
-        return $this->fetch_db_object("Image", $image_id, "1", null, array("content"));
-    }
-
-    function print_image_info($image_id_field_name, $template_var) {
-        $image =& $this->fetch_image_without_content($image_id_field_name);
-        $image->print_values();
-        
-        $filename = ($image->is_definite()) ?
-            "{$template_var}.html" :
-            "{$template_var}_empty.html";
-        
-        $this->app->print_file_new_if_exists(
-            "{$this->_templates_dir}/{$filename}",
-            "{$this->_table_name}{$template_var}"
-        );
-    }
-
     function del_image($image_id_field_name) {
         $image_id = $this->{$image_id_field_name};
         if ($image_id != 0) {
@@ -2484,30 +2460,6 @@ class DbObject extends AppObject {
     }
 
     // Uploaded file helper functions
-    function &fetch_file($file_id_field_name) {
-        $file_id = $this->{$file_id_field_name};
-        return $this->fetch_db_object("File", $file_id);
-    }
-
-    function &fetch_file_without_content($file_id_field_name) {
-        $file_id = $this->{$file_id_field_name};
-        return $this->fetch_db_object("File", $file_id, "1", null, array("content"));
-    }
-
-    function print_file_info($file_id_field_name, $template_var) {
-        $file =& $this->fetch_file_without_content($file_id_field_name);
-        $file->print_values();
-        
-        $filename = ($file->is_definite()) ?
-            "{$template_var}.html" :
-            "{$template_var}_empty.html";
-        
-        $this->app->print_file_new_if_exists(
-            "{$this->_templates_dir}/{$filename}",
-            "{$this->_table_name}{$template_var}"
-        );
-    }
-
     function del_file($file_id_field_name) {
         $file_id = $this->{$file_id_field_name};
         if ($file_id != 0) {

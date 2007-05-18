@@ -164,15 +164,40 @@ class NewsArticleTable extends CustomDbObject {
                 get_word_shortened_string(strip_tags($this->body), $body_short_len, "...")
             );
 
-            $this->print_image_info("thumbnail_image_id", "_thumbnail_image");
+            $this->app->print_db_object_info(
+                $this->app->fetch_image_without_content($this->thumbnail_image_id),
+                $this->_templates_dir,
+                "news_article.thumbnail_image",
+                "_thumbnail_image.html",
+                "_thumbnail_image_empty.html"
+            );
+            
             if ($this->_context == "list_item_admin") {
-                $this->print_file_info("file_id", "_file_info");
+                $this->app->print_db_object_info(
+                    $this->app->fetch_file_without_content($this->file_id),
+                    $this->_templates_dir,
+                    "news_article.file_info",
+                    "_file_info.html",
+                    "_file_info_empty.html"
+                );
             }
         }
         
         if ($this->_context == "view" || $this->_context == "edit") {
-            $this->print_image_info("image_id", "_image");
-            $this->print_file_info("file_id", "_file_info");
+            $this->app->print_db_object_info(
+                $this->app->fetch_image_without_content($this->image_id),
+                $this->_templates_dir,
+                "news_article.image",
+                "_image.html",
+                "_image_empty.html"
+            );
+            $this->app->print_db_object_info(
+                $this->app->fetch_file_without_content($this->file_id),
+                $this->_templates_dir,
+                "news_article.file_info",
+                "_file_info.html",
+                "_file_info_empty.html"
+            );
         }
     }
 

@@ -2256,89 +2256,7 @@ class App extends AppObject {
         }
         return $db_objects_info;
     }
-
-    // Uploaded image
-    function process_uploaded_image(
-        &$obj,
-        $image_id_field_name,
-        $input_name,
-        $params = array()
-    ) {
-        if (!was_file_uploaded($input_name)) {
-            return true;
-        }
-
-        $uploaded_image =& $this->create_object(
-            "UploadedImage", 
-            array(
-                "input_name" => $input_name,
-            )
-        );
-        
-        $obj_image = $obj->fetch_image_without_content($image_id_field_name);
-
-        $image_processor_class_name = get_param_value($params, "image_processor.class", null);
-        if (!is_null($image_processor_class_name)) {
-            $image_processor_params = array(
-                "actions" => get_param_value($params, "image_processor.actions", array()),
-            );
-            $image_processor =& $this->create_object(
-                $image_processor_class_name,
-                $image_processor_params
-            );
-            if (!$image_processor->process($uploaded_image)) {
-                return false;
-            }
-        }
-
-        $obj_image->filename = $uploaded_image->get_orig_filename();
-        $obj_image->set_image_fields_from($uploaded_image);
-        
-        if (!$obj_image->is_definite()) {
-            $obj_image->is_thumbnail = get_param_value($params, "is_thumbnail", 0);
-        }
-
-        $obj_image->save();
-
-        $obj->set_field_value($image_id_field_name, $obj_image->id);
-        
-        if (!is_null($image_processor_class_name)) {
-            $image_processor->cleanup();
-        }
-        
-        return true;
-    }
-
-    // Uploaded file
-    function process_uploaded_file(
-        &$obj,
-        $file_id_field_name,
-        $input_name,
-        $params = array()
-    ) {
-        if (!was_file_uploaded($input_name)) {
-            return true;
-        }
-    
-        $uploaded_file =& $this->create_object(
-            "UploadedFile", 
-            array(
-                "input_name" => $input_name,
-            )
-        );
-        
-        $obj_file = $obj->fetch_file_without_content($file_id_field_name);
-
-        $obj_file->filename = $uploaded_file->get_orig_filename();
-        $obj_file->set_file_fields_from($uploaded_file);
-        
-        $obj_file->save();
-
-        $obj->set_field_value($file_id_field_name, $obj_file->id);
-        
-        return true;
-    }
-
+//
     function delete_db_object($params = array()) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
@@ -2387,6 +2305,96 @@ class App extends AppObject {
             $this->create_self_redirect_response($success_url_params);
         }
     }
+//
+    function print_db_object_info(
+        &$obj,
+        $templates_dir,
+        $template_var,
+        $obj_info_template_name,
+        $obj_info_empty_template_name = null,
+        $params = array()
+    ) {
+        $obj->print_values($params);
+        $template_name = ($obj->is_definite() || is_null($obj_info_empty_template_name)) ?
+            $obj_info_template_name :
+            $obj_info_empty_template_name;
+        return $this->print_file_new_if_exists("{$templates_dir}/{$template_name}", $template_var);
+    }
+
+    function print_db_object_subform(
+        &$obj,
+        $templates_dir,
+        $template_var,
+        $obj_subform_template_name,
+        $obj_empty_template_name = null,
+        $params = array()
+    ) {
+        $obj->print_form_values($params);
+        $template_name = ($obj->is_definite() || is_null($obj_subform_empty_template_name)) ?
+            $obj_subform_template_name :
+            $obj_subform_empty_template_name;
+        return $this->print_file_new_if_exists("{$templates_dir}/{$template_name}", $template_var);
+    }
+
+    // Uploaded image
+    function &fetch_image($image_id) {
+        return $this->fetch_db_object("Image", $image_id);
+    }
+
+    function &fetch_image_without_content($image_id) {
+        return $this->fetch_db_object("Image", $image_id, "1", null, array("content"));
+    }
+
+    function process_uploaded_image(
+        &$obj,
+        $image_id_field_name,
+        $input_name,
+        $params = array()
+    ) {
+        if (!was_file_uploaded($input_name)) {
+            return true;
+        }
+
+        $uploaded_image =& $this->create_object(
+            "UploadedImage", 
+            array(
+                "input_name" => $input_name,
+            )
+        );
+        
+        $obj_image = $this->fetch_image_without_content($obj->{$image_id_field_name});
+
+        $image_processor_class_name = get_param_value($params, "image_processor.class", null);
+        if (!is_null($image_processor_class_name)) {
+            $image_processor_params = array(
+                "actions" => get_param_value($params, "image_processor.actions", array()),
+            );
+            $image_processor =& $this->create_object(
+                $image_processor_class_name,
+                $image_processor_params
+            );
+            if (!$image_processor->process($uploaded_image)) {
+                return false;
+            }
+        }
+
+        $obj_image->filename = $uploaded_image->get_orig_filename();
+        $obj_image->set_image_fields_from($uploaded_image);
+        
+        if (!$obj_image->is_definite()) {
+            $obj_image->is_thumbnail = get_param_value($params, "is_thumbnail", 0);
+        }
+
+        $obj_image->save();
+
+        $obj->set_field_value($image_id_field_name, $obj_image->id);
+        
+        if (!is_null($image_processor_class_name)) {
+            $image_processor->cleanup();
+        }
+        
+        return true;
+    }
 
     function delete_db_object_image($obj, $image_id_field_name, $delete_thumbnail = true) {
         if ($obj->is_definite() && $obj->is_field_exist($image_id_field_name)) {
@@ -2406,18 +2414,56 @@ class App extends AppObject {
             $obj->update($field_names_to_update);
         }
     }
+//
+    // Uploaded file
+    function &fetch_file($file_id) {
+        return $this->fetch_db_object("File", $file_id);
+    }
+
+    function &fetch_file_without_content($file_id) {
+        return $this->fetch_db_object("File", $file_id, "1", null, array("content"));
+    }
+
+    function process_uploaded_file(
+        &$obj,
+        $file_id_field_name,
+        $input_name,
+        $params = array()
+    ) {
+        if (!was_file_uploaded($input_name)) {
+            return true;
+        }
+    
+        $uploaded_file =& $this->create_object(
+            "UploadedFile", 
+            array(
+                "input_name" => $input_name,
+            )
+        );
+        
+        $obj_file = $this->fetch_file_without_content($obj->{$file_id_field_name});
+
+        $obj_file->filename = $uploaded_file->get_orig_filename();
+        $obj_file->set_file_fields_from($uploaded_file);
+        
+        $obj_file->save();
+
+        $obj->set_field_value($file_id_field_name, $obj_file->id);
+        
+        return true;
+    }
 
     function delete_db_object_file($obj, $file_id_field_name) {
         if ($obj->is_definite() && $obj->is_field_exist($file_id_field_name)) {
             $field_names_to_update = array($file_id_field_name);
 
             $obj->del_file($file_id_field_name);
-            $obj->{$file_id_field_name} = 0;
+            $obj->set_field_value($file_id_field_name, 0);
 
             $obj->update($field_names_to_update);
         }
     }
-
+//
     // Email sender
     function &create_email_sender() {
         $email_sender =& $this->create_object("PHPMailer");
