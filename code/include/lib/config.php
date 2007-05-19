@@ -39,7 +39,7 @@ class Config {
         }
 
         $f = fopen($filename, "r");
-        if (!$f){
+        if (!$f) {
             trigger_error(
                 "Cannot open configuration file '{$filename}'!",
                 E_USER_ERROR
@@ -48,18 +48,16 @@ class Config {
 
         flock($f, LOCK_SH);
         while ($line = fgets($f, 1024)) {
-            $line = rtrim($line);
-
             // Comments and group specifiers may start only at the beginning of lines
             if (
-                preg_match('/^#.*$/', $line) ||
-                preg_match('/^\/\/.*$/', $line) ||
+                preg_match('/^#/', $line) ||
+                preg_match('/^\/\//', $line) ||
                 preg_match('/^\[/', $line)
             ) {
                 continue;
             }
 
-            if (preg_match('/^(.+?)\s*=\s*(.*)$/', $line, $matches)) {
+            if (preg_match('/^(.+?)\s*=\s?(.*?)\r?$/', $line, $matches)) {
                 $this->_params[$matches[1]] = $matches[2];
             }
         }

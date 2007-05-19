@@ -50,7 +50,10 @@ class Pager extends AppComponent {
 
         $n_rows_per_page = get_param_value($params, "n_rows_per_page", null);
         if (is_null($n_rows_per_page)) {
-            $n_rows_per_page = $this->get_config_value("{$this->app->app_name}_rows_per_page", 20);
+            $n_rows_per_page = $this->get_config_value(
+                "{$this->app->app_name}.pager.rows_per_page",
+                20
+            );
         }
         $this->set_n_rows_per_page($n_rows_per_page);
 

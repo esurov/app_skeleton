@@ -445,23 +445,23 @@ class App extends AppObject {
 //
     // Date & Time format and formatting
     function get_app_datetime_format() {
-        return $this->get_config_value("app_datetime_format");
+        return $this->get_config_value("app_datetime_format_{$this->lang}");
     }
 
     function get_app_short_datetime_format() {
-        return $this->get_config_value("app_short_datetime_format");
+        return $this->get_config_value("app_short_datetime_format_{$this->lang}");
     }
 
     function get_app_date_format() {
-        return $this->get_config_value("app_date_format");
+        return $this->get_config_value("app_date_format_{$this->lang}");
     }
 
     function get_app_time_format() {
-        return $this->get_config_value("app_time_format");
+        return $this->get_config_value("app_time_format_{$this->lang}");
     }
 
     function get_app_short_time_format() {
-        return $this->get_config_value("app_short_time_format");
+        return $this->get_config_value("app_short_time_format_{$this->lang}");
     }
 
     function get_db_datetime_format() {
@@ -587,30 +587,51 @@ class App extends AppObject {
     }
 //
     // Integer, double and currency formatting
-    function get_app_integer_value($php_integer_value) {
-        return format_integer_value($php_integer_value, ",");
+    function get_app_integer_value($php_number_value) {
+        return format_integer_value(
+            $php_number_value,
+            $this->get_config_value("app_number_thousands_separator_{$this->lang}")
+        );
     }
 
-    function get_php_integer_value($app_integer_value) {
-        $result = str_replace(",", "", $app_integer_value);
-        return (is_php_number($result)) ? (int) $result : 0;
+    function get_php_integer_value($app_number_value) {
+        return (int) $this->get_php_double_value($app_number_value);
+    }
+    
+    function get_app_double_value($php_number_value, $decimals) {
+        return format_double_value(
+            $php_number_value,
+            $decimals,
+            $this->get_config_value("app_number_decimal_point_{$this->lang}"),
+            $this->get_config_value("app_number_thousands_separator_{$this->lang}")
+        );
     }
 
-    function get_app_double_value($php_double_value, $decimals) {
-        return format_double_value($php_double_value, $decimals, ".", ",");
-    }
-
-    function get_php_double_value($app_double_value) {
-        $result = str_replace(",", "", $app_double_value);
+    function get_php_double_value($app_number_value) {
+        $result = str_replace(
+            $this->get_config_value("app_number_thousands_separator_{$this->lang}"),
+            "",
+            $app_number_value
+        );
+        $result = str_replace(
+            $this->get_config_value("app_number_decimal_point_{$this->lang}"),
+            ".",
+            $result
+        );
         return (is_php_number($result)) ? (double) $result : 0.0;
     }
 
-    function get_app_currency_value($php_double_value, $decimals) {
-        return $this->get_app_double_value($php_double_value, $decimals);
+    function get_app_currency_value($php_number_value, $decimals) {
+        return format_double_value(
+            $php_number_value,
+            $decimals,
+            $this->get_config_value("app_currency_decimal_point_{$this->lang}"),
+            $this->get_config_value("app_currency_thousands_separator_{$this->lang}")
+        );
     }
 
     function get_app_currency_with_sign_value(
-        $php_double_value,
+        $php_number_value,
         $decimals = 2,
         $sign = null,
         $sign_at_start = null,
@@ -629,12 +650,12 @@ class App extends AppObject {
 
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
-            if ((double) $php_double_value == (double) $nonset_value) {
+            if ((double) $php_number_value == (double) $nonset_value) {
                 return get_caption_from_value_caption_pair($nonset_value_caption_pair);
             }
         }
         return $this->append_currency_sign(
-            $this->get_app_currency_value($php_double_value, $decimals),
+            $this->get_app_currency_value($php_number_value, $decimals),
             $sign,
             $sign_at_start
         );
@@ -644,6 +665,7 @@ class App extends AppObject {
         return ($sign_at_start) ? "{$sign}{$str}" : "{$str}{$sign}";
     }
 
+    // Euro currency sign utf-8 codepoint
     function get_currency_sign() {
         return "\xE2\x82\xAC ";
     }
@@ -653,7 +675,7 @@ class App extends AppObject {
     }
 
     function get_currency_nonset_value_caption_pair() {
-        return null;
+        return array(0.0, $this->get_lang_str("not_specified"));
     }
 //
     // Template printing functions
@@ -1037,8 +1059,10 @@ class App extends AppObject {
             "{$template_var}.input",
             $this->append_currency_sign($printed_value, $sign, $sign_at_start)
         );
+
         $this->print_text_input_form_value(
             "{$template_var}.without_sign",
+            $input_name,
             $value_formatted_without_sign,
             array_merge(
                 array("class" => "currency"),
