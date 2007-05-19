@@ -17,31 +17,34 @@ function tx() {
 }
 
 // CGI params handling
-function param($name) {
-    if (isset($_GET[$name])) {
-        $param_value = $_GET[$name];
-    } else if (isset($_POST[$name])) {
-        $param_value = $_POST[$name];
-    } else {
-        return null;
-    }
+function param($param_name) {
+    $param_value = read_cgi_param($param_name);
+    return (is_array($param_value)) ? null : $param_value;
+}
 
-//    if (get_magic_quotes_gpc()) {
-//        if (is_array($param_value)) {
-//            $param_values = array();
-//            foreach ($param_value as $value) {
-//                $param_values[] = stripslashes($value);
-//            }
-//            return $param_values;
-//        } else {
-//            return stripslashes($param_value);
-//        }
-//    }
-    return $param_value;
+function param_array($param_name) {
+    $param_value = read_cgi_param($param_name);
+    if (is_null($param_value)) {
+        return array();
+    } else if (is_array($param_value)) {
+        return $param_value;
+    } else {
+        return array($param_value);
+    }
 }
 
 function params() {
     return array_merge($_POST, $_GET);
+}
+
+function read_cgi_param($name) {
+    if (isset($_GET[$name])) {
+        return $_GET[$name];
+    } else if (isset($_POST[$name])) {
+        return $_POST[$name];
+    } else {
+        return null;
+    }
 }
 
 // URL handling functions

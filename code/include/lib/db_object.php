@@ -1470,39 +1470,52 @@ class DbObject extends AppObject {
     }
 //
     function read_order_by($default_order_by_fields) {
+        $order_by_fields = param_array("order_by");
+
+        // Check if all requested fields really exist else fallback to default_order_by fields
+        $use_default_order_by_fields = false;
+        if (count($order_by_fields) == 0) {
+            $use_default_order_by_fields = true;
+        } else {
+            foreach ($order_by_fields as $order_by_field) {
+                $order_by_field_parts = explode(" ", $order_by_field, 2);
+                $order_by_field_name = $order_by_field_parts[0];
+                if (!$this->is_field_exist($order_by_field_name)) {
+                    $use_default_order_by_fields = true;
+                    $this->write_log(
+                        "read_order_by(): Field '{$order_by_field_name}' " .
+                        "specified in 'order_by' CGI parameter not found in " .
+                        "'{$this->_table_name}', trying to use " .
+                        "'default_order_by' fields instead!",
+                        DL_WARNING
+                    );
+                    break;
+                }
+            }
+        }
+        if ($use_default_order_by_fields) {
+            if (!is_array($default_order_by_fields)) {
+                $default_order_by_fields = array($default_order_by_fields);
+            }
+            
+            // Check if all default_order_by fields really exist
+            foreach ($default_order_by_fields as $default_order_by_field) {
+                $default_order_by_field_parts = explode(" ", $default_order_by_field, 2);
+                $default_order_by_field_name = $default_order_by_field_parts[0];
+                if (!$this->is_field_exist($default_order_by_field_name)) {
+                    $this->process_fatal_error(
+                        "read_order_by(): Field '{$default_order_by_field_name}' " .
+                        "specified in 'default_order_by' not found in '{$this->_table_name}'!"
+                    );
+                }
+            }
+            $order_by_fields = $default_order_by_fields;
+        }
+
         $this->_order_by = array();
-
-        if (!is_array($default_order_by_fields)) {
-            $default_order_by_fields = array($default_order_by_fields);
-        }
-        
-        // Check if all default_order_by fields really exist in this obj
-        foreach ($default_order_by_fields as $default_order_by_field) {
-            $default_order_by_field_parts = explode(" ", $default_order_by_field, 2);
-            $default_order_by_field_name = $default_order_by_field_parts[0];
-            if (!$this->is_field_exist($default_order_by_field_name)) {
-                $this->process_fatal_error(
-                    "read_order_by(): Field '{$default_order_by_field_name}' " .
-                    "specified in 'default_order_by' not found in '{$this->_table_name}'!"
-                );
-            }
-        }
-
-        $order_by_fields = param("order_by");
-        if (!is_array($order_by_fields)) {
-            if (is_null($order_by_fields) || trim($order_by_fields) == "") {
-                $order_by_fields = $default_order_by_fields;
-            } else {
-                $order_by_fields = array($order_by_fields);
-            }
-        }
-
         foreach ($order_by_fields as $order_by_field) {
             $order_by_field_parts = explode(" ", $order_by_field, 2);
             $order_by_field_name = $order_by_field_parts[0];
-            if (!$this->is_field_exist($order_by_field_name)) {
-                continue;
-            }
             $order_by_direction = "asc";
             if (isset($order_by_field_parts[1])) {
                 $order_by_direction = strtolower($order_by_field_parts[1]);
