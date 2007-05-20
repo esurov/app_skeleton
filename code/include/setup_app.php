@@ -35,7 +35,7 @@ class SetupApp extends CustomApp {
     }
 
     function run_access_denied_action() {
-        $this->create_http_auth_html_document_response($this->get_lang_str("setup_auth_realm"));
+        $this->create_http_auth_html_document_response($this->get_lang_str("setup_app.auth_realm"));
     }
 //
     function action_pg_index() {

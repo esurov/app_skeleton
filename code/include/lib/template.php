@@ -45,6 +45,36 @@ class Template extends AppObject {
         $this->_fillings = array();
     }
 //
+    function init_fillings() {
+        $this->_fillings = require("{$this->_templates_dir}/lang_{$this->app->lang}.php");
+    }
+
+    function set_filling_values($values) {
+        foreach ($values as $var_name => $var_value) {
+            $this->set_filling_value($var_name, $var_value);
+        }
+    }
+
+    function get_filling_value($name) {
+        return get_param_value($this->_fillings, $name, null);
+    }
+
+    function set_filling_value($name, $value) {
+        $this->_fillings[$name] = $value;
+    }
+
+    function append_to_filling_value($name, $value) {
+        if ($this->has_filling($name)) {
+            $this->set_filling_value($name, $this->get_filling_value($name) . $value);
+        } else {
+            $this->set_filling_value($name, $value);
+        }
+    }
+
+    function has_filling($name) {
+        return array_key_exists($name, $this->_fillings);
+    }
+//
     function verbose_turn_on() {
         $this->_is_verbose_saved = $this->_is_verbose;
         $this->_is_verbose = true;
@@ -62,32 +92,6 @@ class Template extends AppObject {
         $this->_is_verbose = $this->_is_verbose_saved;
         $this->_is_verbose_saved = $is_verbose;
         return $is_verbose;
-    }
-//
-    function get_filling_value($name) {
-        return get_param_value($this->_fillings, $name, null);
-    }
-
-    function set_filling_value($name, $value) {
-        $this->_fillings[$name] = $value;
-    }
-
-    function set_filling_values($values) {
-        foreach ($values as $var_name => $var_value) {
-            $this->set_filling_value($var_name, $var_value);
-        }
-    }
-
-    function append_to_filling_value($name, $value) {
-        if ($this->has_filling($name)) {
-            $this->set_filling_value($name, $this->get_filling_value($name) . $value);
-        } else {
-            $this->set_filling_value($name, $value);
-        }
-    }
-
-    function has_filling($name) {
-        return array_key_exists($name, $this->_fillings);
     }
 //
     // Parse given text, return it with variables filled

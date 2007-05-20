@@ -12,9 +12,9 @@ class App extends AppObject {
     var $db;
 
     // Html page template vars
-    var $html_charset;
     var $page;
     var $page_template_name;
+    var $html_charset;
     
     // App specific custom CGI vars
     var $popup = 0;
@@ -118,15 +118,21 @@ class App extends AppObject {
         $this->dlang = $this->get_config_value("default_language");
         $this->lang = $this->get_current_lang();
 
-        $this->page->lang = $this->lang;
-
         $this->init_lang_resources();
+        $this->init_page_template_lang_resources();
     }
 
     function init_lang_resources() {
-        $this->lang_resources =& new Config();
-        $this->lang_resources->read("lang/default.txt");
-        $this->lang_resources->read("lang/{$this->lang}.txt");
+        $this->lang_resources = array_merge(
+            require("lang/default.php"),
+            require("lang/{$this->lang}.php")
+        );
+    }
+
+    function init_page_template_lang_resources() {
+        $this->page->init_fillings();
+        $this->print_raw_value("global:html_charset", $this->html_charset);
+        $this->print_raw_value("global:lang", $this->lang);
     }
 //
     function get_config_value($name, $default_value = null) {
@@ -230,18 +236,8 @@ class App extends AppObject {
     }
 
     function on_before_validate_action() {
-        $this->print_raw_value("global:html_charset", $this->html_charset);
-
-        $this->print_lang_resources();
     }
 
-    function print_lang_resources() {
-        foreach ($this->lang_resources->_params as $resource_name => $resource_value) {
-            $this->print_raw_value("lang:{$resource_name}", $resource_value);
-        }
-        $this->print_raw_value("global:lang", $this->lang);
-    }
-    
     function run_action($action_name = null, $action_params = array()) {
         // If optional action name was given then use it else default one is used
         if (!is_null($action_name)) {
@@ -405,6 +401,7 @@ class App extends AppObject {
     }
 
     function create_access_denied_html_document_response() {
+        $this->print_head_and_page_titles("access_denied");
         $this->page_template_name = "page_access_denied.html";
         $this->create_html_document_response();
     }
@@ -1662,16 +1659,13 @@ class App extends AppObject {
     }
 //
     // Language resources functions
-    function get_lang_str($resource, $resource_params = null) {
-        $lang_str = $this->lang_resources->get_value($resource);
+    function get_lang_str($resource, $resource_params = array()) {
+        $lang_str = get_param_value($this->lang_resources, $resource, null);
         if (is_null($lang_str)) {
             return null;        
+        } else {
+            return $this->page->get_parsed_text($lang_str, null, $resource_params);
         }
-        if (!is_null($resource_params)) {
-            $this->print_values($resource_params);
-            $lang_str = $this->page->get_parsed_text($lang_str);
-        }
-        return $lang_str;
     }
 
     function get_current_lang() {
