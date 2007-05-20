@@ -77,7 +77,7 @@ class App extends AppObject {
     }
 
     function create_db() {
-        $sql_config = new Config();
+        $sql_config =& new Config();
         $sql_config->read("config/sql.cfg");
 
         $this->db =& $this->create_object(
@@ -93,10 +93,12 @@ class App extends AppObject {
     }
 
     function create_page_template() {
-        $print_template_name = $this->get_config_value("print_template_name");
-        $this->page =& new Template(
-            $this->get_page_templates_dir(),
-            $print_template_name
+        $this->page =& $this->create_object(
+            "Template",
+            array(
+                "templates_dir" => $this->get_page_templates_dir(),
+                "is_verbose" => $this->get_config_value("template.is_verbose"),
+            )
         );
         $this->page_template_name = "";
     }
@@ -115,6 +117,8 @@ class App extends AppObject {
         $this->avail_langs = $this->get_avail_langs();
         $this->dlang = $this->get_config_value("default_language");
         $this->lang = $this->get_current_lang();
+
+        $this->page->lang = $this->lang;
 
         $this->init_lang_resources();
     }
@@ -734,7 +738,7 @@ class App extends AppObject {
     }
 
     function is_file_exist($template_name) {
-        return $this->page->is_template_exist($template_name);
+        return $this->page->is_file_exist($template_name);
     }
 //
     // Complex types template printing functions

@@ -1,30 +1,48 @@
 <?php
 
-class Template {
+// Templates parser and manager
+class Template extends AppObject {
 
-    // Templates parser and manager
-    var $templates_dir;
-    var $parsed_files;
-    var $fillings;
-    var $_is_verbose = false; // used for debug purposes
-    var $_is_verbose_saved;
+    var $TEMPLATE_VAR_EXPR;
+    var $TEMPLATE_VAR_REPLACE_EXPR;
+    var $TEMPLATE_FILE_EXPR;
+    var $TEMPLATE_FILE_REPLACE_EXPR;
+    
     var $TEMPLATE_NAME_PATTERN;
 
-    function Template($templates_dir = "templates", $is_verbose = false) {
-        $this->templates_dir = $templates_dir;
-        $this->parsed_files = array();
-        $this->fillings = array();
+    var $_templates_dir;
+    var $_is_verbose = false; // used for debug purposes
+    var $_is_verbose_saved;
 
-        if ($is_verbose) {
+    var $_parsed_files;
+    var $_fillings;
+
+    function _init($params) {
+        parent::_init($params);
+
+        $this->TEMPLATE_VAR_EXPR = '/{%(.*?)%}/e';
+        $this->TEMPLATE_VAR_REPLACE_EXPR =
+            'isset($extra_fillings["$1"]) ? $extra_fillings["$1"] : (' .
+                'isset($this->_fillings["$1"]) ? $this->_fillings["$1"] : ""' .
+            ')';
+        $this->TEMPLATE_FILE_EXPR = '/{{(.*?)}}/e';
+        $this->TEMPLATE_FILE_REPLACE_EXPR = '$this->parse_file("$1")';
+        
+        $this->TEMPLATE_NAME_PATTERN =
+            "\n<!-- TEMPLATE BEGIN '%s' -->\n" .
+            "%s" .
+            "\n<!-- TEMPLATE END '%s' -->\n";
+
+        $this->_templates_dir = get_param_value($params, "templates_dir", "");
+        
+        if (get_param_value($params, "is_verbose", false)) {
             $this->verbose_turn_on();
         } else {
             $this->verbose_turn_off();
         }
 
-        $this->TEMPLATE_NAME_PATTERN =
-            "\n<!-- TEMPLATE BEGIN '%s' -->\n" .
-            "%s" .
-            "\n<!-- TEMPLATE END '%s' -->\n";
+        $this->_parsed_files = array();
+        $this->_fillings = array();
     }
 //
     function verbose_turn_on() {
@@ -47,11 +65,11 @@ class Template {
     }
 //
     function get_filling_value($name) {
-        return get_param_value($this->fillings, $name, null);
+        return get_param_value($this->_fillings, $name, null);
     }
 
     function set_filling_value($name, $value) {
-        $this->fillings[$name] = $value;
+        $this->_fillings[$name] = $value;
     }
 
     function set_filling_values($values) {
@@ -69,20 +87,24 @@ class Template {
     }
 
     function has_filling($name) {
-        return array_key_exists($name, $this->fillings);
+        return array_key_exists($name, $this->_fillings);
     }
 //
     // Parse given text, return it with variables filled
     // Also append result to given variable in filling
-    function get_parsed_text($raw_text, $append_to_name = null) {
+    function get_parsed_text(
+        $raw_text,
+        $append_to_name = null,
+        $extra_fillings = array()
+    ) {
         $parsed_text = preg_replace(
-            '/{%(.*?)%}/e',
-            'isset($this->fillings["$1"]) ? $this->fillings["$1"] : ""',
+            $this->TEMPLATE_VAR_EXPR,
+            $this->TEMPLATE_VAR_REPLACE_EXPR,
             $raw_text
         );
         $parsed_text = preg_replace(
-            '/{{(.*?)}}/e',
-            '$this->parse_file("$1")',
+            $this->TEMPLATE_FILE_EXPR,
+            $this->TEMPLATE_FILE_REPLACE_EXPR,
             $parsed_text
         );
         if (!is_null(($append_to_name))) {
@@ -94,11 +116,11 @@ class Template {
     // Return non-parsed template text
     // Read from file if necessary
     function get_template_text($template_name) {
-        if (isset($this->parsed_files[$template_name])) {
-            $template_text = $this->parsed_files[$template_name];
+        if (isset($this->_parsed_files[$template_name])) {
+            $template_text = $this->_parsed_files[$template_name];
         } else {
-            $template_text = file_get_contents("{$this->templates_dir}/{$template_name}");
-            $this->parsed_files[$template_name] = $template_text;
+            $template_text = file_get_contents("{$this->_templates_dir}/{$template_name}");
+            $this->_parsed_files[$template_name] = $template_text;
         }
         return $template_text;
     }
@@ -115,8 +137,21 @@ class Template {
                 $template_name
             );
         }
-        return $this->get_parsed_text($template_text, $append_to_name);
+        return $this->get_parsed_text(
+            $template_text,
+            $append_to_name,
+            $this->get_template_lang_resources($template_name)
+        );
     }
+
+    function get_template_lang_resources($template_name) {
+        $lang_resources_filename = "{$template_name}.lang_{$this->app->lang}.php";
+        if ($this->is_file_exist($lang_resources_filename)) {
+            return require("{$this->_templates_dir}/{$lang_resources_filename}");
+        } else {
+            return array();
+        }
+    }    
 
     // Parse given template using values from internal hash
     // Return filled template and empty the variable
@@ -127,7 +162,7 @@ class Template {
     }
 
     function parse_file_if_exists($template_name, $name = null) {
-        if ($this->is_template_exist($template_name)) {
+        if ($this->is_file_exist($template_name)) {
             return $this->parse_file($template_name, $name);    
         } else {
             return "";
@@ -141,8 +176,8 @@ class Template {
         return $this->parse_file_if_exists($template_name, $name);
     }
 
-    function is_template_exist($template_name) {
-        return is_file("{$this->templates_dir}/{$template_name}");
+    function is_file_exist($file_name) {
+        return is_file("{$this->_templates_dir}/{$file_name}");
     }
 
 }

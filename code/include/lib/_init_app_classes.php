@@ -23,6 +23,9 @@ $app_classes = array(
         "MySqlDbResult" => array(
             "filename" => "db_mysql.php",
         ),
+        "Template" => array(
+            "filename" => "template.php",
+        ),
         "AppComponent" => array(
             "filename" => "app_component.php",
         ),

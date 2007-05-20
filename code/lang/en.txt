@@ -173,15 +173,6 @@ user.not_confirmed_yet = User "{%login%}" is not confirmed yet. Use confirmation
 status_message.resource_access_denied = Requested page cannot be displayed. Please use your access info to login.
 status_message.logged_out = Logout completed successfully
 
-login_form_bottom_text_dont_have_account = If you don't have an account, please
-login_form_bottom_text_signup = Create it
-login_form_bottom_text_did_forget_password = Did you forget your password?
-login_form_bottom_text_recover_password = Recover it
-
-login_state_logged_in_as = Logged in as
-login_state_not_logged_in = Not logged in
-user_should_remember = Remember me
-
 ["signup"]
 guest_menu_item.signup = Signup
 
@@ -190,30 +181,10 @@ page_title.pg_signup_almost_completed = Il nuovo account stato creato
 
 user.should_accept_agreement = You should check "Accept agreement" to continue
 
-signup_form_text1 = Fill out this signup form to create new account:
-signup_form_text2 = By submitting this signup form you indicate that you have read, understood and agreed on
-
-policy_terms_of_use = Terms of use
-policy_terms_and_conditions = Terms and conditions
-policy_privacy = Privacy policy
-policy_disclaimer = Disclaimer
-
-signup_form_accept_agreement = I accept
-
-signup_almost_completed = New account was created but it is not confirmed. Email with link to confirmation page was sent to the specified email address. Please wait until you get email and click that link to finish creation of your account.
-signup_login_if_already_confirmed = If confirmation finished, please
-
 email_signup_form_processed_subject = Welcome to !!AppSkeleton website
-email_signup_text1 = This is signup confirmation email from !!AppSkeleton website. If you did not signup at !!AppSkeleton website please ignore this email.
-email_signup_text2 = Account details
-email_signup_text3 = Please keep this mail in a safe place to have your account details safe and handy when you will need them.
-email_signup_text4 = In order to confirm your signup request, please click confirmation link:
 
 ["confirm_signup"]
 page_title.confirm_signup = Account confirmed
-
-signup_confirmed_text1 = Your account is now confirmed.
-signup_confirmed_text2 = Now you may login.
 
 ["recover_password"]
 page_title.pg_recover_password = Recover password
@@ -223,16 +194,10 @@ recover_password.bad_email = Bad email specified
 recover_password.no_account_with_login = Cannot find account with login "{%login%}"
 recover_password.no_account_with_email = Cannot find account with email "{%email%}"
 
-recover_password_form_text1 = Please specify your account login or email address which you used during signup
-
 email_recover_password_form_processed_subject = Password recovery for !!AppSkeleton website
-email_recover_password_text1 = This is password recovery email for !!AppSkeleton website.
-email_recover_password_text2 = Here is your access info:
 
 ["recover_password_sent"]
 page_title.pg_recover_password_sent = Password sent
-
-recover_password_sent = Your password was sent. Please check email and login.
 
 ["news_articles"]
 news_article = news article
@@ -264,7 +229,7 @@ news_article.files_max_total_size_reached = Total uploaded files size is more th
 guest_menu_item.contact_form = Contacts
 
 page_title.pg_contact_form = Contact form
-contact_form_processed = Your contact info was processed. Thank you!
+contact_form.processed = Your contact info was processed. Thank you!
 
 ["users"]
 user = user

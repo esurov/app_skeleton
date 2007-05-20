@@ -113,7 +113,7 @@ class SampleApp extends CustomApp {
 
         $obj->field_currency = 99999999.99;
         $obj->save();
-        vx($this->page->fillings);
+        vx($this->page->_fillings);
     }
 //
     function action_pg_component_view() {

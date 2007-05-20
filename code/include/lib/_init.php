@@ -7,7 +7,6 @@ require_once(_APP_LIB_DIR . "/global.php");
 
 // Core classes
 require_once(_APP_LIB_DIR . "/config.php");
-require_once(_APP_LIB_DIR . "/template.php");
 require_once(_APP_LIB_DIR . "/select_query.php");
 require_once(_APP_LIB_DIR . "/http_response.php");
 require_once(_APP_LIB_DIR . "/status_msg.php");

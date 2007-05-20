@@ -20,9 +20,9 @@ class Logger extends AppObject {
     function _init($params) {
         parent::_init($params);
 
-        $this->set_debug_level(constant($this->get_config_value("log_debug_level")), DL_ERROR);
-        $this->set_max_filesize($this->get_config_value("log_max_filesize", 0));
-        $this->set_truncate_always($this->get_config_value("log_truncate_always", false));
+        $this->set_debug_level(constant($this->get_config_value("log.debug_level")), DL_ERROR);
+        $this->set_max_filesize($this->get_config_value("log.max_filesize", 0));
+        $this->set_truncate_always($this->get_config_value("log.truncate_always", false));
 
         $this->set_filename("log/app.log");
         $this->_file_exists = (is_file($this->_filename));

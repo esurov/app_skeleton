@@ -11,7 +11,7 @@
     <td>{%user.password.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:user_should_remember%}:</td>
+    <td>{%lang:should_remember%}:</td>
     <td>{%user.should_remember.input%}</td>
 </tr>
 <tr>
@@ -23,6 +23,13 @@
 
 </form>
 
+<ul>
+    <li>{%lang:dont_have_account%} <a href="?action=pg_signup"
+        >{%lang:please_signup%}</a></li>
+    <li>{%lang:did_forget_password%} <a href="?action=pg_recover_password"
+        >{%lang:recover_password%}</a></li>
+</ul>
+
 <script type="text/javascript">
 focusFormElement('form', '{%user.login.input_name%}');
 </script>
@@ -30,4 +37,3 @@ focusFormElement('form', '{%user.login.input_name%}');
 <script type="text/javascript">
 {%user.client_validation_js%}
 </script>
-
