@@ -2,7 +2,6 @@
 return array(
     // Common head and page titles
     "lang:head_page_title.app" => "!!AppSkeleton",
-    "lang:head_page_title.setup_app" => "!!AppSkeleton setup area",
 
     // Titles
     "lang:actions" => "Azioni",
