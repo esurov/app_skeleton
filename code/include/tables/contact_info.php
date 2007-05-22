@@ -77,27 +77,27 @@ class ContactInfoTable extends CustomDbObject {
             array(
                 "field" => "first_name",
                 "type" => "not_empty",
-                "message" => "status_message.first_name_empty",
+                "message" => "contact_info.first_name_empty",
             ),
             array(
                 "field" => "last_name",
                 "type" => "not_empty",
-                "message" => "status_message.last_name_empty",
+                "message" => "contact_info.last_name_empty",
             ),
             array(
                 "field" => "email",
                 "type" => "not_empty",
-                "message" => "status_message.email_empty",
+                "message" => "contact_info.email_empty",
                 "dependency" => array(
                     "field" => "email",
                     "type" => "email",
-                    "message" => "status_message.email_bad",
+                    "message" => "contact_info.email_bad",
                 ),
             ),
             array(
                 "field" => "message_text",
                 "type" => "not_empty",
-                "message" => "status_message.message_text_empty",
+                "message" => "contact_info.message_text_empty",
             ),
         );
     }

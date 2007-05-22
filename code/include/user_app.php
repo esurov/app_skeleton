@@ -167,9 +167,7 @@ class UserApp extends CustomApp {
         $this->session->save_request_params();
 
         if ($this->action != "pg_home") {
-            $this->add_session_status_message(
-                new ErrorStatusMsg("status_message.resource_access_denied")
-            );
+            $this->add_session_status_message(new ErrorStatusMsg("resource_access_denied"));
         }
         
         $this->create_self_redirect_response(array("action" => "pg_login"));
@@ -414,7 +412,7 @@ class UserApp extends CustomApp {
     }
 
     function action_logout() {
-        $this->add_session_status_message(new OkStatusMsg("status_message.logged_out"));
+        $this->add_session_status_message(new OkStatusMsg("logged_out"));
         $this->create_self_redirect_response(array("action" => "pg_login"));
         $this->destroy_login_state();
         $this->remove_remember_user_id_and_password_cookies();
@@ -592,7 +590,7 @@ class UserApp extends CustomApp {
         } else {
             $this->send_email_contact_form_processed_to_admin($contact_info);
             
-            $this->add_session_status_message(new OkStatusMsg("contact_form.processed"));
+            $this->add_session_status_message(new OkStatusMsg("contact_info.processed"));
             $this->create_self_redirect_response(array("action" => "pg_contact_form"));
         }
     }

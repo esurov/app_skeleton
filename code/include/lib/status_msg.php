@@ -8,7 +8,8 @@ class StatusMsg {
 
     function StatusMsg($type, $resource, $resource_params = array()) {
         $this->type = $type;
-        $this->resource = $resource;
+        $this->resource = "status_msg.{$resource}";
+v($this->resource);
         $this->resource_params = $resource_params;
     }
 

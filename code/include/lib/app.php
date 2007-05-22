@@ -1965,7 +1965,7 @@ class App extends AppObject {
     }
 
     function action_pg_tables_dump_url() {
-        $table_names = param("table_names");
+        $table_names = param_array("table_names");
         $table_names_str = join(" ", $table_names);
         
         $this->print_value("table_names_str", $table_names_str);
