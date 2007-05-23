@@ -99,15 +99,15 @@ class Template extends AppObject {
         $append_to_name = null,
         $extra_fillings = array()
     ) {
+        $parsed_text = preg_replace_callback(
+            $this->TEMPLATE_FILE_EXPR,
+            $this->TEMPLATE_FILE_REPLACE_FUNC,
+            $raw_text
+        );
         $this->_extra_fillings = $extra_fillings;
         $parsed_text = preg_replace_callback(
             $this->TEMPLATE_VAR_EXPR,
             $this->TEMPLATE_VAR_REPLACE_FUNC,
-            $raw_text
-        );
-        $parsed_text = preg_replace_callback(
-            $this->TEMPLATE_FILE_EXPR,
-            $this->TEMPLATE_FILE_REPLACE_FUNC,
             $parsed_text
         );
         if (!is_null(($append_to_name))) {
@@ -127,8 +127,12 @@ class Template extends AppObject {
     }
 
     function template_file_replace_func($matches) {
-        $template_name = $matches[1];
-        return $this->parse_file_if_exists($template_name);
+        $template_name_without_ext = $matches[1];
+        $full_template_name = "{$template_name_without_ext}_{$this->app->lang}.html";
+        if (!$this->is_file_exist($full_template_name)) {
+            $full_template_name = "{$template_name_without_ext}.html";
+        }
+        return $this->parse_file($full_template_name);
     }
 
     // Return non-parsed template text
