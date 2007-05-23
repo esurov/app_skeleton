@@ -4,9 +4,9 @@
 class Template extends AppObject {
 
     var $TEMPLATE_VAR_EXPR;
-    var $TEMPLATE_VAR_REPLACE_EXPR;
+    var $TEMPLATE_VAR_REPLACE_FUNC;
     var $TEMPLATE_FILE_EXPR;
-    var $TEMPLATE_FILE_REPLACE_EXPR;
+    var $TEMPLATE_FILE_REPLACE_FUNC;
     
     var $TEMPLATE_NAME_PATTERN;
 
@@ -16,17 +16,15 @@ class Template extends AppObject {
 
     var $_parsed_files;
     var $_fillings;
+    var $_extra_fillings;
 
     function _init($params) {
         parent::_init($params);
 
-        $this->TEMPLATE_VAR_EXPR = '/{%(.*?)%}/e';
-        $this->TEMPLATE_VAR_REPLACE_EXPR =
-            'isset($extra_fillings["$1"]) ? $extra_fillings["$1"] : (' .
-                'isset($this->_fillings["$1"]) ? $this->_fillings["$1"] : ""' .
-            ')';
-        $this->TEMPLATE_FILE_EXPR = '/{{(.*?)}}/e';
-        $this->TEMPLATE_FILE_REPLACE_EXPR = '$this->parse_file("$1")';
+        $this->TEMPLATE_VAR_EXPR = '/{%(.*?)%}/';
+        $this->TEMPLATE_VAR_REPLACE_FUNC = array(&$this, "template_var_replace_func");
+        $this->TEMPLATE_FILE_EXPR = '/{{(.*?)}}/';
+        $this->TEMPLATE_FILE_REPLACE_FUNC = array(&$this, "template_file_replace_func");
         
         $this->TEMPLATE_NAME_PATTERN =
             "\n<!-- TEMPLATE BEGIN '%s' -->\n" .
@@ -101,20 +99,36 @@ class Template extends AppObject {
         $append_to_name = null,
         $extra_fillings = array()
     ) {
-        $parsed_text = preg_replace(
+        $this->_extra_fillings = $extra_fillings;
+        $parsed_text = preg_replace_callback(
             $this->TEMPLATE_VAR_EXPR,
-            $this->TEMPLATE_VAR_REPLACE_EXPR,
+            $this->TEMPLATE_VAR_REPLACE_FUNC,
             $raw_text
         );
-        $parsed_text = preg_replace(
+        $parsed_text = preg_replace_callback(
             $this->TEMPLATE_FILE_EXPR,
-            $this->TEMPLATE_FILE_REPLACE_EXPR,
+            $this->TEMPLATE_FILE_REPLACE_FUNC,
             $parsed_text
         );
         if (!is_null(($append_to_name))) {
             $this->append_to_filling_value($append_to_name, $parsed_text);
         }
         return $parsed_text;
+    }
+
+    function template_var_replace_func($matches) {
+        $filling_name = $matches[1];
+        return isset($this->_extra_fillings[$filling_name]) ?
+            $this->_extra_fillings[$filling_name] : (
+                isset($this->_fillings[$filling_name]) ?
+                    $this->_fillings[$filling_name] :
+                    ""
+            );
+    }
+
+    function template_file_replace_func($matches) {
+        $template_name = $matches[1];
+        return $this->parse_file_if_exists($template_name);
     }
 
     // Return non-parsed template text
