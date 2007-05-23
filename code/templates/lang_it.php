@@ -89,8 +89,6 @@ return array(
     "lang:delete_image" => "Cancella immagine",
     "lang:delete_file" => "Cancella file",
 
-    "lang:view_all_news" => "Tutte le News",
-
     // Parts of page
     "lang:sure_delete" => "Sei sicuro di voler cancellare l\\'informazione?",
     "lang:and" => "e",

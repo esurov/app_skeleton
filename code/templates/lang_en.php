@@ -89,8 +89,6 @@ return array(
     "lang:delete_image" => "Delete image",
     "lang:delete_file" => "Delete file",
 
-    "lang:view_all_news" => "View all news",
-
     // Parts of page
     "lang:sure_delete" => "Are you sure you want to delete record?",
     "lang:and" => "e",
