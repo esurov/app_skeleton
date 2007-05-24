@@ -614,10 +614,20 @@ class DbObject extends AppObject {
     }
 
     // Db table maintenance functions (create, update, delete)
-    function create_table() {
+    function create_table($fake_run, &$run_info) {
         $create_table_expression = $this->get_create_table_expression();
         if ($create_table_expression != "") {
-            $this->db->run_create_table_query($this->_table_name, $create_table_expression);
+            $create_table_query = $this->db->get_create_table_query(
+                $this->_table_name,
+                $create_table_expression
+            );
+            if ($fake_run) {
+                $run_info["table_names_to_create"][] = $this->_table_name;
+                $run_info["create_table_queries"][$this->_table_name] =
+                    $this->db->subst_table_prefix($create_table_query);
+            } else {
+                $this->run_query($create_table_query);
+            }
         }
     }
 
@@ -737,10 +747,20 @@ class DbObject extends AppObject {
         return $expression;
     }
 //
-    function update_table() {
+    function update_table($fake_run, &$run_info) {
         $update_table_expression = $this->get_update_table_expression();
         if ($update_table_expression != "") {
-            $this->db->run_update_table_query($this->_table_name, $update_table_expression);
+            $update_table_query = $this->db->get_update_table_query(
+                $this->_table_name,
+                $update_table_expression
+            );
+            if ($fake_run) {
+                $run_info["table_names_to_update"][] = $this->_table_name;
+                $run_info["update_table_queries"][$this->_table_name] =
+                    $this->db->subst_table_prefix($update_table_query);
+            } else {
+                $this->run_query($update_table_query);
+            }
         }
     }
         
@@ -908,7 +928,7 @@ class DbObject extends AppObject {
     }
 
     function delete_table() {
-        $this->db->run_drop_table_query($this->_table_name);
+        $this->run_query($this->db->get_drop_table_query($this->_table_name));
     }
 //
     function store(
@@ -940,7 +960,7 @@ class DbObject extends AppObject {
             $delimiter_str = ",\n    ";
         }
 
-        $this->db->run_insert_query($this->_table_name, $fields_expression);
+        $this->run_query($this->db->get_insert_query($this->_table_name, $fields_expression));
 
         $pr_key_name = $this->get_primary_key_name();
         if ($this->_fields[$pr_key_name]["type"] == "primary_key") {
@@ -976,10 +996,12 @@ class DbObject extends AppObject {
             $fields_expression .= $delimiter_str . $this->get_update_field_expression($field_name);
             $delimiter_str = ",\n    ";
         }
-        $this->db->run_update_query(
-            $this->_table_name,
-            $fields_expression,
-            $this->get_default_where_str(false)
+        $this->run_query(
+            $this->db->get_update_query(
+                $this->_table_name,
+                $fields_expression,
+                $this->get_default_where_str(false)
+            )
         );
     }
 

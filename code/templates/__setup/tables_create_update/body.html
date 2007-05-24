@@ -1,0 +1,13 @@
+<div>
+<h3>Setup will make these changes in database '{%db_name%}':</h3>
+<strong>Tables to create</strong>: <span style="color: green">{%table_names_to_create%}</span><br />
+<strong>Tables to update</strong>: <span style="color: blue">{%table_names_to_update%}</span><br />
+<strong>Tables to drop</strong>: <span style="color: red">{%table_names_to_drop%}</span><br />
+<br />
+Below is SQL script which will make these changes:<br /><br />
+<textarea cols="100" rows="25">{%sql_script_text%}</textarea><br /><br />
+</div>
+
+<form action="?action=create_update_tables" method="post" onsubmit="onsubmitFormHandler(this);">
+<input type="submit" name="submit_btn" value="Execute SQL script" />
+</form>

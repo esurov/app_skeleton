@@ -1943,14 +1943,43 @@ class App extends AppObject {
     }
 //
     // Setup app actions
+    function action_pg_create_update_tables() {
+        $this->process_create_update_tables(true, $run_info);
+
+        $this->print_varchar_value("db_name", $this->db->get_database());
+
+        $draw_delimiter = false;
+        $sql_script_text = "";
+        $table_types = array("create", "update", "drop");
+        foreach ($table_types as $table_type) {
+            $table_names = $run_info["table_names_to_{$table_type}"];
+            $this->print_varchar_value(
+                "table_names_to_{$table_type}",
+                (count($table_names) == 0) ?
+                    $this->get_lang_str("nothing_to_{$table_type}") :
+                    join(", ", $table_names)
+            );
+
+            foreach ($run_info["{$table_type}_table_queries"] as $query) {
+                if ($draw_delimiter) {
+                    $sql_script_text .= str_repeat("-", 100) . "\n";
+                }
+                $sql_script_text .= "{$query}\n";
+                $draw_delimiter = true;
+            }
+        }
+        $this->print_varchar_value("sql_script_text", $sql_script_text);
+        $this->print_file("tables_create_update/body.html", "body");
+    }
+
     function action_create_update_tables() {
-        $this->process_create_update_tables();
+        $this->process_create_update_tables(false, $run_info);
         $this->add_session_status_message(new OkStatusMsg("tables_updated"));
         $this->create_self_redirect_response();
     }
 
     function action_delete_tables() {
-        $this->process_delete_tables();
+        $this->process_delete_tables(null);
         $this->add_session_status_message(new OkStatusMsg("tables_deleted"));
         $this->create_self_redirect_response();
     }
@@ -2225,7 +2254,18 @@ class App extends AppObject {
         return $rows;
     }
 //
-    function process_create_update_tables() {
+    function process_create_update_tables($fake_run, &$run_info) {
+        if ($fake_run) {
+            $run_info = array(
+                "table_names_to_create" => array(),
+                "create_table_queries" => array(),
+                "table_names_to_update" => array(),
+                "update_table_queries" => array(),
+                "table_names_to_drop" => array(),
+                "drop_table_queries" => array(),
+            );
+        }
+
         $actual_table_names = $this->db->get_actual_table_names(false, false);
 
         $all_creatable_db_objects_info = $this->get_all_creatable_db_objects_info();
@@ -2237,23 +2277,30 @@ class App extends AppObject {
 
         foreach ($table_names_to_create as $table_name) {
             $obj =& $this->create_db_object($all_creatable_db_objects_info[$table_name]);
-            $obj->create_table();
+            $obj->create_table($fake_run, $run_info);
         }
 
         foreach ($table_names_to_update as $table_name) {
             $obj =& $this->create_db_object($all_creatable_db_objects_info[$table_name]);
-            $obj->update_table();
+            $obj->update_table($fake_run, $run_info);
         }
 
-        $this->process_delete_tables($table_names_to_drop);
+        $this->process_delete_tables($table_names_to_drop, $fake_run, $run_info);
     }
 
-    function process_delete_tables($table_names_to_drop = null) {
+    function process_delete_tables($table_names_to_drop, $fake_run, &$run_info) {
         if (is_null($table_names_to_drop)) {
             $table_names_to_drop = $this->db->get_actual_table_names(false, false);
         }
         foreach ($table_names_to_drop as $table_name) {
-            $this->db->run_drop_table_query($table_name);
+            $drop_table_query = $this->db->get_drop_table_query($table_name);
+            if ($fake_run) {
+                $run_info["table_names_to_drop"][] = $table_name;
+                $run_info["drop_table_queries"][$table_name] =
+                    $this->db->subst_table_prefix($drop_table_query);
+            } else {
+                $this->db->run_query($drop_table_query);
+            }
         }
     }
 

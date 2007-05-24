@@ -1,12 +1,18 @@
 <div>
-<form action="?" method="get" onsubmit="onsubmitFormHandler(this);">
+<form action="?" method="get" name="form" onsubmit="onsubmitFormHandler(this);">
 <input type="hidden" name="action" value="pg_tables_dump_url" />
 <br />
-<h1>Actual tables</h1>
+<h3>Actual tables:</h3>
 <table border="1">
 <tr>
     <th>Table name</th>
-    <th>Include in dump?</th>
+    <th>
+        Include in dump? [<a
+            href="#" onclick="checkFormCheckboxes('form', 'table_names[]', true); return false;"
+        >+</a>]&nbsp;[<a
+            href="#" onclick="checkFormCheckboxes('form', 'table_names[]', false); return false;"
+        >-</a>]
+    </th>
 </tr>
 
 {%form_items%}

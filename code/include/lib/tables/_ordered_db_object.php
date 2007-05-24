@@ -15,16 +15,16 @@ class OrderedDbObject extends CustomDbObject {
         ));
     }
 //
-    function create_table() {
+    function create_table($fake_run, &$run_info) {
         $this->_move_position_field_to_end();
 
-        parent::create_table();
+        parent::create_table($fake_run, &$run_info);
     }
 
-    function update_table() {
+    function update_table($fake_run, &$run_info) {
         $this->_move_position_field_to_end();
 
-        parent::update_table();
+        parent::update_table($fake_run, &$run_info);
     }
 
     function _move_position_field_to_end() {

@@ -14,6 +14,7 @@ class SetupApp extends CustomApp {
             
             "pg_index" => $a,
 
+            "pg_create_update_tables" => $a,
             "create_update_tables" => $a,
             "delete_tables" => $a,
             "pg_tables_dump" => $a,

@@ -88,16 +88,13 @@ class MySqlDb extends AppObject {
     }
 
     // Run MySQL query
-    function &run_query($query_str) {
+    function &run_query($raw_query_str) {
         if (!$this->_has_connection) {
             $this->connect();
         }
+
         // Handling table name templates
-        $query_str = preg_replace(
-            '/{%(.*?)_table%}/',
-            "{$this->_table_prefix}\$1",
-            $query_str
-        );
+        $query_str = $this->subst_table_prefix($raw_query_str);
 
         // Write query to log file
         $this->write_log(
@@ -139,6 +136,14 @@ class MySqlDb extends AppObject {
         );
     }
 
+    function subst_table_prefix($raw_query_str) {
+        return preg_replace(
+            '/{%(.*?)_table%}/',
+            "{$this->_table_prefix}\$1",
+            $raw_query_str
+        );
+    }
+
     function run_select_query($query) {
         return $this->run_query($query->get_string());
     }
@@ -162,40 +167,36 @@ class MySqlDb extends AppObject {
         return $n;
     }
 
-    function run_insert_query($table_name, $fields_expression) {
-        $this->run_query(
+    function get_insert_query($table_name, $fields_expression) {
+        return
             "INSERT INTO {%{$table_name}_table%}\n" .
             "  SET\n" .
-            "    {$fields_expression}"
-        );
+            "    {$fields_expression}";
     }
 
-    function run_update_query($table_name, $fields_expression, $where_str) {
-        $this->run_query(
+    function get_update_query($table_name, $fields_expression, $where_str) {
+        return
             "UPDATE {%{$table_name}_table%}\n" .
             "  SET\n" .
             "    {$fields_expression}\n" .
-            "  WHERE {$where_str}"
-        );
+            "  WHERE {$where_str}";
     }
 
-    function run_create_table_query($table_name, $create_table_expression) {
-        $this->run_query(
+    function get_create_table_query($table_name, $create_table_expression) {
+        return
             "CREATE TABLE IF NOT EXISTS {%{$table_name}_table%} (\n" .
             "    {$create_table_expression}\n" .
-            "  )"
-        );
+            "  )";
     }
 
-    function run_update_table_query($table_name, $update_table_expression) {
-        $this->run_query(
+    function get_update_table_query($table_name, $update_table_expression) {
+        return
             "ALTER TABLE {%{$table_name}_table%}\n" .
-            "    {$update_table_expression}"
-        );
+            "    {$update_table_expression}";
     }
 
-    function run_drop_table_query($table_name) {
-        $this->run_query("DROP TABLE IF EXISTS {%{$table_name}_table%}");
+    function get_drop_table_query($table_name) {
+        return "DROP TABLE IF EXISTS {%{$table_name}_table%}";
     }
 
     function get_actual_table_names($get_table_names_with_prefix, $from_all_tables) {
