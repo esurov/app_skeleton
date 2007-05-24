@@ -1962,9 +1962,9 @@ class App extends AppObject {
 
             foreach ($run_info["{$table_type}_table_queries"] as $query) {
                 if ($draw_delimiter) {
-                    $sql_script_text .= str_repeat("-", 100) . "\n";
+                    $sql_script_text .= str_repeat("-", 80) . "\n";
                 }
-                $sql_script_text .= "{$query}\n";
+                $sql_script_text .= "  {$query}\n";
                 $draw_delimiter = true;
             }
         }
