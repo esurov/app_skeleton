@@ -266,29 +266,6 @@ class ProductTable extends CustomDbObject {
             ),
         );
     }
-//
-    function print_values($params = array()) {
-        parent::print_values($params);
-
-//        $categories = $this->fetch_categories();
-//        foreach ($categories as $category) {
-//            $category->print_values();
-//        }
-    }
-
-//
-//    function set_categories() {
-//        list($category1, $category2) = $this->fetch_categories();
-//        $this->category1_id = $category1->id;
-//        $this->category2_id = $category2->id;
-//    }
-//
-//    function fetch_categories() {
-//        $category3 = $this->fetch_db_object("category3", $this->category3_id);
-//        $category2 = $this->fetch_db_object("category2", $category3->category2_id);
-//        $category1 = $this->fetch_db_object("category1", $category2->category1_id);
-//        return array($category1, $category2, $category3);
-//    }
 
 }
 

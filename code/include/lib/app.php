@@ -652,7 +652,9 @@ class App extends AppObject {
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
             if ((double) $php_number_value == (double) $nonset_value) {
-                return get_caption_from_value_caption_pair($nonset_value_caption_pair);
+                return get_html_safe_string(
+                    get_caption_from_value_caption_pair($nonset_value_caption_pair)
+                );
             }
         }
         return $this->append_currency_sign(
@@ -757,11 +759,9 @@ class App extends AppObject {
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
             if ((int) $value == (int) $nonset_value) {
-                $nonset_caption = get_html_safe_string(
-                    get_caption_from_value_caption_pair($nonset_value_caption_pair)
-                );
+                $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
+                $value_formatted = get_html_safe_string($nonset_caption);
                 $value_with_nonset = $nonset_caption;
-                $value_formatted = $nonset_caption;
             }
         }
         $this->print_raw_values(array(
@@ -784,13 +784,12 @@ class App extends AppObject {
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
             if ((double) $value == (double) $nonset_value) {
-                $nonset_caption = get_html_safe_string(
-                    get_caption_from_value_caption_pair($nonset_value_caption_pair)
-                );
+                $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
+                $nonset_caption_safe = get_html_safe_string($nonset_caption);
+                $value_formatted = $nonset_caption_safe;
+                $value_formatted_2 = $nonset_caption_safe;
+                $value_formatted_5 = $nonset_caption_safe;
                 $value_with_nonset = $nonset_caption;
-                $value_formatted = $nonset_caption;
-                $value_formatted_2 = $nonset_caption;
-                $value_formatted_5 = $nonset_caption;
             }
         }
         $this->print_raw_values(array(
@@ -822,11 +821,9 @@ class App extends AppObject {
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
             if ((double) $value == (double) $nonset_value) {
-                $nonset_caption = get_html_safe_string(
-                    get_caption_from_value_caption_pair($nonset_value_caption_pair)
-                );
+                $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
+                $value_formatted_without_sign = get_html_safe_string($nonset_caption);
                 $value_with_nonset = $nonset_caption;
-                $value_formatted_without_sign = $nonset_caption;
             }
         }
         $this->print_raw_values(array(

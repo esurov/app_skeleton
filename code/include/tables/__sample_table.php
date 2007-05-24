@@ -203,10 +203,22 @@ class SampleTable extends CustomDbObject {
             "input" => array(
                 "values" => array(
                     "data" => array(
-                        "sign" => "!super_currency_sign!",
-                        "sign_at_start" => false,
                         "nonset_value_caption_pair" =>
                             array(0.0, $this->get_lang_str("not_specified")),
+                    ),
+                ),
+            ),
+        ));
+
+        $this->insert_field(array(
+            "field" => "field_currency2",
+            "type" => "currency",
+            "value" => 1000000.00,
+            "input" => array(
+                "values" => array(
+                    "data" => array(
+                        "sign" => "!super_currency_sign!",
+                        "sign_at_start" => false,
                     ),
                 ),
             ),

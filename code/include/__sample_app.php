@@ -111,7 +111,6 @@ class SampleApp extends CustomApp {
         $obj =& $this->fetch_db_object("Sample2", 1);
         $obj->print_values();
 
-        $obj->field_currency = 99999999.99;
         $obj->save();
         vx($this->page->_fillings);
     }
