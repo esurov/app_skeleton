@@ -200,7 +200,35 @@ class UserTable extends CustomDbObject {
             "select" => "''",
         ));
     }
+//
+    function get_read_field_names_info($context, $context_params) {
+        $field_names_to_read = null;
+        $field_names_to_not_read = null;
 
+        switch ($context) {
+        case "login_form":
+            $fields_names_to_read = array("login", "password", "should_remember");
+            break;
+        case "signup_form":
+            $fields_names_to_not_read = array("role", "is_confirmed", "is_active");
+            break;
+        case "edit_form_by_admin":
+            if ($this->is_definite()) {
+                $fields_names_to_not_read = array("role");
+            }
+            break;
+        case "edit_form_by_user":
+            $fields_names_to_not_read = array("login", "role", "is_confirmed", "is_active");
+            break;
+        case "recover_password_form":
+            $fields_names_to_read = array("login", "email");
+            break;
+        }
+        return array(
+            "field_names_to_read" => $field_names_to_read,
+            "field_names_to_not_read" => $field_names_to_not_read,
+        );
+    }
 //
     function get_validate_conditions($context, $context_params) {
         switch ($context) {

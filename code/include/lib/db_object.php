@@ -1091,16 +1091,32 @@ class DbObject extends AppObject {
     function get_restrict_relations() {
         return array();
     }
+//
+    // CGI functions
 
-//  CGI functions
-    function read(
+    // Read field values from CGI
+    function read($context = null, $context_params = array()) {
+        $field_names_info = $this->get_read_field_names_info($context, $context_params);
+        $this->_read_values(
+            get_param_value($field_names_info, "field_names_to_read", null),
+            get_param_value($field_names_info, "field_names_to_not_read", null),
+            get_param_value($field_names_info, "template_var_prefix", null)
+        );
+    }
+
+    // Should be redefined in child class
+    function get_read_field_names_info($context, $context_params) {
+        return array();
+    }
+    
+    function _read_values(
         $field_names_to_read = null,
         $field_names_to_not_read = null,
         $template_var_prefix = null
     ) {
         // Get data from CGI and store to object values
         $this->write_log(
-            "read()",
+            "_read_values()",
             DL_INFO
         );
 
@@ -1580,6 +1596,7 @@ class DbObject extends AppObject {
         );
     }
 //
+    // Template printing functions
     function _init_print_param($params, $param_name, $default_value) {
         $this->{"_{$param_name}"} = get_param_value($params, $param_name, $default_value);
     }

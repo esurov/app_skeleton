@@ -313,15 +313,17 @@ class UserApp extends CustomApp {
     }
 
     function action_login() {
+        $context = "login_form";
+
         $user = get_param_value($this->action_params, "user", null);
         if (is_null($user)) {
             $user =& $this->create_db_object("User");
             $user->insert_login_form_extra_fields();
-            $user->read(array("login", "password", "should_remember"));
+            $user->read($context);
         }
         $should_remember = $user->should_remember;
 
-        $messages = $user->validate(null, "login_form");
+        $messages = $user->validate(null, $context);
         if (count($messages) == 0) {
             $login = $user->login;
             $password = $user->password;
@@ -444,11 +446,13 @@ class UserApp extends CustomApp {
     }
 
     function action_signup() {
+        $context = "signup_form";
+
         $user =& $this->create_db_object("User");
         $user->insert_signup_form_extra_fields();
-        $user->read(null, array("role", "is_confirmed", "is_active"));
+        $user->read($context);
 
-        $messages = $user->validate(null, "signup_form");
+        $messages = $user->validate(null, $context);
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
             $this->run_action("pg_signup", array("user" => $user));
@@ -521,10 +525,12 @@ class UserApp extends CustomApp {
     }
 
     function action_recover_password() {
-        $user =& $this->create_db_object("User");
-        $user->read(array("login", "email"));
+        $context = "recover_password_form";
 
-        $messages = $user->validate(null, "recover_password_form");
+        $user =& $this->create_db_object("User");
+        $user->read($context);
+
+        $messages = $user->validate(null, $context);
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
             $this->run_action("pg_recover_password", array("user" => $user));
@@ -726,16 +732,10 @@ class UserApp extends CustomApp {
 
         $field_names_to_not_read = array();
         $user_role = $this->get_user_role();
-        if ($user_role == "admin") {
-            if ($user->is_definite()) {
-                $field_names_to_not_read[] = "role";
-            }
-            $context = "edit_form_by_admin";
-        } else {
-            $field_names_to_not_read = array("login", "role", "is_confirmed", "is_active");
-            $context = "edit_form_by_user";
-        }
-        $user->read(null, $field_names_to_not_read);
+
+        $context = ($user_role == "admin") ? "edit_form_by_admin" : "edit_form_by_user";
+
+        $user->read($context);
 
         $messages = $user->validate($user_old, $context);
         if (count($messages) != 0) {
