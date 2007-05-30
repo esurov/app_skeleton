@@ -1290,7 +1290,7 @@ class DbObject extends AppObject {
         if (is_null($param_value)) {
             return null;
         }
-        return $this->app->get_php_double_value((string) $param_value);
+        return $this->app->get_php_currency_value((string) $param_value);
     }
 
     function get_boolean_field_value($param_value) {

@@ -680,6 +680,20 @@ class App extends AppObject {
     function get_currency_nonset_value_caption_pair() {
         return array(0.0, $this->get_lang_str("not_specified"));
     }
+
+    function get_php_currency_value($app_currency_value) {
+        $result = str_replace(
+            $this->get_config_value("app_currency_thousands_separator_{$this->lang}"),
+            "",
+            $app_currency_value
+        );
+        $result = str_replace(
+            $this->get_config_value("app_currency_decimal_point_{$this->lang}"),
+            ".",
+            $result
+        );
+        return (is_php_number($result)) ? (double) $result : 0.0;
+    }
 //
     // Template printing functions
     function print_raw_value($template_var, $value) {
