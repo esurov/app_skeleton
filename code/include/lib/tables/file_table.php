@@ -47,30 +47,17 @@ class FileTable extends CustomDbObject {
         ));
     }
 //
-    function store(
-        $field_names_to_store = null,
-        $field_names_to_not_store = null
-    ) {
+    function store($context = null, $context_params = array()) {
         $this->created = $this->app->get_db_now_datetime();
         $this->updated = $this->app->get_db_now_datetime();
-        if (!is_null($field_names_to_store)) {
-            $field_names_to_store[] = "created";
-            $field_names_to_store[] = "updated";
-        }
 
-        parent::store($field_names_to_store, $field_names_to_not_store);
+        parent::store($context, $context_params);
     }
-//
-    function update(
-        $field_names_to_update = null,
-        $field_names_to_not_update = null
-    ) {
+
+    function update($context = null, $context_params = array()) {
         $this->updated = $this->app->get_db_now_datetime();
-        if (!is_null($field_names_to_update)) {
-            $field_names_to_update[] = "updated";
-        }
-        
-        parent::update($field_names_to_update, $field_names_to_not_update);
+
+        parent::update($context, $context_params);
     }
 //
     function print_values($params = array()) {

@@ -470,46 +470,49 @@ class UserTable extends CustomDbObject {
         }
     }
 //
-    function store(
-        $field_names_to_store = null,
-        $field_names_to_not_store = null
-    ) {
+    function get_save_field_names_info($context, $context_params) {
+        $field_names_to_not_update = null;
+
+        switch ($context) {
+        case "skip_password":
+            $field_names_to_not_update = array("password");
+            break;
+        }
+        return array(
+            "field_names_to_not_update" => $field_names_to_not_update,
+        );
+    }
+
+    function store($context = null, $context_params = array()) {
         $this->created = $this->app->get_db_now_datetime();
         $this->updated = $this->app->get_db_now_datetime();
-        if (!is_null($field_names_to_store)) {
-            $field_names_to_store[] = "created";
-            $field_names_to_store[] = "updated";
-        }
 
-        parent::store($field_names_to_store, $field_names_to_not_store);
+        parent::store($context, $context_params);
     }
-//
-    function update(
-        $field_names_to_update = null,
-        $field_names_to_not_update = null
-    ) {
-        $this->updated = $this->app->get_db_now_datetime();
-        if (!is_null($field_names_to_update)) {
-            $field_names_to_update[] = "updated";
-        }
 
-        parent::update($field_names_to_update, $field_names_to_not_update);
+    function update($context = null, $context_params = array()) {
+        $this->updated = $this->app->get_db_now_datetime();
+
+        parent::update($context, $context_params);
     }
 
     function confirm() {
         $this->confirmation_date = $this->app->get_db_now_datetime();
         $this->is_confirmed = 1;
-        $this->update(array("confirmation_date", "is_confirmed"));
+
+        $this->update();
     }
 
     function activate() {
         $this->is_active = 1;
-        $this->update(array("is_active"));
+        
+        $this->update();
     }
 
     function deactivate() {
         $this->is_active = 0;
-        $this->update(array("is_active"));
+        
+        $this->update();
     }
 //
     function print_values($params = array()) {

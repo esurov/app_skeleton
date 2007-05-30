@@ -385,16 +385,18 @@ class DbObject extends AppObject {
             $attr = get_param_value($field_info, "attr", "");
             
             $create = ($multilingual) ?
-                false :
+                0 :
                 get_param_value($field_info, "create", $default_create);
             $store = (!$create || $field_type == "primary_key") ?
-                false :
-                get_param_value($field_info, "store", true);
+                0 :
+                get_param_value($field_info, "store", 1);
             $update = (!$create || $field_type == "primary_key") ?
-                false :
-                get_param_value($field_info, "update", true);
+                0 :
+                get_param_value($field_info, "update", 1);
 
-            $read = get_param_value($field_info, "read", true);
+            $read = ($field_type == "primary_key") ?
+                0 :
+                get_param_value($field_info, "read", 1);
 
             $join_info = get_param_value($field_info, "join", null);
             if (!is_null($join_info)) {
@@ -931,13 +933,28 @@ class DbObject extends AppObject {
         $this->run_query($this->db->get_drop_table_query($this->_table_name));
     }
 //
-    function store(
+    // Should be redefined in child class
+    // Used for both store() and update()
+    function get_save_field_names_info($context, $context_params) {
+        return array();
+    }
+
+    // Store field values to DB table
+    // Wrapper for SQL INSERT query
+    function store($context = null, $context_params = array()) {
+        $field_names_info = $this->get_save_field_names_info($context, $context_params);
+        $this->_store_values(
+            get_param_value($field_names_info, "field_names_to_store", null),
+            get_param_value($field_names_info, "field_names_to_not_store", null)
+        );
+    }
+
+    function _store_values(
         $field_names_to_store = null,
         $field_names_to_not_store = null
     ) {
-        // Store data to database table
         $this->write_log(
-            "store()",
+            "_store_values()",
             DL_INFO
         );
 
@@ -968,13 +985,23 @@ class DbObject extends AppObject {
         }
     }
 
-    function update(
+    // Update field values in DB table
+    // Wrapper for SQL UPDATE query
+    function update($context = null, $context_params = array()) {
+        $field_names_info = $this->get_save_field_names_info($context, $context_params);
+        $this->_update_values(
+            get_param_value($field_names_info, "field_names_to_update", null),
+            get_param_value($field_names_info, "field_names_to_not_update", null)
+        );
+    }
+
+    function _update_values(
         $field_names_to_update = null,
         $field_names_to_not_update = null
     ) {
         // Update data in database table
         $this->write_log(
-            "update()",
+            "_update_values()",
             DL_INFO
         );
 
@@ -1033,13 +1060,15 @@ class DbObject extends AppObject {
         return "{$field_name} = {$field_value_str}";
     }
 
-    function save($refetch_after_save = false) {
+    // Save (store/update) DbObject to DB table and refetch it
+    // if fields from related DbObjects need to be updated
+    function save($refetch_after_save = false, $context = null, $context_params = array()) {
         $was_definite = $this->is_definite();
 
         if ($was_definite) {
-            $this->update();
+            $this->update($context, $context_params);
         } else {
-            $this->store();
+            $this->store($context, $context_params);
         }
         
         if ($refetch_after_save) {
@@ -1049,10 +1078,13 @@ class DbObject extends AppObject {
         return $was_definite;
     }
 //
+    // Delete single DbObject record from DB table
+    // Wrapper for SQL DELETE query
     function del() {
         $this->del_where($this->get_default_where_str(false));
     }
 
+    // Delete many DbObject records with specified criteria from DB table
     function del_where($where_str) {
         $this->run_query(
             "DELETE FROM {%{$this->_table_name}_table%} " .
@@ -1060,6 +1092,7 @@ class DbObject extends AppObject {
         );
     }
 
+    // Delete single DbObject record from DB table with all related DbObjects
     function del_cascade() {
         $relations = $this->get_restrict_relations();
         foreach ($relations as $relation) {
@@ -1130,6 +1163,7 @@ class DbObject extends AppObject {
 
         // Logger optimization
         $should_write_log = ($this->get_log_debug_level() >= DL_EXTRA_DEBUG);
+        $log_message_text = "Read details:\n";
         
         foreach ($field_names as $field_name) {
             $field_info = $this->_fields[$field_name];
@@ -1206,23 +1240,28 @@ class DbObject extends AppObject {
                 break;
             }
 
+            if (!is_null($field_value)) {
+                $this->set_field_value($field_name, $field_value);
+            }
+
             if ($should_write_log) {
                 if (is_null($field_value)) {
                     $field_updated_str = "CGI param not found - field skipped from update!";
                 } else {
                     $field_value_str = qw(get_shortened_string($field_value, 300));
-                    $field_updated_str = "Updated value is: {$field_value_str}";
+                    $field_updated_str = "Read value is: {$field_value_str}";
                 }
-                $this->write_log(
-                    "Reading field '{$field_name}' from CGI param '{$param_name}'. " .
-                    "{$field_updated_str}",
-                    DL_EXTRA_DEBUG
-                );
+                $log_message_text .=
+                    "  Reading field '{$field_name}' from CGI param '{$param_name}'. " .
+                    "{$field_updated_str}\n";
             }
-            
-            if (!is_null($field_value)) {
-                $this->set_field_value($field_name, $field_value);
-            }
+        }
+
+        if ($should_write_log) {
+            $this->write_log(
+                $log_message_text,
+                DL_EXTRA_DEBUG
+            );
         }
     }
 
@@ -2286,9 +2325,6 @@ class DbObject extends AppObject {
             
         $input_name = "{$this->_input_name_prefix}_{$field_name}{$this->_input_name_suffix}";
         $type = $condition_info["type"];
-        $resource = $condition_info["message"];
-        $message_text = (is_null($resource)) ? null : $this->get_lang_str($resource);
-        $param = get_param_value($condition_info, "param", null);
         
         switch ($type) {
         case "regexp":
@@ -2310,8 +2346,8 @@ class DbObject extends AppObject {
             $validate_condition_str = create_client_validate_condition_str(
                 $input_name,
                 $type,
-                $message_text,
-                $param,
+                (string) $this->get_lang_str("status_msg.{$condition_info['message']}"),
+                get_param_value($condition_info, "param", null),
                 $dependent_validate_condition_str
             );
             break;

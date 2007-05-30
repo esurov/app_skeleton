@@ -120,7 +120,6 @@ class SampleTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "created",
             "type" => "datetime",
-            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
             "update" => 0,
 
@@ -134,7 +133,6 @@ class SampleTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "updated",
             "type" => "datetime",
-            "value" => $this->app->get_db_now_datetime(),
             "read" => 0,
         ));
 
@@ -339,13 +337,17 @@ class SampleTable extends CustomDbObject {
         ));
     }
 //
-    function update(
-        $field_names_to_update = null,
-        $field_names_to_not_update = null
-    ) {
+    function store($context = null, $context_params = array()) {
+        $this->created = $this->app->get_db_now_datetime();
         $this->updated = $this->app->get_db_now_datetime();
-        
-        parent::update($field_names_to_update, $field_names_to_not_update);
+
+        parent::store($context, $context_params);
+    }
+
+    function update($context = null, $context_params = array()) {
+        $this->updated = $this->app->get_db_now_datetime();
+
+        parent::update($context, $context_params);
     }
 //
 

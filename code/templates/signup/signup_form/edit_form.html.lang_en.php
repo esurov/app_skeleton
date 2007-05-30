@@ -1,6 +1,6 @@
 <?php
 return array(
-    "lang:text1" => "Fill out this signup form to create new account:",
+    "lang:text1" => "Fill this signup form to create new account:",
     "lang:text2" => "By submitting this signup form you indicate that you have read, understood and agreed on",
     "lang:accept_agreement" => "I accept",
     "lang:policy_terms_of_use" => "Terms of use",

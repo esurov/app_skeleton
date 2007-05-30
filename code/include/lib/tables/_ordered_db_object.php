@@ -33,14 +33,24 @@ class OrderedDbObject extends CustomDbObject {
         $this->_fields["position"] = $position_field_info;
     }
 //
-    function store(
-        $field_names_to_store = null,
-        $field_names_to_not_store = null
-    ) {
+    function get_save_field_names_info($context, $context_params) {
+        $field_names_to_update = null;
+
+        switch ($context) {
+        case "position":
+            $field_names_to_update = array("position");
+            break;
+        }
+        return array(
+            "field_names_to_update" => $field_names_to_update,
+        );
+    }
+
+    function store($context = null, $context_params = array()) {
         $last_position = $this->fetch_last_db_object_position($this->get_position_where_str());
         $this->position = $last_position + 1;
 
-        parent::store($field_names_to_store, $field_names_to_not_store);
+        parent::store($context, $context_params);
     }
 
     function update_position($update_position_to) {
@@ -59,8 +69,8 @@ class OrderedDbObject extends CustomDbObject {
         $this->position = $neighbor_obj->position;
         $neighbor_obj->position = $tmp_position;
 
-        $this->update(array("position"));
-        $neighbor_obj->update(array("position"));
+        $this->update("position");
+        $neighbor_obj->update("position");
     }
 
     // Should be redefined in child class if custom filter is required

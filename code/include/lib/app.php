@@ -2104,9 +2104,7 @@ class App extends AppObject {
     ) {
         $class_info = get_param_value($classes_info, $class_name_without_suffix, null);
         $class_name = "{$class_name_without_suffix}{$class_name_suffix}";
-        if ($class_name_suffix != "") {
-            $with_suffix_str = " with suffix '{$class_name_suffix}'";
-        }
+        $with_suffix_str = ($class_name_suffix == "") ? "" : " with suffix '{$class_name_suffix}'";
         if (is_null($class_info)) {
             $this->process_fatal_error(
                 "Cannot find info about class '{$class_name_without_suffix}'{$with_suffix_str}!"
@@ -2462,22 +2460,22 @@ class App extends AppObject {
         return true;
     }
 
-    function delete_db_object_image($obj, $image_id_field_name, $delete_thumbnail = true) {
+    function delete_db_object_image(
+        &$obj,
+        $image_id_field_name,
+        $delete_thumbnail = true
+    ) {
         if ($obj->is_definite() && $obj->is_field_exist($image_id_field_name)) {
-            $field_names_to_update = array($image_id_field_name);
-
             $obj->del_image($image_id_field_name);
             $obj->set_field_value($image_id_field_name, 0);
 
             $thumbnail_image_id_field_name = "thumbnail_{$image_id_field_name}";
             if ($delete_thumbnail && $obj->is_field_exist($thumbnail_image_id_field_name)) {
-                $field_names_to_update[] = $thumbnail_image_id_field_name;
-
                 $obj->del_image($thumbnail_image_id_field_name);
                 $obj->set_field_value($thumbnail_image_id_field_name, 0);
             }
 
-            $obj->update($field_names_to_update);
+            $obj->update();
         }
     }
 //
@@ -2519,14 +2517,15 @@ class App extends AppObject {
         return true;
     }
 
-    function delete_db_object_file($obj, $file_id_field_name) {
+    function delete_db_object_file(
+        &$obj,
+        $file_id_field_name
+    ) {
         if ($obj->is_definite() && $obj->is_field_exist($file_id_field_name)) {
-            $field_names_to_update = array($file_id_field_name);
-
             $obj->del_file($file_id_field_name);
             $obj->set_field_value($file_id_field_name, 0);
 
-            $obj->update($field_names_to_update);
+            $obj->update();
         }
     }
 //

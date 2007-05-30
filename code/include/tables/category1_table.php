@@ -38,15 +38,6 @@ class Category1Table extends OrderedDbObject {
         );
     }
 //
-//    function store(
-//        $field_names_to_store = null,
-//        $field_names_to_not_store = null
-//    ) {
-//        $this->position = $this->fetch_last_db_object_position() + 1;
-//
-//        parent::store($field_names_to_store, $field_names_to_not_store);
-//    }
-//
     function print_values($params = array()) {
         parent::print_values($params);
 

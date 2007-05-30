@@ -23,6 +23,7 @@ class Object {
     function get_class_name_without_suffix() {
         return $this->_class_name_without_suffix;
     }
+
 }
 
 class AppObject extends Object {

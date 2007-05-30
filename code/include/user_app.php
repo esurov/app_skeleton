@@ -730,7 +730,6 @@ class UserApp extends CustomApp {
         $user->insert_edit_form_extra_fields();
         $user_old = $user;
 
-        $field_names_to_not_read = array();
         $user_role = $this->get_user_role();
 
         $context = ($user_role == "admin") ? "edit_form_by_admin" : "edit_form_by_user";
@@ -742,16 +741,10 @@ class UserApp extends CustomApp {
             $this->print_status_messages($messages);
             $this->run_action("pg_user_edit", array("user" => $user));
         } else {
-            $field_names_to_not_update = $field_names_to_not_read;
-            if (is_value_empty($user->password)) {
-                $field_names_to_not_update[] = "password";
-            }
-            
-            if ($user_old->is_definite()) {
-                $user->update(null, $field_names_to_not_update);
-            } else {
-                $user->store();
-            }
+            $user->save(
+                false,
+                is_value_empty($user->password) ? "skip_password" : null
+            );
 
             $this->print_status_message_db_object_updated($user_old);
 
