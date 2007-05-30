@@ -207,21 +207,21 @@ class UserTable extends CustomDbObject {
 
         switch ($context) {
         case "login_form":
-            $fields_names_to_read = array("login", "password", "should_remember");
+            $field_names_to_read = array("login", "password", "should_remember");
             break;
         case "signup_form":
-            $fields_names_to_not_read = array("role", "is_confirmed", "is_active");
+            $field_names_to_not_read = array("role", "is_confirmed", "is_active");
             break;
         case "edit_form_by_admin":
             if ($this->is_definite()) {
-                $fields_names_to_not_read = array("role");
+                $field_names_to_not_read = array("role");
             }
             break;
         case "edit_form_by_user":
-            $fields_names_to_not_read = array("login", "role", "is_confirmed", "is_active");
+            $field_names_to_not_read = array("login", "role", "is_confirmed", "is_active");
             break;
         case "recover_password_form":
-            $fields_names_to_read = array("login", "email");
+            $field_names_to_read = array("login", "email");
             break;
         }
         return array(
