@@ -39,12 +39,12 @@ $app_classes = array(
         ),
         
         // App objects and component classes
-        "ObjectView" => array(
-            "filename" => "object_view.php",
+        "ObjectViewer" => array(
+            "filename" => "object_viewer.php",
             "required_classes" => array("ObjectTemplateComponent"),
         ),
-        "ObjectEdit" => array(
-            "filename" => "object_edit.php",
+        "ObjectEditor" => array(
+            "filename" => "object_editor.php",
             "required_classes" => array("ObjectTemplateComponent"),
         ),
         "ObjectsList" => array(

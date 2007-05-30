@@ -298,8 +298,8 @@ class UserApp extends CustomApp {
         } else {
             $user->password = "";
         }
-        $user_edit =& $this->create_object(
-            "ObjectEdit",
+        $user_editor =& $this->create_object(
+            "ObjectEditor",
             array(
                 "templates_dir" => "{$templates_dir}/login_form",
                 "template_var" => "login_form",
@@ -307,7 +307,7 @@ class UserApp extends CustomApp {
                 "context" => "login_form",
             )
         );
-        $user_edit->print_values();
+        $user_editor->print_values();
 
         $this->print_file("{$templates_dir}/body.html", "body");
     }
@@ -431,8 +431,8 @@ class UserApp extends CustomApp {
             $user->password = "";
             $user->password_confirm = "";
         }
-        $user_edit =& $this->create_object(
-            "ObjectEdit",
+        $user_editor =& $this->create_object(
+            "ObjectEditor",
             array(
                 "templates_dir" => "{$templates_dir}/signup_form",
                 "template_var" => "signup_form",
@@ -440,7 +440,7 @@ class UserApp extends CustomApp {
                 "context" => "signup_form",
             )
         );
-        $user_edit->print_values();
+        $user_editor->print_values();
 
         $this->print_file("{$templates_dir}/body.html", "body");
     }
@@ -511,7 +511,7 @@ class UserApp extends CustomApp {
             $user =& $this->create_db_object("User");
         }
         $recover_password_form =& $this->create_object(
-            "ObjectEdit",
+            "ObjectEditor",
             array(
                 "templates_dir" => "{$templates_dir}/recover_password_form",
                 "template_var" => "recover_password_form",
@@ -572,7 +572,7 @@ class UserApp extends CustomApp {
             $contact_info =& $this->create_db_object("ContactInfo");
         }
         $contact_form =& $this->create_object(
-            "ObjectEdit",
+            "ObjectEditor",
             array(
                 "templates_dir" => "{$templates_dir}/contact_form",
                 "template_var" => "contact_form",
@@ -662,16 +662,16 @@ class UserApp extends CustomApp {
         }
 
         $user = $this->read_id_fetch_user();
-        $user_view =& $this->create_object(
-            "ObjectView",
+        $user_viewer =& $this->create_object(
+            "ObjectViewer",
             array(
-                "templates_dir" => "{$templates_dir}/user_view",
-                "template_var" => "user_view",
+                "templates_dir" => "{$templates_dir}/user_viewer",
+                "template_var" => "user_viewer",
                 "obj" => $user,
                 "context" => $context,
             )
         );
-        $user_view->print_values();
+        $user_viewer->print_values();
 
         if ($user_role == "user") {
             $this->print_head_and_page_titles("pg_user_view_my_account");
@@ -707,16 +707,16 @@ class UserApp extends CustomApp {
         $user->password = "";
         $user->password_confirm = "";
 
-        $user_edit =& $this->create_object(
-            "ObjectEdit",
+        $user_editor =& $this->create_object(
+            "ObjectEditor",
             array(
-                "templates_dir" => "{$templates_dir}/user_edit",
-                "template_var" => "user_edit",
+                "templates_dir" => "{$templates_dir}/user_editor",
+                "template_var" => "user_editor",
                 "obj" => $user,
                 "context" => $context,
             )
         );
-        $user_edit->print_values();
+        $user_editor->print_values();
 
         if ($user_role == "user") {
             $this->print_head_and_page_titles("pg_user_edit_my_account");
@@ -828,16 +828,16 @@ class UserApp extends CustomApp {
         $templates_dir = "news_article_view";
 
         $news_article =& $this->read_id_fetch_db_object("NewsArticle");
-        $news_article_view =& $this->create_object(
-            "ObjectView",
+        $news_article_viewer =& $this->create_object(
+            "ObjectViewer",
             array(
-                "templates_dir" => "{$templates_dir}/news_article_view",
-                "template_var" => "news_article_view",
+                "templates_dir" => "{$templates_dir}/news_article_viewer",
+                "template_var" => "news_article_viewer",
                 "obj" => $news_article,
                 "context" => "view",
             )
         );
-        $news_article_view->print_values();
+        $news_article_viewer->print_values();
 
         $this->print_file("{$templates_dir}/body.html", "body");
     }
@@ -849,16 +849,16 @@ class UserApp extends CustomApp {
         if (is_null($news_article)) {
             $news_article =& $this->read_id_fetch_db_object("NewsArticle");
         }
-        $news_article_edit =& $this->create_object(
-            "ObjectEdit",
+        $news_article_editor =& $this->create_object(
+            "ObjectEditor",
             array(
-                "templates_dir" => "{$templates_dir}/news_article_edit",
-                "template_var" => "news_article_edit",
+                "templates_dir" => "{$templates_dir}/news_article_editor",
+                "template_var" => "news_article_editor",
                 "obj" => $news_article,
                 "context" => "edit",
             )
         );
-        $news_article_edit->print_values();
+        $news_article_editor->print_values();
 
         $this->print_file("{$templates_dir}/body.html", "body");
     }
@@ -1009,16 +1009,16 @@ class UserApp extends CustomApp {
                 }
             }
 
-            $category_edit =& $this->create_object(
-                "ObjectEdit",
+            $category_editor =& $this->create_object(
+                "ObjectEditor",
                 array(
-                    "templates_dir" => "{$templates_dir}/{$obj_name}_edit",
-                    "template_var" => "category_edit",
+                    "templates_dir" => "{$templates_dir}/{$obj_name}_editor",
+                    "template_var" => "category_editor",
                     "obj" => $obj,
                     "page_title_resource" => "pg_categories_{$obj_name}_edit",
                 )
             );
-            $category_edit->print_values();
+            $category_editor->print_values();
             break;
         case "delete_obj":
         case "move_obj":
@@ -1126,15 +1126,15 @@ class UserApp extends CustomApp {
                 }
             }
 
-            $product_edit =& $this->create_object(
-                "ObjectEdit",
+            $product_editor =& $this->create_object(
+                "ObjectEditor",
                 array(
-                    "templates_dir" => "{$templates_dir}/product_edit",
-                    "template_var" => "product_edit",
+                    "templates_dir" => "{$templates_dir}/product_editor",
+                    "template_var" => "product_editor",
                     "obj" => $product,
                 )
             );
-            $product_edit->print_values();
+            $product_editor->print_values();
             $this->print_file("{$templates_dir}/body.html", "body");
             break;
         }
