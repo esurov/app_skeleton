@@ -1990,7 +1990,7 @@ class App extends AppObject {
     }
 
     function action_delete_tables() {
-        $this->process_delete_tables(null);
+        $this->process_delete_tables(null, false, $run_info);
         $this->add_session_status_message(new OkStatusMsg("tables_deleted"));
         $this->create_self_redirect_response();
     }
