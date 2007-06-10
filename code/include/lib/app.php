@@ -444,7 +444,23 @@ class App extends AppObject {
         $this->response = new PdfDocumentResponse($content, $filename, $open_inline);
     }
 //
-    // Date & Time format and formatting
+    // Values formatting configuration
+    function get_app_number_thousands_separator() {
+        return $this->get_config_value("app_number_thousands_separator_{$this->lang}");
+    }
+
+    function get_app_number_decimal_point() {
+        return $this->get_config_value("app_number_decimal_point_{$this->lang}");
+    }
+
+    function get_app_currency_decimal_point() {
+        return $this->get_config_value("app_currency_decimal_point_{$this->lang}");
+    }
+
+    function get_app_currency_thousands_separator() {
+        return $this->get_config_value("app_currency_thousands_separator_{$this->lang}");
+    }
+
     function get_app_datetime_format() {
         return $this->get_config_value("app_datetime_format_{$this->lang}");
     }
@@ -476,163 +492,99 @@ class App extends AppObject {
     function get_db_time_format() {
         return $this->get_config_value("db_time_format");
     }
-//
-    function get_app_datetime($db_datetime, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format($this->get_db_datetime_format(), $db_datetime);
-        return create_date_by_format(
-            $this->get_app_datetime_format(),
-            $date_parts,
-            $date_if_unknown
-        );
+
+    // Euro currency sign utf-8 codepoint
+    function get_currency_sign() {
+        return "\xE2\x82\xAC ";
     }
 
-    function get_app_short_datetime($db_datetime, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format($this->get_db_datetime_format(), $db_datetime);
-        return create_date_by_format(
-            $this->get_app_short_datetime_format(),
-            $date_parts,
-            $date_if_unknown
-        );
+    function is_currency_sign_at_start() {
+        return true;
     }
 
-    function get_app_date($db_date, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format($this->get_db_date_format(), $db_date);
-        return create_date_by_format(
-            $this->get_app_date_format(),
-            $date_parts,
-            $date_if_unknown
-        );
-    }
-
-    function get_app_time($db_time, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format($this->get_db_time_format(), $db_time);
-        return create_date_by_format(
-            $this->get_app_time_format(),
-            $date_parts,
-            $date_if_unknown
-        );
-    }
-
-    function get_app_short_time($db_time, $date_if_unknown = "") {
-        $date_parts = parse_date_by_format($this->get_db_time_format(), $db_time);
-        return create_date_by_format(
-            $this->get_app_short_time_format(),
-            $date_parts,
-            $date_if_unknown
-        );
-    }
-
-    function get_db_datetime($app_datetime, $date_if_unknown = "0000-00-00 00:00:00") {
-        $date_parts = parse_date_by_format($this->get_app_datetime_format(), $app_datetime);
-        return create_date_by_format(
-            $this->get_db_datetime_format(),
-            $date_parts,
-            $date_if_unknown
-        );
-    }
-
-    function get_db_date($app_date, $date_if_unknown = "0000-00-00") {
-        $date_parts = parse_date_by_format($this->get_app_date_format(), $app_date);
-        return create_date_by_format(
-            $this->get_db_date_format(),
-            $date_parts,
-            $date_if_unknown
-        );
-    }
-
-    function get_db_time($app_time, $date_if_unknown = "00:00:00") {
-        $date_parts = parse_date_by_format($this->get_app_time_format(), $app_time);
-        return create_date_by_format(
-            $this->get_db_time_format(),
-            $date_parts,
-            $date_if_unknown
-        );
-    }
-//    
-    function get_db_datetime_from_timestamp($ts) {
-        $date_parts = get_date_parts_from_timestamp($ts);
-        return create_date_by_format(
-            $this->get_db_datetime_format(),
-            $date_parts,
-            ""
-        );
-    }
-
-    function get_db_date_from_timestamp($ts) {
-        $date_parts = get_date_parts_from_timestamp($ts);
-        return create_date_by_format(
-            $this->get_db_date_format(),
-            $date_parts,
-            ""
-        );
-    }
-
-    function get_db_now_datetime() {
-        return $this->get_db_datetime_from_timestamp(time());
-    }
-
-    function get_db_now_date() {
-        return $this->get_db_date_from_timestamp(time());
+    function get_currency_nonset_value_caption_pair() {
+        return array(0.0, $this->get_lang_str("not_specified"));
     }
 //
-    function get_timestamp_from_db_datetime($db_datetime) {
-        return get_timestamp_from_date_parts(
-            parse_date_by_format($this->get_db_datetime_format(), $db_datetime)
-        );
+    // Db to App values conversion
+    function get_app_value_by_type(
+        $db_value,
+        $type,
+        $type_params
+    ) {
+        switch ($type) {
+        case "primary_key":
+        case "foreign_key":
+            $app_value = $this->get_app_key_value($db_value);
+            break;
+        case "integer":
+            $app_value = $this->get_app_integer_value($db_value);
+            break;
+        case "double":
+            $app_value = $this->get_app_double_value($db_value, $type_params["prec"]);
+            break;
+        case "currency":
+            $app_value = $this->get_app_currency_value($db_value, $type_params["prec"]);
+            break;
+        case "boolean":
+            $app_value = $this->get_app_boolean_value($db_value);
+            break;
+        case "enum":
+            $app_value = $this->get_app_enum_value($db_value);
+            break;
+        case "varchar":
+            $app_value = $this->get_app_varchar_value($db_value);
+            break;
+        case "text":
+            $app_value = $this->get_app_text_value($db_value);
+            break;
+        case "blob":
+            $app_value = $this->get_app_blob_value($db_value);
+            break;
+        case "datetime":
+            $app_value = $this->get_app_datetime_value($db_value);
+            break;
+        case "date":
+            $app_value = $this->get_app_date_value($db_value);
+            break;
+        case "time":
+            $app_value = $this->get_app_time_value($db_value);
+            break;
+        }
+        return $app_value;
     }
 
-    function get_timestamp_from_db_date($db_date) {
-        return get_timestamp_from_date_parts(
-            parse_date_by_format($this->get_db_date_format(), $db_date)
-        );
+    function get_app_key_value($db_value) {
+        return $db_value;
     }
-//
-    // Integer, double and currency formatting
-    function get_app_integer_value($php_number_value) {
+
+    function get_app_integer_value($db_value) {
         return format_integer_value(
-            $php_number_value,
-            $this->get_config_value("app_number_thousands_separator_{$this->lang}")
+            $db_value,
+            $this->get_app_number_thousands_separator()
         );
     }
 
-    function get_php_integer_value($app_number_value) {
-        return (int) $this->get_php_double_value($app_number_value);
-    }
-    
-    function get_app_double_value($php_number_value, $decimals) {
+    function get_app_double_value($db_value, $decimals) {
         return format_double_value(
-            $php_number_value,
+            $db_value,
             $decimals,
-            $this->get_config_value("app_number_decimal_point_{$this->lang}"),
-            $this->get_config_value("app_number_thousands_separator_{$this->lang}")
+            $this->get_app_number_decimal_point(),
+            $this->get_app_number_thousands_separator()
         );
     }
 
-    function get_php_double_value($app_number_value) {
-        $result = str_replace(
-            $this->get_config_value("app_number_thousands_separator_{$this->lang}"),
-            "",
-            $app_number_value
-        );
-        $result = str_replace(
-            $this->get_config_value("app_number_decimal_point_{$this->lang}"),
-            ".",
-            $result
-        );
-        return (is_php_number($result)) ? (double) $result : 0.0;
-    }
-
-    function get_app_currency_value($php_number_value, $decimals) {
+    function get_app_currency_value($db_value, $decimals) {
         return format_double_value(
-            $php_number_value,
+            $db_value,
             $decimals,
-            $this->get_config_value("app_currency_decimal_point_{$this->lang}"),
-            $this->get_config_value("app_currency_thousands_separator_{$this->lang}")
+            $this->get_app_currency_decimal_point(),
+            $this->get_app_currency_thousands_separator()
         );
     }
 
     function get_app_currency_with_sign_value(
-        $php_number_value,
+        $db_value,
         $decimals = 2,
         $sign = null,
         $sign_at_start = null,
@@ -651,48 +603,362 @@ class App extends AppObject {
 
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
-            if ((double) $php_number_value == (double) $nonset_value) {
+            if ((double) $db_value == (double) $nonset_value) {
                 return get_html_safe_string(
                     get_caption_from_value_caption_pair($nonset_value_caption_pair)
                 );
             }
         }
-        return $this->append_currency_sign(
-            $this->get_app_currency_value($php_number_value, $decimals),
+        
+        return append_currency_sign(
+            $this->get_app_currency_value($db_value, $decimals),
             $sign,
             $sign_at_start
         );
     }
 
-    function append_currency_sign($str, $sign, $sign_at_start) {
-        return ($sign_at_start) ? "{$sign}{$str}" : "{$str}{$sign}";
+    function get_app_boolean_value($db_value) {
+        return $db_value;
     }
 
-    // Euro currency sign utf-8 codepoint
-    function get_currency_sign() {
-        return "\xE2\x82\xAC ";
+    function get_app_enum_value($db_value) {
+        return $db_value;
     }
 
-    function is_currency_sign_at_start() {
-        return true;
+    function get_app_varchar_value($db_value) {
+        return $db_value;
     }
 
-    function get_currency_nonset_value_caption_pair() {
-        return array(0.0, $this->get_lang_str("not_specified"));
+    function get_app_text_value($db_value) {
+        return $db_value;
     }
 
-    function get_php_currency_value($app_currency_value) {
-        $result = str_replace(
-            $this->get_config_value("app_currency_thousands_separator_{$this->lang}"),
-            "",
-            $app_currency_value
+    function get_app_blob_value($db_value) {
+        return $db_value;
+    }
+
+    function get_app_datetime_value($db_value, $value_if_unknown = "") {
+        $date_parts = parse_date_by_format($this->get_db_datetime_format(), $db_value);
+        return create_date_by_format(
+            $this->get_app_datetime_format(),
+            $date_parts,
+            $value_if_unknown
         );
-        $result = str_replace(
-            $this->get_config_value("app_currency_decimal_point_{$this->lang}"),
-            ".",
-            $result
+    }
+
+    function get_app_short_datetime_value($db_value, $value_if_unknown = "") {
+        $date_parts = parse_date_by_format($this->get_db_datetime_format(), $db_value);
+        return create_date_by_format(
+            $this->get_app_short_datetime_format(),
+            $date_parts,
+            $value_if_unknown
         );
-        return (is_php_number($result)) ? (double) $result : 0.0;
+    }
+
+    function get_app_date_value($db_value, $value_if_unknown = "") {
+        $date_parts = parse_date_by_format($this->get_db_date_format(), $db_value);
+        return create_date_by_format(
+            $this->get_app_date_format(),
+            $date_parts,
+            $value_if_unknown
+        );
+    }
+
+    function get_app_time_value($db_value, $value_if_unknown = "") {
+        $date_parts = parse_date_by_format($this->get_db_time_format(), $db_value);
+        return create_date_by_format(
+            $this->get_app_time_format(),
+            $date_parts,
+            $value_if_unknown
+        );
+    }
+
+    function get_app_short_time_value($db_value, $value_if_unknown = "") {
+        $date_parts = parse_date_by_format($this->get_db_time_format(), $db_value);
+        return create_date_by_format(
+            $this->get_app_short_time_format(),
+            $date_parts,
+            $value_if_unknown
+        );
+    }
+//
+    // App to Db values conversion
+    function get_db_value_by_type($app_value, $type) {
+        switch ($type) {
+        case "primary_key":
+        case "foreign_key":
+            $db_value = $this->get_db_key_value($app_value);
+            break;
+        case "integer":
+            $db_value = $this->get_db_integer_value($app_value);
+            break;
+        case "double":
+            $db_value = $this->get_db_double_value($app_value);
+            break;
+        case "currency":
+            $db_value = $this->get_db_currency_value($app_value);
+            break;
+        case "boolean":
+            $db_value = $this->get_db_boolean_value($app_value);
+            break;
+        case "enum":
+            $db_value = $this->get_db_enum_value($app_value);
+            break;
+        case "varchar":
+            $db_value = $this->get_db_varchar_value($app_value);
+            break;
+        case "text":
+            $db_value = $this->get_db_text_value($app_value);
+            break;
+        case "blob":
+            $db_value = $this->get_db_blob_value($app_value);
+            break;
+        case "datetime":
+            $db_value = $this->get_db_datetime_value($app_value);
+            break;
+        case "date":
+            $db_value = $this->get_db_date_value($app_value);
+            break;
+        case "time":
+            $db_value = $this->get_db_time_value($app_value);
+            break;
+        }
+        return $app_value;
+    }
+
+    function get_db_key_value($app_value) {
+        return (int) $app_value;
+    }
+
+    function get_db_integer_value($app_value) {
+        return (int) $this->get_db_double_value($app_value);
+    }
+    
+    function get_db_double_value($app_value) {
+        $result = str_replace($this->get_app_number_thousands_separator(), "", $app_value);
+        $result = str_replace($this->get_app_number_decimal_point(), ".", $result);
+        return (is_db_number($result)) ? (double) $result : 0.0;
+    }
+
+    function get_db_currency_value($app_value) {
+        $result = str_replace($this->get_app_currency_thousands_separator(), "", $app_value);
+        $result = str_replace($this->get_app_currency_decimal_point(), ".", $result);
+        return (is_db_number($result)) ? (double) $result : 0.0;
+    }
+
+    function get_db_boolean_value($app_value) {
+        return ((int) $app_value == 0) ? 0 : 1;
+    }
+
+    function get_db_enum_value($app_value) {
+        return (string) $app_value;
+    }
+
+    function get_db_varchar_value($app_value) {
+        return (string) $app_value;
+    }
+
+    function get_db_text_value($app_value) {
+        return (string) convert_crlf2lf($app_value);
+    }
+
+    function get_db_blob_value($app_value) {
+        return (string) $app_value;
+    }
+
+    function get_db_datetime_value($app_value, $value_if_unknown = "0000-00-00 00:00:00") {
+        $date_parts = parse_date_by_format($this->get_app_datetime_format(), $app_value);
+        return create_date_by_format(
+            $this->get_db_datetime_format(),
+            $date_parts,
+            $value_if_unknown
+        );
+    }
+
+    function get_db_date_value($app_value, $value_if_unknown = "0000-00-00") {
+        $date_parts = parse_date_by_format($this->get_app_date_format(), $app_value);
+        return create_date_by_format(
+            $this->get_db_date_format(),
+            $date_parts,
+            $value_if_unknown
+        );
+    }
+
+    function get_db_time_value($app_value, $value_if_unknown = "00:00:00") {
+        $date_parts = parse_date_by_format($this->get_app_time_format(), $app_value);
+        return create_date_by_format(
+            $this->get_db_time_format(),
+            $date_parts,
+            $value_if_unknown
+        );
+    }
+//
+    function get_db_now_datetime() {
+        return $this->get_db_datetime_from_timestamp(time());
+    }
+
+    function get_db_now_date() {
+        return $this->get_db_date_from_timestamp(time());
+    }
+
+    function get_db_datetime_from_timestamp($ts) {
+        $date_parts = get_date_parts_from_timestamp($ts);
+        return create_date_by_format($this->get_db_datetime_format(), $date_parts, "");
+    }
+
+    function get_db_date_from_timestamp($ts) {
+        $date_parts = get_date_parts_from_timestamp($ts);
+        return create_date_by_format($this->get_db_date_format(), $date_parts, "");
+    }
+
+    function get_timestamp_from_db_datetime($db_datetime) {
+        return get_timestamp_from_date_parts(
+            parse_date_by_format($this->get_db_datetime_format(), $db_datetime)
+        );
+    }
+
+    function get_timestamp_from_db_date($db_date) {
+        return get_timestamp_from_date_parts(
+            parse_date_by_format($this->get_db_date_format(), $db_date)
+        );
+    }
+//
+    // CGI functions
+    function read_value_by_type($input_name, $type, $type_params) {
+        switch ($type) {
+        case "primary_key":
+        case "foreign_key":
+            $db_value = $this->read_key_value($input_name, true);
+            break;
+        case "integer":
+            $db_value = $this->read_integer_value($input_name, true);
+            break;
+        case "double":
+            $db_value = $this->read_double_value($input_name, true);
+            break;
+        case "currency":
+            $db_value = $this->read_currency_value($input_name, true);
+            break;
+        case "boolean":
+            $db_value = $this->read_boolean_value($input_name, true);
+            break;
+        case "enum":
+            $db_value = $this->read_enum_value(
+                $input_name,
+                $type_params["input"]["values"]["data"]["array"],
+                true
+            );
+            break;
+        case "varchar":
+            $db_value = $this->read_varchar_value($input_name, true);
+            break;
+        case "text":
+            $db_value = $this->read_text_value($input_name, true);
+            break;
+        case "blob":
+            $db_value = $this->read_blob_value($input_name, true);
+            break;
+        case "datetime":
+            $db_value = $this->read_datetime_value($input_name, true);
+            break;
+        case "date":
+            $db_value = $this->read_date_value($input_name, true);
+            break;
+        case "time":
+            $db_value = $this->read_time_value($input_name, true);
+            break;
+        }
+
+        return $db_value;
+    }
+
+    function read_key_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_key_value($param_value);
+    }
+
+    function read_integer_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_integer_value($param_value);
+    }
+
+    function read_double_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_double_value($param_value);
+    }
+
+    function read_currency_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_currency_value($param_value);
+    }
+
+    function read_boolean_value($param_name, $null_if_not_found = false) {
+        // Skip reading field value for boolean fields (checkboxes only)
+        // if no hidden value with '__sent_' prefix was sent via CGI
+        if (is_null(param("__sent_{$param_name}")) && $null_if_not_found) {
+            return null;
+        }
+        $param_value = param($param_name);
+        return $this->get_db_boolean_value($param_value);
+    }
+
+    function read_enum_value($param_name, $value_caption_pairs, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_enum_value(
+                get_actual_current_value($value_caption_pairs, $param_value)
+            );
+    }
+
+    function read_varchar_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_varchar_value($param_value);
+    }
+
+    function read_text_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_text_value($param_value);
+    }
+
+    function read_blob_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_blob_value($param_value);
+    }
+
+    function read_datetime_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_datetime_value($param_value);
+    }
+
+    function read_date_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_date_value($param_value);
+    }
+    
+    function read_time_value($param_name, $null_if_not_found = false) {
+        $param_value = param($param_name);
+        return (is_null($param_value) && $null_if_not_found) ?
+            null :
+            $this->get_db_time_value($param_value);
     }
 //
     // Template printing functions
@@ -755,100 +1021,104 @@ class App extends AppObject {
     }
 //
     // Complex types template printing functions
-    function print_primary_key_value($template_var, $value) {
-        $this->print_raw_value($template_var, $value);
+    function print_primary_key_value($template_var, $db_value) {
+        $this->print_raw_value($template_var, $db_value);
     }
 
-    function print_foreign_key_value($template_var, $value) {
-        $this->print_raw_value($template_var, $value);
+    function print_foreign_key_value($template_var, $db_value) {
+        $this->print_raw_value($template_var, $db_value);
     }
 
     function print_integer_value(
         $template_var,
-        $value,
+        $db_value,
         $nonset_value_caption_pair = null
     ) {
-        $value_with_nonset = $value;
-        $value_formatted = $this->get_app_integer_value($value);
+        $app_value_with_nonset = $db_value;
+        $app_value_formatted = $this->get_app_integer_value($db_value);
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
-            if ((int) $value == (int) $nonset_value) {
+            if ((int) $db_value == (int) $nonset_value) {
                 $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
-                $value_formatted = get_html_safe_string($nonset_caption);
-                $value_with_nonset = $nonset_caption;
+                $app_value_formatted = get_html_safe_string($nonset_caption);
+                $app_value_with_nonset = $nonset_caption;
             }
         }
         $this->print_raw_values(array(
-            $template_var => $value_formatted,
-            "{$template_var}.orig" => $value,
-            "{$template_var}.orig_with_nonset" => $value_with_nonset,
+            $template_var => $app_value_formatted,
+            "{$template_var}.orig" => $db_value,
+            "{$template_var}.orig_with_nonset" => $app_value_with_nonset,
         ));
     }
 
     function print_double_value(
         $template_var,
-        $value,
+        $db_value,
         $decimals,
         $nonset_value_caption_pair = null
     ) {
-        $value_with_nonset = $value;
-        $value_formatted = $this->get_app_double_value($value, $decimals);
-        $value_formatted_2 = $this->get_app_double_value($value, 2);
-        $value_formatted_5 = $this->get_app_double_value($value, 5);
+        $app_value_with_nonset = $db_value;
+        $app_value_formatted = $this->get_app_double_value($db_value, $decimals);
+        $app_value_formatted_2 = $this->get_app_double_value($db_value, 2);
+        $app_value_formatted_5 = $this->get_app_double_value($db_value, 5);
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
-            if ((double) $value == (double) $nonset_value) {
+            if ((double) $db_value == (double) $nonset_value) {
                 $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
                 $nonset_caption_safe = get_html_safe_string($nonset_caption);
-                $value_formatted = $nonset_caption_safe;
-                $value_formatted_2 = $nonset_caption_safe;
-                $value_formatted_5 = $nonset_caption_safe;
-                $value_with_nonset = $nonset_caption;
+                $app_value_formatted = $nonset_caption_safe;
+                $app_value_formatted_2 = $nonset_caption_safe;
+                $app_value_formatted_5 = $nonset_caption_safe;
+                $app_value_with_nonset = $nonset_caption;
             }
         }
         $this->print_raw_values(array(
-            $template_var => $value_formatted,
-            "{$template_var}.2" => $value_formatted_2,
-            "{$template_var}.5" => $value_formatted_5,
-            "{$template_var}.orig" => $value,
-            "{$template_var}.orig_with_nonset" => $value_with_nonset,
+            $template_var => $app_value_formatted,
+            "{$template_var}.2" => $app_value_formatted_2,
+            "{$template_var}.5" => $app_value_formatted_5,
+            "{$template_var}.orig" => $db_value,
+            "{$template_var}.orig_with_nonset" => $app_value_with_nonset,
         ));
     }
 
     function print_currency_value(
         $template_var,
-        $value,
+        $db_value,
         $decimals,
         $sign = null,
         $sign_at_start = null,
         $nonset_value_caption_pair = null
     ) {
-        $value_with_nonset = $value;
-        $value_formatted = $this->get_app_currency_with_sign_value(
-            $value,
+        $app_value_with_nonset = $db_value;
+        $app_value_formatted = $this->get_app_currency_with_sign_value(
+            $db_value,
             $decimals,
             $sign,
             $sign_at_start,
             $nonset_value_caption_pair
         );
-        $value_formatted_without_sign = $this->get_app_currency_value($value, $decimals);
+        $app_value_formatted_without_sign = $this->get_app_currency_value($db_value, $decimals);
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
-            if ((double) $value == (double) $nonset_value) {
+            if ((double) $db_value == (double) $nonset_value) {
                 $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
-                $value_formatted_without_sign = get_html_safe_string($nonset_caption);
-                $value_with_nonset = $nonset_caption;
+                $app_value_formatted_without_sign = get_html_safe_string($nonset_caption);
+                $app_value_with_nonset = $nonset_caption;
             }
         }
         $this->print_raw_values(array(
-            $template_var => $value_formatted,
-            "{$template_var}.without_sign" => $value_formatted_without_sign,
-            "{$template_var}.orig" => $value,
-            "{$template_var}.orig_with_nonset" => $value_with_nonset,
+            $template_var => $app_value_formatted,
+            "{$template_var}.without_sign" => $app_value_formatted_without_sign,
+            "{$template_var}.orig" => $db_value,
+            "{$template_var}.orig_with_nonset" => $app_value_with_nonset,
         ));
     }
 
-    function print_boolean_value($template_var, $value, $value_caption_pairs = null) {
+    function print_boolean_value(
+        $template_var,
+        $db_value,
+        $value_caption_pairs = null
+    ) {
         if (is_null($value_caption_pairs)) {
             $value_caption_pairs = array(
                 array(0, $this->get_lang_str("no")),
@@ -857,55 +1127,60 @@ class App extends AppObject {
         }
         $caption = get_caption_by_value_from_value_caption_pairs(
             $value_caption_pairs,
-            ((int) $value != 0) ? 1 : 0
+            ((int) $db_value == 0) ? 0 : 1
         );
         $this->print_value($template_var, $caption);
-        $this->print_raw_value("{$template_var}.orig", $value);
+        $this->print_raw_value("{$template_var}.orig", $db_value);
     }
 
-    function print_enum_value($template_var, $enum_value, $value_caption_pairs) {
-        $enum_value = get_actual_current_value($value_caption_pairs, $enum_value);
-        $enum_caption = get_caption_by_value_from_value_caption_pairs(
-            $value_caption_pairs,
-            $enum_value
+    function print_enum_value(
+        $template_var,
+        $db_value,
+        $value_caption_pairs
+    ) {
+        $db_value = get_actual_current_value($value_caption_pairs, $db_value);
+        $caption = get_caption_by_value_from_value_caption_pairs($value_caption_pairs, $db_value);
+        if (is_null($caption)) {
+            $caption = "";
+        }
+        $this->print_value($template_var, $caption);
+        $this->print_raw_value("{$template_var}.caption_orig", $caption);
+        $this->print_raw_value("{$template_var}.orig", $db_value);
+    }
+
+    function print_varchar_value($template_var, $db_value) {
+        $this->print_value($template_var, $db_value);
+        $this->print_raw_value("{$template_var}.orig", $db_value);
+    }
+
+    function print_text_value($template_var, $db_value) {
+        $this->print_varchar_value($template_var, $db_value);
+        $this->print_raw_value(
+            "{$template_var}.lf2br",
+            convert_lf2br(get_html_safe_string($db_value))
         );
-        $enum_caption = is_null($enum_caption) ? "" : $enum_caption;
-        $this->print_value($template_var, $enum_caption);
-        $this->print_raw_value("{$template_var}.caption_orig", $enum_caption);
-        $this->print_raw_value("{$template_var}.orig", $enum_value);
     }
 
-    function print_varchar_value($template_var, $value) {
-        $this->print_value($template_var, $value);
-        $this->print_raw_value("{$template_var}.orig", $value);
-    }
-
-    function print_text_value($template_var, $value) {
-        $this->print_varchar_value($template_var, $value);
-        $safe_value = get_html_safe_string($value);
-        $this->print_raw_value("{$template_var}.lf2br", convert_lf2br($safe_value));
-    }
-
-    function print_datetime_value($template_var, $db_datetime) {
+    function print_datetime_value($template_var, $db_value) {
         $this->print_values(array(
-            $template_var => $this->get_app_datetime($db_datetime),
-            "{$template_var}.short" => $this->get_app_short_datetime($db_datetime),
-            "{$template_var}.orig" => $db_datetime,
+            $template_var => $this->get_app_datetime_value($db_value),
+            "{$template_var}.short" => $this->get_app_short_datetime_value($db_value),
+            "{$template_var}.orig" => $db_value,
         ));
     }
 
-    function print_date_value($template_var, $db_date) {
+    function print_date_value($template_var, $db_value) {
         $this->print_values(array(
-            $template_var => $this->get_app_date($db_date),
-            "{$template_var}.orig" => $db_date,
+            $template_var => $this->get_app_date_value($db_value),
+            "{$template_var}.orig" => $db_value,
         ));
     }
 
-    function print_time_value($template_var, $db_time) {
+    function print_time_value($template_var, $db_value) {
         $this->print_values(array(
-            $template_var => $this->get_app_time($db_time),
-            "{$template_var}.short" => $this->get_app_short_time($db_time),
-            "{$template_var}.orig" => $db_time,
+            $template_var => $this->get_app_time_value($db_value),
+            "{$template_var}.short" => $this->get_app_short_time_value($db_value),
+            "{$template_var}.orig" => $db_value,
         ));
     }
 //
@@ -913,29 +1188,30 @@ class App extends AppObject {
     function print_primary_key_form_value(
         $template_var,
         $input_name,
-        $value
+        $db_value
     ) {
-        $this->print_hidden_input_form_value($template_var, $input_name, $value);
-        $this->print_text_input_form_value($template_var, $input_name, $value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $db_value);
+        $this->print_text_input_form_value($template_var, $input_name, $db_value);
     }
 
     function print_foreign_key_form_value(
         $template_var,
         $input_name,
-        $value,
+        $db_value,
         $input_type,
         $input_attrs,
         $values_info,
-        $input_type_params
+        $input_type_params,
+        $alt_values_info = null
     ) {
-        $this->print_hidden_input_form_value($template_var, $input_name, $value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $db_value);
 
         switch ($input_type) {
         case "text":
             $printed_value = $this->print_text_input_form_value(
                 $template_var,
                 $input_name,
-                $value,
+                $db_value,
                 $input_attrs
             );
             break;
@@ -943,30 +1219,33 @@ class App extends AppObject {
             $printed_value = $this->print_radio_group_input_form_value(
                 $template_var,
                 $input_name,
-                $value,
+                $db_value,
                 $input_attrs,
-                $values_info
+                $values_info,
+                $alt_values_info
             );
             break;
         case "select":
             $printed_value = $this->print_select_input_form_value(
                 $template_var,
                 $input_name,
-                $value,
+                $db_value,
                 $input_attrs,
-                $values_info
+                $values_info,
+                $alt_values_info
             );
             break;
         case "main_select":
             $printed_value = $this->print_main_select_input_form_value(
                 $template_var,
                 $input_name,
-                $value,
+                $db_value,
                 $input_attrs,
                 $values_info,
                 $input_type_params["dependent_select_name"],
                 $input_type_params["dependency_info"],
-                $input_type_params["dependent_values_info"]
+                $input_type_params["dependent_values_info"],
+                $alt_values_info
             );
             break;
         default:
@@ -979,25 +1258,25 @@ class App extends AppObject {
     function print_integer_form_value(
         $template_var,
         $input_name,
-        $value,
+        $db_value,
         $input_attrs,
         $nonset_value_caption_pair = null
     ) {
-        $value_formatted = $this->get_app_integer_value($value);
-        $this->print_hidden_input_form_value($template_var, $input_name, $value_formatted);
+        $app_value_formatted = $this->get_app_integer_value($db_value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $app_value_formatted);
 
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
-            if ((int) $value == (int) $nonset_value) {
+            if ((int) $db_value == (int) $nonset_value) {
                 $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
-                $value_formatted = $nonset_caption;
+                $app_value_formatted = $nonset_caption;
             }
         }
         
         return $this->print_text_input_form_value(
             $template_var,
             $input_name,
-            $value_formatted,
+            $app_value_formatted,
             array_merge(
                 array("class" => "integer"),
                 $input_attrs
@@ -1008,26 +1287,26 @@ class App extends AppObject {
     function print_double_form_value(
         $template_var,
         $input_name,
-        $value,
+        $db_value,
         $decimals,
         $input_attrs,
         $nonset_value_caption_pair = null
     ) {
-        $value_formatted = $this->get_app_double_value($value, $decimals);
-        $this->print_hidden_input_form_value($template_var, $input_name, $value_formatted);
+        $app_value_formatted = $this->get_app_double_value($db_value, $decimals);
+        $this->print_hidden_input_form_value($template_var, $input_name, $app_value_formatted);
         
         if (!is_null($nonset_value_caption_pair)) {
             $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
-            if ((double) $value == (double) $nonset_value) {
+            if ((double) $db_value == (double) $nonset_value) {
                 $nonset_caption = get_caption_from_value_caption_pair($nonset_value_caption_pair);
-                $value_formatted = $nonset_caption;
+                $app_value_formatted = $nonset_caption;
             }
         }
 
         return $this->print_text_input_form_value(
             $template_var,
             $input_name,
-            $value_formatted,
+            $app_value_formatted,
             array_merge(
                 array("class" => "double"),
                 $input_attrs
@@ -1038,7 +1317,7 @@ class App extends AppObject {
     function print_currency_form_value(
         $template_var,
         $input_name,
-        $value,
+        $db_value,
         $decimals,
         $input_attrs,
         $values_info
@@ -1051,17 +1330,17 @@ class App extends AppObject {
             $this->is_currency_sign_at_start()
         );
 
-        $value_formatted_without_sign = $this->get_app_currency_value($value, $decimals);
+        $app_value_formatted_without_sign = $this->get_app_currency_value($db_value, $decimals);
         $this->print_hidden_input_form_value(
             $template_var,
             $input_name,
-            $value_formatted_without_sign
+            $app_value_formatted_without_sign
         );
         
         $printed_value = $this->print_text_input_form_value(
             $template_var,
             $input_name,
-            $value_formatted_without_sign,
+            $app_value_formatted_without_sign,
             array_merge(
                 array("class" => "currency"),
                 $input_attrs
@@ -1069,13 +1348,13 @@ class App extends AppObject {
         );
         $this->print_raw_value(
             "{$template_var}.input",
-            $this->append_currency_sign($printed_value, $sign, $sign_at_start)
+            append_currency_sign($printed_value, $sign, $sign_at_start)
         );
 
         $this->print_text_input_form_value(
             "{$template_var}.without_sign",
             $input_name,
-            $value_formatted_without_sign,
+            $app_value_formatted_without_sign,
             array_merge(
                 array("class" => "currency"),
                 $input_attrs
@@ -1088,16 +1367,16 @@ class App extends AppObject {
     function print_boolean_form_value(
         $template_var,
         $input_name,
-        $value,
+        $db_value,
         $input_attrs
     ) {
-        $this->print_hidden_input_form_value($template_var, $input_name, $value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $db_value);
         
         return $this->print_checkbox_input_form_value(
             $template_var,
             $input_name,
             1,
-            ($value != 0),
+            ($db_value != 0),
             $input_attrs
         );
     }
@@ -1105,19 +1384,19 @@ class App extends AppObject {
     function print_enum_form_value(
         $template_var,
         $input_name,
-        $enum_value,
+        $db_value,
         $input_type,
         $input_attrs,
         $values_info
     ) {
-        $this->print_hidden_input_form_value($template_var, $input_name, $enum_value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $db_value);
 
         switch ($input_type) {
         case "radio":
             $printed_value = $this->print_radio_group_input_form_value(
                 $template_var,
                 $input_name,
-                $enum_value,
+                $db_value,
                 $input_attrs,
                 $values_info
             );
@@ -1126,7 +1405,7 @@ class App extends AppObject {
             $printed_value = $this->print_select_input_form_value(
                 $template_var,
                 $input_name,
-                $enum_value,
+                $db_value,
                 $input_attrs,
                 $values_info
             );
@@ -1141,11 +1420,11 @@ class App extends AppObject {
     function print_varchar_form_value(
         $template_var,
         $input_name,
-        $value,
+        $db_value,
         $input_type,
         $input_attrs
     ) {
-        $this->print_hidden_input_form_value($template_var, $input_name, $value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $db_value);
 
         switch ($input_type) {
         case "text":
@@ -1154,7 +1433,7 @@ class App extends AppObject {
                 $input_type,
                 $template_var,
                 $input_name,
-                $value,
+                $db_value,
                 array_merge(
                     array("class" => "varchar_normal"),
                     $input_attrs
@@ -1171,18 +1450,18 @@ class App extends AppObject {
     function print_text_form_value(
         $template_var,
         $input_name,
-        $value,
+        $db_value,
         $input_type,
         $input_attrs
     ) {
-        $this->print_hidden_input_form_value($template_var, $input_name, $value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $db_value);
         
         switch ($input_type) {
         case "textarea":
             $printed_value = $this->print_textarea_input_form_value(
                 $template_var,
                 $input_name,
-                $value,
+                $db_value,
                 $input_attrs
             );
             break;
@@ -1193,44 +1472,19 @@ class App extends AppObject {
         return $printed_value;
     }
 
-    function print_multilingual_form_value($template_var) {
-        $lang_inputs_with_captions_str = "";
-        foreach ($this->avail_langs as $lang) {
-            $lang_str = $this->get_lang_str($lang);
-            $lang_input = $this->page->get_filling_value("{$template_var}_{$lang}.input");
-            $lang_inputs_with_captions_str .=
-                "<tr>\n" .
-                "<th>{$lang_str}:</th>\n" .
-                "<td>{$lang_input}</td>\n" .
-                "</tr>\n";
-        }
-        $printed_value = 
-            "<table>\n" .
-            $lang_inputs_with_captions_str .
-            "</table>\n";
-
-        $this->print_raw_value(
-            "{$template_var}.hidden",
-            $this->page->get_filling_value("{$template_var}_{$this->lang}.hidden")
-        );
-        $this->print_raw_value("{$template_var}.input", $printed_value);
-        
-        return $printed_value;
-    }
-
     function print_datetime_form_value(
         $template_var,
         $input_name,
-        $db_datetime,
+        $db_value,
         $input_attrs
     ) {
-        $app_datetime = $this->get_app_datetime($db_datetime);
-        $this->print_hidden_input_form_value($template_var, $input_name, $app_datetime);
+        $app_value = $this->get_app_datetime_value($db_value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $app_value);
 
         return $this->print_text_input_form_value(
             $template_var,
             $input_name,
-            $app_datetime,
+            $app_value,
             array_merge(
                 array("class" => "datetime"),
                 $input_attrs
@@ -1241,16 +1495,16 @@ class App extends AppObject {
     function print_date_form_value(
         $template_var,
         $input_name,
-        $db_date,
+        $db_value,
         $input_attrs
     ) {
-        $app_date = $this->get_app_date($db_date);
-        $this->print_hidden_input_form_value($template_var, $input_name, $app_date);
+        $app_value = $this->get_app_date_value($db_value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $app_value);
 
         return $this->print_text_input_form_value(
             $template_var,
             $input_name,
-            $app_date,
+            $app_value,
             array_merge(
                 array("class" => "date"),
                 $input_attrs
@@ -1261,16 +1515,16 @@ class App extends AppObject {
     function print_time_form_value(
         $template_var,
         $input_name,
-        $db_time,
+        $db_value,
         $input_attrs
     ) {
-        $app_time = $this->get_app_time($db_time);
-        $this->print_hidden_input_form_value($template_var, $input_name, $app_time);
+        $app_value = $this->get_app_time_value($db_value);
+        $this->print_hidden_input_form_value($template_var, $input_name, $app_value);
 
         return $this->print_text_input_form_value(
             $template_var,
             $input_name,
-            $app_time,
+            $app_value,
             array_merge(
                 array("class" => "time"),
                 $input_attrs
@@ -1486,6 +1740,31 @@ class App extends AppObject {
         return $printed_value;
     }
 
+    function print_multilingual_form_value($template_var) {
+        $lang_inputs_with_captions_str = "";
+        foreach ($this->avail_langs as $lang) {
+            $lang_str = $this->get_lang_str($lang);
+            $lang_input = $this->page->get_filling_value("{$template_var}_{$lang}.input");
+            $lang_inputs_with_captions_str .=
+                "<tr>\n" .
+                "<th>{$lang_str}:</th>\n" .
+                "<td>{$lang_input}</td>\n" .
+                "</tr>\n";
+        }
+        $printed_value = 
+            "<table>\n" .
+            $lang_inputs_with_captions_str .
+            "</table>\n";
+
+        $this->print_raw_value(
+            "{$template_var}.hidden",
+            $this->page->get_filling_value("{$template_var}_{$this->lang}.hidden")
+        );
+        $this->print_raw_value("{$template_var}.input", $printed_value);
+        
+        return $printed_value;
+    }
+//
     function get_value_caption_pairs($values_info, $alt_values_info = null) {
         $value_caption_pairs = $this->get_value_caption_pairs_from_source($values_info);
         $value_caption_pairs = $this->expand_value_caption_pairs_with_begin_end(
@@ -1610,7 +1889,7 @@ class App extends AppObject {
         }
         return $value_caption_pairs;
     }
-    
+//    
     function get_select_dependency_array(
         $main_select_value_caption_pairs,
         $dependent_values_info,
@@ -2223,7 +2502,7 @@ class App extends AppObject {
         if (is_null($id_param_name)) {
             $id_param_name = "{$obj->_table_name}_id";
         }
-        $id_param_value = (int) param($id_param_name);
+        $id_param_value = $this->read_key_value($id_param_name);
         return $this->fetch_db_object(
             $obj,
             $id_param_value,

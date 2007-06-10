@@ -109,7 +109,7 @@ function is_value_email($value) {
     return preg_match('/.+@.+\..+/', $value);
 }
 
-function is_php_number($value) {
+function is_db_number($value) {
     return (preg_match('/^\s*[-+]?(?:[0-9]*\.)?[0-9]*\s*$/', $value));
 }
 
@@ -717,6 +717,10 @@ function get_gmt_str_from_timestamp($timestamp) {
 function get_gmt_str_from_if_modified_since($if_modified_since_str) {
     $strs = explode(";", $if_modified_since_str);
     return $strs[0];
+}
+
+function append_currency_sign($str, $sign, $sign_at_start) {
+    return ($sign_at_start) ? "{$sign}{$str}" : "{$str}{$sign}";
 }
 
 // Files handling functions

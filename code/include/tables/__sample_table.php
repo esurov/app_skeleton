@@ -238,9 +238,9 @@ class SampleTable extends CustomDbObject {
                     "source" => "array",
                     "data" => array(
                         "array" => array(
-                            array("value1", $this->get_lang_str("_example_field_enum_value1")),
-                            array("value2", $this->get_lang_str("_example_field_enum_value2")),
-                            array("value3", $this->get_lang_str("_example_field_enum_value3")),
+                            array("value1", "SampleEnum & Value1"),
+                            array("value2", "SampleEnum < Value2"),
+                            array("value3", "SampleEnum > Value3"),
                         ),
                     ),
                 ),

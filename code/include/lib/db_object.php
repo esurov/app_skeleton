@@ -1127,25 +1127,25 @@ class DbObject extends AppObject {
 //
     // CGI functions
 
+    // Should be redefined in child class
+    function get_read_field_names_info($context, $context_params) {
+        return array();
+    }
+    
     // Read field values from CGI
     function read($context = null, $context_params = array()) {
         $field_names_info = $this->get_read_field_names_info($context, $context_params);
         $this->_read_values(
             get_param_value($field_names_info, "field_names_to_read", null),
             get_param_value($field_names_info, "field_names_to_not_read", null),
-            get_param_value($field_names_info, "template_var_prefix", null)
+            get_param_value($field_names_info, "input_name_prefix", null)
         );
     }
 
-    // Should be redefined in child class
-    function get_read_field_names_info($context, $context_params) {
-        return array();
-    }
-    
     function _read_values(
         $field_names_to_read = null,
         $field_names_to_not_read = null,
-        $template_var_prefix = null
+        $input_name_prefix = null
     ) {
         // Get data from CGI and store to object values
         $this->write_log(
@@ -1153,8 +1153,8 @@ class DbObject extends AppObject {
             DL_INFO
         );
 
-        if (is_null($template_var_prefix)) {
-            $template_var_prefix = $this->_table_name;
+        if (is_null($input_name_prefix)) {
+            $input_name_prefix = $this->_table_name;
         }
 
         $field_names = $this->get_field_names($field_names_to_read, $field_names_to_not_read);
@@ -1163,209 +1163,93 @@ class DbObject extends AppObject {
 
         // Logger optimization
         $should_write_log = ($this->get_log_debug_level() >= DL_EXTRA_DEBUG);
-        $log_message_text = "Read details:\n";
+        $log_message_text = "";
         
         foreach ($field_names as $field_name) {
             $field_info = $this->_fields[$field_name];
-            if ($use_read_flag && !$field_info["read"]) {
-                continue;
-            }
-
-            $param_name = "{$template_var_prefix}_{$field_name}";
-            $param_value = param($param_name);
-
-            $field_type = $field_info["type"];
-            switch ($field_type) {
-            case "primary_key":
-            case "foreign_key":
-                $field_value = $this->get_key_field_value($param_value);
-                break;
-            case "integer":
-                $field_value = $this->get_integer_field_value($param_value);
-                break;
-            case "double":
-                $field_value = $this->get_double_field_value($param_value);
-                break;
-            case "currency":
-                $field_value = $this->get_currency_field_value($param_value);
-                break;
-            case "boolean":
-                // Skip changing field value for boolean fields
-                // if no hidden value with '__sent' prefix was passed via CGI
-                if (is_null(param("__sent_{$param_name}"))) {
-                    $field_value = null;
-                } else {
-                    $field_value = $this->get_boolean_field_value($param_value);    
-                }
-                break;
-            case "enum":
-                $field_value = $this->get_enum_field_value(
-                    $param_value,
-                    $field_info["input"]["values"]["data"]["array"]
-                );
-                break;
-            case "varchar":
-                if ($this->is_field_multilingual($field_name)) {
+            $input_name = "{$input_name_prefix}_{$field_name}";
+            if ($use_read_flag && ($field_info["read"] == 0)) {
+                $field_read_skipped = true;
+            } else {
+                $type = $field_info["type"];
+                if (
+                    ($type == "varchar" || $type == "text") &&
+                    $this->is_field_multilingual($field_name)
+                ) {
                     $default_lang_field_value = $this->{"{$field_name}_{$this->app->dlang}"};
                     $current_lang_field_value = $this->{"{$field_name}_{$this->app->lang}"};
                     $field_value = ($current_lang_field_value == "") ?
                         $default_lang_field_value :
                         $current_lang_field_value;
                 } else {
-                    $field_value = $this->get_varchar_field_value($param_value);
-                }
-                break;
-            case "text":
-                if ($this->is_field_multilingual($field_name)) {
-                    $default_lang_field_value = $this->{"{$field_name}_{$this->app->dlang}"};
-                    $current_lang_field_value = $this->{"{$field_name}_{$this->app->lang}"};
-                    $field_value = ($current_lang_field_value == "") ?
-                        $default_lang_field_value :
-                        $current_lang_field_value;
-                } else {
-                    $field_value = $this->get_text_field_value($param_value);
-                }
-                break;
-            case "blob":
-                $field_value = $this->get_blob_field_value($param_value);
-                break;
-            case "datetime":
-                $field_value = $this->get_datetime_field_value($param_value);
-                break;
-            case "date":
-                $field_value = $this->get_date_field_value($param_value);
-                break;
-            case "time":
-                $field_value = $this->get_time_field_value($param_value);
-                break;
-            }
+                    // Let read function to take type params from current field info
+                    $type_params = $field_info;
 
-            if (!is_null($field_value)) {
-                $this->set_field_value($field_name, $field_value);
+                    $field_value = $this->app->read_value_by_type(
+                        $input_name,
+                        $type,
+                        $type_params
+                    );
+                    
+                    if (!is_null($field_value)) {
+                        $this->set_field_value($field_name, $field_value);
+                    }
+                    
+                    $field_read_skipped = false;
+                }
             }
 
             if ($should_write_log) {
-                if (is_null($field_value)) {
-                    $field_updated_str = "CGI param not found - field skipped from update!";
+                if ($field_read_skipped) {
+                    $status_str = "Field skipped ('read' == 0)";
                 } else {
-                    $field_value_str = qw(get_shortened_string($field_value, 300));
-                    $field_updated_str = "Read value is: {$field_value_str}";
+                    if (is_null($field_value)) {
+                        $status_str = "Field skipped (no CGI param found)!";
+                    } else {
+                        $status_str =
+                            "Read value is: " .
+                            qw(get_shortened_string($field_value, 300));
+                    }
                 }
                 $log_message_text .=
-                    "  Reading field '{$field_name}' from CGI param '{$param_name}'. " .
-                    "{$field_updated_str}\n";
+                    "  Reading field '{$field_name}' from CGI param '{$input_name}'. " .
+                    "{$status_str}\n";
             }
         }
 
         if ($should_write_log) {
             $this->write_log(
-                $log_message_text,
+                "Read details:\n" .
+                "{$log_message_text}",
                 DL_EXTRA_DEBUG
             );
         }
     }
-
-    function get_key_field_value($param_value) {
-        if (is_null($param_value)) {
-            return null;
-        }
-        return (int) $param_value;
-    }
-
-    function get_integer_field_value($param_value) {
-        if (is_null($param_value)) {
-            return null;
-        }
-        return $this->app->get_php_integer_value((string) $param_value);
-    }
-
-    function get_double_field_value($param_value) {
-        if (is_null($param_value)) {
-            return null;
-        }
-        return $this->app->get_php_double_value((string) $param_value);
-    }
-
-    function get_currency_field_value($param_value) {
-        if (is_null($param_value)) {
-            return null;
-        }
-        return $this->app->get_php_currency_value((string) $param_value);
-    }
-
-    function get_boolean_field_value($param_value) {
-        return ((int) $param_value == 0) ? 0 : 1;
-    }
-
-    function get_enum_field_value($enum_value, $enum_value_caption_pairs) {
-        if (is_null($enum_value)) {
-            return null;
-        }
-        return get_actual_current_value($enum_value_caption_pairs, $enum_value);
-    }
-
-    function get_varchar_field_value($param_value) {
-        if (is_null($param_value)) {
-            return null;
-        }
-        return (string) $param_value;
-    }
-
-    function get_text_field_value($param_value) {
-        if (is_null($param_value)) {
-            return null;
-        }
-        return convert_crlf2lf((string) $param_value);
-    }
-
-    function get_blob_field_value($param_value) {
-        if (is_null($param_value)) {
-            return null;
-        }
-        return (string) $param_value;
-    }
-
-    function get_datetime_field_value($app_datetime) {
-        if (is_null($app_datetime)) {
-            return null;
-        }
-        return $this->app->get_db_datetime((string) $app_datetime);
-    }
-
-    function get_date_field_value($app_date) {
-        if (is_null($app_date)) {
-            return null;
-        }
-        return $this->app->get_db_date((string) $app_date);
-    }
-    
-    function get_time_field_value($app_time) {
-        if (is_null($app_time)) {
-            return null;
-        }
-        return $this->app->get_db_time((string) $app_time);
-    }
 //
-    function read_filters() {
-        foreach ($this->_filters as $i => $filter_info) {
-            $this->read_filter($this->_filters[$i]);
+    function read_filters($input_name_prefix = null) {
+        foreach (array_keys($this->_filters) as $i) {
+            $this->read_filter($this->_filters[$i], $input_name_prefix);
         }
     }
 
-    function read_filter(&$filter_info) {
+    function read_filter(
+        &$filter_info,
+        $input_name_prefix = null
+    ) {
         $filter_name = $filter_info["name"];
         $filter_relation = $filter_info["relation"];
         
-        $param_name = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
-        $param_sent_name = "{$param_name}__sent";
+        if (is_null($input_name_prefix)) {
+            $input_name_prefix = $this->_table_name;
+        }
+
+        $param_name = "{$input_name_prefix}_{$filter_name}_{$filter_relation}";
+        $param_sent_name = "__sent_{$param_name}";
         $param_value = param($param_name);
 
-        // Hack for boolean values represented by HTML checkbox
-        //
-        // TODO: Move to general function read_boolean_value
-        // and call it from read() and read_filter()
+        // Hack: For boolean values represented by HTML checkbox
         if (!is_null(param($param_sent_name))) {
-            $param_value = $this->get_boolean_field_value($param_value);
+            $param_value = $this->app->read_boolean_value($param_name);
         }
         if (!is_null($param_value)) {
             $filter_info["value"] = $param_value;
@@ -1381,168 +1265,148 @@ class DbObject extends AppObject {
     }
 
     function get_filter_query_ex($filter_info) {
-        $filter_query_ex = array();
-
         $filter_value = $filter_info["value"];
         $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
-        if ((string) $filter_value != (string) $nonset_filter_value) {
-
-            // If filter has its own field 'type' and 'select' - use them
-            // (useful for custom filters or filters for expanded resultsets)
-            // else take them from corresponding field with the same name
+        if ((string) $filter_value == (string) $nonset_filter_value) {
+            $filter_query_ex = array();
+        } else {
             $filter_name = $filter_info["name"];
-            if (isset($filter_info["type"])) {
-                $field_info = array();
-                $field_type = $filter_info["type"];
-                $field_select = $filter_info["select"];
-            } else {
-                $field_info = $this->_fields[$filter_name];
-                $field_type = $field_info["type"];
-                $field_select = $field_info["select"];
+            $filter_relation = $filter_info["relation"];
+
+            // If filter has no 'type' (field type) take it from field with filter's name
+            if (!isset($filter_info["type"])) {
+                $filter_info = $this->_fields[$filter_name];
             }
+            $type = $filter_info["type"];
+
+            $db_value = $this->app->get_db_value_by_type($filter_value, $type);
             
-            switch ($field_type) {
-            case "primary_key":
-            case "foreign_key":
-                $db_value = $this->get_key_field_value($filter_value);
-                break;
-            case "integer":
-                $db_value = $this->get_integer_field_value($filter_value);
-                break;
-            case "double":
-                $db_value = $this->get_double_field_value($filter_value);
-                break;
-            case "currency":
-                $db_value = $this->get_currency_field_value($filter_value);
-                break;
-            case "boolean":
-                $db_value = $this->get_boolean_field_value($filter_value);
-                break;
-            case "enum":
-                $default_enum_value_caption_pairs = array(array($filter_value, ""));
-                $db_value = $this->get_enum_field_value(
-                    $filter_value,
-                    $default_enum_value_caption_pairs
-                );
-                break;
-            case "varchar":
-                $db_value = $this->get_varchar_field_value($filter_value);
-                break;
-            case "text":
-                $db_value = $this->get_text_field_value($filter_value);
-                break;
-            case "blob":
-                $db_value = $this->get_blob_field_value($filter_value);
-                break;
-            case "datetime":
-                $db_value = $this->get_datetime_field_value($filter_value);
-                break;
-            case "date":
-                $db_value = $this->get_date_field_value($filter_value);
-                break;
-            case "time":
-                $db_value = $this->get_time_field_value($filter_value);
-                break;
+            // If filter has no 'select' (field select expression) take it
+            // from field with filter's name
+            if (!isset($filter_info["select"])) {
+                $filter_info = $this->_fields[$filter_name];
             }
-                
-            $relation_name = $filter_info["relation"];
-            switch ($relation_name) {
-            case "equal":
-            case "less":
-            case "less_equal":
-            case "greater":
-            case "greater_equal":
-                $relation_sign = $this->get_relation_sign_by_name($relation_name);
-                $db_value_quoted = qw($db_value);
-                if (is_array($field_select)) {
-                    $field_selects = $field_select;
-                } else {
-                    $field_selects = array($field_select);
-                }
-                $subwheres_or = array();
-                foreach ($field_selects as $field_select) {
-                    $subwheres_or[] = "{$field_select} {$relation_sign} {$db_value_quoted}";
-                }
-                $filter_query_ex["where"] = "(" . join(" OR ", $subwheres_or) . ")";
-                break;
-            case "like":
-            case "like_many":
-                if ($relation_name == "like") {
-                    $keywords = array($db_value);
-                } else {
-                    $keywords = preg_split('/[\s,]+/', $db_value);
-                }
-                if (count($keywords) != 0) {
-                    if (is_array($field_select)) {
-                        $field_selects = $field_select;
-                    } else {
-                        $field_selects = array($field_select);
-                    }
-                    $subwheres_and = array();
-                    foreach ($keywords as $keyword) {
-                        $db_value_lquoted = lqw($keyword, "%", "%");
-                        $subwheres_or = array();
-                        foreach ($field_selects as $field_select) {
-                            $subwheres_or[] = "{$field_select} LIKE {$db_value_lquoted}";
-                    }
-                        $subwheres_and[] = "(" . join(" OR ", $subwheres_or) . ")";
-                    }
-                    $filter_query_ex["where"] = "(" . join(" AND ", $subwheres_and) . ")";
-                }
-                break;
-            case "having_equal":
-            case "having_less":
-            case "having_less_equal":
-            case "having_greater":
-            case "having_greater_equal":
-                $relation_sign = $this->get_relation_sign_by_name($relation_name);
-                $db_value_quoted = qw($db_value);
-                $filter_query_ex["having"] =
-                    "({$field_select} {$relation_sign} {$db_value_quoted})";
-                break;
-            }
+            $field_select_expression = $filter_info["select"];
+            
+            $filter_query_ex = $this->get_filter_query_ex_by_relation(
+                $filter_relation,
+                $db_value,
+                $field_select_expression
+            );
         }
 
         return $filter_query_ex;
     }
 
-    function get_relation_sign_by_name($relation_name) {
-        switch ($relation_name) {
+    function get_filter_query_ex_by_relation(
+        $filter_relation,
+        $db_value,
+        $field_select_expression
+    ) {
+        $filter_query_ex = array();
+
+        switch ($filter_relation) {
+        case "equal":
+        case "less":
+        case "less_equal":
+        case "greater":
+        case "greater_equal":
+            $relation_sign = $this->get_filter_relation_sign_by_relation($filter_relation);
+            $db_value_quoted = qw($db_value);
+            if (is_array($field_select_expression)) {
+                $field_select_expressions = $field_select_expression;
+            } else {
+                $field_select_expressions = array($field_select_expression);
+            }
+            $subwheres_or = array();
+            foreach ($field_select_expressions as $field_select_expression) {
+                $subwheres_or[] =
+                    "{$field_select_expression} {$relation_sign} {$db_value_quoted}";
+            }
+            $filter_query_ex["where"] = "(" . join(" OR ", $subwheres_or) . ")";
+            break;
+        case "like":
+        case "like_many":
+            if ($filter_relation == "like") {
+                $keywords = array($db_value);
+            } else {
+                $keywords = preg_split('/[\s,]+/', $db_value);
+            }
+            if (count($keywords) != 0) {
+                if (is_array($field_select_expression)) {
+                    $field_select_expressions = $field_select_expression;
+                } else {
+                    $field_select_expressions = array($field_select_expression);
+                }
+                $subwheres_and = array();
+                foreach ($keywords as $keyword) {
+                    $db_value_lquoted = lqw($keyword, "%", "%");
+                    $subwheres_or = array();
+                    foreach ($field_select_expressions as $field_select_expression) {
+                        $subwheres_or[] = "{$field_select_expression} LIKE {$db_value_lquoted}";
+                }
+                    $subwheres_and[] = "(" . join(" OR ", $subwheres_or) . ")";
+                }
+                $filter_query_ex["where"] = "(" . join(" AND ", $subwheres_and) . ")";
+            }
+            break;
+        case "having_equal":
+        case "having_less":
+        case "having_less_equal":
+        case "having_greater":
+        case "having_greater_equal":
+            $relation_sign = $this->get_filter_relation_sign_by_relation($filter_relation);
+            $db_value_quoted = qw($db_value);
+            $filter_query_ex["having"] =
+                "({$field_select_expression} {$relation_sign} {$db_value_quoted})";
+            break;
+        }
+
+        return $filter_query_ex;
+    }
+
+    function get_filter_relation_sign_by_relation($filter_relation) {
+        switch ($filter_relation) {
         case "equal":
         case "having_equal":
-            $relation_sign = "=";
+            $filter_relation_sign = "=";
             break;
         case "less":
         case "having_less":
-            $relation_sign = "<";
+            $filter_relation_sign = "<";
             break;
         case "less_equal":
         case "having_less_equal":
-            $relation_sign = "<=";
+            $filter_relation_sign = "<=";
             break;
         case "greater":
         case "having_greater":
-            $relation_sign = ">";
+            $filter_relation_sign = ">";
             break;
         case "greater_equal":
         case "having_greater_equal":
-            $relation_sign = ">=";
+            $filter_relation_sign = ">=";
             break;
         default:
-            $relation_sign = "";
+            $filter_relation_sign = "";
         }
-        return $relation_sign;
+        return $filter_relation_sign;
     }
 
-    function get_filters_suburl_params() {
+    function get_filters_suburl_params($input_name_prefix = null) {
+        if (is_null($input_name_prefix)) {
+            $input_name_prefix = $this->_table_name;
+        }
+
         $suburl_params = array();
         foreach ($this->_filters as $filter_info) {
             $filter_name = $filter_info["name"];
             $filter_relation = $filter_info["relation"];
             $filter_value = $filter_info["value"];
-            $suburl_param_name = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
+            $suburl_param_name = "{$input_name_prefix}_{$filter_name}_{$filter_relation}";
             $suburl_params[$suburl_param_name] = $filter_value;
         }
+        
         return $suburl_params;
     }
 //
@@ -1658,7 +1522,7 @@ class DbObject extends AppObject {
 
     function print_value(
         $template_var,
-        $field_value,
+        $db_value,
         $field_info
     ) {
         $field_type = $field_info["type"];
@@ -1673,20 +1537,20 @@ class DbObject extends AppObject {
         case "primary_key":
             $this->app->print_primary_key_value(
                 $template_var,
-                $field_value
+                $db_value
             );
             break;
         case "foreign_key":
             $this->app->print_foreign_key_value(
                 $template_var,
-                $field_value
+                $db_value
             );
             break;
         case "integer":
             $input_info = get_param_value($field_info, "input", array());
             $this->app->print_integer_value(
                 $template_var,
-                $field_value,
+                $db_value,
                 get_param_value($input_info, "nonset_value_caption_pair", null)
             );
             break;
@@ -1694,7 +1558,7 @@ class DbObject extends AppObject {
             $input_info = get_param_value($field_info, "input", array());
             $this->app->print_double_value(
                 $template_var,
-                $field_value,
+                $db_value,
                 $field_info["prec"],
                 get_param_value($input_info, "nonset_value_caption_pair", null)
             );
@@ -1703,7 +1567,7 @@ class DbObject extends AppObject {
             $values_data_info = get_param_value($values_info, "data", array());
             $this->app->print_currency_value(
                 $template_var,
-                $field_value,
+                $db_value,
                 $field_info["prec"],
                 get_param_value($values_data_info, "sign", null),
                 get_param_value($values_data_info, "sign_at_start", null),
@@ -1714,45 +1578,45 @@ class DbObject extends AppObject {
             $values_data_info = get_param_value($values_info, "data", array());
             $this->app->print_boolean_value(
                 $template_var,
-                $field_value,
+                $db_value,
                 get_param_value($values_data_info, "value_caption_pairs", null)
             );
             break;
         case "enum":
             $this->app->print_enum_value(
                 $template_var,
-                $field_value,
+                $db_value,
                 $values_info["data"]["array"]
             );
             break;
         case "varchar":
             $this->app->print_varchar_value(
                 $template_var,
-                $field_value
+                $db_value
             );
             break;
         case "text":
             $this->app->print_text_value(
                 $template_var,
-                $field_value
+                $db_value
             );
             break;
         case "datetime":
             $this->app->print_datetime_value(
                 $template_var,
-                $field_value
+                $db_value
             );
             break;
         case "date":
             $this->app->print_date_value(
                 $template_var,
-                $field_value
+                $db_value
             );
             break;
         case "time":
             $this->app->print_time_value(
                 $template_var,
-                $field_value
+                $db_value
             );
             break;
         }
@@ -1776,11 +1640,11 @@ class DbObject extends AppObject {
 
         $this->print_client_validation_js();
     }
-//
+
     function print_form_value(
         $template_var,
         $input_name,
-        $field_value,
+        $db_value,
         $field_info
     ) {
         $field_type = $field_info["type"];
@@ -1803,7 +1667,7 @@ class DbObject extends AppObject {
             $this->app->print_primary_key_form_value(
                 $template_var,
                 $input_name,
-                $field_value
+                $db_value
             );
             break;
         case "foreign_key":
@@ -1824,7 +1688,7 @@ class DbObject extends AppObject {
             $this->app->print_foreign_key_form_value(
                 $template_var,
                 $input_name,
-                $field_value,
+                $db_value,
                 $input_type,
                 $input_attrs,
                 $values_info,
@@ -1836,7 +1700,7 @@ class DbObject extends AppObject {
             $this->app->print_integer_form_value(
                 $template_var,
                 $input_name,
-                $field_value,
+                $db_value,
                 $input_attrs,
                 get_param_value($input_info, "nonset_value_caption_pair", null)
             );
@@ -1846,7 +1710,7 @@ class DbObject extends AppObject {
             $this->app->print_double_form_value(
                 $template_var,
                 $input_name,
-                $field_value,
+                $db_value,
                 $field_info["prec"],
                 $input_attrs,
                 get_param_value($input_info, "nonset_value_caption_pair", null)
@@ -1856,7 +1720,7 @@ class DbObject extends AppObject {
             $this->app->print_currency_form_value(
                 $template_var,
                 $input_name,
-                $field_value,
+                $db_value,
                 $field_info["prec"],
                 $input_attrs,
                 $values_info
@@ -1866,7 +1730,7 @@ class DbObject extends AppObject {
             $this->app->print_boolean_form_value(
                 $template_var,
                 $input_name,
-                $field_value,
+                $db_value,
                 $input_attrs
             );
             break;
@@ -1874,7 +1738,7 @@ class DbObject extends AppObject {
             $this->app->print_enum_form_value(
                 $template_var,
                 $input_name,
-                $field_value,
+                $db_value,
                 $input_type,
                 $input_attrs,
                 $values_info
@@ -1887,7 +1751,7 @@ class DbObject extends AppObject {
                 $this->app->print_varchar_form_value(
                     $template_var,
                     $input_name,
-                    $field_value,
+                    $db_value,
                     $input_type,
                     $input_attrs
                 );
@@ -1900,7 +1764,7 @@ class DbObject extends AppObject {
                 $this->app->print_text_form_value(
                     $template_var,
                     $input_name,
-                    $field_value,
+                    $db_value,
                     $input_type,
                     $input_attrs
                 );
@@ -1910,7 +1774,7 @@ class DbObject extends AppObject {
             $this->app->print_datetime_form_value(
                 $template_var,
                 $input_name,
-                $field_value,
+                $db_value,
                 $input_attrs
             );
             break;
@@ -1918,7 +1782,7 @@ class DbObject extends AppObject {
             $this->app->print_date_form_value(
                 $template_var,
                 $input_name,
-                $field_value,
+                $db_value,
                 $input_attrs
             );
             break;
@@ -1926,20 +1790,34 @@ class DbObject extends AppObject {
             $this->app->print_time_form_value(
                 $template_var,
                 $input_name,
-                $field_value,
+                $db_value,
                 $input_attrs
             );
             break;
         }
     }
 //
-    function print_filter_form_values() {
+    function print_filter_form_values(
+        $template_var_prefix = null,
+        $input_name_prefix = null,
+        $input_name_suffix = null
+    ) {
         foreach ($this->_filters as $filter_info) {
-            $this->print_filter_form_value($filter_info);
+            $this->print_filter_form_value(
+                $filter_info,
+                $template_var_prefix,
+                $input_name_prefix,
+                $input_name_suffix
+            );
         }
     }
 
-    function print_filter_form_value($filter_info) {
+    function print_filter_form_value(
+        $filter_info,
+        $template_var_prefix = null,
+        $input_name_prefix = null,
+        $input_name_suffix = null
+    ) {
         $filter_name = $filter_info["name"];
         $filter_relation = $filter_info["relation"];
         $filter_value = $filter_info["value"];
@@ -1963,8 +1841,19 @@ class DbObject extends AppObject {
             }
         }
 
-        $template_var = "{$this->_table_name}.{$filter_name}.{$filter_relation}";
-        $filter_input_name = "{$this->_table_name}_{$filter_name}_{$filter_relation}";
+        if (is_null($template_var_prefix)) {
+            $template_var_prefix = $this->_table_name;
+        }
+        if (is_null($input_name_prefix)) {
+            $input_name_prefix = $this->_table_name;
+        }
+        if (is_null($input_name_prefix)) {
+            $input_name_suffix = "";
+        }
+
+        $template_var = "{$template_var_prefix}.{$filter_name}.{$filter_relation}";
+        $filter_input_name =
+            "{$input_name_prefix}_{$filter_name}_{$filter_relation}{$input_name_suffix}";
 
         $this->app->print_value($template_var, $filter_value);
         $this->app->print_hidden_input_form_value($template_var, $filter_input_name, $filter_value);
@@ -2034,7 +1923,8 @@ class DbObject extends AppObject {
             }
 
             $dependent_select_name =
-                "{$this->_table_name}_{$dependent_filter_name}_{$filter_relation}";
+                "{$input_name_prefix}_{$dependent_filter_name}_" .
+                    "{$filter_relation}{$input_name_suffix}";
             $this->app->print_main_select_input_form_value(
                 $template_var,
                 $filter_input_name,
