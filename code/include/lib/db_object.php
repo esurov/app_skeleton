@@ -8,6 +8,7 @@ class DbObject extends AppObject {
     var $_table_name;  // Db table name without db specific prefix
 
     var $_fields;
+    var $_orig_field_values;
     var $_indexes;
     
     var $_select_from; // FROM clause for SELECT query
@@ -35,6 +36,7 @@ class DbObject extends AppObject {
         }
 
         $this->_fields = array();
+        $this->_orig_field_values = array();
         $this->_indexes = array();
 
         $this->insert_select_from();
@@ -52,6 +54,10 @@ class DbObject extends AppObject {
         return $this->get_class_name_without_suffix();
     }
 
+    function get_full_table_name() {
+        return $this->db->get_full_table_name($this->_table_name);
+    }
+
     function get_plural_name() {
         return $this->get_lang_str($this->get_plural_lang_resource());
     }
@@ -65,7 +71,7 @@ class DbObject extends AppObject {
     }
 
     function get_singular_lang_resource() {
-        return "$this->_table_name";
+        return "{$this->_table_name}";
     }
 
     function get_quantity_str($n) {
@@ -73,31 +79,33 @@ class DbObject extends AppObject {
         return("{$n} {$quantity_str}");
     }
 //
+    // Return name of the PRIMARY KEY column
     function get_primary_key_name() {
-        // Return name of the PRIMARY KEY column
         return "id";
     }
 
+    // Return value of the PRIMARY KEY column
     function get_primary_key_value() {
-        // Return value of the PRIMARY KEY member variable
         $pr_key_name = $this->get_primary_key_name();
         return $this->{$pr_key_name};
     }
 
+    // Return original value of the PRIMARY KEY column
+    function get_orig_primary_key_value() {
+        $pr_key_name = $this->get_primary_key_name();
+        return $this->get_orig_field_value($pr_key_name);
+    }
+
+    // Return true if PRIMARY KEY member variable is non-zero
     function is_definite() {
-        // Return true if PRIMARY KEY member variable is non-zero
         return ($this->get_primary_key_value() != 0);
     }
 
-    function set_indefinite() {
-        // Set PRIMARY KEY member variable to zero
-        $this->set_field_value($this->get_primary_key_name(), 0);
+    // Return true if original PRIMARY KEY member variable was non-zero
+    function was_definite() {
+        return ($this->get_orig_primary_key_value() != 0);
     }
 //
-    function get_full_table_name() {
-        return $this->db->get_full_table_name($this->_table_name);
-    }
-
     function &get_field_info($field_name) {
         return $this->_fields[$field_name];
     }
@@ -111,6 +119,42 @@ class DbObject extends AppObject {
         foreach ($row as $field_name => $field_value) {
             $this->set_field_value($field_name, $field_value);
         }
+    }
+
+    function reset_field_values() {
+        $field_names = array_keys($this->_fields);
+        foreach ($field_names as $field_name) {
+            $this->reset_field_value($field_name);
+        }    
+    }
+
+    function reset_field_value($field_name) {
+        $initial_field_value = $this->_fields[$field_name]["value"]; 
+        $this->set_field_value($field_name, $initial_field_value);
+        $this->set_orig_field_value($field_name, $initial_field_value);
+    }
+
+    function set_orig_field_value($field_name, $field_value) {
+        $this->_orig_field_values[$field_name] = $field_value;
+    }
+
+    function get_orig_field_value($field_name) {
+        return $this->_orig_field_values[$field_name];
+    }
+
+    function sync_orig_field_values() {
+        $field_names = array_keys($this->_fields);
+        foreach ($field_names as $field_name) {
+            $this->sync_orig_field_value($field_name);
+        }    
+    }
+
+    function sync_orig_field_value($field_name) {
+        $this->set_orig_field_value($field_name, $this->{$field_name});
+    }
+
+    function was_field_value_changed($field_name) {
+        return ($this->{$field_name} != $this->get_orig_field_value($field_name));
     }
 //
     function get_field_names(
@@ -473,7 +517,7 @@ class DbObject extends AppObject {
             "multilingual_child" => $multilingual_child,
         );
 
-        $this->set_field_value($field_name_sql_alias, $initial_field_value);
+        $this->reset_field_value($field_name_sql_alias);
     }
 
     function create_field_select_expression(
@@ -483,9 +527,10 @@ class DbObject extends AppObject {
     ) {
         if ($multilingual) {
             $field_select_expression =
-                "IF ({$table_name_sql_alias}.{$field_name}_{$this->app->lang} = '', " .
-                "{$table_name_sql_alias}.{$field_name}_{$this->app->dlang}, " .
-                "{$table_name_sql_alias}.{$field_name}_{$this->app->lang}" .
+                "IF (" .
+                    "{$table_name_sql_alias}.{$field_name}_{$this->app->lang} = '', " .
+                    "{$table_name_sql_alias}.{$field_name}_{$this->app->dlang}, " .
+                    "{$table_name_sql_alias}.{$field_name}_{$this->app->lang}" .
                 ")";
         } else {
             $field_select_expression = "{$table_name_sql_alias}.{$field_name}";
@@ -983,6 +1028,7 @@ class DbObject extends AppObject {
         if ($this->_fields[$pr_key_name]["type"] == "primary_key") {
             $this->set_field_value($pr_key_name, $this->db->get_last_autoincrement_id());
         }
+        $this->sync_orig_field_values();
     }
 
     // Update field values in DB table
@@ -1016,20 +1062,26 @@ class DbObject extends AppObject {
         $fields_expression = "";
         foreach ($field_names as $field_name) {
             $field_info = $this->_fields[$field_name];
-            if ($use_update_flag && !$field_info["update"]) {
-                continue;
+            if ($use_update_flag) {
+                if (!$field_info["update"] || !$this->was_field_value_changed($field_name)) {
+                    continue;
+                }
             }
-            
+
             $fields_expression .= $delimiter_str . $this->get_update_field_expression($field_name);
             $delimiter_str = ",\n    ";
         }
-        $this->run_query(
-            $this->db->get_update_query(
-                $this->_table_name,
-                $fields_expression,
-                $this->get_default_where_str(false)
-            )
-        );
+
+        if ($fields_expression != "") {
+            $this->run_query(
+                $this->db->get_update_query(
+                    $this->_table_name,
+                    $fields_expression,
+                    $this->get_default_where_str(false)
+                )
+            );
+            $this->sync_orig_field_values();
+        }
     }
 
     function get_update_field_expression($field_name) {
@@ -1062,10 +1114,11 @@ class DbObject extends AppObject {
 
     // Save (store/update) DbObject to DB table and refetch it
     // if fields from related DbObjects need to be updated
+    // returns true if object was updated and false if stored
     function save($refetch_after_save = false, $context = null, $context_params = array()) {
-        $was_definite = $this->is_definite();
+        $should_update = $this->was_definite();
 
-        if ($was_definite) {
+        if ($should_update) {
             $this->update($context, $context_params);
         } else {
             $this->store($context, $context_params);
@@ -1075,21 +1128,19 @@ class DbObject extends AppObject {
             $this->fetch();
         }
 
-        return $was_definite;
+        return $should_update;
     }
 //
     // Delete single DbObject record from DB table
     // Wrapper for SQL DELETE query
     function del() {
         $this->del_where($this->get_default_where_str(false));
+        $this->reset_field_values();
     }
 
-    // Delete many DbObject records with specified criteria from DB table
+    // Delete many DbObject records directly from DB table with specified criteria
     function del_where($where_str) {
-        $this->run_query(
-            "DELETE FROM {%{$this->_table_name}_table%} " .
-            "WHERE {$where_str}"
-        );
+        $this->run_query($this->db->get_delete_query($this->_table_name, $where_str));
     }
 
     // Delete single DbObject record from DB table with all related DbObjects
@@ -1201,7 +1252,7 @@ class DbObject extends AppObject {
 
             if ($should_write_log) {
                 if ($field_read_skipped) {
-                    $status_str = "Field skipped ('read' == 0)";
+                    $status_str = "Field skipped ('read' == 0)!";
                 } else {
                     if (is_null($field_value)) {
                         $status_str = "Field skipped (no CGI param found)!";
@@ -1939,9 +1990,9 @@ class DbObject extends AppObject {
             break;
         }
     }
-
-//  Objects validation for store/update and validation helpers
-    function validate($old_obj = null, $context = null, $context_params = array()) {
+//
+    // Objects validation before store/update and validation helpers
+    function validate($context = null, $context_params = array()) {
         $conditions = $this->get_validate_conditions($context, $context_params);
         $field_names_to_validate = $this->get_validate_field_names_for_context(
             $context,
@@ -1954,7 +2005,7 @@ class DbObject extends AppObject {
             if (!$this->should_validate_field($field_name, $field_names_to_validate)) {
                 continue;
             }
-            $this->validate_condition($messages, $condition_info, $old_obj);
+            $this->validate_condition($messages, $condition_info);
         }
         return $messages;
     }
@@ -1969,15 +2020,15 @@ class DbObject extends AppObject {
         return null;
     }
 
-    function validate_condition(&$messages, $condition_info, $old_obj) {
+    function validate_condition(&$messages, $condition_info) {
         $field_name = $condition_info["field"];
         $type = $condition_info["type"];
         $param = get_param_value($condition_info, "param", null);
 
-        if ($this->validate_condition_by_type($field_name, $type, $param, $old_obj)) {
+        if ($this->validate_condition_by_type($field_name, $type, $param)) {
             $condition_info = get_param_value($condition_info, "dependency", null);
             if (!is_null($condition_info)) {
-                $this->validate_condition($messages, $condition_info, $old_obj);
+                $this->validate_condition($messages, $condition_info);
             }
         } else {
             $resource = get_param_value($condition_info, "message", null);
@@ -1990,7 +2041,7 @@ class DbObject extends AppObject {
         }
     }
 
-    function validate_condition_by_type($field_name, $type, $param, $old_obj) {
+    function validate_condition_by_type($field_name, $type, $param) {
         switch ($type) {
         case "regexp":
             $result = $this->validate_regexp_condition($field_name, $param);
@@ -2005,7 +2056,7 @@ class DbObject extends AppObject {
             $result = $this->validate_email_condition($field_name);
             break;
         case "unique":
-            $result = $this->validate_unique_condition($field_name, $old_obj);
+            $result = $this->validate_unique_condition($field_name);
             break;
         case "equal":
             $result = $this->validate_equal_condition($field_name, $param);
@@ -2079,30 +2130,28 @@ class DbObject extends AppObject {
         return is_value_email($this->{$field_name});
     }
 
-    function validate_unique_condition($field_name, $old_obj) {
+    function validate_unique_condition($field_name) {
         if (is_array($field_name)) {
             $field_names = $field_name;
         } else {
             $field_names = array($field_name);
         }
 
-        $was_definite = is_null($old_obj) ? false : $old_obj->is_definite();
-                        
         if ($this->has_multilingual_fields($field_names)) {
             foreach ($this->app->avail_langs as $lang) {
                 $field_names_to_validate = $this->get_field_names_with_lang_subst(
                     $field_names,
                     $lang
                 );
-                if (!$this->validate_unique_condition($field_names_to_validate, $old_obj)) {
+                if (!$this->validate_unique_condition($field_names_to_validate)) {
                     return false;
                 }
             }
         } else {
-            if ($was_definite) {
+            if ($this->was_definite()) {
                 $should_check_db_table = false;
                 foreach ($field_names as $field_name) {
-                    if ($this->{$field_name} != $old_obj->{$field_name}) {
+                    if ($this->was_field_value_changed($field_name)) {
                         $should_check_db_table = true;
                         break;
                     }

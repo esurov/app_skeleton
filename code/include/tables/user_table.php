@@ -404,8 +404,8 @@ class UserTable extends CustomDbObject {
         return $conditions;
     }
 
-    function validate($old_obj = null, $context = "", $context_params = array()) {
-        $messages = parent::validate($old_obj, $context, $context_params);
+    function validate($context = "", $context_params = array()) {
+        $messages = parent::validate($context, $context_params);
 
         if ($context == "signup_form") {
             $this->validate_passwords($messages);
@@ -429,8 +429,7 @@ class UserTable extends CustomDbObject {
                             "login" => $this->login,
                         ),
                     ),
-                ),
-                $old_obj
+                )
             );
         }
 

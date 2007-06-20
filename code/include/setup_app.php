@@ -45,13 +45,14 @@ class SetupApp extends CustomApp {
 //
     function action_insert_initial_data() {
         $this->insert_initial_users();
+
         $this->add_session_status_message(new OkStatusMsg("initial_data_inserted"));
+        
         $this->create_self_redirect_response();
     }
 
     function insert_initial_users() {
         $user =& $this->create_db_object("User");
-
         $user->login = "admin";
         $user->password = "";
         $user->first_name = "Admin";
@@ -68,13 +69,14 @@ class SetupApp extends CustomApp {
         $this->insert_test_categories();
         $this->insert_test_products();
         $this->insert_test_users();
+        
         $this->add_session_status_message(new OkStatusMsg("test_data_inserted"));
+        
         $this->create_self_redirect_response();
     }
 
     function insert_test_users() {
         $user =& $this->create_db_object("User");
-
         $user->login = "user";
         $user->password = "";
         $user->first_name = "Fn";
@@ -86,6 +88,7 @@ class SetupApp extends CustomApp {
         $user->is_active = 1;
         $user->store();
 
+        $user =& $this->create_db_object("User");
         $user->login = "user_not_active";
         $user->password = "";
         $user->first_name = "FnNotActive";
@@ -97,6 +100,7 @@ class SetupApp extends CustomApp {
         $user->is_active = 0;
         $user->store();
 
+        $user =& $this->create_db_object("User");
         $user->login = "user_not_confirmed";
         $user->password = "";
         $user->first_name = "FnNotConfirmed";
@@ -108,8 +112,9 @@ class SetupApp extends CustomApp {
         $user->is_active = 0;
         $user->store();
     }
+    
     function insert_test_news_articles() {
-        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
+        $news_article =& $this->create_db_object("NewsArticle");
         $news_article->created = "2004-06-20";
         $news_article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";
         $news_article->body_it =
@@ -144,6 +149,7 @@ class SetupApp extends CustomApp {
             "mauris felis, eleifend eget, lacinia eget, blandit nec, lacus.";
         $news_article->store();
 
+        $news_article =& $this->create_db_object("NewsArticle");
         $news_article->created = "2004-06-23";
         $news_article->title_it = "IT: Phasellus nec neque. Morbi massa.";
         $news_article->body_it =
@@ -173,6 +179,7 @@ class SetupApp extends CustomApp {
             "nisl nisl egestas odio, non lobortis massa ipsum vitae dui.";
         $news_article->store();
 
+        $news_article =& $this->create_db_object("NewsArticle");
         $news_article->created = "2004-06-24";
         $news_article->title_it = "IT: Nam molestie lectus vitae tellus.";
         $news_article->body_it =
@@ -206,11 +213,16 @@ class SetupApp extends CustomApp {
 
     function insert_test_categories() {
         $lines = read_and_parse_csv_file("data/categories.csv");
+        
         $category1 =& $this->create_db_object("Category1");
         $category2 =& $this->create_db_object("Category2");
         $category3 =& $this->create_db_object("Category3");
+        
+        $category1_id = 0;
         $category1_name_old = "";
+        $category2_id = 0;
         $category2_name_old = "";
+        $category3_id = 0;
         $category3_name_old = "";
         foreach ($lines as $line_values) {
             $category1_name = $line_values[0];
@@ -218,29 +230,35 @@ class SetupApp extends CustomApp {
             $category3_name = $line_values[2];
 
             if ($category1_name != $category1_name_old) {
-                $category1->id = 0;
                 $category1->name_it = $category1_name;
                 $category1->name_en = $category1_name;
-                $category1->position = 0;
                 $category1->store();
+
+                $category1_id = $category1->id;
+
+                $category1->reset_field_values();
             }
 
             if ($category2_name != $category2_name_old) {
-                $category2->id = 0;
-                $category2->category1_id = $category1->id;
+                $category2->category1_id = $category1_id;
                 $category2->name_it = $category2_name;
                 $category2->name_en = $category2_name;
-                $category2->position = 0;
                 $category2->store();
+
+                $category2_id = $category2->id;
+
+                $category2->reset_field_values();
             }
 
             if ($category3_name != $category3_name_old) {
-                $category3->id = 0;
-                $category3->category2_id = $category2->id;
+                $category3->category2_id = $category2_id;
                 $category3->name_it = $category3_name;
                 $category3->name_en = $category3_name;
-                $category3->position = 0;
                 $category3->store();
+
+                $category3_id = $category3->id;
+                
+                $category3->reset_field_values();
             }
 
             $category1_name_old = $category1_name;
@@ -254,12 +272,14 @@ class SetupApp extends CustomApp {
 
         $product =& $this->create_db_object("Product");
         foreach ($lines as $line_values) {
-            $product->id = 0;
             $product->category3_id = $line_values[0];
             $product->name_it = $line_values[2];
             $product->name_en = $line_values[2];
             $product->price = $line_values[3];
+            
             $product->store();
+            
+            $product->reset_field_values();
         }
     }
 

@@ -182,6 +182,12 @@ class MySqlDb extends AppObject {
             "  WHERE {$where_str}";
     }
 
+    function get_delete_query($table_name, $where_str) {
+        return
+            "DELETE FROM {%{$table_name}_table%}\n" .
+            "  WHERE {$where_str}";
+    }
+
     function get_create_table_query($table_name, $create_table_expression) {
         return
             "CREATE TABLE IF NOT EXISTS {%{$table_name}_table%} (\n" .
@@ -319,6 +325,7 @@ class MySqlDbResult extends AppObject {
             return false;
         }
         $obj->set_field_values_from_row($row);
+        $obj->sync_orig_field_values();
         return $row;
     }
 

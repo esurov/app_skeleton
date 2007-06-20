@@ -2060,7 +2060,7 @@ class App extends AppObject {
     }
 
     function print_status_message_db_object_updated($obj) {
-        $action_done = ($obj->is_definite()) ? "updated" : "added";
+        $action_done = ($obj->was_definite()) ? "updated" : "added";
         $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}.{$action_done}"));
     }
         
@@ -2264,13 +2264,17 @@ class App extends AppObject {
 
     function action_create_update_tables() {
         $this->process_create_update_tables(false, $run_info);
+        
         $this->add_session_status_message(new OkStatusMsg("tables_updated"));
+        
         $this->create_self_redirect_response();
     }
 
     function action_delete_tables() {
         $this->process_delete_tables(null, false, $run_info);
+
         $this->add_session_status_message(new OkStatusMsg("tables_deleted"));
+        
         $this->create_self_redirect_response();
     }
 //
@@ -2479,11 +2483,13 @@ class App extends AppObject {
         if (is_string($obj)) {
             $obj =& $this->create_db_object($obj);
         }
-        $obj->fetch(
-            "{$obj->_table_name}.id = {$obj_id} AND {$where_str}",
-            $field_names_to_select,
-            $field_names_to_not_select
-        );
+        if ($obj_id != 0) {
+            $obj->fetch(
+                "{$obj->_table_name}.id = {$obj_id} AND {$where_str}",
+                $field_names_to_select,
+                $field_names_to_not_select
+            );
+        }
         return $obj;
     }
 

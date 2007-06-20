@@ -110,7 +110,7 @@ class UserApp extends CustomApp {
                     if (sha1($this->user->password) == $user_password_hash) {
                         $this->create_login_state($this->user);
                     } else {
-                        $this->user->set_indefinite();
+                        $this->user->reset_field_values();
                     }
                 }
             }
@@ -415,7 +415,9 @@ class UserApp extends CustomApp {
 
     function action_logout() {
         $this->add_session_status_message(new OkStatusMsg("logged_out"));
+
         $this->create_self_redirect_response(array("action" => "pg_login"));
+        
         $this->destroy_login_state();
         $this->remove_remember_user_id_and_password_cookies();
     }
@@ -586,10 +588,9 @@ class UserApp extends CustomApp {
 
     function action_process_contact_form() {
         $contact_info =& $this->create_db_object("ContactInfo");
-        $contact_info_old = $contact_info;
         $contact_info->read();
 
-        $messages = $contact_info->validate($contact_info_old);
+        $messages = $contact_info->validate();
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
             $this->run_action("pg_contact_form", array("contact_info" => $contact_info));
@@ -597,6 +598,7 @@ class UserApp extends CustomApp {
             $this->send_email_contact_form_processed_to_admin($contact_info);
             
             $this->add_session_status_message(new OkStatusMsg("contact_info.processed"));
+
             $this->create_self_redirect_response(array("action" => "pg_contact_form"));
         }
     }
@@ -728,7 +730,6 @@ class UserApp extends CustomApp {
     function action_update_user() {
         $user = $this->read_id_fetch_user();
         $user->insert_edit_form_extra_fields();
-        $user_old = $user;
 
         $user_role = $this->get_user_role();
 
@@ -736,17 +737,17 @@ class UserApp extends CustomApp {
 
         $user->read($context);
 
-        $messages = $user->validate($user_old, $context);
+        $messages = $user->validate($context);
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
             $this->run_action("pg_user_edit", array("user" => $user));
         } else {
+            $this->print_status_message_db_object_updated($user);
+
             $user->save(
                 false,
                 is_value_empty($user->password) ? "skip_password" : null
             );
-
-            $this->print_status_message_db_object_updated($user_old);
 
             if ($user_role == "admin") {
                 $this->create_self_redirect_response(array("action" => "pg_users"));
@@ -766,6 +767,7 @@ class UserApp extends CustomApp {
                 $this->add_session_status_message(
                     new ErrorStatusMsg("user.cannot_delete_main_admin")
                 );
+
                 $this->create_self_redirect_response(array("action" => "pg_users"));
                 return;
             }
@@ -858,14 +860,16 @@ class UserApp extends CustomApp {
 
     function action_update_news_article() {
         $news_article =& $this->read_id_fetch_db_object("NewsArticle");
-        $news_article_old = $news_article;
+        
         $news_article->read();
 
-        $messages = $news_article->validate($news_article_old);
+        $messages = $news_article->validate();
         if (count($messages) != 0) {
             $this->print_status_messages($messages);
             $this->run_action("pg_news_article_edit", array("news_article" => $news_article));
         } else {
+            $this->print_status_message_db_object_updated($news_article);
+
             $this->process_uploaded_image(
                 $news_article,
                 "image_id",
@@ -911,7 +915,7 @@ class UserApp extends CustomApp {
             $this->process_uploaded_file($news_article, "file_id", "file");
 
             $news_article->save();
-            $this->print_status_message_db_object_updated($news_article_old);
+            
             $this->create_self_redirect_response(array("action" => "pg_news_articles"));
         }
     }
@@ -932,6 +936,7 @@ class UserApp extends CustomApp {
         $this->delete_db_object_image($news_article, "image_id");
         
         $this->add_session_status_message(new OkStatusMsg("news_article.image_deleted"));
+
         $this->create_self_redirect_response(array(
             "action" => "pg_news_article_edit",
             "news_article_id" => $news_article->id,
@@ -944,6 +949,7 @@ class UserApp extends CustomApp {
         $this->delete_db_object_file($news_article, "file_id");
         
         $this->add_session_status_message(new OkStatusMsg("news_article.file_deleted"));
+
         $this->create_self_redirect_response(array(
             "action" => "pg_news_article_edit",
             "news_article_id" => $news_article->id,
@@ -987,15 +993,15 @@ class UserApp extends CustomApp {
             }
 
             if ($command == "update_obj") {
-                $obj_old = $obj;
                 $obj->read();
 
-                $messages = $obj->validate($obj_old);
+                $messages = $obj->validate();
                 if (count($messages) != 0) {
                     $this->print_status_messages($messages);
                 } else {
+                    $this->print_status_message_db_object_updated($obj);
+
                     $obj->save();
-                    $this->print_status_message_db_object_updated($obj_old);
 
                     $should_redirect = true;
                     break;
@@ -1104,15 +1110,15 @@ class UserApp extends CustomApp {
             $product =& $this->read_id_fetch_db_object("Product");
 
             if ($command == "update") {
-                $product_old = $product;
                 $product->read();
 
-                $messages = $product->validate($product_old);
+                $messages = $product->validate();
                 if (count($messages) != 0) {
                     $this->print_status_messages($messages);
                 } else {
+                    $this->print_status_message_db_object_updated($product);
+
                     $product->save();
-                    $this->print_status_message_db_object_updated($product_old);
 
                     $this->create_self_redirect_response(array("action" => "pg_products"));
                     break;
