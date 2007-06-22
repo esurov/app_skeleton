@@ -1,6 +1,5 @@
-<form action="?" method="post" name="form">
-<input type="hidden" name="action" value="update_user" />
-{%user.id.hidden%}
+<form action="?action=pg_user_edit&amp;user_id={%user.id%}" method="post" name="form">
+<input type="hidden" name="command" value="update" />
 
 <table>
 {%_role%}

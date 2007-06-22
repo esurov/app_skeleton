@@ -98,18 +98,6 @@ class NewsArticleTable extends CustomDbObject {
                     "message" => "news_article.image_bad",
                 )
             );
-
-            $uploaded_file_info = get_uploaded_file_info("file");
-            $filesize = $uploaded_file_info["size"];
-            if ($filesize > $this->get_config_value("news_article_file_max_size")) {
-                $messages[] = new ErrorStatusMsg("news_article.file_max_size_reached");
-            }
-            if (
-                $this->get_files_total_size("file_id") + $filesize >
-                    $this->get_config_value("news_article_files_max_total_size")
-            ) {
-                $messages[] = new ErrorStatusMsg("news_article.files_max_total_size_reached");
-            }
         }
 
         if (was_file_uploaded("file")) {

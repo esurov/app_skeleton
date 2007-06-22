@@ -1,6 +1,6 @@
-<form action="?" method="post" name="form" enctype="multipart/form-data">
-<input type="hidden" name="action" value="update_news_article" />
-{%news_article.id.hidden%}
+<form action="?action=pg_news_article_edit&amp;news_article_id={%news_article.id%}"
+    method="post" name="form" enctype="multipart/form-data">
+<input type="hidden" name="command" value="update" />
 
 <table>
 <tr>

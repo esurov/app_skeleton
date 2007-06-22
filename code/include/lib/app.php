@@ -329,6 +329,23 @@ class App extends AppObject {
         );
     }
 
+    function create_self_action_redirect_response($suburl_params = array(), $protocol = "http") {
+        $this->create_self_redirect_response(
+            $this->get_self_action_suburl_params() + $suburl_params
+        );
+    }
+
+    function get_self_action_suburl_params() {
+        $self_action_suburl_params = array();
+        if ($this->action != $this->get_default_action_name()) {
+            $self_action_suburl_params["action"] = $this->action;
+            if ($this->action == "pg_static") {
+                $self_action_suburl_params["page"] = $this->read_static_page_name();
+            }
+        }
+        return $self_action_suburl_params;
+    }
+
     function get_app_extra_suburl_params() {
         $params = array();
         if ($this->popup != 0) {
@@ -2129,15 +2146,7 @@ class App extends AppObject {
 
         $lang_menu->avail_langs = $this->get_avail_langs();
         $lang_menu->current_lang = $this->lang;
-
-        $redirect_url_params = array();
-        if ($this->action != $this->get_default_action_name()) {
-            $redirect_url_params["action"] = $this->action;
-            if ($this->action == "pg_static") {
-                $redirect_url_params["page"] = $this->read_static_page_name();
-            }
-        }
-        $lang_menu->redirect_url = create_self_full_url($redirect_url_params);
+        $lang_menu->redirect_url = create_self_full_url($this->get_self_action_suburl_params());
 
         return $lang_menu->print_values();
     }

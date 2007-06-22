@@ -34,14 +34,14 @@ function param_array($param_name) {
 }
 
 function params() {
-    return array_merge($_POST, $_GET);
+    return array_merge($_GET, $_POST);
 }
 
 function read_cgi_param($name) {
-    if (isset($_GET[$name])) {
-        return $_GET[$name];
-    } else if (isset($_POST[$name])) {
+    if (isset($_POST[$name])) {
         return $_POST[$name];
+    } else if (isset($_GET[$name])) {
+        return $_GET[$name];
     } else {
         return null;
     }

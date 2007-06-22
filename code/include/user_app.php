@@ -26,54 +26,33 @@ class UserApp extends CustomApp {
 
             // Login/Signup/Confirm/RecoverPassword
             "pg_login" => $e,
-            "login" => $e,
             "logout" => $e,
             "pg_signup" => $e,
-            "signup" => $e,
-            "pg_signup_almost_completed" => $e,
             "confirm_signup" => $e,
             "pg_recover_password" => $e,
-            "recover_password" => $e,
-            "pg_recover_password_sent" => $e,
 
             // Contact form
             "pg_contact_form" => $e,
-            "process_contact_form" => $e,
 
-            // User management
+            // Users management
             "pg_users" => $a,
             "pg_user_view" => $u_a,
             "pg_user_edit" => $u_a,
-            "update_user" => $u_a,
-            "delete_user" => $a,
 
             // News articles
             "pg_news_articles" => $e,
             "pg_news_article_view" => $e,
             "pg_news_article_edit" => $a,
-            "update_news_article" => $a,
-            "delete_news_article" => $a,
-            "delete_news_article_image" => $a,
-            "delete_news_article_file" => $a,
 
             // Categories management
             "pg_categories" => $a,
             "pg_category1_edit" => $a,
-            "update_category1" => $a,
-            "delete_category1" => $a,
-            "move_category1" => $a,
             "pg_category2_edit" => $a,
-            "update_category2" => $a,
-            "delete_category2" => $a,
-            "move_category2" => $a,
             "pg_category3_edit" => $a,
-            "update_category3" => $a,
-            "delete_category3" => $a,
-            "move_category3" => $a,
 
+            // Products management
             "pg_products" => $a,
             "pg_product_edit" => $a,
-            "delete_product" => $a,
         );
     }
 //
@@ -288,71 +267,71 @@ class UserApp extends CustomApp {
     function action_pg_login() {
         $templates_dir = "login";
 
-        $user = get_param_value($this->action_params, "user", null);
-        if (is_null($user)) {
-            $user =& $this->create_db_object("User");
+        $user =& $this->create_db_object("User");
+
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "login":
+            $context = "login_form";
+            
             $user->insert_login_form_extra_fields();
             if ($this->was_user_remembered()) {
                 $user->should_remember = 1;
             }
-        } else {
             $user->password = "";
-        }
-        $user_editor =& $this->create_object(
-            "ObjectEditor",
-            array(
-                "templates_dir" => "{$templates_dir}/login_form",
-                "template_var" => "login_form",
-                "obj" => $user,
-                "context" => "login_form",
-            )
-        );
-        $user_editor->print_values();
 
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
+            if ($command == "login") {
+                $user->read($context);
+                
+                $should_remember = $user->should_remember;
 
-    function action_login() {
-        $context = "login_form";
+                $messages = $user->validate($context);
+                if (count($messages) == 0) {
+                    $login = $user->login;
+                    $password = $user->password;
 
-        $user = get_param_value($this->action_params, "user", null);
-        if (is_null($user)) {
-            $user =& $this->create_db_object("User");
-            $user->insert_login_form_extra_fields();
-            $user->read($context);
-        }
-        $should_remember = $user->should_remember;
+                    $user->fetch("user.login = ". qw($login));
+                    $context_params = array(
+                        "login" => $login,
+                        "password" => $password,
+                    );
+                    $messages = $user->validate("login", $context_params);
+                }
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+                } else {
+                    $saved_request_params = $this->session->get_saved_request_params();
+                    if (is_null(get_param_value($saved_request_params, "action", null))) {
+                        $saved_request_params = array("action" => "pg_home") + $saved_request_params;
+                    }
+                    $this->session->destroy_saved_request_params();
+                    
+                    $this->create_self_redirect_response($saved_request_params);
 
-        $messages = $user->validate(null, $context);
-        if (count($messages) == 0) {
-            $login = $user->login;
-            $password = $user->password;
-
-            $user->fetch("user.login = ". qw($login));
-            $context_params = array(
-                "login" => $login,
-                "password" => $password,
-            );
-            $messages = $user->validate(null, "login", $context_params);
-        }
-        if (count($messages) != 0) {
-            $this->print_status_messages($messages);
-            $this->run_action("pg_login", array("user" => $user));
-        } else {
-            $saved_request_params = $this->session->get_saved_request_params();
-            if (is_null(get_param_value($saved_request_params, "action", null))) {
-                $saved_request_params = array("action" => "pg_home") + $saved_request_params;
+                    $this->create_login_state($user);
+                    if ($should_remember) {
+                        $this->add_remember_user_id_and_password_cookies($user);
+                    } else {
+                        $this->remove_remember_user_id_and_password_cookies();
+                    }
+                    break;
+                }
             }
-            $this->session->destroy_saved_request_params();
             
-            $this->create_self_redirect_response($saved_request_params);
+            $login_form =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/login_form",
+                    "template_var" => "login_form",
+                    "obj" => $user,
+                    "context" => $context,
+                )
+            );
+            $login_form->print_values();
 
-            $this->create_login_state($user);
-            if ($should_remember) {
-                $this->add_remember_user_id_and_password_cookies($user);
-            } else {
-                $this->remove_remember_user_id_and_password_cookies();
-            }
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
         }
     }
 
@@ -424,46 +403,55 @@ class UserApp extends CustomApp {
 //
     function action_pg_signup() {
         $templates_dir = "signup";
+        
+        $user =& $this->create_db_object("User");
 
-        $user = get_param_value($this->action_params, "user", null);
-        if (is_null($user)) {
-            $user =& $this->create_db_object("User");
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "signup":
+            $context = "signup_form";
+            
             $user->insert_signup_form_extra_fields();
-        } else {
             $user->password = "";
             $user->password_confirm = "";
-        }
-        $user_editor =& $this->create_object(
-            "ObjectEditor",
-            array(
-                "templates_dir" => "{$templates_dir}/signup_form",
-                "template_var" => "signup_form",
-                "obj" => $user,
-                "context" => "signup_form",
-            )
-        );
-        $user_editor->print_values();
 
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
+            if ($command == "signup") {
+                $user->read($context);
+                
+                $messages = $user->validate($context);
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+                } else {
+                    $user->is_active = 1;
 
-    function action_signup() {
-        $context = "signup_form";
+                    $user->save(true);
 
-        $user =& $this->create_db_object("User");
-        $user->insert_signup_form_extra_fields();
-        $user->read($context);
+                    $this->send_email_signup_form_processed_to_user($user);
+                    
+                    $this->create_self_action_redirect_response(array(
+                        "command" => "signup_almost_completed",
+                    ));
+                    break;
+                }
+            }   
+        
+            $user_editor =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/signup_form",
+                    "template_var" => "signup_form",
+                    "obj" => $user,
+                    "context" => "signup_form",
+                )
+            );
+            $user_editor->print_values();
 
-        $messages = $user->validate(null, $context);
-        if (count($messages) != 0) {
-            $this->print_status_messages($messages);
-            $this->run_action("pg_signup", array("user" => $user));
-        } else {
-            $user->is_active = 1;
-            $user->save(true);
-
-            $this->send_email_signup_form_processed_to_user($user);
-            $this->create_self_redirect_response(array("action" => "pg_signup_almost_completed"));
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
+        case "signup_almost_completed":
+            $this->print_file("signup/body_signup_almost_completed.html", "body");
+            break;
         }
     }
 
@@ -493,10 +481,6 @@ class UserApp extends CustomApp {
         $email_sender->Send();
     }
 
-    function action_pg_signup_almost_completed() {
-        $this->print_file("signup/body_signup_almost_completed.html", "body");
-    }
-
     function action_confirm_signup() {
         $user =& $this->read_id_fetch_db_object("User");
         if ($user->is_definite() && !$user->is_confirmed) {
@@ -508,37 +492,46 @@ class UserApp extends CustomApp {
     function action_pg_recover_password() {
         $templates_dir = "recover_password";
 
-        $user = get_param_value($this->action_params, "user", null);
-        if (is_null($user)) {
-            $user =& $this->create_db_object("User");
-        }
-        $recover_password_form =& $this->create_object(
-            "ObjectEditor",
-            array(
-                "templates_dir" => "{$templates_dir}/recover_password_form",
-                "template_var" => "recover_password_form",
-                "obj" => $user,
-                "context" => "recover_password_form",
-            )
-        );
-        $recover_password_form->print_values();
-
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
-
-    function action_recover_password() {
-        $context = "recover_password_form";
-
         $user =& $this->create_db_object("User");
-        $user->read($context);
 
-        $messages = $user->validate(null, $context);
-        if (count($messages) != 0) {
-            $this->print_status_messages($messages);
-            $this->run_action("pg_recover_password", array("user" => $user));
-        } else {
-            $this->send_email_recover_password_form_processed_to_user($user);
-            $this->create_self_redirect_response(array("action" => "pg_recover_password_sent"));
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "recover":
+            $context = "recover_password_form";
+            
+            if ($command == "recover") {
+                $user->read($context);
+
+                $messages = $user->validate($context);
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+                } else {
+                    $this->send_email_recover_password_form_processed_to_user($user);
+                    
+                    $this->create_self_action_redirect_response(array(
+                        "command" => "password_sent",
+                    ));
+                    break;
+                }
+            }
+
+            $recover_password_form =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/recover_password_form",
+                    "template_var" => "recover_password_form",
+                    "obj" => $user,
+                    "context" => "recover_password_form",
+                )
+            );
+            $recover_password_form->print_values();
+
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
+        case "password_sent":
+            $this->print_file("recover_password/body_password_sent.html", "body");
+            break;
         }
     }
 
@@ -561,45 +554,44 @@ class UserApp extends CustomApp {
         $email_sender->Body = $body;
         $email_sender->Send();
     }
-
-    function action_pg_recover_password_sent() {
-        $this->print_file("recover_password/body_password_sent.html", "body");
-    }
 //
     function action_pg_contact_form() {
         $templates_dir = "contact_form";
 
-        $contact_info = get_param_value($this->action_params, "contact_info", null);
-        if (is_null($contact_info)) {
-            $contact_info =& $this->create_db_object("ContactInfo");
-        }
-        $contact_form =& $this->create_object(
-            "ObjectEditor",
-            array(
-                "templates_dir" => "{$templates_dir}/contact_form",
-                "template_var" => "contact_form",
-                "obj" => $contact_info,
-            )
-        );
-        $contact_form->print_values();
-
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
-
-    function action_process_contact_form() {
         $contact_info =& $this->create_db_object("ContactInfo");
-        $contact_info->read();
 
-        $messages = $contact_info->validate();
-        if (count($messages) != 0) {
-            $this->print_status_messages($messages);
-            $this->run_action("pg_contact_form", array("contact_info" => $contact_info));
-        } else {
-            $this->send_email_contact_form_processed_to_admin($contact_info);
-            
-            $this->add_session_status_message(new OkStatusMsg("contact_info.processed"));
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "process":
+            if ($command == "process") {
+                $contact_info->read();
 
-            $this->create_self_redirect_response(array("action" => "pg_contact_form"));
+                $messages = $contact_info->validate();
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+                } else {
+                    $this->add_session_status_message(new OkStatusMsg("contact_info.processed"));
+
+                    $this->send_email_contact_form_processed_to_admin($contact_info);
+
+                    $this->create_self_action_redirect_response();
+                    break;
+                }
+            }
+
+            $contact_form =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/contact_form",
+                    "template_var" => "contact_form",
+                    "obj" => $contact_info,
+                )
+            );
+            $contact_form->print_values();
+
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
         }
     }
 
@@ -657,11 +649,8 @@ class UserApp extends CustomApp {
         $templates_dir = "user_view";
 
         $user_role = $this->get_user_role();
-        if ($user_role == "admin") {
-            $context = "view_by_admin";
-        } else {
-            $context = "view_by_user";
-        }
+        
+        $context = ($user_role == "admin") ? "view_by_admin" : "view_by_user";
 
         $user = $this->read_id_fetch_user();
         $user_viewer =& $this->create_object(
@@ -686,98 +675,93 @@ class UserApp extends CustomApp {
         $templates_dir = "user_edit";
 
         $user_role = $this->get_user_role();
-        if ($user_role == "admin") {
-            $context = "edit_form_by_admin";
-        } else {
-            $context = "edit_form_by_user";
-        }
+        
+        $user = $this->read_id_fetch_user();
 
-        $user = get_param_value($this->action_params, "user", null);
-        if (is_null($user)) {
-            $user = $this->read_id_fetch_user();
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "update":
+            $context = ($user_role == "admin") ? "edit_form_by_admin" : "edit_form_by_user";
+
             $user->insert_edit_form_extra_fields();
-            if (!$user->is_definite()) {
+            if ($user->is_definite()) {
+                if ($user_role == "user") {
+                    $field_info =& $user->get_field_info("login");
+                    $field_info["input"]["type_attrs"]["disabled"] = "disabled";
+                }
+            } else {
                 // Set initial values for user which will be created by admin
                 $user->is_confirmed = 1;
                 $user->is_active = 1;
             }
-        }
-        if ($user_role == "user" && $user->is_definite()) {
-            $field_info =& $user->get_field_info("login");
-            $field_info["input"]["type_attrs"]["disabled"] = "disabled";
-        }
-        $user->password = "";
-        $user->password_confirm = "";
+            $user->password = "";
+            $user->password_confirm = "";
 
-        $user_editor =& $this->create_object(
-            "ObjectEditor",
-            array(
-                "templates_dir" => "{$templates_dir}/user_editor",
-                "template_var" => "user_editor",
-                "obj" => $user,
-                "context" => $context,
-            )
-        );
-        $user_editor->print_values();
+            if ($command == "update") {
+                $user->read($context);
 
-        if ($user_role == "user") {
-            $this->print_head_and_page_titles("pg_user_edit_my_account");
-        }
+                $messages = $user->validate($context);
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+                } else {
+                    $this->print_status_message_db_object_updated($user);
 
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
+                    $user->save(
+                        false,
+                        is_value_empty($user->password) ? "skip_password" : null
+                    );
 
-    function action_update_user() {
-        $user = $this->read_id_fetch_user();
-        $user->insert_edit_form_extra_fields();
-
-        $user_role = $this->get_user_role();
-
-        $context = ($user_role == "admin") ? "edit_form_by_admin" : "edit_form_by_user";
-
-        $user->read($context);
-
-        $messages = $user->validate($context);
-        if (count($messages) != 0) {
-            $this->print_status_messages($messages);
-            $this->run_action("pg_user_edit", array("user" => $user));
-        } else {
-            $this->print_status_message_db_object_updated($user);
-
-            $user->save(
-                false,
-                is_value_empty($user->password) ? "skip_password" : null
+                    if ($user_role == "admin") {
+                        $this->create_self_redirect_response(array(
+                            "action" => "pg_users",
+                        ));
+                    } else {
+                        $this->create_self_redirect_response(array(
+                            "action" => "pg_user_view", 
+                            "user_id" => $user->id, 
+                        ));
+                    }
+                    break;
+                }
+            }
+            
+            $user_editor =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/user_editor",
+                    "template_var" => "user_editor",
+                    "obj" => $user,
+                    "context" => $context,
+                )
             );
+            $user_editor->print_values();
 
+            if ($user_role == "user") {
+                $this->print_head_and_page_titles("pg_user_edit_my_account");
+            }
+
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
+        case "delete":
             if ($user_role == "admin") {
-                $this->create_self_redirect_response(array("action" => "pg_users"));
-            } else {
-                $this->create_self_redirect_response(array(
-                    "action" => "pg_user_view", 
-                    "user_id" => $user->id, 
+                if ($user->role == "admin" && $user->get_num_admins() <= 1) {
+                    $this->add_session_status_message(
+                        new ErrorStatusMsg("user.cannot_delete_main_admin")
+                    );
+
+                    $this->create_self_redirect_response(array("action" => "pg_users"));
+                    break;
+                }
+                $redirect_url_params = array("action" => "pg_users");
+                $this->delete_db_object(array(
+                    "obj" => $user,
+                    "success_url_params" => $redirect_url_params,
+                    "error_url_params" => $redirect_url_params,
                 ));
             }
+            break;
         }
-    }
-
-    function action_delete_user() {
-        $user =& $this->read_id_fetch_db_object("User");
-        if ($user->role == "admin") {
-            if ($user->get_num_admins() <= 1) {
-                $this->add_session_status_message(
-                    new ErrorStatusMsg("user.cannot_delete_main_admin")
-                );
-
-                $this->create_self_redirect_response(array("action" => "pg_users"));
-                return;
-            }
-        }
-        $redirect_url_params = array("action" => "pg_users");
-        $this->delete_db_object(array(
-            "obj" => $user,
-            "success_url_params" => $redirect_url_params,
-            "error_url_params" => $redirect_url_params,
-        ));
     }
 //
     function action_pg_news_articles() {
@@ -840,120 +824,111 @@ class UserApp extends CustomApp {
     function action_pg_news_article_edit() {
         $templates_dir = "news_article_edit";
 
-        $news_article = get_param_value($this->action_params, "news_article", null);
-        if (is_null($news_article)) {
-            $news_article =& $this->read_id_fetch_db_object("NewsArticle");
-        }
-        $news_article_editor =& $this->create_object(
-            "ObjectEditor",
-            array(
-                "templates_dir" => "{$templates_dir}/news_article_editor",
-                "template_var" => "news_article_editor",
+        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
+
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "update":
+            if ($command == "update") {
+                $news_article->read();
+
+                $messages = $news_article->validate();
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+                } else {
+                    $this->print_status_message_db_object_updated($news_article);
+
+                    $this->process_uploaded_image(
+                        $news_article,
+                        "image_id",
+                        "image_file",
+                        array(
+                            "image_processor.class" => $this->get_config_value("image_processor"),
+                            "image_processor.actions" => array(
+                                array(
+                                    "name" => "crop_and_resize",
+                                    "width" => $this->get_config_value("news_article_image_width"),
+                                    "height" => $this->get_config_value("news_article_image_height"),
+                                ),
+                            ),
+                            "is_thumbnail" => 0,
+                        )
+                    );
+                    $this->process_uploaded_image(
+                        $news_article,
+                        "thumbnail_image_id",
+                        "image_file",
+                        array(
+                            "image_processor.class" => $this->get_config_value("image_processor"),
+                            "image_processor.actions" => array(
+                                array(
+                                    "name" => "crop_and_resize",
+                                    "width" => $this->get_config_value(
+                                        "news_article_thumbnail_image_width"
+                                    ),
+                                    "height" => $this->get_config_value(
+                                        "news_article_thumbnail_image_height"
+                                    ),
+                                ),
+                                // This is example of second image processor action
+                                // Remove if grayscale is not needed (almost always ;) )
+                                array(
+                                    "name" => "convert_to_grayscale",
+                                ),
+                            ),
+                            "is_thumbnail" => 1,
+                        )
+                    );
+
+                    $this->process_uploaded_file($news_article, "file_id", "file");
+
+                    $news_article->save();
+                    
+                    $this->create_self_redirect_response(array("action" => "pg_news_articles"));
+                    break;
+                }
+            }
+                    
+            $news_article_editor =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/news_article_editor",
+                    "template_var" => "news_article_editor",
+                    "obj" => $news_article,
+                    "context" => "edit",
+                )
+            );
+            $news_article_editor->print_values();
+
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
+        case "delete":
+            $this->delete_db_object(array(
                 "obj" => $news_article,
-                "context" => "edit",
-            )
-        );
-        $news_article_editor->print_values();
-
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
-
-    function action_update_news_article() {
-        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
-        
-        $news_article->read();
-
-        $messages = $news_article->validate();
-        if (count($messages) != 0) {
-            $this->print_status_messages($messages);
-            $this->run_action("pg_news_article_edit", array("news_article" => $news_article));
-        } else {
-            $this->print_status_message_db_object_updated($news_article);
-
-            $this->process_uploaded_image(
-                $news_article,
-                "image_id",
-                "image_file",
-                array(
-                    "image_processor.class" => $this->get_config_value("image_processor"),
-                    "image_processor.actions" => array(
-                        array(
-                            "name" => "crop_and_resize",
-                            "width" => $this->get_config_value("news_article_image_width"),
-                            "height" => $this->get_config_value("news_article_image_height"),
-                        ),
-                    ),
-                    "is_thumbnail" => 0,
-                )
-            );
-            $this->process_uploaded_image(
-                $news_article,
-                "thumbnail_image_id",
-                "image_file",
-                array(
-                    "image_processor.class" => $this->get_config_value("image_processor"),
-                    "image_processor.actions" => array(
-                        array(
-                            "name" => "crop_and_resize",
-                            "width" => $this->get_config_value(
-                                "news_article_thumbnail_image_width"
-                            ),
-                            "height" => $this->get_config_value(
-                                "news_article_thumbnail_image_height"
-                            ),
-                        ),
-                        // This is example of second image processor action
-                        // Remove if grayscale is not needed (almost always ;) )
-                        array(
-                            "name" => "convert_to_grayscale",
-                        ),
-                    ),
-                    "is_thumbnail" => 1,
-                )
-            );
-
-            $this->process_uploaded_file($news_article, "file_id", "file");
-
-            $news_article->save();
+                "success_url_params" => array("action" => "pg_news_articles"),
+                "error_url_params" => array("action" => "pg_news_articles"),
+            ));
+            break;
+        case "delete_image":
+            $this->delete_db_object_image($news_article, "image_id");
             
-            $this->create_self_redirect_response(array("action" => "pg_news_articles"));
+            $this->add_session_status_message(new OkStatusMsg("news_article.image_deleted"));
+
+            $this->create_self_action_redirect_response(array(
+                "news_article_id" => $news_article->id,
+            ));
+            break;
+        case "delete_file":
+            $this->delete_db_object_file($news_article, "file_id");
+            
+            $this->add_session_status_message(new OkStatusMsg("news_article.file_deleted"));
+
+            $this->create_self_action_redirect_response(array(
+                "news_article_id" => $news_article->id,
+            ));
+            break;
         }
-    }
-
-    function action_delete_news_article() {
-        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
-
-        $this->delete_db_object(array(
-            "obj" => $news_article,
-            "success_url_params" => array("action" => "pg_news_articles"),
-            "error_url_params" => array("action" => "pg_news_articles"),
-        ));
-    }
-
-    function action_delete_news_article_image() {
-        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
-
-        $this->delete_db_object_image($news_article, "image_id");
-        
-        $this->add_session_status_message(new OkStatusMsg("news_article.image_deleted"));
-
-        $this->create_self_redirect_response(array(
-            "action" => "pg_news_article_edit",
-            "news_article_id" => $news_article->id,
-        ));
-    }
-
-    function action_delete_news_article_file() {
-        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
-
-        $this->delete_db_object_file($news_article, "file_id");
-        
-        $this->add_session_status_message(new OkStatusMsg("news_article.file_deleted"));
-
-        $this->create_self_redirect_response(array(
-            "action" => "pg_news_article_edit",
-            "news_article_id" => $news_article->id,
-        ));
     }
 //
     function action_pg_categories() {
@@ -963,16 +938,17 @@ class UserApp extends CustomApp {
 
         $should_redirect = false;
 
-        $command = (string) param("command");
         $avail_obj_names = array(
             "category1" => "Category1",
             "category2" => "Category2",
             "category3" => "Category3",
         );
         $obj_name = (string) param("obj");
+        
+        $command = (string) param("command");
         switch ($command) {
-        case "edit_obj":
-        case "update_obj":
+        case "edit":
+        case "update":
             if (!in_array($obj_name, array_keys($avail_obj_names))) {
                 break;
             }
@@ -992,7 +968,7 @@ class UserApp extends CustomApp {
                 }
             }
 
-            if ($command == "update_obj") {
+            if ($command == "update") {
                 $obj->read();
 
                 $messages = $obj->validate();
@@ -1019,14 +995,14 @@ class UserApp extends CustomApp {
             );
             $category_editor->print_values();
             break;
-        case "delete_obj":
-        case "move_obj":
+        case "delete":
+        case "move":
             if (!in_array($obj_name, array_keys($avail_obj_names))) {
                 break;
             }
             $obj =& $this->read_id_fetch_db_object($avail_obj_names[$obj_name], "1", "obj_id");
 
-            if ($command == "delete_obj") {
+            if ($command == "delete") {
                 $this->delete_db_object(array(
                     "obj" => $obj,
                     "should_redirect" => false,
@@ -1039,8 +1015,7 @@ class UserApp extends CustomApp {
         }
 
         if ($should_redirect) {
-            $this->create_self_redirect_response(array(
-                "action" => "pg_categories",
+            $this->create_self_action_redirect_response(array(
                 "current_category1_id" => $current_category_ids["current_category1_id"],
                 "current_category2_id" => $current_category_ids["current_category2_id"],
                 "current_category3_id" => $current_category_ids["current_category3_id"],
@@ -1103,12 +1078,12 @@ class UserApp extends CustomApp {
     function action_pg_product_edit() {
         $templates_dir = "product_edit";
 
+        $product =& $this->read_id_fetch_db_object("Product");
+
         $command = (string) param("command");
         switch ($command) {
         case "":
         case "update":
-            $product =& $this->read_id_fetch_db_object("Product");
-
             if ($command == "update") {
                 $product->read();
 
@@ -1134,19 +1109,17 @@ class UserApp extends CustomApp {
                 )
             );
             $product_editor->print_values();
+  
             $this->print_file("{$templates_dir}/body.html", "body");
             break;
+        case "delete":
+            $this->delete_db_object(array(
+                "obj" => $product,
+                "success_url_params" => array("action" => "pg_products"),
+                "error_url_params" => array("action" => "pg_products"),
+            ));
+            break;
         }
-    }
-
-    function action_delete_product() {
-        $product =& $this->read_id_fetch_db_object("Product");
-
-        $this->delete_db_object(array(
-            "obj" => $product,
-            "success_url_params" => array("action" => "pg_products"),
-            "error_url_params" => array("action" => "pg_products"),
-        ));
     }
 
 }

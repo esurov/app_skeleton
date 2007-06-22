@@ -1,6 +1,5 @@
-<form action="?action=pg_product_edit" method="post" name="form">
+<form action="?action=pg_product_edit&amp;product_id={%product.id%}" method="post" name="form">
 <input type="hidden" name="command" value="update" />
-{%product.id.hidden%}
 
 <table>
 <tr>
