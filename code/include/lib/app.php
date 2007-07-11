@@ -2433,7 +2433,7 @@ class App extends AppObject {
                 $obj_params = $init_obj_params + $obj_params;
             }
             if (is_subclass_of($obj, "AppObject")) {
-                $obj->set_app(&$this);
+                $obj->set_app($this);
             }
         }
         if (method_exists($obj, "_init")) {
