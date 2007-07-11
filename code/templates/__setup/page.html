@@ -10,6 +10,18 @@
     <script type="text/javascript" src="js/lib.js"></script>
 </head>
 <body>
-{%menu%}{%page_title%}{%status_messages%}{%body%}
+<div id="all">
+
+    <div class="header">
+        <a href="."><img src="images/logo.gif" alt="{%lang:head_page_title.app%}" title="{%lang:head_page_title.app%}" /></a>
+    </div>
+    {%menu%}
+    {%status_messages%}
+    <div class="content">
+        {%page_title%}
+        {%body%}
+    </div>
+
+</div>
 </body>
 </html>

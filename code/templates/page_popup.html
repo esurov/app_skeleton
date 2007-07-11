@@ -7,8 +7,18 @@
     <title>{%lang:head_page_title.app%} - {%head_page_title%}</title>
     <link rel="stylesheet" type="text/css" href="css/common.css" />
     <link rel="stylesheet" type="text/css" href="css/user.css" />
+    <script type="text/javascript" src="js/minmax.js"></script>
 </head>
-<body>
-{%page_title%}{%status_messages%}{%body%}
+<body class="popup">
+<div id="all">
+
+    {%status_messages%}
+    <div class="content">
+        {%page_title%}
+        {%body%}
+        <hr />
+    </div>
+
+</div>
 </body>
 </html>

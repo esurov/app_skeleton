@@ -1,53 +1,55 @@
-<p>{%lang:text1%}</p>
+<div class="hint">{%lang:text1%}</div>
 
 <form action="?action=pg_signup" method="post" name="form">
 <input type="hidden" name="command" value="signup" />
 
 <table>
 <tr>
-    <td>{%lang:login%}:&nbsp;<span class="required">*</span></td>
+    <th>{%lang:login%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.login.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:password%}:&nbsp;<span class="required">*</span></td>
+    <th>{%lang:password%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.password.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:password_confirm%}:&nbsp;<span class="required">*</span></td>
+    <th>{%lang:password_confirm%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.password_confirm.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:first_name%}:&nbsp;<span class="required">*</span></td>
+    <th>{%lang:first_name%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.first_name.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:last_name%}:&nbsp;<span class="required">*</span></td>
+    <th>{%lang:last_name%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.last_name.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:email%}:&nbsp;<span class="required">*</span></td>
+    <th>{%lang:email%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.email.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:extra_info%}:</td>
+    <th>{%lang:extra_info%}:</th>
     <td>{%user.extra_info.input%}</td>
 </tr>
 <tr>
-    <td colspan="2">
-        {%lang:text2%}<br />
-        <a href="javascript:void(openPolicyTermsOfUsePopupWindow());"
-            >{%lang:policy_terms_of_use%}</a>,
-        <a href="javascript:void(openPolicyTermsAndConditionsPopupWindow());"
-            >{%lang:policy_terms_and_conditions%}</a>,
-        <a href="javascript:void(openPolicyPrivacyPopupWindow());"
-            >{%lang:policy_privacy%}</a> {%lang:and%}
-        <a href="javascript:void(openPolicyDisclaimerPopupWindow());"
-            >{%lang:policy_disclaimer%}</a>.
-    </td>
+    <th colspan="2">
+        <div class="hint">
+            {%lang:text2%}<br />
+            <a href="javascript:void(openPolicyTermsOfUsePopupWindow());"
+                >{%lang:policy_terms_of_use%}</a>,
+            <a href="javascript:void(openPolicyTermsAndConditionsPopupWindow());"
+                >{%lang:policy_terms_and_conditions%}</a>,
+            <a href="javascript:void(openPolicyPrivacyPopupWindow());"
+                >{%lang:policy_privacy%}</a> {%lang:and%}
+            <a href="javascript:void(openPolicyDisclaimerPopupWindow());"
+                >{%lang:policy_disclaimer%}</a>.
+        </div>
+    </th>
 </tr>
 <tr>
-    <td>{%lang:accept_agreement%}:&nbsp;<span class="required">*</span></td>
-    <td>{%user.agreement_accepted.input%}</td>
+    <th>{%user.agreement_accepted.input%} {%lang:accept_agreement%}:&nbsp;<span class="required">*</span></th>
+    <td></td>
 </tr>
 <tr>
     <td colspan="2" align="center">

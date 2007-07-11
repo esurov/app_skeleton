@@ -19,6 +19,8 @@
     item_selected_template="menu_item_selected.html"
     item_delimiter_template="menu_item_delimiter.html"
     item_has_sub_menu_template="menu_item_has_sub_menu.html"
+    print_delimiter_before_selected_item="false"
+    print_delimiter_after_selected_item="false"
 >
     <menu_item
         name="index"

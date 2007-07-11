@@ -3,32 +3,35 @@
 
 <table>
 <tr>
-    <td>{%lang:first_name%}:&nbsp;<span class="required">*</span></td>
+    <th>{%lang:first_name%}:&nbsp;<span class="required">*</span></th>
     <td>{%contact_info.first_name.input%}</td>
 
-    <td>{%lang:last_name%}:&nbsp;<span class="required">*</span></td>
-    <td>{%contact_info.last_name.input%}</td>
-</tr>
-<tr>
-    <td>{%lang:email%}:&nbsp;<span class="required">*</span></td>
-    <td>{%contact_info.email.input%}</td>
-    <td>{%lang:company_name%}:</td>
+    <th>{%lang:company_name%}:</th>
     <td>{%contact_info.company_name.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:city%}:</td>
+    <th>{%lang:last_name%}:&nbsp;<span class="required">*</span></th>
+    <td>{%contact_info.last_name.input%}</td>
+
+    <th>{%lang:city%}:</th>
     <td>{%contact_info.city.input%}</td>
-    <td>{%lang:address%}:</td>
+</tr>
+<tr>
+    <th>{%lang:email%}:&nbsp;<span class="required">*</span></th>
+    <td>{%contact_info.email.input%}</td>
+
+    <th>{%lang:address%}:</th>
     <td>{%contact_info.address.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:phone%}:</td>
+    <th>{%lang:phone%}:</th>
     <td>{%contact_info.phone.input%}</td>
-    <td>{%lang:fax%}:</td>
+
+    <th>{%lang:fax%}:</th>
     <td>{%contact_info.fax.input%}</td>
 </tr>
 <tr>
-    <td valign="middle">{%lang:message_text%}:&nbsp;<span class="required">*</span></td>
+    <th valign="middle">{%lang:message_text%}:&nbsp;<span class="required">*</span></th>
     <td colspan="3">{%contact_info.message_text.input%}</td>
 </tr>
 <tr>
@@ -48,4 +51,6 @@ focusFormElement('form', '{%contact_info.first_name.input_name%}');
 {%contact_info.client_validation_js%}
 </script>
 
-{{contact_form/contact_form/_notice}}
+<span class="info">
+    {{contact_form/contact_form/_notice}}
+</span>

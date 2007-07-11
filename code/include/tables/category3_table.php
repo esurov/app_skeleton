@@ -53,12 +53,13 @@ class Category3Table extends OrderedDbObject {
         parent::print_values($params);
 
         if ($this->_context == "list_item_category_browser") {
-            if ($this->id == $this->_custom_params["selected_item_id"]) {
-                $this->app->print_raw_value(
-                    "list_item_class",
-                    "{$params['list_item_class']}_selected"
-                );
-            }
+            $list_item_selected_class = ($this->id == $this->_custom_params["selected_item_id"]) ?
+                " list_item_selected" : 
+                "";
+            $this->app->print_raw_value(
+                "list_item_selected_class", 
+                $list_item_selected_class
+            );
         }
     }
 

@@ -3,22 +3,53 @@
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{%global:lang%}" lang="{%global:lang%}" dir="ltr">
 <head>
+    <title>{%lang:head_page_title.app%} - {%head_page_title%}</title>
+    
     <meta http-equiv="Content-Type" content="text/html; charset={%global:html_charset%}" />
     <meta http-equiv="Page-Exit" content="progid:DXImageTransform.Microsoft.Fade(Duration=0.2)" />
-    <title>{%lang:head_page_title.app%} - {%head_page_title%}</title>
+    <meta http-equiv="imagetoolbar" content="no" />
+
     <link rel="stylesheet" type="text/css" href="css/common.css" />
     <link rel="stylesheet" type="text/css" href="css/user.css" />
+
+    <script type="text/javascript" src="js/minmax.js"></script>
     <script type="text/javascript" src="js/lib.js"></script>
 </head>
 <body>
-{%menu%}{%login_state%}{%page_title%}{%status_messages%}{%body%}
-<hr />
-<p>
-    <a href="http://validator.w3.org/check?uri=referer"
-        ><img src="images/valid-xhtml10.png"
-            alt="Valid XHTML 1.0 Transitional"
-            width="88" height="31"
-            border="0" /></a>
-</p>
+<div id="all">
+
+
+    <div class="header">
+        {%login_state%}
+        {%lang_menu%}
+        <a href="./"><img src="images/logo.gif" alt="{%lang:head_page_title.app%}" title="{%lang:head_page_title.app%}" /></a>
+    </div>
+    {%menu%}
+    
+    <div class="content">
+        {%page_title%}
+        {%status_messages%}
+        {%body%}
+    </div>
+
+
+<div class="footer_empty"></div>
+<div class="footer">
+
+    <p>
+        <a href="http://validator.w3.org/check?uri=referer"
+            ><img src="images/valid-xhtml10.png"
+                alt="Valid XHTML 1.0 Transitional"
+                width="88" height="31"
+                border="0" /></a>
+    </p>
+    <div class="copyright">
+        <div>
+            &copy; <a href="http://logicast.it" title="logicast.it">Logicast</a> 2007
+        </div>
+    </div>
+</div>
+
+</div>
 </body>
 </html>

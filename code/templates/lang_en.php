@@ -99,5 +99,7 @@ return array(
     "lang:no_records_found" => "No records found",
     "lang:no_image" => "No image uploaded",
     "lang:no_file" => "No file uploaded",
+
+    "lang:copyright" => "Copyright", 
 );
 ?>

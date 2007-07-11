@@ -3,7 +3,8 @@
 <input type="hidden" name="action" value="pg_tables_dump_url" />
 <br />
 <h3>Actual tables:</h3>
-<table border="1">
+<table class="table">
+<thead>
 <tr>
     <th>Table name</th>
     <th>
@@ -14,8 +15,10 @@
         >-</a>]
     </th>
 </tr>
-
-{%form_items%}
+</thead>
+<tbody>
+    {%form_items%}
+</tbody>
 
 </table>
 <br />

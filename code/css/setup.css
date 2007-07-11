@@ -1,3 +1,25 @@
 body {
+    margin: 0;
+}
+
+form {
     margin: 10px;
 }
+
+.block {
+    float: left;
+    border: 1px dotted #3f4447;
+    margin-left: 20px;
+}
+
+.important {
+    margin-left: 100px;
+    border: 1px dotted #ef0101;
+}
+
+.header {
+    text-align: center;
+    padding: 10px 0;
+    width: 100%;
+}
+
