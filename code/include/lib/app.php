@@ -2076,12 +2076,12 @@ class App extends AppObject {
         $this->print_status_message($messages);
     }
 
-    function print_status_message_db_object_updated($obj) {
+    function print_status_message_db_object_updated(&$obj) {
         $action_done = ($obj->was_definite()) ? "updated" : "added";
         $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}.{$action_done}"));
     }
         
-    function print_status_message_db_object_deleted($obj) {
+    function print_status_message_db_object_deleted(&$obj) {
         $this->add_session_status_message(new OkStatusMsg("{$obj->_table_name}.deleted"));
     }
 

@@ -107,9 +107,9 @@ class UserApp extends CustomApp {
         return (isset($_COOKIE["user_id"]) && isset($_COOKIE["user_password_hash"]));
     }
 
-    function get_user_role($user = null) {
+    function get_user_role(&$user = null) {
         if (is_null($user)) {
-            $user = $this->user;
+            $user =& $this->user;
         }
         if (
             $user->is_definite() &&
