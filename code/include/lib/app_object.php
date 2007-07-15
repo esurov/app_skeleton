@@ -38,30 +38,41 @@ class AppObject extends Object {
         parent::_init($params);
     }
 //
-    function set_app(&$app) {
+    function set_app() {
+        global $app;
+
         $this->app =& $app;
     }
 //
+    // App objects creation functions
     function &create_object($obj_class_name, $obj_params = array()) {
         return $this->app->create_object($obj_class_name, $obj_params);
     }
 //
+    // Config functions
     function get_config_value($name, $default_value = null) {
-        return $this->app->get_config_value($name, $default_value);
+        return $this->app->config->get_value($name, $default_value);
     }
 //
+    // Language resources functions
+    function get_lang_str($resource, $resource_params = null) {
+        return $this->app->get_lang_str($resource, $resource_params);
+    }
+//
+    // Logger functions
     function get_log_debug_level() {
-        return $this->app->get_log_debug_level();
+        return $this->app->log->get_debug_level();
     }
 
     function write_log($message, $debug_level, $class_name = null) {
-        $this->app->write_log(
+        $this->app->log->write(
+            is_null($class_name) ? $this->get_class_name() : $class_name,
             $message,
-            $debug_level,
-            is_null($class_name) ? $this->get_class_name() : $class_name
+            $debug_level
         );
     }
 //
+    // Error processing functions
     function process_fatal_error($message) {
         $this->write_log("FATAL ERROR: {$message}", DL_FATAL_ERROR);
 
@@ -81,10 +92,6 @@ class AppObject extends Object {
         $this->process_fatal_error(
             "{$message_prefix}Required param '{$param_name}' not found!"
         );
-    }
-//
-    function get_lang_str($resource, $resource_params = null) {
-        return $this->app->get_lang_str($resource, $resource_params);
     }
 
 }

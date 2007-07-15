@@ -6,7 +6,7 @@ class UserApp extends CustomApp {
     var $user;
 
     function UserApp() {
-        parent::CustomApp("UserApp", "user");
+        parent::CustomApp("UserApp", "user_app");
 
         $e = array("roles" => array("guest", "user", "admin"));
         $u = array("roles" => array("user"));

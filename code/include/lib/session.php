@@ -7,23 +7,23 @@ class Session extends AppObject {
 
         ini_set(
             "session.use_trans_sid",
-            $this->get_config_value("php_session_use_trans_sid", 0)
+            $this->get_config_value("php_session.use_trans_sid", 0)
         );
         ini_set(
             "session.use_cookies",
-            $this->get_config_value("php_session_use_cookies", 1)
+            $this->get_config_value("php_session.use_cookies", 1)
         );
         ini_set(
             "session.use_only_cookies",
-            $this->get_config_value("php_session_use_only_cookies", 1)
+            $this->get_config_value("php_session.use_only_cookies", 1)
         );
         ini_set(
             "session.cache_limiter",
-            $this->get_config_value("php_session_cache_limiter", "none")
+            $this->get_config_value("php_session.cache_limiter", "none")
         );
         ini_set(
             "session.gc_maxlifetime",
-            $this->get_config_value("php_session_gc_maxlifetime", 14400)
+            $this->get_config_value("php_session.gc_maxlifetime", 14400)
         );
         session_start();
     }

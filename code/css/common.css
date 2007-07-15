@@ -5,7 +5,6 @@ html, body {
     padding: 0;
 }
 
-
 body, form, input, textarea, select {
     font-size: 11px;
     font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
@@ -283,7 +282,6 @@ ul.menu li.menu_item_delimiter, ul.sub-menu li.sub-menu_item_delimiter, ul.sub-s
     border: 1px solid #ffffff;
 }
 */
-
 
 /* Lang menu */
 .lang_menu {

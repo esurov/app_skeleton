@@ -2,6 +2,9 @@
 
 class _ImageProcessor extends AppObject {
 
+    // Result Image object
+    var $_image;
+
     // Info about actions to be performed with the image
     var $_actions;
 

@@ -41,20 +41,20 @@ class App extends AppObject {
         $this->set_class_name($app_class_name); 
         $this->app_name = $app_name;
 
-        $this->create_core_objects();
-        $this->init_app();
-
         // One action defined, but nobody can access it
         $this->actions = array(
             "pg_index" => array("roles" => array())
         );
-
-        $this->write_log(
-            "App '{$this->app_name}' started",
-            DL_INFO
-        );
     }
 //
+    function init() {
+        $this->set_app();
+        $this->create_core_objects();
+        
+        $this->html_charset = $this->get_config_value("html_charset");
+        $this->init_lang_vars();
+    }
+
     function create_core_objects() {
         $this->create_config();
         $this->create_logger();
@@ -106,12 +106,6 @@ class App extends AppObject {
     function get_page_templates_dir() {
         return "templates";
     }
-//
-    function init_app() {
-        $this->html_charset = $this->get_config_value("html_charset");
-
-        $this->init_lang_vars();
-    }
 
     function init_lang_vars() {
         $this->avail_langs = $this->get_avail_langs();
@@ -135,23 +129,115 @@ class App extends AppObject {
         $this->print_raw_value("global:lang", $this->lang);
     }
 //
-    function get_config_value($name, $default_value = null) {
-        return $this->config->get_value($name, $default_value);
-    }
-//
-    function get_log_debug_level() {
-        return $this->log->get_debug_level();
-    }
+    // App objects creation functions
+    function &create_object($obj_class_name, $obj_params = array()) {
+        global $app_classes;
 
-    function write_log($message, $debug_level, $class_name = null) {
-        $this->log->write(
-            is_null($class_name) ? $this->get_class_name() : $class_name,
-            $message,
-            $debug_level
+        return $this->_create_object(
+            $obj_class_name,
+            "",
+            $app_classes["classes"],
+            $app_classes["class_paths"],
+            $obj_params
         );
     }
+
+    function &create_db_object($obj_class_name, $obj_params = array()) {
+        global $db_classes;
+
+        return $this->_create_object(
+            $obj_class_name,
+            "Table",
+            $db_classes["classes"],
+            $db_classes["class_paths"],
+            $obj_params
+        );
+    }
+
+    function &_create_object(
+        $class_name_without_suffix,
+        $class_name_suffix,
+        $classes_info,
+        $class_paths,
+        $obj_params = array()
+    ) {
+        $class_info = get_param_value($classes_info, $class_name_without_suffix, null);
+        $class_name = "{$class_name_without_suffix}{$class_name_suffix}";
+        $with_suffix_str = ($class_name_suffix == "") ? "" : " with suffix '{$class_name_suffix}'";
+        if (is_null($class_info)) {
+            $this->process_fatal_error(
+                "Cannot find info about class '{$class_name_without_suffix}'{$with_suffix_str}!"
+            );
+        }
+        
+        if (!class_exists($class_name)) {
+            if (!$this->_load_class($class_name_without_suffix, $classes_info, $class_paths)) {
+                $this->process_fatal_error(
+                    "Cannot load class '{$class_name_without_suffix}'{$with_suffix_str}!"
+                );
+            }
+        }
+        
+        $obj =& new $class_name();
+        if (is_subclass_of($obj, "Object")) {
+            $obj->set_class_name($class_name_without_suffix, $class_name_suffix);
+            $init_obj_params = get_param_value($class_info, "params", null);
+            if (!is_null($init_obj_params)) {
+                $obj_params = $init_obj_params + $obj_params;
+            }
+            if (is_subclass_of($obj, "AppObject")) {
+                $obj->set_app();
+            }
+        }
+        if (method_exists($obj, "_init")) {
+            $obj->_init($obj_params);
+        }
+        
+        return $obj;
+    }
+
+    function _load_class(
+        $class_name,
+        $classes_info,
+        $class_paths
+    ) {
+        $class_info = get_param_value($classes_info, $class_name, null);
+        if (is_null($class_info)) {
+            $this->process_fatal_error(
+                "Cannot find info about class '{$class_name}'!"
+            );
+        }
+
+        $required_classes = get_param_value($class_info, "required_classes", array());
+        foreach ($required_classes as $required_class_name) {
+            if (!$this->_load_class(
+                $required_class_name,
+                $classes_info,
+                $class_paths
+            )) {
+                return false;
+            }
+        }
+
+        foreach ($class_paths as $class_dir) {
+            $class_filename = $class_info["filename"];
+            $class_full_filename = "{$class_dir}/{$class_filename}";
+            if (is_file($class_full_filename)) {
+                require_once($class_full_filename);
+                return true;
+            }
+        }
+        
+        return false;
+    }
 //
+    // App main entry point
     function run() {
+        $this->write_log(
+            "App '{$this->app_name}' started",
+            DL_INFO
+        );
+
         // Create user used to run allowed actions only
         $this->create_current_user();
 
@@ -2375,110 +2461,82 @@ class App extends AppObject {
         }
         return $stream;
     }
+//
+    function process_create_update_tables($fake_run, &$run_info) {
+        if ($fake_run) {
+            $run_info = array(
+                "table_names_to_create" => array(),
+                "create_table_queries" => array(),
+                "table_names_to_update" => array(),
+                "update_table_queries" => array(),
+                "table_names_to_drop" => array(),
+                "drop_table_queries" => array(),
+            );
+        }
 
-    // App objects creation functions
-    function &create_object($obj_class_name, $obj_params = array()) {
-        global $app_classes;
+        $actual_table_names = $this->db->get_actual_table_names(false, false);
 
-        return $this->_create_object(
-            $obj_class_name,
-            "",
-            $app_classes["classes"],
-            $app_classes["class_paths"],
-            $obj_params
-        );
+        $all_creatable_db_objects_info = $this->get_all_creatable_db_objects_info();
+        $all_table_names_to_create = array_keys($all_creatable_db_objects_info);
+
+        $table_names_to_create = array_diff($all_table_names_to_create, $actual_table_names);
+        $table_names_to_update = array_intersect($all_table_names_to_create, $actual_table_names);
+        $table_names_to_drop = array_diff($actual_table_names, $all_table_names_to_create);
+
+        foreach ($table_names_to_create as $table_name) {
+            $obj =& $this->create_db_object($all_creatable_db_objects_info[$table_name]);
+            $obj->create_table($fake_run, $run_info);
+        }
+
+        foreach ($table_names_to_update as $table_name) {
+            $obj =& $this->create_db_object($all_creatable_db_objects_info[$table_name]);
+            $obj->update_table($fake_run, $run_info);
+        }
+
+        $this->process_delete_tables($table_names_to_drop, $fake_run, $run_info);
     }
 
-    function &create_db_object($obj_class_name, $obj_params = array()) {
+    function process_delete_tables($table_names_to_drop, $fake_run, &$run_info) {
+        if (is_null($table_names_to_drop)) {
+            $table_names_to_drop = $this->db->get_actual_table_names(false, false);
+        }
+        foreach ($table_names_to_drop as $table_name) {
+            $drop_table_query = $this->db->get_drop_table_query($table_name);
+            if ($fake_run) {
+                $run_info["table_names_to_drop"][] = $table_name;
+                $run_info["drop_table_queries"][$table_name] =
+                    $this->db->subst_table_prefix($drop_table_query);
+            } else {
+                $this->db->run_query($drop_table_query);
+            }
+        }
+    }
+
+    function get_all_creatable_db_objects_info() {
         global $db_classes;
 
-        return $this->_create_object(
-            $obj_class_name,
-            "Table",
-            $db_classes["classes"],
-            $db_classes["class_paths"],
-            $obj_params
-        );
+        $db_objects_info = array();
+        foreach ($db_classes["classes"] as $obj_class_name => $obj_class_info) {
+            $obj_class_params = get_param_value($obj_class_info, "params", null);
+            if (is_null($obj_class_params)) {
+                continue;
+            }
+            $should_create = get_param_value($obj_class_params, "create", null);
+            if (is_null($should_create) || !$should_create) {
+                continue;
+            }
+            $obj_table_name = get_param_value($obj_class_params, "table_name", null);
+            if (is_null($obj_table_name)) {
+                continue;
+            }
+            $db_objects_info[$obj_table_name] = $obj_class_name;
+        }
+        return $db_objects_info;
     }
-
-    function &_create_object(
-        $class_name_without_suffix,
-        $class_name_suffix,
-        $classes_info,
-        $class_paths,
-        $obj_params = array()
-    ) {
-        $class_info = get_param_value($classes_info, $class_name_without_suffix, null);
-        $class_name = "{$class_name_without_suffix}{$class_name_suffix}";
-        $with_suffix_str = ($class_name_suffix == "") ? "" : " with suffix '{$class_name_suffix}'";
-        if (is_null($class_info)) {
-            $this->process_fatal_error(
-                "Cannot find info about class '{$class_name_without_suffix}'{$with_suffix_str}!"
-            );
-        }
-        
-        if (!class_exists($class_name)) {
-            if (!$this->_load_class($class_name_without_suffix, $classes_info, $class_paths)) {
-                $this->process_fatal_error(
-                    "Cannot load class '{$class_name_without_suffix}'{$with_suffix_str}!"
-                );
-            }
-        }
-        
-        $obj =& new $class_name();
-        if (is_subclass_of($obj, "Object")) {
-            $obj->set_class_name($class_name_without_suffix, $class_name_suffix);
-            $init_obj_params = get_param_value($class_info, "params", null);
-            if (!is_null($init_obj_params)) {
-                $obj_params = $init_obj_params + $obj_params;
-            }
-            if (is_subclass_of($obj, "AppObject")) {
-                $obj->set_app($this);
-            }
-        }
-        if (method_exists($obj, "_init")) {
-            $obj->_init($obj_params);
-        }
-        
-        return $obj;
-    }
-
-    function _load_class(
-        $class_name,
-        $classes_info,
-        $class_paths
-    ) {
-        $class_info = get_param_value($classes_info, $class_name, null);
-        if (is_null($class_info)) {
-            $this->process_fatal_error(
-                "Cannot find info about class '{$class_name}'!"
-            );
-        }
-
-        $required_classes = get_param_value($class_info, "required_classes", array());
-        foreach ($required_classes as $required_class_name) {
-            if (!$this->_load_class(
-                $required_class_name,
-                $classes_info,
-                $class_paths
-            )) {
-                return false;
-            }
-        }
-
-        foreach ($class_paths as $class_dir) {
-            $class_filename = $class_info["filename"];
-            $class_full_filename = "{$class_dir}/{$class_filename}";
-            if (is_file($class_full_filename)) {
-                require_once($class_full_filename);
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
+//
     // Action helper functions
+    
+    // Create new object and fetch its values from db table by id
     function &fetch_db_object(
         $obj,
         $obj_id,
@@ -2556,79 +2614,7 @@ class App extends AppObject {
         }
         return $rows;
     }
-//
-    function process_create_update_tables($fake_run, &$run_info) {
-        if ($fake_run) {
-            $run_info = array(
-                "table_names_to_create" => array(),
-                "create_table_queries" => array(),
-                "table_names_to_update" => array(),
-                "update_table_queries" => array(),
-                "table_names_to_drop" => array(),
-                "drop_table_queries" => array(),
-            );
-        }
-
-        $actual_table_names = $this->db->get_actual_table_names(false, false);
-
-        $all_creatable_db_objects_info = $this->get_all_creatable_db_objects_info();
-        $all_table_names_to_create = array_keys($all_creatable_db_objects_info);
-
-        $table_names_to_create = array_diff($all_table_names_to_create, $actual_table_names);
-        $table_names_to_update = array_intersect($all_table_names_to_create, $actual_table_names);
-        $table_names_to_drop = array_diff($actual_table_names, $all_table_names_to_create);
-
-        foreach ($table_names_to_create as $table_name) {
-            $obj =& $this->create_db_object($all_creatable_db_objects_info[$table_name]);
-            $obj->create_table($fake_run, $run_info);
-        }
-
-        foreach ($table_names_to_update as $table_name) {
-            $obj =& $this->create_db_object($all_creatable_db_objects_info[$table_name]);
-            $obj->update_table($fake_run, $run_info);
-        }
-
-        $this->process_delete_tables($table_names_to_drop, $fake_run, $run_info);
-    }
-
-    function process_delete_tables($table_names_to_drop, $fake_run, &$run_info) {
-        if (is_null($table_names_to_drop)) {
-            $table_names_to_drop = $this->db->get_actual_table_names(false, false);
-        }
-        foreach ($table_names_to_drop as $table_name) {
-            $drop_table_query = $this->db->get_drop_table_query($table_name);
-            if ($fake_run) {
-                $run_info["table_names_to_drop"][] = $table_name;
-                $run_info["drop_table_queries"][$table_name] =
-                    $this->db->subst_table_prefix($drop_table_query);
-            } else {
-                $this->db->run_query($drop_table_query);
-            }
-        }
-    }
-
-    function get_all_creatable_db_objects_info() {
-        global $db_classes;
-
-        $db_objects_info = array();
-        foreach ($db_classes["classes"] as $obj_class_name => $obj_class_info) {
-            $obj_class_params = get_param_value($obj_class_info, "params", null);
-            if (is_null($obj_class_params)) {
-                continue;
-            }
-            $should_create = get_param_value($obj_class_params, "create", null);
-            if (is_null($should_create) || !$should_create) {
-                continue;
-            }
-            $obj_table_name = get_param_value($obj_class_params, "table_name", null);
-            if (is_null($obj_table_name)) {
-                continue;
-            }
-            $db_objects_info[$obj_table_name] = $obj_class_name;
-        }
-        return $db_objects_info;
-    }
-//
+//    
     function delete_db_object($params = array()) {
         $obj = get_param_value($params, "obj", null);
         if (is_null($obj)) {
@@ -2678,36 +2664,6 @@ class App extends AppObject {
         }
     }
 //
-    function print_db_object_info(
-        &$obj,
-        $templates_dir,
-        $template_var,
-        $obj_info_template_name,
-        $obj_info_empty_template_name = null,
-        $params = array()
-    ) {
-        $obj->print_values($params);
-        $template_name = ($obj->is_definite() || is_null($obj_info_empty_template_name)) ?
-            $obj_info_template_name :
-            $obj_info_empty_template_name;
-        return $this->print_file_new_if_exists("{$templates_dir}/{$template_name}", $template_var);
-    }
-
-    function print_db_object_subform(
-        &$obj,
-        $templates_dir,
-        $template_var,
-        $obj_subform_template_name,
-        $obj_empty_template_name = null,
-        $params = array()
-    ) {
-        $obj->print_form_values($params);
-        $template_name = ($obj->is_definite() || is_null($obj_subform_empty_template_name)) ?
-            $obj_subform_template_name :
-            $obj_subform_empty_template_name;
-        return $this->print_file_new_if_exists("{$templates_dir}/{$template_name}", $template_var);
-    }
-
     // Uploaded image
     function &fetch_image($image_id) {
         return $this->fetch_db_object("Image", $image_id);
@@ -2835,6 +2791,40 @@ class App extends AppObject {
 
             $obj->update();
         }
+    }
+//
+    // Print DbObject values, wrap with appropriate
+    // info template file and put result to template var
+    function print_db_object_info(
+        &$obj,
+        $templates_dir,
+        $template_var,
+        $obj_info_template_name,
+        $obj_info_empty_template_name = null,
+        $params = array()
+    ) {
+        $obj->print_values($params);
+        $template_name = ($obj->is_definite() || is_null($obj_info_empty_template_name)) ?
+            $obj_info_template_name :
+            $obj_info_empty_template_name;
+        return $this->print_file_new_if_exists("{$templates_dir}/{$template_name}", $template_var);
+    }
+
+    // Print DbObject form values, wrap with appropriate
+    // subform template file and put result to template var
+    function print_db_object_subform(
+        &$obj,
+        $templates_dir,
+        $template_var,
+        $obj_subform_template_name,
+        $obj_empty_template_name = null,
+        $params = array()
+    ) {
+        $obj->print_form_values($params);
+        $template_name = ($obj->is_definite() || is_null($obj_subform_empty_template_name)) ?
+            $obj_subform_template_name :
+            $obj_subform_empty_template_name;
+        return $this->print_file_new_if_exists("{$templates_dir}/{$template_name}", $template_var);
     }
 //
     // Email sender

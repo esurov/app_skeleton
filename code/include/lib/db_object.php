@@ -44,8 +44,8 @@ class DbObject extends AppObject {
         $this->_filters = array();
     }
 //
-    function set_app(&$app) {
-        parent::set_app($app);
+    function set_app() {
+        parent::set_app();
 
         $this->db =& $this->app->db;
     }

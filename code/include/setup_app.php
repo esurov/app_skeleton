@@ -3,7 +3,7 @@
 class SetupApp extends CustomApp {
 
     function SetupApp() {
-        parent::CustomApp("SetupApp", "setup");
+        parent::CustomApp("SetupApp", "setup_app");
 
         $this->set_current_lang($this->dlang);
 
