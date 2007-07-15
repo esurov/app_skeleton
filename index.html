@@ -44,43 +44,86 @@
 
 <h3>HEAD</h3>
 <ul>
-    <li>Components added</li>
+    <li>Dynamic loading classes and components added.</li>
+    <li>Image processing is reimplemented in ImageProcessor component.</li>
+    <li>Added initial application with users, news, categories, products
+        as example of classes usage for application development.</li>
+    <li>Added 'Remember me' feature to user login form.</li>
+    <li>Added 'like_many' filter type.</li>
+    <li>Reading typed CGI values code moved from DbObject to App.</li>
+    <li>DbObject::read() log output is much more verbose now.</li>
+    <li>DbObject::read() and DbObject::update() optimized,
+        DbObject remembers its original/initial values.</li>
+    <li>Added contexts to DbObject's read(), save(), store(), update().</li>
+    <li>Logger debug_level is constant-based now, available values:
+        DL_FATAL_ERROR, DL_ERROR, DL_WARNING, DL_INFO, DL_DEBUG, DL_EXTRA_DEBUG.</li>
+    <li>SelectQuery log output is greatly enhanced.</li>
+    <li>Added App::fetch_rows_list() for speed optimization.</li>
+    <li>Action naming convention changed:
+        pg_view_news_articles -&gt; pg_news_articles,
+        pg_edit_news_article -&gt; pg_news_article_edit.</li>
+    <li>Action functions naming convention changed: now using prefix 'action_'.</li>
+    <li>Added inheritance support to DbObject.</li>
+    <li>DbObject-derived classes have 'Table' suffix.</li>
+    <li>Added OrderedDbObject for tables with strict ordering.</li>
+    <li>Added ImageTable is derived from FileTable now.</li>
+    <li>Converted language resources from txt to php.</li>
+    <li>Added support for per-template language resources.</li>
+    <li>Language resources have prefix 'lang:' in templates.</li>
+    <li>Global template variables have prefix 'global:'.</li>
+    <li>Changed delimiter in config, language resources and templates from '_' to '.'.</li>
+    <li>Made possible to use custom prefixes in template variables.</li>
+    <li>Now param() returns null if array was passed to CGI,
+        param_array() should be used to get that array.</li>
+    <li>Added 'Create/Update SQL script' preview before execution in SetupApp.</li>
+    <li>Changed way of forms posting: single action processes different 'command'
+        instead of different actions for each command
+        (view, edit, update, delete, delete_image).</li>
+    <li>POST parameters are accessed first before GET parameters now by param().</li>
+    <li>Added App::create_self_action_redirect_response().</li>
+    <li>Template parser speed improved.</li>
+    <li>Templates directory structure reorganization.</li>
+    <li>New templates layout (XHTML/CSS).</li>
+    <li>Now runs on php5 with php4 compatibility mode turned on.</li>
+    <li>Added initial web_install script configs (release, test).</li>
+    <li>Library improvements/bugfixes/refactoring.</li>
 </ul>
 
 <h3>app_skeleton-2-3</h3>
 <ul>
-    <li>Added n-level menu xml class</li>
-    <li>Enhancements</li>
-    <li>Bugfixes</li>
+    <li>Added n-level menu xml class.</li>
+    <li>Enhancements.</li>
+    <li>Bugfixes.</li>
 </ul>
 
 <h3>app_skeleton-2-2</h3>
 <ul>
-    <li>Values printing moved from DbObject to App</li>
-    <li>Client-side validations added</li>
-    <li>MySQL tables dump download added to Setup area</li>
-    <li>Library improvements/bugfixes/refactoring</li>
+    <li>Values printing moved from DbObject to App.</li>
+    <li>Client-side validations added.</li>
+    <li>MySQL tables dump download added to Setup area.</li>
+    <li>Library improvements/bugfixes/refactoring.</li>
 </ul>
 
 <h3>app_skeleton-2-1</h3>
 <ul>
-    <li>Library improvements/redesign</li>
-    <li>Default encoding for application and database is UTF-8 now</li>
+    <li>Library improvements/redesign.</li>
+    <li>Default encoding for application and database is UTF-8 now.</li>
 </ul>
 
 <h3>app_skeleton-2-0</h3>
 <ul>
-    <li>Library improvements/redesign</li>
+    <li>Library improvements/redesign.</li>
 </ul>
 
 <h3>app_skeleton-1-1</h3>
 <ul>
-    <li>Improvements</li>
+    <li>Improvements.</li>
 </ul>
 
 <h3>app_skeleton-1-0</h3>
 <ul>
-    <li>Initial release of app_skeleton with imported library PHPLib-1</li>
+    <li>Initial release of app_skeleton with imported library PHPLib-1.</li>
 </ul>
+
 </body>
 </html>
