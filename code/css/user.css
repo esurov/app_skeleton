@@ -21,7 +21,6 @@
 
 .copyright {
     background: #dcdcdc;
-    border-top: 1px solid #ffffff;
     height: 48px;
     width: 100%;
     padding-top: 20px;
@@ -76,4 +75,9 @@
 
 .hint {
     font-size: 80%;
+}
+
+/* Category browser */
+.category_browser td, .category_browser th{
+    border: 1px dotted #7d878d;
 }

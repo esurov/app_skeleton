@@ -19,12 +19,9 @@ body {
 
 body.popup {
     height: auto;
-    margin: 50px;
-    min-width: 500px;
-}
-
-.popup .content {
-    min-width: 400px;
+    padding: 20px;
+    min-width: 300px;
+    text-align: left;
 }
 
 #all {
@@ -84,8 +81,17 @@ form table td {
     padding-left: 30px;
 }
 
-table.table tbody tr td, table.table thead tr th {
+table.table tr th {
+    text-align: center;
+}
+
+form table th {
+    text-align: left;
+}
+
+table.table td, table.table th {
     border: 1px solid #3f4447;
+    vertical-align: middle;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -139,25 +145,21 @@ a img {
 
 /* Status messages */
 .status_messages {
-    padding: 5px;
     font-size: 12px;
     font-weight: bold;
     background: #bfc3c7;
     margin: 10px auto;
+    padding: 2px;
+
 }
 
 .status_messages div {
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.status_messages div div {
-    margin: 0;
-    vertical-align: top;
+    margin: 5px auto 5px auto;
 }
 
 .status_messages div img {
     margin-right: 20px;
+    vertical-align: middle;
 }
 
 .err {
@@ -315,11 +317,15 @@ td .toolbar, th .toolbar {
     margin: 10px auto 20px auto;
     padding-top: 10px;
     color: #005588;
-    font-size: 80%;
+    font-size: 10px;
     text-align: left;
     border-top: 1px solid #b0b3b7;
 }
 
 .navigation {
     margin: 20px auto;
+}
+
+small {
+    font-size: 10px;
 }
