@@ -287,13 +287,6 @@ class SampleTable extends CustomDbObject {
             "field_sql_alias" => "field_varchar_alias",
         ));
 
-        // Field 'field_text' from self-joined aliased table
-        // Note: Calculated fields cannot be got this way when 'table_sql_alias' specified
-        $this->insert_field(array(
-            "table_sql_alias" => "{$this->_table_name}_alias",
-            "field" => "field_text",
-        ));
-
         // Alias field name 'field_text_alias' for the field 'field_text' from self-joined table
         // Note: Calculated fields cannot be got this way when 'table_sql_alias' specified
         $this->insert_field(array(

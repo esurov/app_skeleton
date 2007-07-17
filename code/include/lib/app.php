@@ -2551,8 +2551,9 @@ class App extends AppObject {
             $obj =& $this->create_db_object($obj);
         }
         if ($obj_id != 0) {
+            $obj_id_name = $obj->get_primary_key_name();
             $obj->fetch(
-                "{$obj->_table_name}.id = {$obj_id} AND {$where_str}",
+                "{$obj->_table_name}.{$obj_id_name} = {$obj_id} AND {$where_str}",
                 $field_names_to_select,
                 $field_names_to_not_select
             );

@@ -320,6 +320,9 @@ class DbObject extends AppObject {
                 if (is_null($table_name_sql_alias)) {
                     $table_name_sql_alias = $this->_table_name;
                 }
+                if (is_null($field_name_sql_alias)) {
+                    $field_name_sql_alias = $field_name;
+                }
                 $field_select_expression = $this->create_field_select_expression(
                     $table_name_sql_alias,
                     $field_name,
@@ -327,10 +330,6 @@ class DbObject extends AppObject {
                 );
                 $field_info["multilingual"] = 0;
                 $field_info["multilingual_child"] = 0;
-                
-                $field_name_sql_alias = (is_null($field_name_sql_alias)) ?
-                    "{$table_name_sql_alias}_{$field_name}" :
-                    "{$table_name_sql_alias}_{$field_name_sql_alias}";
                 $default_create = 0;
             }
             $multilingual = get_param_value($field_info, "multilingual", 0);
