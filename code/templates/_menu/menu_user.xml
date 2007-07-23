@@ -10,11 +10,11 @@
     <menu_item
         name="index"
         url="?"
-        contexts="pg_index"
+        contexts="index"
     />
     <menu_item
         name="user"
-        url="?action=pg_user_view"
-        contexts="pg_user_view, pg_user_edit"
+        url="?action=user_view"
+        contexts="user_view, user_edit"
     />
 </menu>

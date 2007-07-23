@@ -1,10 +1,10 @@
 <div class="block">
-    <form action="?action=pg_create_update_tables" method="post" onsubmit="onsubmitFormHandler(this);">
+    <form action="?action=create_update_tables" method="post" onsubmit="onsubmitFormHandler(this);">
         <input type="submit" name="submit_btn" value="Create/Update MySQL tables &gt;&gt;&gt;" />
     </form>
 
     <form action="?" method="get" onsubmit="onsubmitFormHandler(this);">
-        <input type="hidden" name="action" value="pg_tables_dump" />
+        <input type="hidden" name="action" value="tables_dump" />
         <input type="submit" name="submit_btn" value="Dump MySQL tables &gt;&gt;&gt;" />
     </form>
 </div>

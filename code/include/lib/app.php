@@ -43,7 +43,7 @@ class App extends AppObject {
 
         // One action defined, but nobody can access it
         $this->actions = array(
-            "pg_index" => array("roles" => array())
+            "index" => array("roles" => array())
         );
     }
 //
@@ -307,12 +307,12 @@ class App extends AppObject {
     }
 
     function get_default_action_name($user = null) {
-        return "pg_index";
+        return "index";
     }
 
     function get_action_lang_resource() {
         $resource = $this->action;
-        if ($this->action == "pg_static") {
+        if ($this->action == "static") {
             $page_name = $this->read_static_page_name();
             if ($page_name != "") {
                 $resource = "{$this->action}.{$page_name}";
@@ -425,7 +425,7 @@ class App extends AppObject {
         $self_action_suburl_params = array();
         if ($this->action != $this->get_default_action_name()) {
             $self_action_suburl_params["action"] = $this->action;
-            if ($this->action == "pg_static") {
+            if ($this->action == "static") {
                 $self_action_suburl_params["page"] = $this->read_static_page_name();
             }
         }
@@ -2254,7 +2254,7 @@ class App extends AppObject {
         $this->create_redirect_response((string) param("redirect_url"));
     }
 //
-    function action_pg_static() {
+    function action_static() {
         $page_name = $this->read_static_page_name();
         if ($page_name != "") {
             $this->print_static_page($page_name, "body");
@@ -2328,41 +2328,43 @@ class App extends AppObject {
     }
 //
     // Setup app actions
-    function action_pg_create_update_tables() {
-        $this->process_create_update_tables(true, $run_info);
-
-        $this->print_varchar_value("db_name", $this->db->get_database());
-
-        $draw_delimiter = false;
-        $sql_script_text = "";
-        $table_types = array("create", "update", "drop");
-        foreach ($table_types as $table_type) {
-            $table_names = $run_info["table_names_to_{$table_type}"];
-            $this->print_varchar_value(
-                "table_names_to_{$table_type}",
-                (count($table_names) == 0) ?
-                    $this->get_lang_str("nothing_to_{$table_type}") :
-                    join(", ", $table_names)
-            );
-
-            foreach ($run_info["{$table_type}_table_queries"] as $query) {
-                if ($draw_delimiter) {
-                    $sql_script_text .= str_repeat("-", 80) . "\n";
-                }
-                $sql_script_text .= "  {$query}\n";
-                $draw_delimiter = true;
-            }
-        }
-        $this->print_varchar_value("sql_script_text", $sql_script_text);
-        $this->print_file("tables_create_update/body.html", "body");
-    }
-
     function action_create_update_tables() {
-        $this->process_create_update_tables(false, $run_info);
-        
-        $this->add_session_status_message(new OkStatusMsg("tables_updated"));
-        
-        $this->create_self_redirect_response();
+        $command = (string) param("command");
+
+        if ($command != "create_update") {
+            $this->process_create_update_tables(true, $run_info);
+
+            $this->print_varchar_value("db_name", $this->db->get_database());
+
+            $draw_delimiter = false;
+            $sql_script_text = "";
+            $table_types = array("create", "update", "drop");
+            foreach ($table_types as $table_type) {
+                $table_names = $run_info["table_names_to_{$table_type}"];
+                $this->print_varchar_value(
+                    "table_names_to_{$table_type}",
+                    (count($table_names) == 0) ?
+                        $this->get_lang_str("nothing_to_{$table_type}") :
+                        join(", ", $table_names)
+                );
+
+                foreach ($run_info["{$table_type}_table_queries"] as $query) {
+                    if ($draw_delimiter) {
+                        $sql_script_text .= str_repeat("-", 80) . "\n";
+                    }
+                    $sql_script_text .= "  {$query}\n";
+                    $draw_delimiter = true;
+                }
+            }
+            $this->print_varchar_value("sql_script_text", $sql_script_text);
+            $this->print_file("tables_create_update/body.html", "body");
+        } else {
+            $this->process_create_update_tables(false, $run_info);
+            
+            $this->add_session_status_message(new OkStatusMsg("tables_updated"));
+            
+            $this->create_self_redirect_response();
+        }
     }
 
     function action_delete_tables() {
@@ -2373,7 +2375,7 @@ class App extends AppObject {
         $this->create_self_redirect_response();
     }
 //
-    function action_pg_tables_dump() {
+    function action_tables_dump() {
         $actual_table_names = $this->db->get_actual_table_names(true, false);
         foreach ($actual_table_names as $actual_table_name) {
             $this->print_varchar_value("table_name", $actual_table_name);
@@ -2382,14 +2384,14 @@ class App extends AppObject {
         $this->print_file("tables_dump/tables_list/form.html", "body");
     }
 
-    function action_pg_tables_dump_url() {
+    function action_tables_dump_url() {
         $table_names = param_array("table_names");
         $table_names_str = join(" ", $table_names);
         
         $this->print_value("table_names_str", $table_names_str);
 
         $url = create_self_full_url(array(
-            "action" => "pg_tables_dump_view",
+            "action" => "tables_dump_view",
             "table_names" => $table_names_str,
         ));
         $this->print_value("view_dump_url", $url);
@@ -2403,10 +2405,10 @@ class App extends AppObject {
         $this->print_file("tables_dump/url/body.html", "body");
     }
 
-    function action_pg_tables_dump_view() {
+    function action_tables_dump_view() {
         $stream = $this->_create_tables_dump_stream(param("table_names"), false);
         if ($stream === false) {
-            $this->create_self_redirect_response(array("action" => "pg_tables_dump"));
+            $this->create_self_redirect_response(array("action" => "tables_dump"));
         } else {
             $dump_text = stream_get_contents($stream);
             pclose($stream);
@@ -2423,7 +2425,7 @@ class App extends AppObject {
     function action_download_tables_dump() {
         $stream = $this->_create_tables_dump_stream(param("table_names"), true);
         if ($stream === false) {
-            $this->create_self_redirect_response(array("action" => "pg_tables_dump"));
+            $this->create_self_redirect_response(array("action" => "tables_dump"));
         } else {
             $now_date_str = $this->get_db_now_date();
             $this->create_binary_stream_response(

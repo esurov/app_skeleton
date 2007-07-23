@@ -9,9 +9,9 @@
     <td>{%user.is_active%}</td>
     <td>
         [<a
-            href="?action=pg_user_edit&amp;user_id={%user.id%}"
+            href="?action=user_edit&amp;user_id={%user.id%}"
         >{%global:edit%}</a>]&nbsp;[<a
-            href="?action=pg_user_edit&amp;user_id={%user.id%}&amp;command=delete"
+            href="?action=user_edit&amp;user_id={%user.id%}&amp;command=delete"
             onclick="return confirm('{%global:sure_delete%}')"
         >{%global:delete%}</a>]
     </td>

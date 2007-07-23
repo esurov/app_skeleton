@@ -12,26 +12,26 @@
     <menu_item
         name="index"
         url="./"
-        contexts="pg_index"
+        contexts="index"
     />
     <menu_item
         name="users"
-        url="?action=pg_users"
-        contexts="pg_users, pg_user_edit"
+        url="?action=users"
+        contexts="users, user_edit"
     />
     <menu_item
         name="news"
-        url="?action=pg_news_articles"
-        contexts="pg_news_articles, pg_news_article_edit"
+        url="?action=news_articles"
+        contexts="news_articles, news_article_edit"
     />
     <menu_item
         name="categories"
-        url="?action=pg_categories"
-        contexts="pg_categories"
+        url="?action=categories"
+        contexts="categories"
     />
     <menu_item
         name="products"
-        url="?action=pg_products"
-        contexts="pg_products, pg_product_edit"
+        url="?action=products"
+        contexts="products, product_edit"
     />
 </menu>

@@ -1,4 +1,4 @@
-<form action="?action=pg_login" method="post" name="form">
+<form action="?action=login" method="post" name="form">
 <input type="hidden" name="command" value="login" />
 
 <table>
@@ -24,9 +24,9 @@
 </form>
 
 <ul>
-    <li>{%local:dont_have_account%} <a href="?action=pg_signup"
+    <li>{%local:dont_have_account%} <a href="?action=signup"
         >{%local:please_signup%}</a></li>
-    <li>{%local:did_forget_password%} <a href="?action=pg_recover_password"
+    <li>{%local:did_forget_password%} <a href="?action=recover_password"
         >{%local:recover_password%}</a></li>
 </ul>
 

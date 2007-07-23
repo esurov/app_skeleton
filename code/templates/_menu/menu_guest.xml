@@ -25,21 +25,21 @@
     <menu_item
         name="index"
         url="./"
-        contexts="pg_index"
+        contexts="index"
     />
     <menu_item
         name="news"
-        url="?action=pg_news_articles"
-        contexts="pg_news_articles, pg_news_article_view"
+        url="?action=news_articles"
+        contexts="news_articles, news_article_view"
     />
     <menu_item
         name="contact_form"
-        url="?action=pg_contact_form"
-        contexts="pg_contact_form"
+        url="?action=contact_form"
+        contexts="contact_form"
     />
     <menu_item
         name="sample_static_pages"
-        url="?action=pg_static&amp;page=sample_page1"
+        url="?action=static&amp;page=sample_page1"
     >
         <menu
             name="guest_sub_menu"
@@ -51,26 +51,26 @@
         >
             <menu_item
                 name="sample_static_page1"
-                url="?action=pg_static&amp;page=sample_page1"
-                contexts="pg_static.sample_page1"
+                url="?action=static&amp;page=sample_page1"
+                contexts="static.sample_page1"
             />
             <menu_item
                 name="sample_static_page2"
-                url="?action=pg_static&amp;page=sample_page2"
-                contexts="pg_static.sample_page2"
+                url="?action=static&amp;page=sample_page2"
+                contexts="static.sample_page2"
             />
             <menu_item
                 name="sample_popup"
-                url="javascript:void(openPopupWindow('?action=pg_static&amp;page=sample_page1', 600, 500, 'yes', ''));"
+                url="javascript:void(openPopupWindow('?action=static&amp;page=sample_page1', 600, 500, 'yes', ''));"
             />
             <menu_item
                 name="sample_new_window"
                 item_template="sub_menu_item_sample_new_window.html"
-                url="?action=pg_static&amp;page=sample_page1"
+                url="?action=static&amp;page=sample_page1"
             />
             <menu_item
                 name="sample_static_pages2"
-                url="?action=pg_static&amp;page=sample_page2_1"
+                url="?action=static&amp;page=sample_page2_1"
             >
                 <menu
                     name="guest_sub_sub_menu"
@@ -82,13 +82,13 @@
                 >
                     <menu_item
                         name="sample_static_page2_1"
-                        url="?action=pg_static&amp;page=sample_page2_1"
-                        contexts="pg_static.sample_page2_1"
+                        url="?action=static&amp;page=sample_page2_1"
+                        contexts="static.sample_page2_1"
                     />
                     <menu_item
                         name="sample_static_page2_2"
-                        url="?action=pg_static&amp;page=sample_page2_2"
-                        contexts="pg_static.sample_page2_2"
+                        url="?action=static&amp;page=sample_page2_2"
+                        contexts="static.sample_page2_2"
                     />
                 </menu>
             </menu_item>
@@ -96,7 +96,7 @@
     </menu_item>
     <menu_item
         name="signup"
-        url="?action=pg_signup"
-        contexts="pg_signup"
+        url="?action=signup"
+        contexts="signup"
     />
 </menu>

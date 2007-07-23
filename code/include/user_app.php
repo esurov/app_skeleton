@@ -16,43 +16,45 @@ class UserApp extends CustomApp {
         $this->actions = array(
             // Common
             "change_lang" => $e,
-            "pg_static" => $e,
+            "static" => $e,
             "get_image" => $e,
             "get_file" => $e,
 
             // Index and Home pages
-            "pg_index" => $e,
-            "pg_home" => $u_a,
+            "index" => $e,
+            "home" => $u_a,
+            "user_home" => $u,
+            "admin_home" => $a,
 
             // Login/Signup/Confirm/RecoverPassword
-            "pg_login" => $e,
+            "login" => $e,
             "logout" => $e,
-            "pg_signup" => $e,
+            "signup" => $e,
             "confirm_signup" => $e,
-            "pg_recover_password" => $e,
+            "recover_password" => $e,
 
             // Contact form
-            "pg_contact_form" => $e,
+            "contact_form" => $e,
 
             // Users management
-            "pg_users" => $a,
-            "pg_user_view" => $u_a,
-            "pg_user_edit" => $u_a,
+            "users" => $a,
+            "user_view" => $u_a,
+            "user_edit" => $u_a,
 
             // News articles
-            "pg_news_articles" => $e,
-            "pg_news_article_view" => $e,
-            "pg_news_article_edit" => $a,
+            "news_articles" => $e,
+            "news_article_view" => $e,
+            "news_article_edit" => $a,
 
             // Categories management
-            "pg_categories" => $a,
-            "pg_category1_edit" => $a,
-            "pg_category2_edit" => $a,
-            "pg_category3_edit" => $a,
+            "categories" => $a,
+            "category1_edit" => $a,
+            "category2_edit" => $a,
+            "category3_edit" => $a,
 
             // Products management
-            "pg_products" => $a,
-            "pg_product_edit" => $a,
+            "products" => $a,
+            "product_edit" => $a,
         );
     }
 //
@@ -145,11 +147,11 @@ class UserApp extends CustomApp {
     function run_access_denied_action() {
         $this->session->save_request_params();
 
-        if ($this->action != "pg_home") {
+        if ($this->action != "home") {
             $this->add_session_status_message(new ErrorStatusMsg("resource_access_denied"));
         }
         
-        $this->create_self_redirect_response(array("action" => "pg_login"));
+        $this->create_self_redirect_response(array("action" => "login"));
     }
 
     function print_menu($params = array()) {
@@ -223,7 +225,7 @@ class UserApp extends CustomApp {
         $this->add_current_lang_cookie();
     }
 //
-    function action_pg_index() {
+    function action_index() {
         $templates_dir = "index";
 
         $news_article =& $this->create_db_object("NewsArticle");
@@ -246,25 +248,25 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 //
-    function action_pg_home() {
+    function action_home() {
         $user_role = $this->get_user_role();
         switch ($user_role) {
         case "user":
         case "admin":
-            $this->{"pg_{$user_role}_home_page"}();
+            $this->create_self_redirect_response(array("action" => "{$user_role}_home"));
             break;
         }
     }
 
-    function pg_user_home_page() {
-        $this->create_self_redirect_response(array("action" => "pg_user_view"));
+    function action_user_home() {
+        $this->create_self_redirect_response(array("action" => "user_view"));
     }
 
-    function pg_admin_home_page() {
-        $this->create_self_redirect_response(array("action" => "pg_users"));
+    function action_admin_home() {
+        $this->create_self_redirect_response(array("action" => "users"));
     }
 //
-    function action_pg_login() {
+    function action_login() {
         $templates_dir = "login";
 
         $user =& $this->create_db_object("User");
@@ -279,11 +281,10 @@ class UserApp extends CustomApp {
             if ($this->was_user_remembered()) {
                 $user->should_remember = 1;
             }
-            $user->password = "";
 
             if ($command == "login") {
                 $user->read($context);
-                
+
                 $should_remember = $user->should_remember;
 
                 $messages = $user->validate($context);
@@ -300,10 +301,14 @@ class UserApp extends CustomApp {
                 }
                 if (count($messages) != 0) {
                     $this->print_status_messages($messages);
+                    
+                    $user->login = "";
+                    $user->password = "";
+                    $user->should_remember = $should_remember;
                 } else {
                     $saved_request_params = $this->session->get_saved_request_params();
                     if (is_null(get_param_value($saved_request_params, "action", null))) {
-                        $saved_request_params = array("action" => "pg_home") + $saved_request_params;
+                        $saved_request_params = array("action" => "home") + $saved_request_params;
                     }
                     $this->session->destroy_saved_request_params();
                     
@@ -395,13 +400,13 @@ class UserApp extends CustomApp {
     function action_logout() {
         $this->add_session_status_message(new OkStatusMsg("logged_out"));
 
-        $this->create_self_redirect_response(array("action" => "pg_login"));
+        $this->create_self_redirect_response(array("action" => "login"));
         
         $this->destroy_login_state();
         $this->remove_remember_user_id_and_password_cookies();
     }
 //
-    function action_pg_signup() {
+    function action_signup() {
         $templates_dir = "signup";
         
         $user =& $this->create_db_object("User");
@@ -489,7 +494,7 @@ class UserApp extends CustomApp {
         $this->print_file("signup/body_signup_confirmed.html", "body");
     }
         
-    function action_pg_recover_password() {
+    function action_recover_password() {
         $templates_dir = "recover_password";
 
         $user =& $this->create_db_object("User");
@@ -555,7 +560,7 @@ class UserApp extends CustomApp {
         $email_sender->Send();
     }
 //
-    function action_pg_contact_form() {
+    function action_contact_form() {
         $templates_dir = "contact_form";
 
         $contact_info =& $this->create_db_object("ContactInfo");
@@ -615,7 +620,7 @@ class UserApp extends CustomApp {
         $email_sender->Send();
     }
 //
-    function action_pg_users() {
+    function action_users() {
         $templates_dir = "users";
         
         $user =& $this->create_db_object("User");
@@ -645,7 +650,7 @@ class UserApp extends CustomApp {
         return $user;
     }
 
-    function action_pg_user_view() {
+    function action_user_view() {
         $templates_dir = "user_view";
 
         $user_role = $this->get_user_role();
@@ -665,13 +670,13 @@ class UserApp extends CustomApp {
         $user_viewer->print_values();
 
         if ($user_role == "user") {
-            $this->print_head_and_page_titles("pg_user_view_my_account");
+            $this->print_head_and_page_titles("user_view_my_account");
         }
 
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_pg_user_edit() {
+    function action_user_edit() {
         $templates_dir = "user_edit";
 
         $user_role = $this->get_user_role();
@@ -714,11 +719,11 @@ class UserApp extends CustomApp {
 
                     if ($user_role == "admin") {
                         $this->create_self_redirect_response(array(
-                            "action" => "pg_users",
+                            "action" => "users",
                         ));
                     } else {
                         $this->create_self_redirect_response(array(
-                            "action" => "pg_user_view", 
+                            "action" => "user_view", 
                             "user_id" => $user->id, 
                         ));
                     }
@@ -738,7 +743,7 @@ class UserApp extends CustomApp {
             $user_editor->print_values();
 
             if ($user_role == "user") {
-                $this->print_head_and_page_titles("pg_user_edit_my_account");
+                $this->print_head_and_page_titles("user_edit_my_account");
             }
 
             $this->print_file("{$templates_dir}/body.html", "body");
@@ -750,10 +755,10 @@ class UserApp extends CustomApp {
                         new ErrorStatusMsg("user.cannot_delete_main_admin")
                     );
 
-                    $this->create_self_redirect_response(array("action" => "pg_users"));
+                    $this->create_self_redirect_response(array("action" => "users"));
                     break;
                 }
-                $redirect_url_params = array("action" => "pg_users");
+                $redirect_url_params = array("action" => "users");
                 $this->delete_db_object(array(
                     "obj" => $user,
                     "success_url_params" => $redirect_url_params,
@@ -764,7 +769,7 @@ class UserApp extends CustomApp {
         }
     }
 //
-    function action_pg_news_articles() {
+    function action_news_articles() {
         $templates_dir = "news_articles";
 
         $user_role = $this->get_user_role();
@@ -803,7 +808,7 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_pg_news_article_view() {
+    function action_news_article_view() {
         $templates_dir = "news_article_view";
 
         $news_article =& $this->read_id_fetch_db_object("NewsArticle");
@@ -821,7 +826,7 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_pg_news_article_edit() {
+    function action_news_article_edit() {
         $templates_dir = "news_article_edit";
 
         $news_article =& $this->read_id_fetch_db_object("NewsArticle");
@@ -885,7 +890,7 @@ class UserApp extends CustomApp {
 
                     $news_article->save();
                     
-                    $this->create_self_redirect_response(array("action" => "pg_news_articles"));
+                    $this->create_self_redirect_response(array("action" => "news_articles"));
                     break;
                 }
             }
@@ -906,8 +911,8 @@ class UserApp extends CustomApp {
         case "delete":
             $this->delete_db_object(array(
                 "obj" => $news_article,
-                "success_url_params" => array("action" => "pg_news_articles"),
-                "error_url_params" => array("action" => "pg_news_articles"),
+                "success_url_params" => array("action" => "news_articles"),
+                "error_url_params" => array("action" => "news_articles"),
             ));
             break;
         case "delete_image":
@@ -931,7 +936,7 @@ class UserApp extends CustomApp {
         }
     }
 //
-    function action_pg_categories() {
+    function action_categories() {
         $templates_dir = "categories";
 
         $current_category_ids = $this->_read_and_print_current_category_ids();
@@ -990,7 +995,7 @@ class UserApp extends CustomApp {
                     "templates_dir" => "{$templates_dir}/{$obj_name}_editor",
                     "template_var" => "category_editor",
                     "obj" => $obj,
-                    "page_title_resource" => "pg_categories_{$obj_name}_edit",
+                    "page_title_resource" => "categories_{$obj_name}_edit",
                 )
             );
             $category_editor->print_values();
@@ -1050,7 +1055,7 @@ class UserApp extends CustomApp {
         return $category_ids;
     }
 //
-    function action_pg_products() {
+    function action_products() {
         $templates_dir = "products";
 
         $product =& $this->create_db_object("Product");
@@ -1075,7 +1080,7 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_pg_product_edit() {
+    function action_product_edit() {
         $templates_dir = "product_edit";
 
         $product =& $this->read_id_fetch_db_object("Product");
@@ -1095,7 +1100,7 @@ class UserApp extends CustomApp {
 
                     $product->save();
 
-                    $this->create_self_redirect_response(array("action" => "pg_products"));
+                    $this->create_self_redirect_response(array("action" => "products"));
                     break;
                 }
             }
@@ -1115,8 +1120,8 @@ class UserApp extends CustomApp {
         case "delete":
             $this->delete_db_object(array(
                 "obj" => $product,
-                "success_url_params" => array("action" => "pg_products"),
-                "error_url_params" => array("action" => "pg_products"),
+                "success_url_params" => array("action" => "products"),
+                "error_url_params" => array("action" => "products"),
             ));
             break;
         }

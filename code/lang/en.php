@@ -11,16 +11,16 @@ return array(
     // Static head and page titles
     "page_title.access_denied" => "Access denied!",
 
-    "head_page_title.pg_index" => "Home",
-    "page_title.pg_static.policy_terms_of_use" => "Terms of use",
-    "page_title.pg_static.policy_terms_and_conditions" => "Terms and conditions",
-    "page_title.pg_static.policy_privacy" => "Privacy policy",
-    "page_title.pg_static.policy_disclaimer" => "Disclaimer",
+    "head_page_title.index" => "Home",
+    "page_title.static.policy_terms_of_use" => "Terms of use",
+    "page_title.static.policy_terms_and_conditions" => "Terms and conditions",
+    "page_title.static.policy_privacy" => "Privacy policy",
+    "page_title.static.policy_disclaimer" => "Disclaimer",
 
-    "page_title.pg_static.sample_page1" => "SampleStaticPage1",
-    "page_title.pg_static.sample_page2" => "SampleStaticPage2",
-    "page_title.pg_static.sample_page2_1" => "SampleStaticPage2_1",
-    "page_title.pg_static.sample_page2_2" => "SampleStaticPage2_2",
+    "page_title.static.sample_page1" => "SampleStaticPage1",
+    "page_title.static.sample_page2" => "SampleStaticPage2",
+    "page_title.static.sample_page2_1" => "SampleStaticPage2_1",
+    "page_title.static.sample_page2_2" => "SampleStaticPage2_2",
 
     // Menu items
     "guest_menu_item.index" => "Home",
@@ -54,7 +54,7 @@ return array(
     "status_msg.cannot_delete_record_because_it_has_restrict_relations" => "Cannot delete {%main_obj_name%} because it has links to {%dep_objs_info_str%}",
 
     // Login/Logout
-    "page_title.pg_login" => "Log In",
+    "page_title.login" => "Log In",
 
     "status_msg.resource_access_denied" => "Requested page cannot be displayed. Please use your access info to login.",
     "status_msg.logged_out" => "Logout completed successfully",
@@ -71,15 +71,15 @@ return array(
     "user_menu_item.user" => "My Account",
     "admin_menu_item.users" => "Users",
 
-    "page_title.pg_signup" => "Signup",
-    "page_title.pg_signup_almost_completed" => "Il nuovo account stato creato",
+    "page_title.signup" => "Signup",
+    "page_title.signup_almost_completed" => "Il nuovo account stato creato",
     "page_title.confirm_signup" => "Account confirmed",
-    "page_title.pg_users" => "Users",
-    "page_title.pg_user_view" => "View user",
-    "page_title.pg_user_view_my_account" => "My Account",
-    "page_title.pg_user_edit_new" => "Add user",
-    "page_title.pg_user_edit" => "Edit user",
-    "page_title.pg_user_edit_my_account" => "Edit My Account",
+    "page_title.users" => "Users",
+    "page_title.user_view" => "View user",
+    "page_title.user_view_my_account" => "My Account",
+    "page_title.user_edit_new" => "Add user",
+    "page_title.user_edit" => "Edit user",
+    "page_title.user_edit_my_account" => "Edit My Account",
 
     "status_msg.user.added" => "User added",
     "status_msg.user.updated" => "User updated",
@@ -111,8 +111,8 @@ return array(
     "user_role.admin" => "Administrator",
 
     // Recover password
-    "page_title.pg_recover_password" => "Recover password",
-    "page_title.pg_recover_password_sent" => "Password sent",
+    "page_title.recover_password" => "Recover password",
+    "page_title.recover_password_sent" => "Password sent",
 
     "status_msg.recover_password.login_or_email_empty" => "Specify login or email",
     "status_msg.recover_password.bad_email" => "Bad email specified",
@@ -128,10 +128,10 @@ return array(
     "guest_menu_item.news" => "News",
     "admin_menu_item.news" => "News",
 
-    "page_title.pg_news_articles" => "News",
-    "page_title.pg_news_article_view" => "View news article",
-    "page_title.pg_news_article_edit_new" => "Add news article",
-    "page_title.pg_news_article_edit" => "Edit news article",
+    "page_title.news_articles" => "News",
+    "page_title.news_article_view" => "View news article",
+    "page_title.news_article_edit_new" => "Add news article",
+    "page_title.news_article_edit" => "Edit news article",
 
     "status_msg.news_article.added" => "News article added",
     "status_msg.news_article.updated" => "News article updated",
@@ -150,7 +150,7 @@ return array(
     // Contact form
     "guest_menu_item.contact_form" => "Contacts",
 
-    "page_title.pg_contact_form" => "Contact form",
+    "page_title.contact_form" => "Contact form",
 
     "status_msg.contact_info.processed" => "Your contact info was processed. Thank you!",
     "status_msg.contact_info.first_name_empty" => "Please input your first name",
@@ -169,13 +169,13 @@ return array(
 
     "admin_menu_item.categories" => "Categories",
 
-    "page_title.pg_categories" => "Categories",
-    "page_title.pg_categories_category1_edit_new" => "Add category1",
-    "page_title.pg_categories_category1_edit" => "Edit category1",
-    "page_title.pg_categories_category2_edit_new" => "Add category2",
-    "page_title.pg_categories_category2_edit" => "Edit category2",
-    "page_title.pg_categories_category3_edit_new" => "Add category3",
-    "page_title.pg_categories_category3_edit" => "Edit category3",
+    "page_title.categories" => "Categories",
+    "page_title.categories_category1_edit_new" => "Add category1",
+    "page_title.categories_category1_edit" => "Edit category1",
+    "page_title.categories_category2_edit_new" => "Add category2",
+    "page_title.categories_category2_edit" => "Edit category2",
+    "page_title.categories_category3_edit_new" => "Add category3",
+    "page_title.categories_category3_edit" => "Edit category3",
 
     "status_msg.category1.added" => "Category1 added",
     "status_msg.category1.updated" => "Category1 updated",
@@ -201,9 +201,9 @@ return array(
 
     "admin_menu_item.products" => "Products",
 
-    "page_title.pg_products" => "Products",
-    "page_title.pg_product_edit_new" => "Add product",
-    "page_title.pg_product_edit" => "Edit product",
+    "page_title.products" => "Products",
+    "page_title.product_edit_new" => "Add product",
+    "page_title.product_edit" => "Edit product",
 
     "status_msg.product.added" => "Product added",
     "status_msg.product.updated" => "Product updated",

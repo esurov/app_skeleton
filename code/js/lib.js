@@ -641,7 +641,7 @@ function getAppCurrency(jsDouble) {
 //
 function openPolicyTermsOfUsePopupWindow() {
     return openPopupWindow(
-        '?action=pg_static&page=policy_terms_of_use',
+        '?action=static&page=policy_terms_of_use',
         600,
         400,
         'yes'
@@ -650,7 +650,7 @@ function openPolicyTermsOfUsePopupWindow() {
 
 function openPolicyTermsAndConditionsPopupWindow() {
     return openPopupWindow(
-        '?action=pg_static&page=policy_terms_and_conditions',
+        '?action=static&page=policy_terms_and_conditions',
         600,
         400,
         'yes'
@@ -659,7 +659,7 @@ function openPolicyTermsAndConditionsPopupWindow() {
 
 function openPolicyPrivacyPopupWindow() {
     return openPopupWindow(
-        '?action=pg_static&page=policy_privacy',
+        '?action=static&page=policy_privacy',
         600,
         400,
         'yes'
@@ -668,7 +668,7 @@ function openPolicyPrivacyPopupWindow() {
 
 function openPolicyDisclaimerPopupWindow() {
     return openPopupWindow(
-        '?action=pg_static&page=policy_disclaimer',
+        '?action=static&page=policy_disclaimer',
         600,
         400,
         'yes'

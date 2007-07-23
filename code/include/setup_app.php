@@ -10,16 +10,15 @@ class SetupApp extends CustomApp {
         $a = array("roles" => array("admin"));
 
         $this->actions = array(
-            "pg_static" => $a,
+            "static" => $a,
             
-            "pg_index" => $a,
+            "index" => $a,
 
-            "pg_create_update_tables" => $a,
             "create_update_tables" => $a,
             "delete_tables" => $a,
-            "pg_tables_dump" => $a,
-            "pg_tables_dump_url" => $a,
-            "pg_tables_dump_view" => $a,
+            "tables_dump" => $a,
+            "tables_dump_url" => $a,
+            "tables_dump_view" => $a,
             "download_tables_dump" => $a,
             
             "insert_initial_data" => $a,
@@ -39,7 +38,7 @@ class SetupApp extends CustomApp {
         $this->create_http_auth_html_document_response($this->get_lang_str("setup_app.auth_realm"));
     }
 //
-    function action_pg_index() {
+    function action_index() {
         $this->print_static_page("index", "body");
     }
 //

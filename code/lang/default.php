@@ -2,10 +2,10 @@
 return array(
     "setup_app.auth_realm" => "!!AppSkeleton setup area",
 
-    "page_title.pg_create_update_tables" => "Create/Update MySQL tables",
-    "page_title.pg_tables_dump" => "Dump MySQL tables",
-    "page_title.pg_tables_dump_url" => "URL for dump download",
-    "page_title.pg_tables_dump_view" => "View dump",
+    "page_title.create_update_tables" => "Create/Update MySQL tables",
+    "page_title.tables_dump" => "Dump MySQL tables",
+    "page_title.tables_dump_url" => "URL for dump download",
+    "page_title.tables_dump_view" => "View dump",
 
     "status_msg.tables_updated" => "Tables have been updated!",
     "status_msg.tables_deleted" => "Tables have been deleted!",

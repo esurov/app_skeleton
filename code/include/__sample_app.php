@@ -8,19 +8,19 @@ class SampleApp extends CustomApp {
         $e = array("roles" => array("guest"));
 
         $this->actions = array(
-            "pg_index" => $e,
+            "index" => $e,
 
             "set_cookie" => $e,
             "check_cookie" => $e,
             "get_news_articles_with_new_field_xml" => $e,
 /*
-            "pg_sample_records_list_in_context1" => $e,
-            "pg_sample_records_list_in_context2" => $e,
-            "pg_sample_records_list_as_objects" => $e,
+            "sample_records_list_in_context1" => $e,
+            "sample_records_list_in_context2" => $e,
+            "sample_records_list_as_objects" => $e,
 */
             "print_and_save_one_sample2_record" => $e,
 
-            "pg_component_view" => $e,
+            "component_view" => $e,
         );
     }
 //
@@ -28,7 +28,7 @@ class SampleApp extends CustomApp {
         return "templates/__sample";
     }
 //
-    function action_pg_index() {
+    function action_index() {
         foreach (array_keys($this->actions) as $action) {
             $this->print_varchar_value("action_name", $action);
             $this->print_varchar_value(
@@ -75,7 +75,7 @@ class SampleApp extends CustomApp {
 //  Context usage example
 //  Print list with specific to context1 template variables
 /*
-    function action_pg_sample_records_list_in_context1() {
+    function action_sample_records_list_in_context1() {
         $this->print_many_objects_list_page(array(
             "obj" => "Sample",
             "templates_dir" => "_sample_table/list_context1",
@@ -87,7 +87,7 @@ class SampleApp extends CustomApp {
         ));
     }
 
-    function action_pg_sample_records_list_in_context2() {
+    function action_sample_records_list_in_context2() {
         $this->print_many_objects_list_page(array(
             "obj" => "Sample",
             "templates_dir" => "_sample_table/list_context2",
@@ -95,7 +95,7 @@ class SampleApp extends CustomApp {
         ));
     }
 
-    function action_pg_sample_records_list_as_objects() {
+    function action_sample_records_list_as_objects() {
         $objects = $this->fetch_db_objects_list(
             "Sample",
             array("order_by" => "created DESC")
@@ -115,7 +115,7 @@ class SampleApp extends CustomApp {
         vx($this->page->_fillings);
     }
 //
-    function action_pg_component_view() {
+    function action_component_view() {
         $templates_dir = "sample_component_view";
 
         $component =& $this->create_object(

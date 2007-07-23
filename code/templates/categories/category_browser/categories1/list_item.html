@@ -1,18 +1,18 @@
 <tr class="{%list_item_class%}{%list_item_selected_class%}">
     <td>
-        <a href="?action=pg_categories&amp;current_category1_id={%category1.id%}"
+        <a href="?action=categories&amp;current_category1_id={%category1.id%}"
         >{%category1.name%}</a>
     </td>
     <td>
     <div class="toolbar">
         [<a
-            href="?action=pg_categories&amp;command=move&amp;obj=category1&amp;obj_id={%category1.id%}&amp;to=prev&amp;{%current_category_ids_suburl%}"
+            href="?action=categories&amp;command=move&amp;obj=category1&amp;obj_id={%category1.id%}&amp;to=prev&amp;{%current_category_ids_suburl%}"
         >{%global:move_up%}</a>]&nbsp;[<a
-            href="?action=pg_categories&amp;command=move&amp;obj=category1&amp;obj_id={%category1.id%}&amp;to=next&amp;{%current_category_ids_suburl%}"
+            href="?action=categories&amp;command=move&amp;obj=category1&amp;obj_id={%category1.id%}&amp;to=next&amp;{%current_category_ids_suburl%}"
         >{%global:move_down%}</a>]&nbsp;[<a
-            href="?action=pg_categories&amp;command=edit&amp;obj=category1&amp;obj_id={%category1.id%}&amp;{%current_category_ids_suburl%}&amp;current_category1_id={%category1.id%}"
+            href="?action=categories&amp;command=edit&amp;obj=category1&amp;obj_id={%category1.id%}&amp;{%current_category_ids_suburl%}&amp;current_category1_id={%category1.id%}"
         >{%global:edit%}</a>]&nbsp;[<a
-            href="?action=pg_categories&amp;command=delete&amp;obj=category1&amp;obj_id={%category1.id%}&amp;{%current_category_ids_suburl%}"
+            href="?action=categories&amp;command=delete&amp;obj=category1&amp;obj_id={%category1.id%}&amp;{%current_category_ids_suburl%}"
             onclick="return confirm('{%global:sure_delete%}')"
         >{%global:delete%}</a>]
     </div>
