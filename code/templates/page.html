@@ -1,11 +1,11 @@
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{%global:lang%}" lang="{%global:lang%}" dir="ltr">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{%sys:lang%}" lang="{%sys:lang%}" dir="ltr">
 <head>
-    <title>{%lang:head_page_title.app%} - {%head_page_title%}</title>
+    <title>{%global:head_page_title.app%} - {%head_page_title%}</title>
     
-    <meta http-equiv="Content-Type" content="text/html; charset={%global:html_charset%}" />
+    <meta http-equiv="Content-Type" content="text/html; charset={%sys:html_charset%}" />
     <meta http-equiv="Page-Exit" content="progid:DXImageTransform.Microsoft.Fade(Duration=0.2)" />
     <meta http-equiv="imagetoolbar" content="no" />
 
@@ -20,7 +20,7 @@
     <div class="header">
         {%login_state%}
         {%lang_menu%}
-        <a href="./"><img src="images/logo.gif" alt="{%lang:head_page_title.app%}" title="{%lang:head_page_title.app%}" /></a>
+        <a href="./"><img src="images/logo.gif" alt="{%global:head_page_title.app%}" title="{%global:head_page_title.app%}" /></a>
     </div>
 
     {%menu%}

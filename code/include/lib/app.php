@@ -125,8 +125,8 @@ class App extends AppObject {
 
     function init_page_template_lang_resources() {
         $this->page->init_fillings();
-        $this->print_raw_value("global:html_charset", $this->html_charset);
-        $this->print_raw_value("global:lang", $this->lang);
+        $this->print_raw_value("sys:html_charset", $this->html_charset);
+        $this->print_raw_value("sys:lang", $this->lang);
     }
 //
     // App objects creation functions

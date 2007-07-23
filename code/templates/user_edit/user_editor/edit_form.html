@@ -4,38 +4,38 @@
 <table>
 {%_role%}
 <tr>
-    <th>{%lang:login%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:login%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.login.input%}</td>
 </tr>
 <tr>
-    <th>{%lang:password%}:</th>
+    <th>{%global:password%}:</th>
     <td>{%user.password.input%}</td>
 </tr>
 <tr>
-    <th>{%lang:password_confirm%}:</th>
+    <th>{%global:password_confirm%}:</th>
     <td>{%user.password_confirm.input%}</td>
 </tr>
 <tr>
-    <th>{%lang:first_name%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:first_name%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.first_name.input%}</td>
 </tr>
 <tr>
-    <th>{%lang:last_name%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:last_name%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.last_name.input%}</td>
 </tr>
 <tr>
-    <th>{%lang:email%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:email%}:&nbsp;<span class="required">*</span></th>
     <td>{%user.email.input%}</td>
 </tr>
 <tr>
-    <th>{%lang:extra_info%}:</th>
+    <th>{%global:extra_info%}:</th>
     <td>{%user.extra_info.input%}</td>
 </tr>
 {%_is_confirmed%}
 {%_is_active%}
 <tr>
     <td colspan="2" align="center">
-        <input name="submit_btn" type="submit" value="{%lang:save%}" />
+        <input name="submit_btn" type="submit" value="{%global:save%}" />
     </td>
 </tr>
 </table>

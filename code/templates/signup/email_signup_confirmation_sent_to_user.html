@@ -1,46 +1,46 @@
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{%global:lang%}" lang="{%global:lang%}" dir="ltr">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{%sys:lang%}" lang="{%sys:lang%}" dir="ltr">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset={%global:html_charset%}">
+    <meta http-equiv="Content-Type" content="text/html; charset={%sys:html_charset%}">
 </head>
 <body>
-<p>{%lang:text1%}</p>
+<p>{%local:text1%}</p>
 
 <table>
 <tr>
-    <td colspan="2">{%lang:text2%}:</td>
+    <td colspan="2">{%local:text2%}:</td>
 </tr>
 <tr>
-    <td>{%lang:login%}:</td>
+    <td>{%global:login%}:</td>
     <td>{%user.login%}</td>
 </tr>
 <tr>
-    <td>{%lang:password%}:</td>
+    <td>{%global:password%}:</td>
     <td>{%user.password%}</td>
 </tr>
 <tr>
-    <td>{%lang:first_name%}:</td>
+    <td>{%global:first_name%}:</td>
     <td>{%user.first_name%}</td>
 </tr>
 <tr>
-    <td>{%lang:last_name%}:</td>
+    <td>{%global:last_name%}:</td>
     <td>{%user.last_name%}</td>
 </tr>
 <tr>
-    <td>{%lang:email%}:</td>
+    <td>{%global:email%}:</td>
     <td>{%user.email%}</td>
 </tr>
 <tr>
-    <td valign="middle">{%lang:extra_info%}:</td>
+    <td valign="middle">{%global:extra_info%}:</td>
     <td>{%user.extra_info.lf2br%}</td>
 </tr>
 </table>
 
-<p>{%lang:text3%}</p>
+<p>{%local:text3%}</p>
 
-<p>{%lang:text4%} <a href="{%confirmation_link%}">{%confirmation_link%}</a></p>
+<p>{%local:text4%} <a href="{%confirmation_link%}">{%confirmation_link%}</a></p>
 
 </body>
 </html>

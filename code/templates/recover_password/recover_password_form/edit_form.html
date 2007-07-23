@@ -1,20 +1,20 @@
-<p>{%lang:text1%}</p>
+<p>{%local:text1%}</p>
 
-<form action="?" method="post" name="form">
-<input type="hidden" name="action" value="recover_password" />
+<form action="?action=pg_recover_password" method="post" name="form">
+<input type="hidden" name="command" value="recover" />
 
 <table>
 <tr>
-    <th>{%lang:login%}:</th>
+    <th>{%global:login%}:</th>
     <td>{%user.login.input%}</td>
 </tr>
 <tr>
-    <th>{%lang:email%}:</th>
+    <th>{%global:email%}:</th>
     <td>{%user.email.input%}</td>
 </tr>
 <tr>
     <td colspan="5" align="center">
-       <input type="submit" name="submit_btn" value="{%lang:send%}" />
+       <input type="submit" name="submit_btn" value="{%global:send%}" />
     </td>
 </tr>
 </table>

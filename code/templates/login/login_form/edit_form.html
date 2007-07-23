@@ -3,20 +3,20 @@
 
 <table>
 <tr>
-    <td>{%lang:login%}:</td>
+    <td>{%global:login%}:</td>
     <td>{%user.login.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:password%}:</td>
+    <td>{%global:password%}:</td>
     <td>{%user.password.input%}</td>
 </tr>
 <tr>
-    <td>{%lang:should_remember%}:</td>
+    <td>{%global:should_remember%}:</td>
     <td>{%user.should_remember.input%}</td>
 </tr>
 <tr>
     <td colspan="2" align="center">
-        <input name="submit_btn" type="submit" value="{%lang:login%}" />
+        <input name="submit_btn" type="submit" value="{%global:login%}" />
     </td>
 </tr>
 </table>
@@ -24,10 +24,10 @@
 </form>
 
 <ul>
-    <li>{%lang:dont_have_account%} <a href="?action=pg_signup"
-        >{%lang:please_signup%}</a></li>
-    <li>{%lang:did_forget_password%} <a href="?action=pg_recover_password"
-        >{%lang:recover_password%}</a></li>
+    <li>{%local:dont_have_account%} <a href="?action=pg_signup"
+        >{%local:please_signup%}</a></li>
+    <li>{%local:did_forget_password%} <a href="?action=pg_recover_password"
+        >{%local:recover_password%}</a></li>
 </ul>
 
 <script type="text/javascript">

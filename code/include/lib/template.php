@@ -44,7 +44,7 @@ class Template extends AppObject {
     }
 //
     function init_fillings() {
-        $this->_fillings = require("{$this->_templates_dir}/lang_{$this->app->lang}.php");
+        $this->_fillings = require("{$this->_templates_dir}/global_{$this->app->lang}.php");
     }
 
     function set_filling_values($values) {
@@ -167,7 +167,7 @@ class Template extends AppObject {
     }
 
     function get_template_lang_resources($template_name) {
-        $lang_resources_filename = "{$template_name}.lang_{$this->app->lang}.php";
+        $lang_resources_filename = "{$template_name}.local_{$this->app->lang}.php";
         if ($this->is_file_exist($lang_resources_filename)) {
             return require("{$this->_templates_dir}/{$lang_resources_filename}");
         } else {
