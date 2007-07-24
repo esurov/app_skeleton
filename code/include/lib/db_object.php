@@ -2281,10 +2281,15 @@ class DbObject extends AppObject {
         case "number_greater_equal":
         case "number_less":
         case "number_less_equal":
+            $message_lang_resource = $condition_info["message"];
+            $message_text = (is_null($message_lang_resource)) ?
+                null :
+                (string) $this->get_lang_str("status_msg.{$message_lang_resource}");
+            
             $validate_condition_str = create_client_validate_condition_str(
                 $input_name,
                 $type,
-                (string) $this->get_lang_str("status_msg.{$condition_info['message']}"),
+                $message_text,
                 get_param_value($condition_info, "param", null),
                 $dependent_validate_condition_str
             );
