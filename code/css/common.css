@@ -121,15 +121,14 @@ a:link {
     text-decoration: underline;
 }
 
-a:hover {
-    color: #006af9;
-    text-decoration: none;
-}
-
 a:visited {
     color: #006af9;
 }
 
+a:hover {
+    color: #006af9;
+    text-decoration: none;
+}
 
 a img {
     border: 0;
