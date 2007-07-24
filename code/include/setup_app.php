@@ -5,8 +5,6 @@ class SetupApp extends CustomApp {
     function SetupApp() {
         parent::CustomApp("SetupApp", "setup_app");
 
-        $this->set_current_lang($this->dlang);
-
         $a = array("roles" => array("admin"));
 
         $this->actions = array(
@@ -26,10 +24,16 @@ class SetupApp extends CustomApp {
         );
     }
 //
+    function init() {
+        parent::init();
+
+        $this->set_current_lang($this->dlang);
+    }
+
     function get_page_templates_dir() {
         return "templates/__setup";
     }
-//
+
     function get_user_role($user = null) {
         return $this->get_http_auth_user_role();
     }
