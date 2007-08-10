@@ -60,21 +60,21 @@ table {
     border-collapse: collapse;
 }
 
-table td, table th {
+table th {
     border: 0;
     vertical-align: top;
     padding: 5px;
-}
-
-table th {
     font-size: 12px;
     font-weight: bold;
+}
+
+table td {
+    vertical-align: middle;
 }
 
 form table th {
     font-weight: normal;
     font-size: 11px;
-    padding-top: 8px;
 }
 
 form table td {
@@ -83,6 +83,10 @@ form table td {
 
 table.table tr th {
     text-align: center;
+}
+
+table.table tr td, table.table tr th {
+    padding: 5px;
 }
 
 form table th {
