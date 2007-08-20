@@ -178,10 +178,6 @@ class ProductTable extends CustomDbObject {
                     "data" => array(
                         "nonset_value_caption_pair" => array(0, $this->app->get_lang_str("all")),
                     ),
-                    "dependency" => array(
-                        "filter" => "category3_category2_id",
-                        "key_field_name" => "category2.category1_id",
-                    ),
                 ),
             ),
         ));
@@ -195,10 +191,6 @@ class ProductTable extends CustomDbObject {
                     "source" => "field",
                     "data" => array(
                         "nonset_value_caption_pair" => array(0, $this->app->get_lang_str("all")),
-                    ),
-                    "dependency" => array(
-                        "filter" => "category3_id",
-                        "key_field_name" => "category3.category2_id",
                     ),
                 ),
             ),
