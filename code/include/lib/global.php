@@ -64,9 +64,16 @@ function create_suburl($params = array(), $params_delimiter = "&") {
 
 function create_self_url($params = array()) {
     $params_suburl = create_suburl($params);
-    $self_suburl = (basename($_SERVER["SCRIPT_NAME"]) == "index.php") ?
-        dirname($_SERVER["SCRIPT_NAME"]) . "/" :
-        $_SERVER["SCRIPT_NAME"];
+    
+    $script_path = dirname($_SERVER["SCRIPT_NAME"]);
+    if ($script_path == "/") {
+        $script_path = "";
+    }
+    $script_name = basename($_SERVER["SCRIPT_NAME"]);
+
+    $self_suburl = ($script_name == "index.php") ?
+        "{$script_path}/" :
+        "{$script_path}/{$script_name}";
     if (count($params) == 0) {
         return $self_suburl;            
     } else {
