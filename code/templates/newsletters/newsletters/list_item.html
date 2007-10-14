@@ -1,0 +1,13 @@
+<tr class="{%list_item_class%}">
+    <td>{%newsletter.id%}</td>
+    <td>{%newsletter.date_sent%}</td>
+    <td>{%newsletter.newsletter_category_name%}</td>
+    <td>{%newsletter.title%}</td>
+    <td>{%newsletter.thumbnail_image%}</td>
+    <td>{%newsletter.file_info%}</td>
+    <td>
+        [<a href="?action=newsletter_view&amp;newsletter_id={%newsletter.id%}">
+            {%global:view%}
+         </a>]
+    </td>
+</tr>

@@ -17,4 +17,9 @@
         url="?action=user_view"
         contexts="user_view, user_edit"
     />
+    <menu_item
+        name="user_subscription"
+        url="?action=user_subscription"
+        contexts="user_subscription"
+    />
 </menu>

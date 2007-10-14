@@ -46,6 +46,19 @@ class UserApp extends CustomApp {
             "news_article_view" => $e,
             "news_article_edit" => $a,
 
+            // Newsletters
+            "newsletters" => $a,
+            "newsletter_view" => $a,
+            "newsletter_edit" => $a,
+
+            // Newsletter category
+            "newsletter_categories" => $a,
+            "newsletter_category_edit" => $a,
+
+            // User Subscription
+            "user_subscription" => $u,
+            "user_subscription_edit" => $u,
+
             // Categories management
             "categories" => $a,
             "category1_edit" => $a,
@@ -935,6 +948,292 @@ class UserApp extends CustomApp {
             break;
         }
     }
+
+
+//**********************
+    function action_newsletters() {
+        $templates_dir = "newsletters";
+
+        $newsletter =& $this->create_db_object("Newsletter");
+        $newsletters_list =& $this->create_object(
+            "PagedQueryObjectsList",
+             array(
+                 "templates_dir" => "{$templates_dir}/newsletters",
+                 "template_var" => "newsletters",
+                 "obj" => $newsletter,
+                 "filter_form.visible" => true,
+                 "context" => "list_item",
+                 "default_order_by" => array("id DESC"),    
+             )
+        );
+        $newsletters_list->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_newsletter_view() {
+        $templates_dir = "newsletter_view";
+
+        $newsletter =& $this->read_id_fetch_db_object("Newsletter");
+        $newsletter_viewer =& $this->create_object(
+            "ObjectViewer",
+            array(
+                "templates_dir" => "{$templates_dir}/newsletter_viewer",
+                "template_var" => "newsletter_viewer",
+                "obj" => $newsletter,
+                "context" => "view",
+            )
+        );
+        $newsletter_viewer->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_newsletter_edit() {
+        $templates_dir = "newsletter_edit";
+
+        $newsletter =& $this->read_id_fetch_db_object("Newsletter");
+
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "update":
+            if ($command == "update") {
+                $newsletter->read();
+
+                $messages = $newsletter->validate();
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+                } else {
+                    $this->print_status_message_db_object_updated($newsletter);
+
+                    $this->process_uploaded_image(
+                        $newsletter,
+                        "image_id",
+                        "image_file",
+                        array(
+                            "image_processor.class" => $this->get_config_value("image_processor"),
+                            "image_processor.actions" => array(
+                                array(
+                                    "name" => "crop_and_resize",
+                                    "width" => $this->get_config_value("newsletter_image_width"),
+                                    "height" => $this->get_config_value("newsletter_image_height"),
+                                ),
+                            ),
+                            "is_thumbnail" => 0,
+                        )
+                    );
+                    $this->process_uploaded_image(
+                        $newsletter,
+                        "thumbnail_image_id",
+                        "image_file",
+                        array(
+                            "image_processor.class" => $this->get_config_value("image_processor"),
+                            "image_processor.actions" => array(
+                                array(
+                                    "name" => "crop_and_resize",
+                                    "width" => $this->get_config_value(
+                                        "newsletter_thumbnail_image_width"
+                                    ),
+                                    "height" => $this->get_config_value(
+                                        "newsletter_thumbnail_image_height"
+                                    ),
+                                ),
+                                // This is example of second image processor action
+                                // Remove if grayscale is not needed (almost always ;) )
+                                array(
+                                    "name" => "convert_to_grayscale",
+                                ),
+                            ),
+                            "is_thumbnail" => 1,
+                        )
+                    );
+
+                    $this->process_uploaded_file($newsletter, "file_id", "file");
+                    $newsletter->save();
+
+                    $user_subscription =& $this->create_db_object("UserSubscription");
+                    $user_subscription->insert_user_list_fields();
+                    $user_subscription_list =& $this->fetch_db_objects_list(
+                        $user_subscription, 
+                        array(
+                            "where" => "user_subscription.newsletter_category_id = {$newsletter->newsletter_category_id}",
+                        )
+                    );
+//                    $user_email_subscription_list = array();
+//                    foreach($user_subscription_list as $value) {
+//                        $user_email_subscription_list[] = $value->user_email;
+//                    }
+
+                    $newsletter->send_newsletter($user_subscription_list);
+                    $this->create_self_action_redirect_response(array(
+                        "action" => "newsletters",
+                    ));
+                }
+
+            }
+                    
+            $newsletter_editor =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/newsletter_editor",
+                    "template_var" => "newsletter_editor",
+                    "obj" => $newsletter,
+                    "context" => "edit",
+                )
+            );
+            $newsletter_editor->print_values();
+
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
+        }
+    }
+
+// 
+    function action_newsletter_categories() {
+        $templates_dir = "newsletter_categories";
+
+        $newsletter_category =& $this->create_db_object("NewsletterCategory");
+        $newsletter_categories_list =& $this->create_object(
+            "PagedQueryObjectsList",
+            array(
+                "templates_dir" => "{$templates_dir}/newsletter_categories",
+                "template_var" => "newsletter_categories",
+                "obj" => $newsletter_category,
+                "context" => "list_item",
+                "default_order_by" => array("id DESC"),
+            )
+        );
+
+        $newsletter_categories_list->print_values();
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_newsletter_category_edit() {
+        $templates_dir = "newsletter_category_edit";
+
+        $newsletter_category =& $this->read_id_fetch_db_object("NewsletterCategory");
+
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "update":
+            if ($command == "update") {
+                $newsletter_category->read();
+
+                $messages = $newsletter_category->validate();
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+                } else {
+                    $this->print_status_message_db_object_updated($newsletter_category);
+                    $newsletter_category->save();
+                    $this->create_self_redirect_response(array("action" => "newsletter_categories"));
+                    break;
+                }
+            }
+                    
+            $newsletter_category_editor =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/newsletter_category_editor",
+                    "template_var" => "newsletter_category_editor",
+                    "obj" => $newsletter_category,
+                    "context" => "edit",
+                )
+            );
+            $newsletter_category_editor->print_values();
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
+
+        case "activate_deactivate":
+            $newsletter_category->activate_deactivate();
+            $this->add_session_status_message(new OkStatusMsg("newsletter_category.updated"));
+            $this->create_self_redirect_response(array("action" => "newsletter_categories"));
+            break;
+        }
+    }
+
+    function action_user_subscription() {
+        $user_id = $this->user->id;
+        $templates_dir = "user_subscription";
+
+        $user_subscription =& $this->create_db_object("NewsletterCategory");
+        $user_subscription->insert_list_extra_fields($user_id);
+        $user_subscription_list =& $this->create_object(
+            "PagedQueryObjectsList",
+             array(
+                 "templates_dir" => "{$templates_dir}/user_subscriptions",
+                 "template_var" => "user_subscriptions",
+                 "obj" => $user_subscription,
+                 "query_ex" => array(
+                    "where" => "is_active = 1",
+                 ), 
+                 "context" => "user_subscription",
+                 "default_order_by" => array("id DESC"),    
+             )
+        );
+        $user_subscription_list->print_values();
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_user_subscription_edit() {
+        
+        $command = (string) param("command");
+        switch ($command) {
+        case "update":
+            $user_id = $this->user->id;
+            $newsletter_categories_is_checked = param_array("newsletter_category_is_checked");
+            $user_subscription =& $this->create_db_object("UserSubscription");
+            $user_subscription->del_where("user_id = {$user_id}");
+
+            foreach ($newsletter_categories_is_checked as $newsletter_category_id => $newsletter_category_checked_status) {
+                $user_subscription =& $this->create_db_object("UserSubscription");
+                $user_subscription->user_id = $user_id;
+                $user_subscription->newsletter_category_id = $newsletter_category_id;
+                $user_subscription->save();
+            }
+
+            break;
+        }
+
+        $this->add_session_status_message(new OkStatusMsg("user_subscription.subscribed"));
+        $this->create_self_redirect_response(array("action" => "user_subscription"));
+    }
+
+    function _send_newsletter($newsletter) {
+        vx("not realized");
+    }
+
+    function send_newsletter_to_email($email, $newsletter) {
+        $email_from = $this->get_config_value("website_email_from");
+        $name_from = $this->get_config_value("website_name_from");
+        $email_to = $this->get_actual_email_to($email);
+        $name_to = "";
+        $subject = $newsletter->title;
+
+        $newsletter->print_values();
+        $body = $this->print_file("newsletters/email_sent_to_user.html");
+
+        $attachment_image = $this->fetch_db_object("Image", $newsletter->image_id);
+//        $attachment_file = $this->fetch_db_object("Image", $newsletter->image_id);
+
+        $email_sender =& $this->create_email_sender();
+        $email_sender->From = $email_from;
+        $email_sender->Sender = $email_from;
+        $email_sender->FromName = trim($name_from);
+        $email_sender->AddAddress($email_to, trim($name_to));
+        $email_sender->Subject = $subject;
+        $email_sender->Body = $body;
+        $email_sender->AddStringImageAttachment(
+            $attachment_image->content,
+            "image.jpg",
+            "image.jpg",
+            "base64",
+            "image/jpeg"
+        );
+        $email_sender->Send();
+    }
+
 //
     function action_categories() {
         $templates_dir = "categories";

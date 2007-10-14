@@ -28,10 +28,25 @@ $db_classes["classes"] = array(
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "user", "create" => true),
     ),
+    "UserSubscription" => array(
+        "filename" => "user_subscription_table.php",
+        "required_classes" => array("CustomDbObject"),
+        "params" => array("table_name" => "user_subscription", "create" => true),
+    ),
     "NewsArticle" => array(
         "filename" => "news_article_table.php",
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "news_article", "create" => true),
+    ),
+    "Newsletter" => array(
+        "filename" => "newsletter_table.php",
+        "required_classes" => array("CustomDbObject"),
+        "params" => array("table_name" => "newsletter", "create" => true),
+    ),
+    "NewsletterCategory" => array(
+        "filename" => "newsletter_category_table.php",
+        "required_classes" => array("CustomDbObject"),
+        "params" => array("table_name" => "newsletter_category", "create" => true),
     ),
     "Category1" => array(
         "filename" => "category1_table.php",

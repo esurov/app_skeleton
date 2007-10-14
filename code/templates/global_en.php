@@ -57,6 +57,7 @@ return array(
     "global:category1" => "Category1",
     "global:category2" => "Category2",
     "global:category3" => "Category3",
+    "global:add_newsletter_category" => "Add new category",
 
     // Link/button titles
     "global:view" => "View",
@@ -71,6 +72,7 @@ return array(
     "global:back" => "Back",
     "global:send" => "Send",
     "global:save" => "Save",
+    "global:save_and_send" => "Save and send",
     "global:filter" => "Filter",
     "global:show" => "Show",
     "global:show_all" => "Show all",

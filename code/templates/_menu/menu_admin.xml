@@ -25,6 +25,36 @@
         contexts="news_articles, news_article_edit"
     />
     <menu_item
+        name="newsletters"
+        url="?action=newsletter_edit"
+        contexts="newsletters, newsletter_edit, newsletter_category, newsletter_category_edit"
+    >
+        <menu
+            name="admin_sub_menu"
+            template="sub_menu.html"
+            item_template="sub_menu_item.html"
+            item_selected_template="sub_menu_item_selected.html"
+            item_delimiter_template="sub_menu_item_delimiter.html"
+            item_has_sub_menu_template="menu_item_has_sub_menu.html"
+        >
+            <menu_item
+                name="newsletter_edit"
+                url="?action=newsletter_edit"
+                contexts="newsletter_edit"
+            />
+            <menu_item
+                name="newsletters"
+                url="?action=newsletters"
+                contexts="newsletters, newsletter_view"
+            />
+            <menu_item
+                name="newsletter_category"
+                url="?action=newsletter_categories"
+                contexts="newsletter_categories, newsletter_category_edit"
+            />
+        </menu>
+    </menu_item>
+    <menu_item
         name="categories"
         url="?action=categories"
         contexts="categories"

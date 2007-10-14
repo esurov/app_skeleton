@@ -147,6 +147,74 @@ return array(
     "status_msg.news_article.file_max_size_reached" => "Uploaded file size is more than 2 Mb",
     "status_msg.news_article.files_max_total_size_reached" => "Total uploaded files size is more than 100 Mb",
 
+    // Newsletters
+    "newsletter" => "news article",
+    "newsletters" => "news articles",
+
+    "guest_menu_item.newsletters" => "Newsletters",
+    "admin_menu_item.newsletters" => "Newsletters",
+    "admin_sub_menu_item.newsletters" => "List of newsletters",
+    "admin_sub_menu_item.newsletter_edit" => "New newsletter",
+    "admin_sub_menu_item.newsletter_category" => "Category of newsletters",
+    "admin_sub_menu_item.newsletter_edit_new" => "Add newsletter",
+    "admin_sub_menu_item.newsletter_edit" => "Edit newsletter",
+
+    "page_title.newsletters" => "Newsletter",
+    "page_title.newsletter_view" => "View newsletter",
+    "page_title.newsletter_edit_new" => "Add newsletter",
+    "page_title.newsletter_edit" => "Edit newsletter",
+ 
+    "status_msg.newsletter.added" => "Newsletter added",
+    "status_msg.newsletter.updated" => "Newsletter updated",
+    "status_msg.newsletter.deleted" => "Newsletter deleted",
+    "status_msg.newsletter.image_deleted" => "Newsletter image deleted",
+    "status_msg.newsletter.file_deleted" => "Newsletter file deleted",
+
+    "status_msg.newsletter.title_empty" => "Specify title",
+    "status_msg.newsletter.body_empty" => "Specify body",
+    "status_msg.newsletter.category_empty" => "Category is empty",
+    "status_msg.newsletter.image_empty" => "Please upload image",
+    "status_msg.newsletter.image_bad" => "Please upload valid image",
+    "status_msg.newsletter.file_empty" => "Please upload file",
+    "status_msg.newsletter.file_bad" => "Please upload valid file",
+    "status_msg.newsletter.file_max_size_reached" => "Uploaded file size is more than 2 Mb",
+    "status_msg.newsletter.files_max_total_size_reached" => "Total uploaded files size is more than 100 Mb",
+    "status_msg.newsletter.send_mail_failed" => "!!Function \"Send mail\" not realized",
+    "status_msg.newsletter.send_emails_done" => "!!Emails is sent",
+
+    // Newsletter Category
+    "newsletter_category" => "Newsletter category",
+    "newsletter_categorys" => "Newsletter categories",
+
+    "admin_menu_item.newsletter_category" => "Category of newsletters",
+
+    "page_title.newsletter_category" => "Category of newsletters",
+    "page_title.newsletter_category_edit_new" => "Add newsletter category",
+    "page_title.newsletter_category_edit" => "Edit category",
+
+    "status_msg.newsletter_category.added" => "Newsletter category added",
+    "status_msg.newsletter_category.updated" => "Newsletter category updated",
+    "status_msg.newsletter_category.deleted" => "Newsletter category deleted",
+
+    "status_msg.newsletter_category.name_empty" => "Specify newsletter category name",
+
+    // User Subscription
+    "user_subscription" => "!!user_subscription",
+    "user_subscriptions" => "!!user_subscriptions",
+
+    "user_menu_item.user_subscription" => "!!user_subscription",
+
+    "page_title.user_subscription" => "!!user_subscription",
+//    "page_title.newsletter_category_edit_new" => "Add newsletter category",
+//    "page_title.newsletter_category_edit" => "Edit category",
+
+    "status_msg.user_subscription.subscribed" => "!!user_subscription subscribed",
+//    "status_msg.newsletter_category.unsubscribed" => "!!user_subscription unsubscribed",
+//    "status_msg.newsletter_category.deleted" => "Newsletter category deleted",
+//    "status_msg.newsletter_category.name_empty" => "Specify newsletter category name",
+
+
+
     // Contact form
     "guest_menu_item.contact_form" => "Contacts",
 

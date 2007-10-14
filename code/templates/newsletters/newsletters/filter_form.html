@@ -1,0 +1,23 @@
+<form action="?" method="get" name="form" onsubmit="onsubmitFormHandler(this);">
+<input type="hidden" name="action" value="newsletters" />
+
+    <table>
+    <tr>
+        <th colspan="2"><strong>{%global:filter_by%}:</strong></th>
+    </tr>
+    <tr>
+        <th>{%global:text%}:</th>
+        <td>{%newsletter.full_text.like_many.input%}</td>
+    </tr>
+    <tr>
+        <th>{%global:category%}:</th>
+        <td>{%newsletter.newsletter_category_id.equal.input%}</td>
+    </tr>
+    <tr>
+        <td colspan="2" align="center">
+            <input type="submit" name="submit_btn" value="{%global:filter%}" />
+        </td>
+    </tr>
+    </table>
+
+</form>

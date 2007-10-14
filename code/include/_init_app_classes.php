@@ -25,6 +25,11 @@ $app_classes["classes"] += array(
         "filename" => "__sample_component.php",
         "required_classes" => array("SampleComponent"),
     ),
+    "CustomPHPMailer" => array(
+        "filename" => "custom_phpmailer.php",
+        "required_classes" => array("PHPMailer"),
+    ),
 );
+
 
 ?>
