@@ -202,32 +202,50 @@ class NewsletterTable extends CustomDbObject {
         return $messages;
     }
 //
-    function send_newsletter($user_subscription_list) {
-        foreach($user_email_subscription_list as $user_email_subscription) {
-            $this->send_newsletter_to_email($user_email_subscription, $this);
+    function send_newsletter($user_subscription_list, $params = array()) {
+        foreach($user_subscription_list as $user_account) {
+            $this->send_newsletter_to_email($user_account, $params);
         }
     }
 
-//      title
-//      body
-    function send_newsletter_to_email($user_account) {!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// ToDo!!: ask Alex about calling parent::print_values() not in children function print_values()
+    function send_newsletter_to_email($user_account, $params = array()) {
+        parent::print_values($params);
+
         $email_from = $this->get_config_value("website_email_from");
         $name_from = $this->get_config_value("website_name_from");
-        $email_to = $this->app->get_actual_email_to($email);
-        $name_to = "";
+        $email_to = $this->app->get_actual_email_to($user_account["user_email"]);
+        $name_to = $user_account["login"];
         $subject = $this->title;
         $this->print_values();
-        $body = $this->app->print_file("newsletters/email_sent_to_user.html");
 
+        $this->_templates_dir = "newsletter_edit/email";
+
+        $attachment_file = $this->fetch_db_object("File", $this->file_id);
         $attachment_image = $this->fetch_db_object("Image", $this->image_id);
+
+        $this->app->print_db_object_info(
+            $this->app->fetch_image_without_content($this->image_id),
+            $this->_templates_dir,
+            "email.image",
+            "_image.html",
+            "_image_empty.html"
+        );
+        $this->app->print_db_object_info(
+            $this->app->fetch_file_without_content($this->file_id),
+            $this->_templates_dir,
+            "email.file_info",
+            "_file_info.html",
+            "_file_info_empty.html"
+        );
+
+        $body = $this->app->print_file("{$this->_templates_dir}/email_sent_to_user.html");
 
         $email_sender =& $this->app->create_email_sender();
         $email_sender->From = $email_from;
         $email_sender->Sender = $email_from;
         $email_sender->FromName = trim($name_from);
         $email_sender->AddAddress($email_to, trim($name_to));
-        $email_sender->Subject = $subject;
-        $email_sender->Body = $body;
         $email_sender->AddStringImageAttachment(
             $attachment_image->content,
             "image.jpg",
@@ -235,12 +253,11 @@ class NewsletterTable extends CustomDbObject {
             "base64",
             "image/jpeg"
         );
+        $email_sender->AddAttachment($attachment_file->content, $attachment_file->filename);
+        $email_sender->Subject = $subject;
+        $email_sender->Body = $body;
         $email_sender->Send();
     }
-
-
-
-
     
     function print_values($params = array()) {
         parent::print_values($params);
@@ -252,12 +269,6 @@ class NewsletterTable extends CustomDbObject {
                 get_word_shortened_string(strip_tags($this->title), $title_short_len, "...")
             );
             
-//            $body_short_len = $this->get_config_value("newsletter_body_short_length");
-//            $this->app->print_varchar_value(
-//                "newsletter.body.short",
-//                get_word_shortened_string(strip_tags($this->body), $body_short_len, "...")
-//            );
-
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->thumbnail_image_id),
                 $this->_templates_dir,
@@ -277,13 +288,6 @@ class NewsletterTable extends CustomDbObject {
                 "_image_empty.html"
             );
         }
-
-//        $newsletter_category = $this->fetch_db_object("NewsletterCategory", $this->newsletter_category_id);
-//        $this->app->print_varchar_value(
-//            "{$this->_template_var_prefix}.newsletter_category_name",
-//            $newsletter_category->name
-//        );
-
 
         $this->app->print_db_object_info(
             $this->app->fetch_file_without_content($this->file_id),
