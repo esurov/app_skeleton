@@ -1060,17 +1060,16 @@ class UserApp extends CustomApp {
                             "where" => "user_subscription.newsletter_category_id = {$newsletter->newsletter_category_id}",
                         )
                     );
-//                    $user_email_subscription_list = array();
-//                    foreach($user_subscription_list as $value) {
-//                        $user_email_subscription_list[] = $value->user_email;
-//                    }
-
-                    $newsletter->send_newsletter($user_subscription_list);
+                    $newsletter->send_newsletter(
+                        $user_subscription_list, 
+                        array(
+                            "templates_dir" => "{$templates_dir}/email_sent_to_user",
+                        )
+                    );
                     $this->create_self_action_redirect_response(array(
                         "action" => "newsletters",
                     ));
                 }
-
             }
                     
             $newsletter_editor =& $this->create_object(
@@ -1200,39 +1199,6 @@ class UserApp extends CustomApp {
         $this->create_self_redirect_response(array("action" => "user_subscription"));
     }
 
-    function _send_newsletter($newsletter) {
-        vx("not realized");
-    }
-
-    function send_newsletter_to_email($email, $newsletter) {
-        $email_from = $this->get_config_value("website_email_from");
-        $name_from = $this->get_config_value("website_name_from");
-        $email_to = $this->get_actual_email_to($email);
-        $name_to = "";
-        $subject = $newsletter->title;
-
-        $newsletter->print_values();
-        $body = $this->print_file("newsletters/email_sent_to_user.html");
-
-        $attachment_image = $this->fetch_db_object("Image", $newsletter->image_id);
-//        $attachment_file = $this->fetch_db_object("Image", $newsletter->image_id);
-
-        $email_sender =& $this->create_email_sender();
-        $email_sender->From = $email_from;
-        $email_sender->Sender = $email_from;
-        $email_sender->FromName = trim($name_from);
-        $email_sender->AddAddress($email_to, trim($name_to));
-        $email_sender->Subject = $subject;
-        $email_sender->Body = $body;
-        $email_sender->AddStringImageAttachment(
-            $attachment_image->content,
-            "image.jpg",
-            "image.jpg",
-            "base64",
-            "image/jpeg"
-        );
-        $email_sender->Send();
-    }
 
 //
     function action_categories() {
