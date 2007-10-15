@@ -1172,7 +1172,7 @@ class UserApp extends CustomApp {
              array(
                  "templates_dir" => "{$templates_dir}/user_subscriptions",
                  "template_var" => "user_subscriptions",
-                 "obj" => user_subscriptions,
+                 "obj" => $user_subscriptions,
                  "query_ex" => array(
                     "where" => "is_active = 1",
                  ), 
