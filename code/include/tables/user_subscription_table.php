@@ -39,7 +39,6 @@ class UserSubscriptionTable extends CustomDbObject {
         );
     }
 
-
 //
     function insert_user_list_fields() {
         
@@ -53,6 +52,11 @@ class UserSubscriptionTable extends CustomDbObject {
             //user_subscription_user_login
             "obj_class" => "User",
             "field" => "email",
+        ));
+        $this->insert_field(array(
+            //user_subscription_user_login
+            "obj_class" => "User",
+            "field" => "first_name",
         ));
     }
 

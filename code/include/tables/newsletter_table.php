@@ -117,16 +117,8 @@ class NewsletterTable extends CustomDbObject {
             
         ));
     }
-//
-//    function del() {
-//        $this->del_image("image_id");
-//        $this->del_image("thumbnail_image_id");
-//        $this->del_file("file_id");
-//      
-//        parent::del();
-//    }
-//
 
+//
     function get_validate_conditions($context, $context_params) {
         return array(
 
@@ -202,63 +194,6 @@ class NewsletterTable extends CustomDbObject {
         return $messages;
     }
 //
-    function send_newsletter($user_subscription_list, $params = array()) {
-        foreach($user_subscription_list as $user_account) {
-            $this->send_newsletter_to_email($user_account, $params);
-        }
-    }
-
-// ToDo!!: ask Alex about calling parent::print_values() not in children function print_values()
-    function send_newsletter_to_email($user_account, $params = array()) {
-        parent::print_values($params);
-
-        $email_from = $this->get_config_value("website_email_from");
-        $name_from = $this->get_config_value("website_name_from");
-        $email_to = $this->app->get_actual_email_to($user_account["user_email"]);
-        $name_to = $user_account["login"];
-        $subject = $this->title;
-        $this->print_values();
-
-        $this->_templates_dir = "newsletter_edit/email";
-
-        $attachment_file = $this->fetch_db_object("File", $this->file_id);
-        $attachment_image = $this->fetch_db_object("Image", $this->image_id);
-
-        $this->app->print_db_object_info(
-            $this->app->fetch_image_without_content($this->image_id),
-            $this->_templates_dir,
-            "email.image",
-            "_image.html",
-            "_image_empty.html"
-        );
-        $this->app->print_db_object_info(
-            $this->app->fetch_file_without_content($this->file_id),
-            $this->_templates_dir,
-            "email.file_info",
-            "_file_info.html",
-            "_file_info_empty.html"
-        );
-
-        $body = $this->app->print_file("{$this->_templates_dir}/email_sent_to_user.html");
-
-        $email_sender =& $this->app->create_email_sender();
-        $email_sender->From = $email_from;
-        $email_sender->Sender = $email_from;
-        $email_sender->FromName = trim($name_from);
-        $email_sender->AddAddress($email_to, trim($name_to));
-        $email_sender->AddStringImageAttachment(
-            $attachment_image->content,
-            "image.jpg",
-            "image.jpg",
-            "base64",
-            "image/jpeg"
-        );
-        $email_sender->AddAttachment($attachment_file->content, $attachment_file->filename);
-        $email_sender->Subject = $subject;
-        $email_sender->Body = $body;
-        $email_sender->Send();
-    }
-    
     function print_values($params = array()) {
         parent::print_values($params);
 
@@ -289,6 +224,23 @@ class NewsletterTable extends CustomDbObject {
             );
         }
 
+        if ($this->_context == "email") {
+            $this->app->print_db_object_info(
+                $this->app->fetch_image_without_content($this->image_id),
+                $this->_templates_dir,
+                "email.image",
+                "_image.html",
+                "_image_empty.html"
+            );
+            $this->app->print_db_object_info(
+                $this->app->fetch_file_without_content($this->file_id),
+                $this->_templates_dir,
+                "email.file_info",
+                "_file_info.html",
+                "_file_info_empty.html"
+            );
+        }
+
         $this->app->print_db_object_info(
             $this->app->fetch_file_without_content($this->file_id),
             $this->_templates_dir,
@@ -298,6 +250,53 @@ class NewsletterTable extends CustomDbObject {
         );
     }
 
+//
+    function send_newsletter($user_subscription_list, $params = array()) {
+        $this->print_values($params);
+
+        $email_from = $this->get_config_value("website_email_from");
+        $name_from = $this->get_config_value("website_name_from");
+        $subject = $this->title;
+        $attachment_file = $this->fetch_db_object("File", $this->file_id);
+        $attachment_image = $this->fetch_db_object("Image", $this->image_id);
+        $body = $this->app->print_file("{$this->_templates_dir}/email_sent_to_user.html");
+
+        $email_sender =& $this->app->create_email_sender();
+        $email_sender->From = $email_from;
+        $email_sender->Sender = $email_from;
+        $email_sender->FromName = trim($name_from);
+        if ($attachment_image->id != 0) {
+            $email_sender->AddStringImageAttachment(
+                $attachment_image->content,
+                "image.jpg",
+                "image.jpg",
+                "base64",
+                "image/jpeg"
+            );
+        }
+        if ($attachment_file->id != 0) {
+            $email_sender->AddStringAttachment(
+                $attachment_file->content, 
+                $attachment_file->filename
+            );
+        }
+        $email_sender->Subject = $subject;
+        $email_sender->Body = $body;
+
+        foreach($user_subscription_list as $user_account) {
+            $this->send_newsletter_to_email($user_account, $email_sender);
+        }
+    }
+
+    function send_newsletter_to_email($user_account, &$email_sender) {
+        $name_to = trim($user_account["user_name"]);
+        $email_to = $this->app->get_actual_email_to($user_account["user_email"]);
+
+        $email_sender->ClearAddresses();
+        $email_sender->AddAddress($email_to, $name_to);
+        $email_sender->Send();
+    }
+    
 }
 
 ?>

@@ -67,7 +67,6 @@ class NewsletterCategoryTable extends CustomDbObject {
 
 //
     function insert_list_extra_fields($user_id) {
-
         $this->insert_join(array(
             "type" => "left",
             "obj_class" => "UserSubscription",
@@ -75,21 +74,18 @@ class NewsletterCategoryTable extends CustomDbObject {
                 "newsletter_category.id = user_subscription.newsletter_category_id AND " .
                 "user_subscription.user_id = {$user_id}",
         ));
-
         $this->insert_field(array(
             "field" => "is_checked",
             "type" => "boolean",
             "select" => "!ISNULL(user_subscription.id)",
             "value" => 0,
         ));
-
-
     }
 
     function print_values($params = array()) {
         parent::print_values($params);
 
-        if ($this->_context == "user_subscription") {
+        if ($this->_context == "user_subscriptions") {
             $template_value_is_checked = "";
             if ($this->is_checked) {
                 $template_value_is_checked = "checked";

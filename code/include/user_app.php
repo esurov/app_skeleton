@@ -993,8 +993,16 @@ class UserApp extends CustomApp {
         $templates_dir = "newsletter_edit";
 
         $newsletter =& $this->read_id_fetch_db_object("Newsletter");
+        if ($newsletter->is_definite()) {
+            $this->create_self_redirect_response(array(
+                "action" => "newsletters",
+            ));
+            return;
+        }
 
         $command = (string) param("command");
+
+// simply_case!!
         switch ($command) {
         case "":
         case "update":
@@ -1064,6 +1072,7 @@ class UserApp extends CustomApp {
                         $user_subscription_list, 
                         array(
                             "templates_dir" => "{$templates_dir}/email_sent_to_user",
+                            "context" => "email",
                         )
                     );
                     $this->create_self_action_redirect_response(array(
@@ -1156,25 +1165,26 @@ class UserApp extends CustomApp {
         $user_id = $this->user->id;
         $templates_dir = "user_subscription";
 
-        $user_subscription =& $this->create_db_object("NewsletterCategory");
-        $user_subscription->insert_list_extra_fields($user_id);
-        $user_subscription_list =& $this->create_object(
+        $user_subscriptions =& $this->create_db_object("NewsletterCategory");
+        $user_subscriptions->insert_list_extra_fields($user_id);
+        $user_subscriptions_list =& $this->create_object(
             "PagedQueryObjectsList",
              array(
                  "templates_dir" => "{$templates_dir}/user_subscriptions",
                  "template_var" => "user_subscriptions",
-                 "obj" => $user_subscription,
+                 "obj" => user_subscriptions,
                  "query_ex" => array(
                     "where" => "is_active = 1",
                  ), 
-                 "context" => "user_subscription",
+                 "context" => "user_subscriptions",
                  "default_order_by" => array("id DESC"),    
              )
         );
-        $user_subscription_list->print_values();
+        $user_subscriptions_list->print_values();
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
+// check unactive category. !!
     function action_user_subscription_edit() {
         
         $command = (string) param("command");
@@ -1184,14 +1194,15 @@ class UserApp extends CustomApp {
             $newsletter_categories_is_checked = param_array("newsletter_category_is_checked");
             $user_subscription =& $this->create_db_object("UserSubscription");
             $user_subscription->del_where("user_id = {$user_id}");
-
             foreach ($newsletter_categories_is_checked as $newsletter_category_id => $newsletter_category_checked_status) {
-                $user_subscription =& $this->create_db_object("UserSubscription");
-                $user_subscription->user_id = $user_id;
-                $user_subscription->newsletter_category_id = $newsletter_category_id;
-                $user_subscription->save();
+                $newsletter_category =& $this->create_db_object("NewsletterCategory");
+                if ($newsletter_category->fetch("newsletter_category.id = {$newsletter_category_id}")) {
+                    $user_subscription =& $this->create_db_object("UserSubscription");
+                    $user_subscription->user_id = $user_id;
+                    $user_subscription->newsletter_category_id = $newsletter_category_id;
+                    $user_subscription->save();
+                }
             }
-
             break;
         }
 
