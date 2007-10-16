@@ -2832,7 +2832,7 @@ class App extends AppObject {
 //
     // Email sender
     function &create_email_sender() {
-        $email_sender =& $this->create_object("PHPMailer");
+        $email_sender =& $this->create_object("CustomPHPMailer");
         $email_sender->IsSendmail();
         $email_sender->IsHTML($this->get_config_value("email_is_html"));
         $email_sender->CharSet = $this->get_config_value("email_charset");

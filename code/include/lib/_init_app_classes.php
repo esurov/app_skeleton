@@ -112,6 +112,11 @@ $app_classes = array(
         "PHPMailer" => array(
             "filename" => "phpmailer.php",
         ),
+        "CustomPHPMailer" => array(
+            "filename" => "custom_phpmailer.php",
+            "required_classes" => array("PHPMailer"),
+        ),
+
     ),
 );
 

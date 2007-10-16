@@ -51,11 +51,11 @@ class UserApp extends CustomApp {
             "newsletter_view" => $a,
             "newsletter_edit" => $a,
 
-            // Newsletter category
+            // Newsletter categories
             "newsletter_categories" => $a,
             "newsletter_category_edit" => $a,
 
-            // User Subscription
+            // User subscription
             "user_subscription" => $u,
             "user_subscription_edit" => $u,
 
@@ -948,9 +948,7 @@ class UserApp extends CustomApp {
             break;
         }
     }
-
-
-//**********************
+//
     function action_newsletters() {
         $templates_dir = "newsletters";
 
@@ -1002,7 +1000,6 @@ class UserApp extends CustomApp {
 
         $command = (string) param("command");
 
-// simply_case!!
         switch ($command) {
         case "":
         case "update":
@@ -1060,21 +1057,28 @@ class UserApp extends CustomApp {
                     $this->process_uploaded_file($newsletter, "file_id", "file");
                     $newsletter->save();
 
-                    $user_subscription =& $this->create_db_object("UserSubscription");
-                    $user_subscription->insert_user_list_fields();
-                    $user_subscription_list =& $this->fetch_db_objects_list(
-                        $user_subscription, 
-                        array(
-                            "where" => "user_subscription.newsletter_category_id = {$newsletter->newsletter_category_id}",
-                        )
+                    $this->send_email_newsletter_to_subscribed_users(
+                        $newsletter,
+                        "{$templates_dir}/email_sent_to_user"
                     );
-                    $newsletter->send_newsletter(
-                        $user_subscription_list, 
-                        array(
-                            "templates_dir" => "{$templates_dir}/email_sent_to_user",
-                            "context" => "email",
-                        )
-                    );
+
+//                    $user_subscription =& $this->create_db_object("UserSubscription");
+//                    $user_subscription->insert_user_list_fields();
+//                    $user_subscription_list =& $this->fetch_db_objects_list(
+//                        $user_subscription, 
+//                        array(
+//                            "where" =>
+//                                "user_subscription.newsletter_category_id = " .
+//                                "{$newsletter->newsletter_category_id}",
+//                        )
+//                    );
+//                    $newsletter->send_newsletter(
+//                        $user_subscription_list, 
+//                        array(
+//                            "templates_dir" => "{$templates_dir}/email_sent_to_user",
+//                            "context" => "email",
+//                        )
+//                    );
                     $this->create_self_action_redirect_response(array(
                         "action" => "newsletters",
                     ));
@@ -1097,6 +1101,62 @@ class UserApp extends CustomApp {
         }
     }
 
+    function send_email_newsletter_to_subscribed_users($newsletter, $templates_dir) {
+        $subscribed_users =& $this->fetch_db_objects_list(
+            "User", 
+            array(
+                "from" =>
+                    "INNER JOIN {%user_subscription_table%} AS user_subscription " .
+                        "ON user_subscription.user_id = user.id",
+                "where" =>
+                    "user_subscription.newsletter_category_id = " .
+                        "{$newsletter->newsletter_category_id}",
+            )
+        );
+        
+        $email_from = $this->get_config_value("website_email_from");
+        $name_from = $this->get_config_value("website_name_from");
+        $subject = $newsletter->title;
+
+        $attachment_file = $this->fetch_db_object("File", $newsletter->file_id);
+        $attachment_image = $this->fetch_db_object("Image", $newsletter->image_id);
+        $newsletter->print_values(array(
+            "templates_dir" => $templates_dir,
+            "context" => "email",
+        ));
+        $body = $this->print_file("{$templates_dir}/email_sent_to_user.html");
+        
+        $email_sender =& $this->create_email_sender();
+        $email_sender->From = $email_from;
+        $email_sender->Sender = $email_from;
+        $email_sender->FromName = trim($name_from);
+        if ($attachment_image->id != 0) {
+            $email_sender->AddStringImageAttachment(
+                $attachment_image->content,
+                "image.jpg",
+                "image.jpg",
+                "base64",
+                "image/jpeg"
+            );
+        }
+        if ($attachment_file->id != 0) {
+            $email_sender->AddStringAttachment(
+                $attachment_file->content, 
+                $attachment_file->filename
+            );
+        }
+        $email_sender->Subject = $subject;
+        $email_sender->Body = $body;
+        
+        foreach ($subscribed_users as $subscribed_user) {
+            $name_to = $subscribed_user->get_full_name();
+            $email_to = $this->get_actual_email_to($subscribed_user->email);
+
+            $email_sender->ClearAddresses();
+            $email_sender->AddAddress($email_to, $name_to);
+            $email_sender->Send();
+        }
+    }
 // 
     function action_newsletter_categories() {
         $templates_dir = "newsletter_categories";
@@ -1162,25 +1222,25 @@ class UserApp extends CustomApp {
     }
 
     function action_user_subscription() {
-        $user_id = $this->user->id;
         $templates_dir = "user_subscription";
 
-        $user_subscriptions =& $this->create_db_object("NewsletterCategory");
-        $user_subscriptions->insert_list_extra_fields($user_id);
-        $user_subscriptions_list =& $this->create_object(
+        $newsletter_ñategory =& $this->create_db_object("NewsletterCategory");
+        $newsletter_ñategory->insert_list_extra_fields($this->user->id);
+        $categories_to_subscribe_list =& $this->create_object(
             "PagedQueryObjectsList",
              array(
-                 "templates_dir" => "{$templates_dir}/user_subscriptions",
-                 "template_var" => "user_subscriptions",
-                 "obj" => $user_subscriptions,
+                 "templates_dir" => "{$templates_dir}/categories_to_subscribe",
+                 "template_var" => "categories_to_subscribe",
+                 "obj" => $newsletter_ñategory,
                  "query_ex" => array(
                     "where" => "is_active = 1",
                  ), 
-                 "context" => "user_subscriptions",
                  "default_order_by" => array("id DESC"),    
+                 "pager.visible" => false,
+                 "context" => "list_item_user_subscriptions",
              )
         );
-        $user_subscriptions_list->print_values();
+        $categories_to_subscribe_list->print_values();
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
@@ -1209,7 +1269,6 @@ class UserApp extends CustomApp {
         $this->add_session_status_message(new OkStatusMsg("user_subscription.subscribed"));
         $this->create_self_redirect_response(array("action" => "user_subscription"));
     }
-
 
 //
     function action_categories() {

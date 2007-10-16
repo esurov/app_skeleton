@@ -13,7 +13,6 @@ class NewsletterTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "newsletter_category_id",
             "type" => "foreign_key",
-//            "read" => 0,
             "input" => array(
                 "type" => "select",
                 "values" => array(
@@ -36,7 +35,6 @@ class NewsletterTable extends CustomDbObject {
             "type" => "date",
             "value" => $this->app->get_db_now_date(),
             "index" => "index",
-            "read" => 1,
         ));
 
         $this->insert_field(array(
@@ -114,7 +112,6 @@ class NewsletterTable extends CustomDbObject {
                     ),
                 ),
             ),
-            
         ));
     }
 
@@ -211,10 +208,21 @@ class NewsletterTable extends CustomDbObject {
                 "_thumbnail_image.html",
                 "_thumbnail_image_empty.html"
             );
-            
+
+            $this->app->print_db_object_info(
+                $this->app->fetch_file_without_content($this->file_id),
+                $this->_templates_dir,
+                "newsletter.file_info",
+                "_file_info.html",
+                "_file_info_empty.html"
+            );
         }
         
-        if ($this->_context == "view" || $this->_context == "edit") {
+        if (
+            $this->_context == "view" ||
+            $this->_context == "edit" ||
+            $this->_context == "email"
+        ) {
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->image_id),
                 $this->_templates_dir,
@@ -222,79 +230,15 @@ class NewsletterTable extends CustomDbObject {
                 "_image.html",
                 "_image_empty.html"
             );
-        }
 
-        if ($this->_context == "email") {
-            $this->app->print_db_object_info(
-                $this->app->fetch_image_without_content($this->image_id),
-                $this->_templates_dir,
-                "email.image",
-                "_image.html",
-                "_image_empty.html"
-            );
             $this->app->print_db_object_info(
                 $this->app->fetch_file_without_content($this->file_id),
                 $this->_templates_dir,
-                "email.file_info",
+                "newsletter.file_info",
                 "_file_info.html",
                 "_file_info_empty.html"
             );
         }
-
-        $this->app->print_db_object_info(
-            $this->app->fetch_file_without_content($this->file_id),
-            $this->_templates_dir,
-            "newsletter.file_info",
-            "_file_info.html",
-            "_file_info_empty.html"
-        );
-    }
-
-//
-    function send_newsletter($user_subscription_list, $params = array()) {
-        $this->print_values($params);
-
-        $email_from = $this->get_config_value("website_email_from");
-        $name_from = $this->get_config_value("website_name_from");
-        $subject = $this->title;
-        $attachment_file = $this->fetch_db_object("File", $this->file_id);
-        $attachment_image = $this->fetch_db_object("Image", $this->image_id);
-        $body = $this->app->print_file("{$this->_templates_dir}/email_sent_to_user.html");
-
-        $email_sender =& $this->app->create_email_sender();
-        $email_sender->From = $email_from;
-        $email_sender->Sender = $email_from;
-        $email_sender->FromName = trim($name_from);
-        if ($attachment_image->id != 0) {
-            $email_sender->AddStringImageAttachment(
-                $attachment_image->content,
-                "image.jpg",
-                "image.jpg",
-                "base64",
-                "image/jpeg"
-            );
-        }
-        if ($attachment_file->id != 0) {
-            $email_sender->AddStringAttachment(
-                $attachment_file->content, 
-                $attachment_file->filename
-            );
-        }
-        $email_sender->Subject = $subject;
-        $email_sender->Body = $body;
-
-        foreach($user_subscription_list as $user_account) {
-            $this->send_newsletter_to_email($user_account, $email_sender);
-        }
-    }
-
-    function send_newsletter_to_email($user_account, &$email_sender) {
-        $name_to = trim($user_account["user_name"]);
-        $email_to = $this->app->get_actual_email_to($user_account["user_email"]);
-
-        $email_sender->ClearAddresses();
-        $email_sender->AddAddress($email_to, $name_to);
-        $email_sender->Send();
     }
     
 }

@@ -20,7 +20,6 @@ class UserSubscriptionTable extends CustomDbObject {
             "type" => "foreign_key",
         ));
     }
-
 //
     function get_validate_conditions($context, $context_params) {
         return array(
@@ -37,27 +36,6 @@ class UserSubscriptionTable extends CustomDbObject {
                 "message" => "user_subscription.category_empty",
             ),
         );
-    }
-
-//
-    function insert_user_list_fields() {
-        
-        $this->insert_join(array(
-            "type" => "left",
-            "obj_class" => "User",
-            "condition" => "{$this->_table_name}.user_id = user.id",
-        ));
-
-        $this->insert_field(array(
-            //user_subscription_user_login
-            "obj_class" => "User",
-            "field" => "email",
-        ));
-        $this->insert_field(array(
-            //user_subscription_user_login
-            "obj_class" => "User",
-            "field" => "first_name",
-        ));
     }
 
 }

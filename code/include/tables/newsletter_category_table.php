@@ -85,26 +85,17 @@ class NewsletterCategoryTable extends CustomDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        if ($this->_context == "user_subscriptions") {
+        if ($this->_context == "list_item_user_subscriptions") {
             $template_value_is_checked = "";
             if ($this->is_checked) {
                 $template_value_is_checked = "checked";
             }
-            $this->app->print_varchar_value(
+            $this->app->print_value(
                 "newsletter_category.is_checked",
                 $template_value_is_checked
             );
         }
-
-
-
-
-        
     }
-
-
-
-
 
 }
 
