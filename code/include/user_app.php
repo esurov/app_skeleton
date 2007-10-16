@@ -1224,14 +1224,14 @@ class UserApp extends CustomApp {
     function action_user_subscription() {
         $templates_dir = "user_subscription";
 
-        $newsletter_ñategory =& $this->create_db_object("NewsletterCategory");
-        $newsletter_ñategory->insert_list_extra_fields($this->user->id);
+        $newsletter_category =& $this->create_db_object("NewsletterCategory");
+        $newsletter_category->insert_list_extra_fields($this->user->id);
         $categories_to_subscribe_list =& $this->create_object(
             "PagedQueryObjectsList",
              array(
                  "templates_dir" => "{$templates_dir}/categories_to_subscribe",
                  "template_var" => "categories_to_subscribe",
-                 "obj" => $newsletter_ñategory,
+                 "obj" => $newsletter_category,
                  "query_ex" => array(
                     "where" => "is_active = 1",
                  ), 
