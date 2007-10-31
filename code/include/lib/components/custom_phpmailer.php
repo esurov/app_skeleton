@@ -1,4 +1,4 @@
-<?
+<?php
 
 class CustomPHPMailer extends PHPMailer {
 
