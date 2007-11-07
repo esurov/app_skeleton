@@ -11,7 +11,7 @@ class SelectQueryEx {
     var $limit;
 
     function SelectQueryEx($q = array()) {
-        $this->distinct = isset($q["distinct"]) ? $q["distinct"] : false;
+        $this->distinct = isset($q["distinct"]) ? $q["distinct"] : "";
         $this->select   = isset($q["select"  ]) ? $q["select"  ] : "";
         $this->from     = isset($q["from"    ]) ? $q["from"    ] : "";
         $this->where    = isset($q["where"   ]) ? $q["where"   ] : "";
@@ -26,7 +26,7 @@ class SelectQueryEx {
         if (is_array($query_ex)) {
 
             // Expand from array with keys-clauses
-            if (isset($query_ex["distinct"])) {
+            if (isset($query_ex["distinct"]) && is_value_not_empty($query_ex["distinct"])) {
                 $this->distinct = $query_ex["distinct"];
             }
             
@@ -84,7 +84,9 @@ class SelectQueryEx {
         } else {
 
             // Expand from SelectQueryEx object
-            $this->distinct = $query_ex->distinct;
+            if (is_value_not_empty($query_ex->distinct)) {
+                $this->distinct = $query_ex->distinct;
+            }
             
             if (is_value_not_empty($query_ex->select)) {
                 if (is_value_empty($this->select)) {
@@ -146,6 +148,10 @@ class SelectQuery extends SelectQueryEx {
 
     function SelectQuery($q = array()) {
         parent::SelectQueryEx($q);
+
+        if (is_value_empty($this->distinct)) {
+            $this->distinct = false;
+        }
     }
 
     // Return complete query string assembled from clauses
