@@ -826,7 +826,7 @@ class App extends AppObject {
             $db_value = $this->get_db_time_value($app_value);
             break;
         }
-        return $app_value;
+        return $db_value;
     }
 
     function get_db_key_value($app_value) {
