@@ -161,6 +161,7 @@ a img {
 }
 
 .status_messages div img {
+    float: left;
     margin-right: 20px;
     vertical-align: middle;
 }
