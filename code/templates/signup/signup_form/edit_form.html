@@ -36,13 +36,13 @@
     <th colspan="2">
         <div class="hint">
             {%local:text2%}<br />
-            <a href="javascript:void(openPolicyTermsOfUsePopupWindow());"
+            <a href="#" onclick="openPolicyTermsOfUsePopupWindow(); return false;"
                 >{%local:policy_terms_of_use%}</a>,
-            <a href="javascript:void(openPolicyTermsAndConditionsPopupWindow());"
+            <a href="#" onclick="openPolicyTermsAndConditionsPopupWindow(); return false;"
                 >{%local:policy_terms_and_conditions%}</a>,
-            <a href="javascript:void(openPolicyPrivacyPopupWindow());"
+            <a href="#" onclick="openPolicyPrivacyPopupWindow(); return false;"
                 >{%local:policy_privacy%}</a> {%global:and%}
-            <a href="javascript:void(openPolicyDisclaimerPopupWindow());"
+            <a href="#" onclick="openPolicyDisclaimerPopupWindow(); return false;"
                 >{%local:policy_disclaimer%}</a>.
         </div>
     </th>
