@@ -8,6 +8,22 @@ return array(
     "de" => "Tedesco",
     "de_native" => "Deutsch",
 
+    // Status messages and parts of page
+    "any" => "Qualsiasi",
+    "all" => "Tutti",
+    "choose_one" => "Selezionare:",
+    "yes" => "Sì",
+    "no" => "No",
+    "none" => "None",
+    "other" => "Altro",
+    "not_specified" => "Non specificato",
+
+    "pager.pages_title" => "Pagine:",
+    "pager.prev_page" => "&lt;&lt;&nbsp;Precedente",
+    "pager.next_page" => "Prossimo&nbsp;&gt;&gt;",
+
+    "status_msg.cannot_delete_record_because_it_has_restrict_relations" => "Impossibile eliminare {%main_obj_name%} perché in relazione con {%dep_objs_info_str%}",
+
     // Static head and page titles
     "page_title.access_denied" => "Accesso non autorizzato!",
 
@@ -37,22 +53,6 @@ return array(
 
     "admin_menu_item.index" => "Home",
     "admin_menu_item.newsletters" => "Newsletters",
-
-    // Status messages and parts of page
-    "any" => "Qualsiasi",
-    "all" => "Tutti",
-    "choose_one" => "Selezionare:",
-    "yes" => "Sì",
-    "no" => "No",
-    "none" => "None",
-    "other" => "Altro",
-    "not_specified" => "Non specificato",
-
-    "pager.pages_title" => "Pagine:",
-    "pager.prev_page" => "&lt;&lt;&nbsp;!!Precedente",
-    "pager.next_page" => "!!Prossimo&nbsp;&gt;&gt;",
-
-    "status_msg.cannot_delete_record_because_it_has_restrict_relations" => "Impossibile eliminare {%main_obj_name%} perché in relazione con {%dep_objs_info_str%}",
 
     // Login/Logout
     "page_title.login" => "Log In",
@@ -183,7 +183,7 @@ return array(
     "status_msg.newsletter.send_mail_failed" => "!!Function \"Send mail\" not realized",
     "status_msg.newsletter.send_emails_done" => "!!Emails is sent",
 
-    // Newsletter Category
+    // Newsletter categories
     "newsletter_category" => "!!Newsletter category",
     "newsletter_categorys" => "!!Newsletter categories",
 
@@ -199,20 +199,16 @@ return array(
 
     "status_msg.newsletter_category.name_empty" => "!!Specify newsletter category name",
 
-    // User Subscription
+    // User subscription
     "user_subscription" => "!!user_subscription",
     "user_subscriptions" => "!!user_subscriptions",
 
     "user_menu_item.user_subscription" => "!!user_subscription",
 
     "page_title.user_subscription" => "!!user_subscription",
-//    "page_title.newsletter_category_edit_new" => "Add newsletter category",
-//    "page_title.newsletter_category_edit" => "Edit category",
 
     "status_msg.user_subscription.subscribed" => "!!user_subscription subscribed",
     "status_msg.newsletter_category.unsubscribed" => "!!user_subscription unsubscribed",
-//    "status_msg.newsletter_category.deleted" => "Newsletter category deleted",
-//    "status_msg.newsletter_category.name_empty" => "Specify newsletter category name",
 
     // Contact form
     "guest_menu_item.contact_form" => "Contatti",

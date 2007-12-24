@@ -3,6 +3,17 @@ return array(
     // Common head and page titles
     "global:head_page_title.app" => "!!AppSkeleton",
 
+    // Parts of page
+    "global:sure_delete" => "Sei sicuro di voler cancellare l\\'informazione?",
+    "global:and" => "e",
+    "global:or" => "o",
+    "global:from" => "dal",
+    "global:to" => "al",
+    "global:filter_by" => "Filtra per",
+    "global:no_records_found" => "Non sono stati trovati dati",
+    "global:no_image" => "No immagine",
+    "global:no_file" => "No file",
+
     // Titles
     "global:actions" => "Azioni",
     "global:id" => "ID",
@@ -57,7 +68,6 @@ return array(
     "global:category1" => "Categoria1",
     "global:category2" => "Categoria2",
     "global:category3" => "Categoria3",
-    "global:add_newsletter_category" => "!!Add new category",
 
     // Link/button titles
     "global:view" => "Visualizza",
@@ -72,7 +82,7 @@ return array(
     "global:back" => "Indietro",
     "global:send" => "Invia",
     "global:save" => "Salva",
-    "global:save_and_send" => "Salva and Invia",
+    "global:save_and_send" => "Salva e Invia",
     "global:filter" => "Filtra",
     "global:show" => "Invio",
     "global:show_all" => "Mostra Tutto",
@@ -88,28 +98,33 @@ return array(
     "global:move_down" => "Giù",
     "global:move_left" => "Sinistro",
     "global:move_right" => "Destro",
+    "global:previous" => "Precedente",
+    "global:next" => "Prossimo",
     "global:accept" => "Accetta",
     "global:reject" => "Rifiuta",
+    "global:assign" => "Assegna",
+    "global:resume" => "Riattiva",
+    "global:suspend" => "Sospendi",
+    "global:finish" => "Fine",
+    "global:done" => "Eseguito",
+    "global:generate" => "Genera",
+
     "global:delete_image" => "Cancella immagine",
     "global:delete_file" => "Cancella file",
 
     "global:view_all_news" => "Tutte le News",
-    "global:add_user" => "Aggiungi utente",
     "global:add_news_article" => "Aggiungi notizia",
+    
+    "global:add_user" => "Aggiungi utente",
+
     "global:add_category1" => "Aggiungi categoria1",
+    
     "global:add_category2" => "Aggiungi categoria2",
+    
     "global:add_category3" => "Aggiungi categoria3",
+    
     "global:add_product" => "Aggiungi prodotto",
 
-    // Parts of page
-    "global:sure_delete" => "Sei sicuro di voler cancellare l\\'informazione?",
-    "global:and" => "e",
-    "global:or" => "o",
-    "global:from" => "dal",
-    "global:to" => "al",
-    "global:filter_by" => "Filtra per",
-    "global:no_records_found" => "Non sono stati trovati dati",
-    "global:no_image" => "No immagine",
-    "global:no_file" => "No file",
+    "global:add_newsletter_category" => "Aggiungi categoria",
 );
 ?>

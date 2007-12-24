@@ -3,6 +3,17 @@ return array(
     // Common head and page titles
     "global:head_page_title.app" => "!!AppSkeleton",
 
+    // Parts of page
+    "global:sure_delete" => "Are you sure you want to delete record?",
+    "global:and" => "and",
+    "global:or" => "or",
+    "global:from" => "from",
+    "global:to" => "to",
+    "global:filter_by" => "Filter by",
+    "global:no_records_found" => "No records found",
+    "global:no_image" => "No image uploaded",
+    "global:no_file" => "No file uploaded",
+
     // Titles
     "global:actions" => "Actions",
     "global:id" => "ID",
@@ -57,7 +68,6 @@ return array(
     "global:category1" => "Category1",
     "global:category2" => "Category2",
     "global:category3" => "Category3",
-    "global:add_newsletter_category" => "Add new category",
 
     // Link/button titles
     "global:view" => "View",
@@ -72,7 +82,7 @@ return array(
     "global:back" => "Back",
     "global:send" => "Send",
     "global:save" => "Save",
-    "global:save_and_send" => "Save and send",
+    "global:save_and_send" => "Save and Send",
     "global:filter" => "Filter",
     "global:show" => "Show",
     "global:show_all" => "Show all",
@@ -88,28 +98,33 @@ return array(
     "global:move_down" => "Down",
     "global:move_left" => "Left",
     "global:move_right" => "Right",
+    "global:previous" => "Previous",
+    "global:next" => "Next",
     "global:accept" => "Accept",
     "global:reject" => "Reject",
+    "global:assign" => "Assign",
+    "global:resume" => "Resume",
+    "global:suspend" => "Suspend",
+    "global:finish" => "Finish",
+    "global:done" => "Done",
+    "global:generate" => "Generate",
+
     "global:delete_image" => "Delete image",
     "global:delete_file" => "Delete file",
 
     "global:view_all_news" => "View all news",
-    "global:add_user" => "Add user",
     "global:add_news_article" => "Add news article",
+
+    "global:add_user" => "Add user",
+
     "global:add_category1" => "Add category1",
+
     "global:add_category2" => "Add category2",
+
     "global:add_category3" => "Add category3",
+
     "global:add_product" => "Add product",
 
-    // Parts of page
-    "global:sure_delete" => "Are you sure you want to delete record?",
-    "global:and" => "and",
-    "global:or" => "or",
-    "global:from" => "from",
-    "global:to" => "to",
-    "global:filter_by" => "Filter by",
-    "global:no_records_found" => "No records found",
-    "global:no_image" => "No image uploaded",
-    "global:no_file" => "No file uploaded",
+    "global:add_newsletter_category" => "Add category",
 );
 ?>

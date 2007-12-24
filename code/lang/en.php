@@ -8,6 +8,22 @@ return array(
     "de" => "German",
     "de_native" => "Deutsch",
 
+    // Status messages and parts of page
+    "any" => "Any",
+    "all" => "All",
+    "choose_one" => "Choose one:",
+    "yes" => "Yes",
+    "no" => "No",
+    "none" => "None",
+    "other" => "Other",
+    "not_specified" => "Not specified",
+
+    "pager.pages_title" => "Pages:",
+    "pager.prev_page" => "&lt;&lt;&nbsp;Previous",
+    "pager.next_page" => "Next&nbsp;&gt;&gt;",
+
+    "status_msg.cannot_delete_record_because_it_has_restrict_relations" => "Cannot delete {%main_obj_name%} because it has links to {%dep_objs_info_str%}",
+
     // Static head and page titles
     "page_title.access_denied" => "Access denied!",
 
@@ -36,22 +52,6 @@ return array(
     "user_menu_item.index" => "Home",
 
     "admin_menu_item.index" => "Home",
-
-    // Status messages and parts of page
-    "any" => "Any",
-    "all" => "All",
-    "choose_one" => "Choose one:",
-    "yes" => "Yes",
-    "no" => "No",
-    "none" => "None",
-    "other" => "Other",
-    "not_specified" => "Not specified",
-
-    "pager.pages_title" => "Pages:",
-    "pager.prev_page" => "&lt;&lt;&nbsp;Previous",
-    "pager.next_page" => "Next&nbsp;&gt;&gt;",
-
-    "status_msg.cannot_delete_record_because_it_has_restrict_relations" => "Cannot delete {%main_obj_name%} because it has links to {%dep_objs_info_str%}",
 
     // Login/Logout
     "page_title.login" => "Log In",
@@ -182,7 +182,7 @@ return array(
     "status_msg.newsletter.send_mail_failed" => "!!Function \"Send mail\" not realized",
     "status_msg.newsletter.send_emails_done" => "!!Emails is sent",
 
-    // Newsletter Category
+    // Newsletter categories
     "newsletter_category" => "Newsletter category",
     "newsletter_categorys" => "Newsletter categories",
 
@@ -198,22 +198,15 @@ return array(
 
     "status_msg.newsletter_category.name_empty" => "Specify newsletter category name",
 
-    // User Subscription
+    // User subscription
     "user_subscription" => "!!user_subscription",
     "user_subscriptions" => "!!user_subscriptions",
 
     "user_menu_item.user_subscription" => "!!user_subscription",
 
     "page_title.user_subscription" => "!!user_subscription",
-//    "page_title.newsletter_category_edit_new" => "Add newsletter category",
-//    "page_title.newsletter_category_edit" => "Edit category",
 
     "status_msg.user_subscription.subscribed" => "!!user_subscription subscribed",
-//    "status_msg.newsletter_category.unsubscribed" => "!!user_subscription unsubscribed",
-//    "status_msg.newsletter_category.deleted" => "Newsletter category deleted",
-//    "status_msg.newsletter_category.name_empty" => "Specify newsletter category name",
-
-
 
     // Contact form
     "guest_menu_item.contact_form" => "Contacts",
