@@ -52,7 +52,7 @@ return array(
     "user_menu_item.index" => "Home",
 
     "admin_menu_item.index" => "Home",
-    "admin_menu_item.newsletters" => "Newsletters",
+    "admin_menu_item.newsletters" => "!!Newsletters",
 
     // Login/Logout
     "page_title.login" => "Log In",
@@ -154,13 +154,13 @@ return array(
 
     "guest_menu_item.newsletters" => "!!Newsletters",
     "admin_menu_item.newsletters" => "!!Newsletters",
-    "admin_sub_menu_item.newsletters" => "!!List of newsletters",
+    "admin_sub_menu_item.newsletters" => "!!Newsletters list",
     "admin_sub_menu_item.newsletter_edit" => "!!New newsletter",
-    "admin_sub_menu_item.newsletter_category" => "!!Category of newsletters",
+    "admin_sub_menu_item.newsletter_category" => "!!Newsletter categories",
     "admin_sub_menu_item.newsletter_edit_new" => "!!Add newsletter",
     "admin_sub_menu_item.newsletter_edit" => "!!Edit newsletter",
 
-    "page_title.newsletters" => "!!Newsletter",
+    "page_title.newsletters" => "!!Newsletters",
     "page_title.newsletter_view" => "!!View newsletter",
     "page_title.newsletter_edit_new" => "!!Add newsletter",
     "page_title.newsletter_edit" => "!!Edit newsletter",
@@ -181,17 +181,17 @@ return array(
     "status_msg.newsletter.file_max_size_reached" => "!!Uploaded file size is more than 2 Mb",
     "status_msg.newsletter.files_max_total_size_reached" => "!!Total uploaded files size is more than 100 Mb",
     "status_msg.newsletter.send_mail_failed" => "!!Function \"Send mail\" not realized",
-    "status_msg.newsletter.send_emails_done" => "!!Emails is sent",
+    "status_msg.newsletter.send_emails_done" => "!!Emails were sent",
 
     // Newsletter categories
-    "newsletter_category" => "!!Newsletter category",
-    "newsletter_categorys" => "!!Newsletter categories",
+    "newsletter_category" => "!!newsletter category",
+    "newsletter_categorys" => "!!newsletter categories",
 
-    "admin_menu_item.newsletter_category" => "!!Category of newsletters",
+    "admin_menu_item.newsletter_category" => "!!Newsletter categories",
 
-    "page_title.newsletter_categories" => "!!Category of newsletters",
-    "page_title.newsletter_categories_category_edit_new" => "!!Add newsletter category",
-    "page_title.newsletter_categories_category_edit" => "!!Edit category",
+    "page_title.newsletter_categories" => "!!Newsletter categories",
+    "page_title.newsletter_category_edit_new" => "!!Add newsletter category",
+    "page_title.newsletter_category_edit" => "!!Edit category",
 
     "status_msg.newsletter_category.added" => "!!Newsletter category added",
     "status_msg.newsletter_category.updated" => "!!Newsletter category updated",

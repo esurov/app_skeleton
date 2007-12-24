@@ -111,11 +111,15 @@ return array(
 
     "global:delete_image" => "Delete image",
     "global:delete_file" => "Delete file",
+    "global:activate_deactivate" => "Activate/Deactivate",
 
     "global:view_all_news" => "View all news",
     "global:add_news_article" => "Add news article",
+    "global:back_to_news_articles" => "Back to news articles",
 
     "global:add_user" => "Add user",
+    "global:back_to_users" => "Back to users",
+    "global:back_to_user_view" => "Back to user view",
 
     "global:add_category1" => "Add category1",
 
@@ -124,7 +128,12 @@ return array(
     "global:add_category3" => "Add category3",
 
     "global:add_product" => "Add product",
+    "global:back_to_products" => "Back to products",
 
-    "global:add_newsletter_category" => "Add category",
+    "global:add_newsletter" => "Add newsletter",
+    "global:back_to_newsletters" => "Back to newsletters",
+
+    "global:add_newsletter_category" => "Add newsletter category",
+    "global:back_to_newsletter_categories" => "Back to newsletter categories",
 );
 ?>

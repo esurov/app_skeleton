@@ -111,20 +111,29 @@ return array(
 
     "global:delete_image" => "Cancella immagine",
     "global:delete_file" => "Cancella file",
+    "global:activate_deactivate" => "!!Activate/Deactivate",
 
     "global:view_all_news" => "Tutte le News",
     "global:add_news_article" => "Aggiungi notizia",
+    "global:back_to_news_articles" => "!!Torna alla lista ... notizie",
     
     "global:add_user" => "Aggiungi utente",
+    "global:back_to_users" => "!!Torna alla lista degli utenti",
+    "global:back_to_user_view" => "!!Torna al dettaglio utente",
 
     "global:add_category1" => "Aggiungi categoria1",
-    
+
     "global:add_category2" => "Aggiungi categoria2",
     
     "global:add_category3" => "Aggiungi categoria3",
     
     "global:add_product" => "Aggiungi prodotto",
+    "global:back_to_products" => "!!Torna alla lista ... prodotti",
 
-    "global:add_newsletter_category" => "Aggiungi categoria",
+    "global:add_newsletter" => "!!Aggiungi newsletter",
+    "global:back_to_newsletters" => "!!Torna alla lista ... newsletters",
+
+    "global:add_newsletter_category" => "!!Aggiungi newsletter categoria",
+    "global:back_to_newsletter_categories" => "!!Torna alla lista ... newsletter categorie",
 );
 ?>
