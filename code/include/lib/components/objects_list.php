@@ -51,12 +51,12 @@ class _ObjectsList extends ObjectTemplateComponent {
             $list_items_template_name = "list_items.{$this->templates_ext}";
         }
         
-        $this->app->print_file(
+        $this->app->print_file_new(
             "{$this->templates_dir}/{$list_items_template_name}",
             "{$this->template_var_prefix}_list"
         );
 
-        return $this->app->print_file(
+        return $this->app->print_file_new(
             "{$this->templates_dir}/list.{$this->templates_ext}",
             $this->template_var
         );
@@ -67,11 +67,6 @@ class _ObjectsList extends ObjectTemplateComponent {
         $list_item_class = ($list_item_parity == 0) ?
             "list_item_even" :
             "list_item_odd";
-
-        $this->app->print_raw_values(array(
-            "list_item_parity" => $list_item_parity,
-            "list_item_class" => $list_item_class,
-        ));
 
         $obj->print_values(array(
              "templates_dir" => $this->templates_dir,
@@ -85,6 +80,11 @@ class _ObjectsList extends ObjectTemplateComponent {
              "list_item_parity" => $list_item_parity,
              "list_item_class" => $list_item_class,
              "list_items_count" => $this->_get_num_objects(),
+        ));
+
+        $this->app->print_raw_values(array(
+            "list_item_parity" => $list_item_parity,
+            "list_item_class" => $list_item_class,
         ));
     }
 

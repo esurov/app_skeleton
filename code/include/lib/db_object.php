@@ -651,6 +651,19 @@ class DbObject extends AppObject {
         }
         return $nonset_value;
     }
+
+    function has_nonset_filters() {
+        $result = false;
+        foreach ($this->_filters as $filter_info) {
+            $filter_value = $filter_info["value"];
+            $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
+            if ((string) $filter_value == (string) $nonset_filter_value) {
+                $result = true;
+                break;
+            }
+        }
+        return $result;
+    }
 //
     function insert_select_from($select_from = null) {
         // Store FROM clause for SELECT query.
@@ -2525,6 +2538,17 @@ class DbObject extends AppObject {
 
     function fetch_rows_list($query) {
         return $this->app->fetch_rows_list($query);
+    }
+
+    function fetch_max_field_value($field_name, $where_str = "1") {
+        $query = new SelectQuery(array(
+            "select" => "IFNULL(MAX($field_name), 0) as max_value",
+            "from" => "{%{$this->_table_name}_table%}",
+            "where" => $where_str,
+        ));
+        $res = $this->run_select_query($query);
+        $row = $res->fetch_next_row();
+        return $row["max_value"];
     }
 //
     // Uploaded image helper functions

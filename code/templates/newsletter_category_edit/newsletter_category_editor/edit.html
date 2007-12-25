@@ -2,4 +2,32 @@
     [<a href="?action=newsletter_categories">{%global:back_to_newsletter_categories%}</a>]
 </div>
 
-{%newsletter_category_form%}
+<form action="?action=newsletter_category_edit&amp;newsletter_category_id={%newsletter_category.id%}"
+    method="post" name="form" enctype="multipart/form-data">
+<input type="hidden" name="command" value="update" />
+
+<table>
+<tr>
+    <th>{%global:id%}:</th>
+    <td>{%newsletter_category.id%}</td>
+</tr>
+<tr>
+    <th>{%global:name%}:&nbsp;<span class="required">*</span></th>
+    <td>{%newsletter_category.name.input%}</td>
+</tr>
+<tr>
+    <th>{%global:is_active%}:</th>
+    <td>{%newsletter_category.is_active.input%}</td>
+</tr>
+<tr>
+    <td colspan="2">
+        <input type="submit" name="submit_btn" value="{%global:save%}" />
+    </td>
+</tr>
+</table>
+
+</form>
+
+<script type="text/javascript">
+{%newsletter_category.client_validation_js%}
+</script>

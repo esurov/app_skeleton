@@ -66,7 +66,7 @@ function create_self_url($params = array()) {
     $params_suburl = create_suburl($params);
     
     $script_path = dirname($_SERVER["SCRIPT_NAME"]);
-    if ($script_path == "/") {
+    if ($script_path == "/" || $script_path == "\\") {
         $script_path = "";
     }
     $script_name = basename($_SERVER["SCRIPT_NAME"]);

@@ -1,1 +1,65 @@
-{%user_form%}
+<div class="hint">{%local:text1%}</div>
+
+<form action="?action=signup" method="post" name="form">
+<input type="hidden" name="command" value="signup" />
+
+<table>
+<tr>
+    <th>{%global:login%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.login.input%}</td>
+</tr>
+<tr>
+    <th>{%global:password%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.password.input%}</td>
+</tr>
+<tr>
+    <th>{%global:password_confirm%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.password_confirm.input%}</td>
+</tr>
+<tr>
+    <th>{%global:first_name%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.first_name.input%}</td>
+</tr>
+<tr>
+    <th>{%global:last_name%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.last_name.input%}</td>
+</tr>
+<tr>
+    <th>{%global:email%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.email.input%}</td>
+</tr>
+<tr>
+    <th>{%global:extra_info%}:</th>
+    <td>{%user.extra_info.input%}</td>
+</tr>
+<tr>
+    <th colspan="2">
+        <div class="hint">
+            {%local:text2%}<br />
+            <a href="#" onclick="openPolicyTermsOfUsePopupWindow(); return false;"
+                >{%local:policy_terms_of_use%}</a>,
+            <a href="#" onclick="openPolicyTermsAndConditionsPopupWindow(); return false;"
+                >{%local:policy_terms_and_conditions%}</a>,
+            <a href="#" onclick="openPolicyPrivacyPopupWindow(); return false;"
+                >{%local:policy_privacy%}</a> {%global:and%}
+            <a href="#" onclick="openPolicyDisclaimerPopupWindow(); return false;"
+                >{%local:policy_disclaimer%}</a>.
+        </div>
+    </th>
+</tr>
+<tr>
+    <th>{%user.agreement_accepted.input%} {%global:accept_agreement%}&nbsp;<span class="required">*</span></th>
+    <td></td>
+</tr>
+<tr>
+    <td colspan="2" align="center">
+        <input name="submit_btn" type="submit" value="{%global:send%}" />
+    </td>
+</tr>
+</table>
+
+</form>
+
+<script type="text/javascript">
+{%user.client_validation_js%}
+</script>

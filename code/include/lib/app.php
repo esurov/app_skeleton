@@ -1923,28 +1923,74 @@ class App extends AppObject {
         return $value_caption_pairs;
     }
 
+    // New implementation.
+    // Note:
+    // $captions_field_name may be string (field name) or array("func" => "func_name")
     function get_value_caption_pairs_from_db_object_query(
         $obj,
         $query_ex,
         $values_field_name,
         $captions_field_name
     ) {
-        if (is_string($obj)) {
-            $obj =& $this->create_db_object($obj);
-        }
-        $query = $obj->get_expanded_select_query(
-            $query_ex,
-            array(
-                $values_field_name,
-                $captions_field_name,
-            )
-        );
-        return $this->get_value_caption_pairs_from_query(
-            $query,
+        return $this->get_value_caption_pairs_from_db_objects_list(
+            $this->fetch_db_objects_list($obj, $query_ex),
             $values_field_name,
             $captions_field_name
         );
     }
+
+    function get_value_caption_pairs_from_db_objects_list(
+        $db_objects_list,
+        $values_field_name,
+        $captions_field_name
+    ) {
+        if (is_string($captions_field_name)) {
+            $get_captions_by_func = false;
+        } else {
+            $get_captions_by_func = true;
+            $captions_func_name = $captions_field_name["func"];
+        }
+
+        $value_caption_pairs = array();
+        foreach ($db_objects_list as $obj) {
+            $value = $obj->{$values_field_name};
+            
+            if ($get_captions_by_func) {
+                $caption = $obj->{$captions_func_name}();
+            } else {
+                $caption = $obj->{$captions_field_name};
+            }
+            
+            $value_caption_pairs[] = array($value, $caption);
+        }
+        return $value_caption_pairs;
+    }
+
+// Old implementation.
+// Works faster but adds more troubles.
+// Redefine function with code below if necessary. 
+//    function get_value_caption_pairs_from_db_object_query(
+//        $obj,
+//        $query_ex,
+//        $values_field_name,
+//        $captions_field_name
+//    ) {
+//        if (is_string($obj)) {
+//            $obj =& $this->create_db_object($obj);
+//        }
+//        $query = $obj->get_expanded_select_query(
+//            $query_ex,
+//            array(
+//                $values_field_name,
+//                $captions_field_name,
+//            )
+//        );
+//        return $this->get_value_caption_pairs_from_query(
+//            $query,
+//            $values_field_name,
+//            $captions_field_name
+//        );
+//    }
 
     function get_value_caption_pairs_from_query(
         $query,

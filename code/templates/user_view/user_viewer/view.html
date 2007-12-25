@@ -1,4 +1,25 @@
 [<a href="?action=user_edit&amp;user_id={%user.id%}">{%global:edit%}</a>]
 <br />
 <br />
-{%user_info%}
+<table class="table">
+<tr>
+    <td>{%global:login%}:</td>
+    <td>{%user.login%}</td>
+</tr>
+<tr>
+    <td>{%global:first_name%}:</td>
+    <td>{%user.first_name%}</td>
+</tr>
+<tr>
+    <td>{%global:last_name%}:</td>
+    <td>{%user.last_name%}</td>
+</tr>
+<tr>
+    <td>{%global:email%}:</td>
+    <td>{%user.email%}</td>
+</tr>
+<tr>
+    <td valign="middle">{%global:extra_info%}:</td>
+    <td>{%user.extra_info.lf2br%}</td>
+</tr>
+</table>

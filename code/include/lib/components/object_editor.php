@@ -46,11 +46,7 @@ class ObjectEditor extends ObjectTemplateComponent {
 
         $this->_print_object_values($this->obj);
 
-        $this->app->print_file_new(
-            "{$this->templates_dir}/edit_form.{$this->templates_ext}",
-            "{$this->template_var_prefix}_form"
-        );
-        return $this->app->print_file(
+        return $this->app->print_file_new(
             "{$this->templates_dir}/edit.{$this->templates_ext}",
             $this->template_var
         );

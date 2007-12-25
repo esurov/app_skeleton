@@ -29,11 +29,7 @@ class ObjectViewer extends ObjectTemplateComponent {
 
         $this->_print_object_values($this->obj);
 
-        $this->app->print_file_new(
-            "{$this->templates_dir}/view_info.{$this->templates_ext}",
-            "{$this->template_var_prefix}_info"
-        );
-        return $this->app->print_file(
+        return $this->app->print_file_new(
             "{$this->templates_dir}/view.{$this->templates_ext}",
             $this->template_var
         );

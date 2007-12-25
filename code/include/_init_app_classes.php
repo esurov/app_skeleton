@@ -2,7 +2,6 @@
 
 $app_classes["class_paths"] = array_merge(
     array(
-        _APP_DIR,
         _APP_DIR . "/components",
     ),
     $app_classes["class_paths"]

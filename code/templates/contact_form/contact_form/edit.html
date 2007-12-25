@@ -1,1 +1,56 @@
-{%contact_info_form%}
+<form action="?action=contact_form" method="post" name="form">
+<input type="hidden" name="command" value="process" />
+
+<table>
+<tr>
+    <th>{%global:first_name%}:&nbsp;<span class="required">*</span></th>
+    <td>{%contact_info.first_name.input%}</td>
+
+    <th>{%global:company_name%}:</th>
+    <td>{%contact_info.company_name.input%}</td>
+</tr>
+<tr>
+    <th>{%global:last_name%}:&nbsp;<span class="required">*</span></th>
+    <td>{%contact_info.last_name.input%}</td>
+
+    <th>{%global:city%}:</th>
+    <td>{%contact_info.city.input%}</td>
+</tr>
+<tr>
+    <th>{%global:email%}:&nbsp;<span class="required">*</span></th>
+    <td>{%contact_info.email.input%}</td>
+
+    <th>{%global:address%}:</th>
+    <td>{%contact_info.address.input%}</td>
+</tr>
+<tr>
+    <th>{%global:phone%}:</th>
+    <td>{%contact_info.phone.input%}</td>
+
+    <th>{%global:fax%}:</th>
+    <td>{%contact_info.fax.input%}</td>
+</tr>
+<tr>
+    <th valign="middle">{%global:message_text%}:&nbsp;<span class="required">*</span></th>
+    <td colspan="3">{%contact_info.message_text.input%}</td>
+</tr>
+<tr>
+    <td colspan="4" align="center">
+        <input name="submit_btn" type="submit" value="{%global:send%}" />
+    </td>
+</tr>
+</table>
+
+</form>
+
+<script type="text/javascript">
+focusFormElement('form', '{%contact_info.first_name.input_name%}');
+</script>
+
+<script type="text/javascript">
+{%contact_info.client_validation_js%}
+</script>
+
+<span class="info">
+    {{contact_form/contact_form/_notice}}
+</span>

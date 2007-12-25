@@ -78,6 +78,10 @@
 }
 
 /* Category browser */
-.category_browser td, .category_browser th{
+.category_browser td, .category_browser th {
     border: 1px dotted #7d878d;
+}
+
+table.category_browser>tbody>tr>td {
+    vertical-align: top;
 }

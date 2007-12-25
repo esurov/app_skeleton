@@ -2,4 +2,50 @@
     [<a href="?action=products">{%global:back_to_products%}</a>]
 </div>
 
-{%product_form%}
+<form action="?action=product_edit&amp;product_id={%product.id%}" method="post" name="form">
+<input type="hidden" name="command" value="update" />
+
+<table>
+<tr>
+    <td>{%global:category1%}:&nbsp;<span class="required">*</span></td>
+    <td>{%product.category2_category1_id.input%}</td>
+</tr>
+<tr>
+    <td>{%global:category2%}:&nbsp;<span class="required">*</span></td>
+    <td>{%product.category3_category2_id.input%}</td>
+</tr>
+<tr>
+    <td>{%global:category3%}:&nbsp;<span class="required">*</span></td>
+    <td>{%product.category3_id.input%}</td>
+</tr>
+<tr>
+    <td>{%global:name%}:&nbsp;<span class="required">*</span></td>
+    <td>{%product.name.input%}</td>
+</tr>
+<tr>
+    <td>{%global:description%}:</td>
+    <td>{%product.description.input%}</td>
+</tr>
+<tr>
+    <td>{%global:price%}:</td>
+    <td>{%product.price.input%}</td>
+</tr>
+<tr>
+    <td colspan="2">
+        <input type="submit" name="submit_btn" value="{%global:save%}" />
+    </td>
+</tr>
+</table>
+
+</form>
+
+{%product.category3_category2_id.dependency_js%}
+{%product.category2_category1_id.dependency_js%}
+
+<script type="text/javascript">
+initDependencies();
+</script>
+
+<script type="text/javascript">
+{%product.client_validation_js%}
+</script>

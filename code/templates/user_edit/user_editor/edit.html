@@ -1,3 +1,49 @@
 <div class="toolbar">{%_link_back%}</div>
 
-{%user_form%}
+<form action="?action=user_edit&amp;user_id={%user.id%}" method="post" name="form">
+<input type="hidden" name="command" value="update" />
+
+<table>
+{%_role%}
+<tr>
+    <th>{%global:login%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.login.input%}</td>
+</tr>
+<tr>
+    <th>{%global:password%}:</th>
+    <td>{%user.password.input%}</td>
+</tr>
+<tr>
+    <th>{%global:password_confirm%}:</th>
+    <td>{%user.password_confirm.input%}</td>
+</tr>
+<tr>
+    <th>{%global:first_name%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.first_name.input%}</td>
+</tr>
+<tr>
+    <th>{%global:last_name%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.last_name.input%}</td>
+</tr>
+<tr>
+    <th>{%global:email%}:&nbsp;<span class="required">*</span></th>
+    <td>{%user.email.input%}</td>
+</tr>
+<tr>
+    <th>{%global:extra_info%}:</th>
+    <td>{%user.extra_info.input%}</td>
+</tr>
+{%_is_confirmed%}
+{%_is_active%}
+<tr>
+    <td colspan="2" align="center">
+        <input name="submit_btn" type="submit" value="{%global:save%}" />
+    </td>
+</tr>
+</table>
+
+</form>
+
+<script type="text/javascript">
+{%user.client_validation_js%}
+</script>
