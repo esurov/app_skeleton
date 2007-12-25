@@ -18,6 +18,43 @@ class Menu extends TemplateComponent {
     function add_item(&$item) {
         $this->items[] =& $item;
     }
+
+    function remove_item(&$item) {
+        $this->remove_item_by_name($item->name);
+    }
+
+    function remove_item_by_name($name) {
+        $menu_item =& $this->get_item_by_name($name);
+        if (!is_null($menu_item)) {
+            unset($menu_item);
+        }
+    }
+
+    function hide_item_by_name($name) {
+        $menu_item =& $this->get_item_by_name($name);
+        if (!is_null($menu_item)) {
+            $menu_item->is_visible = false;
+        }
+    }
+
+    function hide_items_by_names($names) {
+        foreach ($names as $name) {
+            $this->hide_item_by_name($name);
+        }
+    }
+
+    function &get_item_by_name($name) {
+        $result_item = null;
+        $n = count($this->items);
+        for ($i = 0; $i < $n; $i++) {
+            $menu_item =& $this->items[$i];
+            if ($menu_item->name == $name) {
+                $result_item =& $menu_item;
+                break;
+            }
+        }
+        return $result_item;
+    }
 //
     function load_from_xml($xml_filename) {
         $this->app->page->verbose_turn_off();
@@ -41,6 +78,10 @@ class Menu extends TemplateComponent {
         $n = count($menu->items);
         for ($i = 0; $i < $n; $i++) {
             $menu_item =& $menu->items[$i];
+
+            if (!$menu_item->is_visible) {
+                continue;
+            }
         
             if ($menu_item->is_selected) {
                 if ($menu_item->has_sub_menu()) {
@@ -136,6 +177,7 @@ class MenuItem {
 
     var $sub_menu = null;
 
+    var $is_visible = true;
     var $is_selected = false;
 
     function has_sub_menu() {

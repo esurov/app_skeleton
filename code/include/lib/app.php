@@ -534,17 +534,17 @@ class App extends AppObject {
     function create_plain_text_document_response(
         $content,
         $filename = null,
-        $open_inline = true
+        $is_attachment = false
     ) {
-        $this->response = new PlainTextDocumentResponse($content, $filename, $open_inline);
+        $this->response = new PlainTextDocumentResponse($content, $filename, $is_attachment);
     }
 
     function create_pdf_document_response(
         $content,
         $filename = null,
-        $open_inline = true
+        $is_attachment = false
     ) {
-        $this->response = new PdfDocumentResponse($content, $filename, $open_inline);
+        $this->response = new PdfDocumentResponse($content, $filename, $is_attachment);
     }
 //
     // Values formatting configuration
@@ -1808,6 +1808,7 @@ class App extends AppObject {
         $main_select_name = $input_name;
         $dependency_key_field_name = $dependency_info["key_field_name"];
         $dependency_query_ex = get_param_value($dependency_info, "query_ex", array());
+        $dependency_name = get_param_value($dependency_info, "name", $template_var);
 
         $input_attrs["onchange"] =
             "updateDependentSelect(this, '{$dependent_select_name}'); " .
@@ -1838,7 +1839,7 @@ class App extends AppObject {
         
         $this->print_input_name($template_var, $input_name);
         $this->print_raw_value("{$template_var}.input", $printed_value);
-        $this->print_raw_value("{$template_var}.dependency_js", $dependency_js);
+        $this->print_raw_value("{$dependency_name}.dependency_js", $dependency_js);
         
         return $printed_value;
     }
@@ -2209,6 +2210,9 @@ class App extends AppObject {
         $menu =& $this->create_menu($params);
         
         $menu->load_from_xml(get_param_value($params, "xml_filename", "menu.xml"));
+
+        $menu->hide_items_by_names(get_param_value($params, "item_names_to_hide", array()));
+
         $menu->select_items_by_context(
             get_param_value($params, "context", $this->get_action_lang_resource())
         );
