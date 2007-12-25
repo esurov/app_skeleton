@@ -2067,6 +2067,24 @@ class DbObject extends AppObject {
         case "not_equal":
             $result = $this->validate_not_equal_condition($field_name, $param);
             break;
+        case "less":
+            $result = $this->validate_less_condition($field_name, $param);
+            break;
+        case "less_equal":
+            $result = $this->validate_less_equal_condition($field_name, $param);
+            break;
+        case "greater":
+            $result = $this->validate_greater_condition($field_name, $param);
+            break;
+        case "greater_equal":
+            $result = $this->validate_greater_equal_condition($field_name, $param);
+            break;
+        case "simple_url":
+            $result = $this->validate_simple_url_condition($field_name, $param);
+            break;
+        case "has_substring":
+            $result = $this->validate_has_substring_condition($field_name, $param);
+            break;
         case "uploaded_file_types":
             $type = get_param_value($param, "type", "files");
             $custom_types_str = get_param_value($param, "custom_types", "*");
@@ -2203,7 +2221,31 @@ class DbObject extends AppObject {
             in_array($field_name, $field_names_to_validate)
         );
     }
-//
+
+    function validate_less_condition($field_name, $param) {
+        return ($this->{$field_name} < $param);
+    }
+
+    function validate_less_equal_condition($field_name, $param) {
+        return ($this->{$field_name} <= $param);
+    }
+
+    function validate_greater_condition($field_name, $param) {
+        return ($this->{$field_name} > $param);
+    }
+
+    function validate_greater_equal_condition($field_name, $param) {
+        return ($this->{$field_name} >= $param);
+    }
+
+    function validate_simple_url_condition($field_name, $param) {
+        return preg_match('/^https?:\/\/(.*?)\/(.*?)$/', $this->{$field_name});
+    }
+
+    function validate_has_substring_condition($field_name, $param) {
+        return (strpos($this->{$field_name}, $param) !== false);
+    }
+
     function validate_uploaded_file_types_condition($input_name, $file_types_allowed) {
         if (is_null($file_types_allowed)) {
             return true;
