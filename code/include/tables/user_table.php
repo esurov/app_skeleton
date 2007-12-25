@@ -505,7 +505,11 @@ class UserTable extends CustomDbObject {
         parent::print_values($params);
 
         if ($this->_context == "list_item") {
-            $this->app->print_varchar_value("user.full_name", $this->get_full_name());
+            $this->app->print_varchar_value(
+                "user.full_name",
+                $this->get_full_name()
+            );
+
             $this->app->print_varchar_value(
                 "user.full_name.reversed",
                 $this->get_full_name_reversed()
@@ -514,23 +518,11 @@ class UserTable extends CustomDbObject {
     }
 
     function get_full_name() {
-        return trim("{$this->first_name} {$this->last_name}");
+        return get_full_name($this->first_name, $this->last_name);
     }
 
     function get_full_name_reversed() {
-        if (is_value_empty($this->last_name)) {
-            if (is_value_empty($this->first_name)) {
-                return "";
-            } else {
-                return $this->first_name;
-            }
-        } else {
-            if (is_value_empty($this->first_name)) {
-                return $this->last_name;
-            } else {
-                return "{$this->last_name}, {$this->first_name}";
-            }
-        }
+        return get_full_name_reversed($this->first_name, $this->last_name);
     }
 //
     function print_form_values($params = array()) {
