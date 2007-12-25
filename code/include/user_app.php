@@ -362,7 +362,7 @@ class UserApp extends CustomApp {
     }
 
     function destroy_login_state() {
-        $this->session->destroy_login_state();
+        $this->session->clear();
     }
 
     function add_remember_user_id_and_password_cookies($user) {
