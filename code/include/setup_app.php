@@ -47,7 +47,12 @@ class SetupApp extends CustomApp {
     }
 //
     function action_insert_initial_data() {
-        $this->insert_initial_users();
+        $obj_name = (string) param("obj");
+        if ($obj_name != "") {
+            $this->{"insert_initial_{$obj_name}"}();
+        } else {
+            $this->insert_initial_users();
+        }
 
         $this->add_session_status_message(new OkStatusMsg("initial_data_inserted"));
         
@@ -56,6 +61,7 @@ class SetupApp extends CustomApp {
 
     function insert_initial_users() {
         $user =& $this->create_db_object("User");
+        $user->truncate_table();
         $user->login = "admin";
         $user->password = "";
         $user->first_name = "Admin";
@@ -65,6 +71,7 @@ class SetupApp extends CustomApp {
         $user->is_confirmed = 1;
         $user->is_active = 1;
         $user->store();
+        $user->reset_field_values();
     }
 //
     function action_insert_test_data() {

@@ -10,8 +10,10 @@
 </div>
 
 <div class="block">
-    <form action="?" method="post" onsubmit="onsubmitFormHandler(this);">
-        <input type="hidden" name="action" value="insert_initial_data" />
+    <form action="?action=insert_initial_data" method="post" onsubmit="onsubmitFormHandler(this);">
+        <input id="input_all" type="radio" name="obj" value="" checked/> <label for="input_all">All</label><br />
+        <input id="input_users" type="radio" name="obj" value="users" /> <label for="input_users">Users</label><br />
+        <br />
         <input type="submit" name="submit_btn" value="Insert initial data" />
     </form>
 

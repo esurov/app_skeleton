@@ -976,6 +976,10 @@ class DbObject extends AppObject {
     function delete_table() {
         $this->run_query($this->db->get_drop_table_query($this->_table_name));
     }
+
+    function truncate_table() {
+        $this->db->run_query($this->db->get_truncate_table_query($this->_table_name));
+    }
 //
     // Should be redefined in child class
     // Used for both store() and update()

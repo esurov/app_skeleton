@@ -205,6 +205,10 @@ class MySqlDb extends AppObject {
         return "DROP TABLE IF EXISTS {%{$table_name}_table%}";
     }
 
+    function get_truncate_table_query($table_name) {
+        return "TRUNCATE TABLE {%{$table_name}_table%}";
+    }
+
     function get_actual_table_names($get_table_names_with_prefix, $from_all_tables) {
         $table_names = array();
         $like_str = ($from_all_tables) ? "" : " LIKE '{$this->_table_prefix}%'";
