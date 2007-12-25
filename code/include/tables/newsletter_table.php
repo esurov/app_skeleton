@@ -11,6 +11,13 @@ class NewsletterTable extends CustomDbObject {
         ));
 
         $this->insert_field(array(
+            "field" => "sent_date",
+            "type" => "date",
+            "value" => $this->app->get_db_now_date(),
+            "index" => "index",
+        ));
+
+        $this->insert_field(array(
             "field" => "newsletter_category_id",
             "type" => "foreign_key",
             "input" => array(
@@ -28,13 +35,6 @@ class NewsletterTable extends CustomDbObject {
                     ),
                 ),
             ),
-        ));
-
-        $this->insert_field(array(
-            "field" => "date_sent",
-            "type" => "date",
-            "value" => $this->app->get_db_now_date(),
-            "index" => "index",
         ));
 
         $this->insert_field(array(

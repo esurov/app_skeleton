@@ -125,7 +125,7 @@ class SetupApp extends CustomApp {
     
     function insert_test_news_articles() {
         $news_article =& $this->create_db_object("NewsArticle");
-        $news_article->created = "2004-06-20";
+        $news_article->created_date = "2004-06-20";
         $news_article->title_it = "IT: Integer id ante dignissim lacus elementum dapibus.";
         $news_article->body_it =
             "Integer id ante dignissim lacus elementum dapibus. " .
@@ -160,7 +160,7 @@ class SetupApp extends CustomApp {
         $news_article->store();
 
         $news_article =& $this->create_db_object("NewsArticle");
-        $news_article->created = "2004-06-23";
+        $news_article->created_date = "2004-06-23";
         $news_article->title_it = "IT: Phasellus nec neque. Morbi massa.";
         $news_article->body_it =
             "Phasellus nec neque. Morbi massa. Quisque sed odio. " .
@@ -190,7 +190,7 @@ class SetupApp extends CustomApp {
         $news_article->store();
 
         $news_article =& $this->create_db_object("NewsArticle");
-        $news_article->created = "2004-06-24";
+        $news_article->created_date = "2004-06-24";
         $news_article->title_it = "IT: Nam molestie lectus vitae tellus.";
         $news_article->body_it =
             "Nam molestie lectus vitae tellus. Etiam molestie placerat " .

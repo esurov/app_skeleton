@@ -64,7 +64,7 @@ class SampleApp extends CustomApp {
                 "templates_ext" => "xml",
                 "obj" => $news_article,
                 "query_ex" => array(
-                    "order_by" => "created DESC, id DESC",
+                    "order_by" => "created_date DESC, id DESC",
                 ),
             )
         );

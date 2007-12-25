@@ -1,6 +1,6 @@
 <list_item
     id="{%news_article.id%}"
-    created="{%news_article.created%}"
+    created="{%news_article.created_date%}"
     title="{%news_article.title%}"
     body="{%news_article.body%}"
     image_id="{%news_article.image_id%}"

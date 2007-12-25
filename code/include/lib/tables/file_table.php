@@ -11,21 +11,6 @@ class FileTable extends CustomDbObject {
         ));
 
         $this->insert_field(array(
-            "field" => "created",
-            "type" => "datetime",
-            "read" => 0,
-            "update" => 0,
-            "index" => "index",
-        ));
-
-        $this->insert_field(array(
-            "field" => "updated",
-            "type" => "datetime",
-            "read" => 0,
-            "index" => "index",
-        ));
-
-        $this->insert_field(array(
             "field" => "filename",
             "type" => "varchar",
             "index" => "index",
@@ -44,6 +29,20 @@ class FileTable extends CustomDbObject {
         $this->insert_field(array(
             "field" => "content_length",
             "type" => "integer",
+        ));
+
+        $this->insert_field(array(
+            "field" => "created",
+            "type" => "datetime",
+            "read" => 0,
+            "update" => 0,
+        ));
+
+        $this->insert_field(array(
+            "field" => "updated",
+            "type" => "datetime",
+            "read" => 0,
+            "index" => "index",
         ));
     }
 //

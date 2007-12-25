@@ -11,7 +11,7 @@ class NewsArticleTable extends CustomDbObject {
         ));
 
         $this->insert_field(array(
-            "field" => "created",
+            "field" => "created_date",
             "type" => "date",
             "value" => $this->app->get_db_now_date(),
             "index" => "index",

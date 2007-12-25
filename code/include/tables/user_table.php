@@ -11,20 +11,6 @@ class UserTable extends CustomDbObject {
         ));
 
         $this->insert_field(array(
-            "field" => "created",
-            "type" => "datetime",
-            "read" => 0,
-            "update" => 0,
-            "index" => "index",
-        ));
-
-        $this->insert_field(array(
-            "field" => "updated",
-            "type" => "datetime",
-            "read" => 0,
-        ));
-
-        $this->insert_field(array(
             "field" => "login",
             "type" => "varchar",
             "index" => "unique",
@@ -96,6 +82,20 @@ class UserTable extends CustomDbObject {
             "field" => "is_active",
             "type" => "boolean",
             "value" => 0,
+        ));
+
+        $this->insert_field(array(
+            "field" => "created",
+            "type" => "datetime",
+            "read" => 0,
+            "update" => 0,
+            "index" => "index",
+        ));
+
+        $this->insert_field(array(
+            "field" => "updated",
+            "type" => "datetime",
+            "read" => 0,
         ));
 //
         $this->insert_filter(array(
@@ -416,7 +416,7 @@ class UserTable extends CustomDbObject {
         
         if ($context == "edit_form_by_admin") {
             $this->validate_condition(
-                &$messages,
+                $messages,
                 array(
                     "field" => "login",
                     "type" => "not_empty",
@@ -480,19 +480,6 @@ class UserTable extends CustomDbObject {
         return array(
             "field_names_to_not_update" => $field_names_to_not_update,
         );
-    }
-
-    function store($context = null, $context_params = array()) {
-        $this->created = $this->app->get_db_now_datetime();
-        $this->updated = $this->app->get_db_now_datetime();
-
-        parent::store($context, $context_params);
-    }
-
-    function update($context = null, $context_params = array()) {
-        $this->updated = $this->app->get_db_now_datetime();
-
-        parent::update($context, $context_params);
     }
 
     function confirm() {

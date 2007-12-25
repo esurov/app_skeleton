@@ -330,20 +330,6 @@ class SampleTable extends CustomDbObject {
         ));
     }
 //
-    function store($context = null, $context_params = array()) {
-        $this->created = $this->app->get_db_now_datetime();
-        $this->updated = $this->app->get_db_now_datetime();
-
-        parent::store($context, $context_params);
-    }
-
-    function update($context = null, $context_params = array()) {
-        $this->updated = $this->app->get_db_now_datetime();
-
-        parent::update($context, $context_params);
-    }
-//
-
     function print_values($params = array()) {
         parent::print_values($params);
 

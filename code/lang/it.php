@@ -149,8 +149,8 @@ return array(
     "status_msg.news_article.files_max_total_size_reached" => "La dimensione totale dei file caricati è maggiore di 100 Mb",
 
     // Newsletters
-    "newsletter" => "!!news article",
-    "newsletters" => "!!news articles",
+    "newsletter" => "!!newsletter",
+    "newsletters" => "!!newsletters",
 
     "guest_menu_item.newsletters" => "!!Newsletters",
     "admin_menu_item.newsletters" => "!!Newsletters",

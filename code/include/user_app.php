@@ -250,7 +250,7 @@ class UserApp extends CustomApp {
                 "template_var" => "recent_news_articles",
                 "obj" => $news_article,
                 "query_ex" => array(
-                    "order_by" => "created DESC, id DESC",
+                    "order_by" => "created_date DESC, id DESC",
                     "limit" => "0, {$n_recent_news_articles}",
                 ),
                 "context" => "list_item",
@@ -789,14 +789,14 @@ class UserApp extends CustomApp {
         if ($user_role == "admin") {
             $templates_subdir = "news_articles_admin";
             $default_order_by = array(
-                "default_order_by" => array("created DESC", "id DESC"),    
+                "default_order_by" => array("created_date DESC", "id DESC"),    
             );
             $context = "list_item_admin";
         } else {
             $templates_subdir = "news_articles";
             $default_order_by = array(
                 "query_ex" => array(
-                    "order_by" => "created DESC, id DESC",
+                    "order_by" => "created_date DESC, id DESC",
                 ),    
             );
             $context = "list_item";

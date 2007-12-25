@@ -11,15 +11,6 @@ class ContactInfoTable extends CustomDbObject {
         ));
 
         $this->insert_field(array(
-            "field" => "created",
-            "type" => "date",
-            "value" => $this->app->get_db_now_date(),
-            "read" => 0,
-            "update" => 0,
-            "index" => "index",
-        ));
-
-        $this->insert_field(array(
             "field" => "first_name",
             "type" => "varchar",
         ));
