@@ -273,7 +273,7 @@ class MenuXml extends XML {
             $menu_item->name = $attributes["name"];
             $menu_item->url = $attributes["url"];
 
-            $is_html_str = get_param_value($attributes, "is_html", "false");
+            $is_html_str = get_param_value($attributes, "is_html", "true");
             $menu_item->is_html = ($is_html_str == "true") ? true : false;
 
             $menu_item->item_template_name = get_param_value(

@@ -9,7 +9,7 @@
     Optional attributes with default values for <menu_item>:
     item_template=owner_menu->item_template
     item_current_template=owner_menu->item_current_template
-    is_html="false"
+    is_html="true"
     contexts=""
 -->
 <menu

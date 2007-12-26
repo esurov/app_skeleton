@@ -1467,14 +1467,18 @@ class DbObject extends AppObject {
 
         $suburl_params = array();
         foreach ($this->_filters as $filter_info) {
-            $filter_name = $filter_info["name"];
-            $filter_relation = $filter_info["relation"];
-            $filter_value = $filter_info["value"];
-            $suburl_param_name = "{$input_name_prefix}_{$filter_name}_{$filter_relation}";
-            $suburl_params[$suburl_param_name] = $filter_value;
+            $suburl_params += $this->get_filter_suburl_param($filter_info, $input_name_prefix);
         }
         
         return $suburl_params;
+    }
+
+    function get_filter_suburl_param($filter_info, $input_name_prefix = null) {
+        $filter_name = $filter_info["name"];
+        $filter_relation = $filter_info["relation"];
+        $filter_value = $filter_info["value"];
+        $suburl_param_name = "{$input_name_prefix}_{$filter_name}_{$filter_relation}";
+        return array($suburl_param_name => $filter_value);
     }
 //
     function read_order_by($default_order_by_fields) {

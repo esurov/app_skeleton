@@ -169,7 +169,7 @@ class UserApp extends CustomApp {
 
     function print_menu($params = array()) {
         $user_role = $this->get_user_role();
-        $params["xml_filename"] = "menu_{$user_role}.xml";
+        $params["xml_filename"] = "_menu_{$user_role}.xml";
 
         return parent::print_menu($params);
     }

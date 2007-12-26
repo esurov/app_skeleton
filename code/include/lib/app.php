@@ -2153,7 +2153,7 @@ class App extends AppObject {
         $this->print_head_page_title($resource);
     }
 
-    function print_page_title($resource, $is_html = false) {
+    function print_page_title($resource, $is_html = true) {
         $page_title_resource = "page_title.{$resource}";
         $page_title_text = $this->get_lang_str($page_title_resource);
         if (!is_null($page_title_text)) {
@@ -2167,7 +2167,7 @@ class App extends AppObject {
         $this->print_raw_value("page_title.lang_resource", $page_title_resource);
     }
 
-    function print_head_page_title($resource, $is_html = false) {
+    function print_head_page_title($resource, $is_html = true) {
         $head_page_title_resource = "head_page_title.{$resource}";
         $head_page_title_text = $this->get_lang_str($head_page_title_resource);
         if (is_null($head_page_title_text)) {
@@ -2255,7 +2255,7 @@ class App extends AppObject {
     function print_menu($params = array()) {
         $menu =& $this->create_menu($params);
         
-        $menu->load_from_xml(get_param_value($params, "xml_filename", "menu.xml"));
+        $menu->load_from_xml(get_param_value($params, "xml_filename", "_menu.xml"));
 
         $menu->hide_items_by_names(get_param_value($params, "item_names_to_hide", array()));
 
