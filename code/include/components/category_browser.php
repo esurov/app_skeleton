@@ -24,7 +24,7 @@ class CategoryBrowser extends TemplateComponent {
                 "template_var" => "categories1",
                 "template_var_prefix" => "category1",
                 "objects" => $this->fetch_categories1(),
-                "context" => "list_item_category_browser",
+                "context" => "category_browser_list_item",
                 "custom_params" => array(
                     "selected_item_id" => $this->current_category1_id,
                 ),
@@ -45,7 +45,7 @@ class CategoryBrowser extends TemplateComponent {
                     "template_var" => "categories2",
                     "template_var_prefix" => "category2",
                     "objects" => $this->fetch_categories2(),
-                    "context" => "list_item_category_browser",
+                    "context" => "category_browser_list_item",
                     "custom_params" => array(
                         "selected_item_id" => $this->current_category2_id,
                     ),
@@ -67,7 +67,7 @@ class CategoryBrowser extends TemplateComponent {
                     "template_var" => "categories3",
                     "template_var_prefix" => "category3",
                     "objects" => $this->fetch_categories3(),
-                    "context" => "list_item_category_browser",
+                    "context" => "category_browser_list_item",
                     "custom_params" => array(
                         "selected_item_id" => $this->current_category3_id,
                     ),

@@ -70,7 +70,6 @@ class NewsletterTable extends CustomDbObject {
             "type" => "foreign_key",
             "read" => 0,
         ));
-
 //
         $this->insert_join(array(
             "type" => "left",
@@ -83,7 +82,6 @@ class NewsletterTable extends CustomDbObject {
             "obj_class" => "NewsletterCategory",
             "field" => "name",
         ));
-
 //
         $this->insert_filter(array(
             "name" => "full_text",
@@ -114,7 +112,6 @@ class NewsletterTable extends CustomDbObject {
             ),
         ));
     }
-
 //
     function get_validate_conditions($context, $context_params) {
         return array(
@@ -194,17 +191,17 @@ class NewsletterTable extends CustomDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        if ($this->_context == "list_item") {
+        if ($this->_context == "newsletters_list_item") {
             $title_short_len = $this->get_config_value("newsletter_title_short_length");
             $this->app->print_varchar_value(
-                "newsletter.title.short",
+                "{$this->_template_var_prefix}.title.short",
                 get_word_shortened_string(strip_tags($this->title), $title_short_len, "...")
             );
             
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->thumbnail_image_id),
                 $this->_templates_dir,
-                "newsletter.thumbnail_image",
+                "{$this->_template_var_prefix}.thumbnail_image",
                 "_thumbnail_image.html",
                 "_thumbnail_image_empty.html"
             );
@@ -212,21 +209,20 @@ class NewsletterTable extends CustomDbObject {
             $this->app->print_db_object_info(
                 $this->app->fetch_file_without_content($this->file_id),
                 $this->_templates_dir,
-                "newsletter.file_info",
+                "{$this->_template_var_prefix}.file_info",
                 "_file_info.html",
                 "_file_info_empty.html"
             );
         }
         
         if (
-            $this->_context == "view" ||
-            $this->_context == "edit" ||
-            $this->_context == "email"
+            $this->_context == "newsletter_view" ||
+            $this->_context == "newsletter_edit"
         ) {
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->image_id),
                 $this->_templates_dir,
-                "newsletter.image",
+                "{$this->_template_var_prefix}.image",
                 "_image.html",
                 "_image_empty.html"
             );
@@ -234,7 +230,7 @@ class NewsletterTable extends CustomDbObject {
             $this->app->print_db_object_info(
                 $this->app->fetch_file_without_content($this->file_id),
                 $this->_templates_dir,
-                "newsletter.file_info",
+                "{$this->_template_var_prefix}.file_info",
                 "_file_info.html",
                 "_file_info_empty.html"
             );

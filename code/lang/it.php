@@ -265,8 +265,8 @@ return array(
     "admin_menu_item.products" => "Prodotti",
 
     "page_title.products" => "Prodotti",
-    "page_title.product_edit_new" => "!!Add product",
-    "page_title.product_edit" => "!!Edit product",
+    "page_title.product_edit_new" => "Aggiungi prodotto",
+    "page_title.product_edit" => "Modifica prodotto",
 
     "status_msg.product.added" => "!!Product added",
     "status_msg.product.updated" => "!!Product updated",

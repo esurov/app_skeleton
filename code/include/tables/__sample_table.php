@@ -335,7 +335,7 @@ class SampleTable extends CustomDbObject {
 
         // This template variable is expansion of default printed variables for all contexts
         $this->app->print_raw_value(
-            "{$this->_table_name}_field_double.decorated",
+            "{$this->_template_var_prefix}.field_double.decorated",
             "!!" . $this->app->page->get_filling_value("{$this->_table_name}_field_double") . "!!"
         );
 
@@ -360,7 +360,7 @@ class SampleTable extends CustomDbObject {
 
             // Add context-specific template variable
             $this->app->print_varchar_value(
-                "{$this->_table_name}_context1_specific_value",
+                "{$this->_template_var_prefix}.context1_specific_value",
                 "str1&{$list_item_number}<>{$list_item_parity}"
             );
             break;
@@ -368,7 +368,7 @@ class SampleTable extends CustomDbObject {
         case "context2":
             // Add context-specific template variable
             $this->app->print_boolean_value(
-                "{$this->_table_name}_context2_specific_value",
+                "{$this->_template_var_prefix}.context2_specific_value",
                 1 - $this->field_boolean
             );
             break;

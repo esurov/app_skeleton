@@ -149,7 +149,9 @@ class ProductTable extends CustomDbObject {
             "obj_class" => "Category3",
             "field" => "name",
         ));
+    }
 //
+    function insert_filters() {
         $this->insert_filter(array(
             "name" => "keywords",
             "relation" => "like_many",

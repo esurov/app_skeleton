@@ -97,7 +97,9 @@ class UserTable extends CustomDbObject {
             "type" => "datetime",
             "read" => 0,
         ));
-//
+    }
+
+    function insert_filters() {
         $this->insert_filter(array(
             "name" => "login",
             "relation" => "like",
@@ -212,12 +214,12 @@ class UserTable extends CustomDbObject {
         case "signup_form":
             $field_names_to_not_read = array("role", "is_confirmed", "is_active");
             break;
-        case "edit_form_by_admin":
+        case "user_edit_admin":
             if ($this->is_definite()) {
                 $field_names_to_not_read = array("role");
             }
             break;
-        case "edit_form_by_user":
+        case "user_edit_user":
             $field_names_to_not_read = array("login", "role", "is_confirmed", "is_active");
             break;
         case "recover_password_form":
@@ -331,8 +333,8 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
-        case "edit_form_by_user":
-        case "edit_form_by_admin":
+        case "user_edit_admin":
+        case "user_edit_user":
             $conditions = array(
                 array(
                     "field" => "role",
@@ -414,7 +416,7 @@ class UserTable extends CustomDbObject {
             }
         }
         
-        if ($context == "edit_form_by_admin") {
+        if ($context == "user_edit_admin") {
             $this->validate_condition(
                 $messages,
                 array(
@@ -434,7 +436,7 @@ class UserTable extends CustomDbObject {
         }
 
         if (
-            ($context == "edit_form_by_admin" || $context == "edit_form_by_user") &&
+            ($context == "user_edit_admin" || $context == "user_edit_user") &&
             is_value_not_empty($this->password)
         ) {
             $this->validate_passwords($messages);
@@ -504,31 +506,21 @@ class UserTable extends CustomDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        if ($this->_context == "list_item") {
-            $this->app->print_varchar_value(
-                "user.full_name",
-                $this->get_full_name()
-            );
+        $this->app->print_varchar_value(
+            "{$this->_template_var_prefix}.full_name",
+            $this->get_full_name()
+        );
 
-            $this->app->print_varchar_value(
-                "user.full_name.reversed",
-                $this->get_full_name_reversed()
-            );
-        }
-    }
-
-    function get_full_name() {
-        return get_full_name($this->first_name, $this->last_name);
-    }
-
-    function get_full_name_reversed() {
-        return get_full_name_reversed($this->first_name, $this->last_name);
+        $this->app->print_varchar_value(
+            "{$this->_template_var_prefix}.full_name.reversed",
+            $this->get_full_name_reversed()
+        );
     }
 //
     function print_form_values($params = array()) {
         parent::print_form_values($params);
 
-        if ($this->_context == "edit_form_by_admin") {
+        if ($this->_context == "user_edit_admin") {
             if (!$this->is_definite()) {
                 $this->app->print_file("{$this->_templates_dir}/_role.html", "_role");
             }
@@ -536,9 +528,18 @@ class UserTable extends CustomDbObject {
             $this->app->print_file("{$this->_templates_dir}/_is_confirmed.html", "_is_confirmed");
             $this->app->print_file("{$this->_templates_dir}/_link_back_admin.html", "_link_back");
         }
-        if ($this->_context == "edit_form_by_user") {
+        
+        if ($this->_context == "user_edit_user") {
             $this->app->print_file("{$this->_templates_dir}/_link_back_user.html", "_link_back");
         }
+    }
+//
+    function get_full_name() {
+        return get_full_name($this->first_name, $this->last_name);
+    }
+
+    function get_full_name_reversed() {
+        return get_full_name_reversed($this->first_name, $this->last_name);
     }
 //
     function get_num_admins() {

@@ -107,6 +107,11 @@ class App extends AppObject {
         return "templates";
     }
 
+    function init_sys_var($name, $value) {
+        $this->{$name} = $value;
+        $this->print_raw_value("sys:{$name}", $value);
+    }
+
     function init_lang_vars() {
         $this->avail_langs = $this->get_avail_langs();
         $this->dlang = $this->get_config_value("default_language");
@@ -346,14 +351,9 @@ class App extends AppObject {
     }
 
     function on_before_run_action() {
-        $this->popup = (int) param("popup");
-        $this->print_custom_param("popup", $this->popup);
-
-        $this->report = (int) param("report");
-        $this->print_custom_param("report", $this->report);
-        
-        $this->printable = (int) param("printable");
-        $this->print_custom_param("printable", $this->printable);
+        $this->init_sys_var("popup", (int) param("popup"));
+        $this->init_sys_var("report", (int) param("report"));
+        $this->init_sys_var("printable", (int) param("printable"));
 
         if (!$this->report && !$this->printable) {
             $this->print_session_status_messages();
@@ -2893,6 +2893,53 @@ class App extends AppObject {
         return $this->get_config_value("email_debug_mode") ?
             $this->get_config_value("admin_email_to") :
             $email_to;
+    }
+//
+    // Popup windows helpers
+    function init_popup($width, $height) {
+        $templates_dir = "_global/popup";
+
+        $this->init_sys_var("popup", 1);
+
+        $this->print_raw_value("sys:popup.width", $width);
+        $this->print_raw_value("sys:popup.height", $height);
+
+        if (param("new_popup") == 1) {
+            $this->print_file(
+                "{$templates_dir}/_popup_center_js.html",
+                "_popup_center_js"
+            );
+        }
+
+        if (param("reload_opener") == 1) {
+            $this->print_file(
+                "{$templates_dir}/_reload_opener_js.html",
+                "_reload_opener_js"
+            );
+        }
+
+        $this->print_file("{$templates_dir}/init_popup_js.html", "init_popup_js");
+    }
+
+    function create_reload_opener_self_redirect_response(
+        $suburl_params = array(),
+        $protocol = "http"
+    ) {
+        $this->create_self_redirect_response(
+            $suburl_params + array("reload_opener" => 1),
+            $protocol
+        );
+    }
+
+    function create_close_popup_and_reload_opener_html_response($opener_suburl_params = null) {
+        if (is_null($opener_suburl_params)) {
+            $location_js = "reload()";
+        } else {
+            $url = create_self_full_url($opener_suburl_params);
+            $location_js = "href = '{$url}'";
+        }
+        $this->print_raw_value("location_js", $location_js);
+        $this->print_file("_global/popup/close_and_reload_opener_js.html", "body");
     }
 
 }

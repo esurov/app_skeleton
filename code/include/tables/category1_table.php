@@ -41,7 +41,7 @@ class Category1Table extends OrderedDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        if ($this->_context == "list_item_category_browser") {
+        if ($this->_context == "category_browser_list_item") {
             $list_item_selected_class = ($this->id == $this->_custom_params["selected_item_id"]) ?
                 " list_item_selected" : 
                 "";

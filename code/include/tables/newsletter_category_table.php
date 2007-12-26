@@ -34,7 +34,6 @@ class NewsletterCategoryTable extends CustomDbObject {
             array("newsletter", "newsletter_category_id"),
         );
     }
-
 //
     function get_validate_conditions($context, $context_params) {
         return array(
@@ -45,7 +44,6 @@ class NewsletterCategoryTable extends CustomDbObject {
             ),
         );
     }
-
 //
     function activate_deactivate() {
         if ($this->is_active) {
@@ -64,7 +62,6 @@ class NewsletterCategoryTable extends CustomDbObject {
         $this->is_active = 0;
         $this->update();
     }
-
 //
     function insert_list_extra_fields($user_id) {
         $this->insert_join(array(
@@ -74,6 +71,7 @@ class NewsletterCategoryTable extends CustomDbObject {
                 "newsletter_category.id = user_subscription.newsletter_category_id AND " .
                 "user_subscription.user_id = {$user_id}",
         ));
+        
         $this->insert_field(array(
             "field" => "is_checked",
             "type" => "boolean",
@@ -85,13 +83,13 @@ class NewsletterCategoryTable extends CustomDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        if ($this->_context == "list_item_user_subscriptions") {
+        if ($this->_context == "user_subscription_list_item") {
             $template_value_is_checked = "";
             if ($this->is_checked) {
                 $template_value_is_checked = "checked";
             }
             $this->app->print_value(
-                "newsletter_category.is_checked",
+                "{$this->_template_var_prefix}.is_checked",
                 $template_value_is_checked
             );
         }

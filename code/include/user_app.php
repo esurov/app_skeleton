@@ -253,7 +253,7 @@ class UserApp extends CustomApp {
                     "order_by" => "created_date DESC, id DESC",
                     "limit" => "0, {$n_recent_news_articles}",
                 ),
-                "context" => "list_item",
+                "context" => "index_list_item",
             )
         );
         $recent_news_articles_list->print_values();
@@ -637,6 +637,7 @@ class UserApp extends CustomApp {
         $templates_dir = "users";
         
         $user =& $this->create_db_object("User");
+        $user->insert_filters();
         $users_list =& $this->create_object(
             "PagedQueryObjectsList",
             array(
@@ -645,7 +646,7 @@ class UserApp extends CustomApp {
                 "obj" => $user,
                 "default_order_by" => array("created DESC", "id DESC"),
                 "filter_form.visible" => true,
-                "context" => "list_item",
+                "context" => "users_list_item",
             )
         );
         $users_list->print_values();
@@ -700,7 +701,7 @@ class UserApp extends CustomApp {
         switch ($command) {
         case "":
         case "update":
-            $context = ($user_role == "admin") ? "edit_form_by_admin" : "edit_form_by_user";
+            $context = ($user_role == "admin") ? "user_edit_admin" : "user_edit_user";
 
             $user->insert_edit_form_extra_fields();
             if ($user->is_definite()) {
@@ -791,7 +792,7 @@ class UserApp extends CustomApp {
             $default_order_by = array(
                 "default_order_by" => array("created_date DESC", "id DESC"),    
             );
-            $context = "list_item_admin";
+            $context = "news_articles_admin_list_item";
         } else {
             $templates_subdir = "news_articles";
             $default_order_by = array(
@@ -799,10 +800,11 @@ class UserApp extends CustomApp {
                     "order_by" => "created_date DESC, id DESC",
                 ),    
             );
-            $context = "list_item";
+            $context = "news_articles_list_item";
         }
         
         $news_article =& $this->create_db_object("NewsArticle");
+        $news_article->insert_filters();
         $news_articles_list =& $this->create_object(
             "PagedQueryObjectsList",
             array_merge(
@@ -831,7 +833,7 @@ class UserApp extends CustomApp {
                 "templates_dir" => "{$templates_dir}/news_article_viewer",
                 "template_var" => "news_article_viewer",
                 "obj" => $news_article,
-                "context" => "view",
+                "context" => "news_article_view",
             )
         );
         $news_article_viewer->print_values();
@@ -914,7 +916,7 @@ class UserApp extends CustomApp {
                     "templates_dir" => "{$templates_dir}/news_article_editor",
                     "template_var" => "news_article_editor",
                     "obj" => $news_article,
-                    "context" => "edit",
+                    "context" => "news_article_edit",
                 )
             );
             $news_article_editor->print_values();
@@ -960,7 +962,7 @@ class UserApp extends CustomApp {
                  "template_var" => "newsletters",
                  "obj" => $newsletter,
                  "filter_form.visible" => true,
-                 "context" => "list_item",
+                 "context" => "newsletters_list_item",
                  "default_order_by" => array("id DESC"),    
              )
         );
@@ -979,7 +981,7 @@ class UserApp extends CustomApp {
                 "templates_dir" => "{$templates_dir}/newsletter_viewer",
                 "template_var" => "newsletter_viewer",
                 "obj" => $newsletter,
-                "context" => "view",
+                "context" => "newsletter_view",
             )
         );
         $newsletter_viewer->print_values();
@@ -1062,23 +1064,6 @@ class UserApp extends CustomApp {
                         "{$templates_dir}/email_sent_to_user"
                     );
 
-//                    $user_subscription =& $this->create_db_object("UserSubscription");
-//                    $user_subscription->insert_user_list_fields();
-//                    $user_subscription_list =& $this->fetch_db_objects_list(
-//                        $user_subscription, 
-//                        array(
-//                            "where" =>
-//                                "user_subscription.newsletter_category_id = " .
-//                                "{$newsletter->newsletter_category_id}",
-//                        )
-//                    );
-//                    $newsletter->send_newsletter(
-//                        $user_subscription_list, 
-//                        array(
-//                            "templates_dir" => "{$templates_dir}/email_sent_to_user",
-//                            "context" => "email",
-//                        )
-//                    );
                     $this->create_self_action_redirect_response(array(
                         "action" => "newsletters",
                     ));
@@ -1091,7 +1076,7 @@ class UserApp extends CustomApp {
                     "templates_dir" => "{$templates_dir}/newsletter_editor",
                     "template_var" => "newsletter_editor",
                     "obj" => $newsletter,
-                    "context" => "edit",
+                    "context" => "newsletter_edit",
                 )
             );
             $newsletter_editor->print_values();
@@ -1122,7 +1107,7 @@ class UserApp extends CustomApp {
         $attachment_image = $this->fetch_db_object("Image", $newsletter->image_id);
         $newsletter->print_values(array(
             "templates_dir" => $templates_dir,
-            "context" => "email",
+            "context" => "newsletter_view",
         ));
         $body = $this->print_file("{$templates_dir}/email_sent_to_user.html");
         
@@ -1168,7 +1153,7 @@ class UserApp extends CustomApp {
                 "templates_dir" => "{$templates_dir}/newsletter_categories",
                 "template_var" => "newsletter_categories",
                 "obj" => $newsletter_category,
-                "context" => "list_item",
+                "context" => "newsletter_categories_list_item",
                 "default_order_by" => array("id DESC"),
             )
         );
@@ -1206,7 +1191,7 @@ class UserApp extends CustomApp {
                     "templates_dir" => "{$templates_dir}/newsletter_category_editor",
                     "template_var" => "newsletter_category_editor",
                     "obj" => $newsletter_category,
-                    "context" => "edit",
+                    "context" => "newsletter_category_edit",
                 )
             );
             $newsletter_category_editor->print_values();
@@ -1237,39 +1222,46 @@ class UserApp extends CustomApp {
                  ), 
                  "default_order_by" => array("id DESC"),    
                  "pager.visible" => false,
-                 "context" => "list_item_user_subscriptions",
+                 "context" => "user_subscription_list_item",
              )
         );
         $categories_to_subscribe_list->print_values();
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-// check unactive category. !!
+    // !!NB: Check inactive categories!
     function action_user_subscription_edit() {
-        
         $command = (string) param("command");
         switch ($command) {
         case "update":
             $user_id = $this->user->id;
             $newsletter_categories_is_checked = param_array("newsletter_category_is_checked");
+
             $user_subscription =& $this->create_db_object("UserSubscription");
             $user_subscription->del_where("user_id = {$user_id}");
-            foreach ($newsletter_categories_is_checked as $newsletter_category_id => $newsletter_category_checked_status) {
-                $newsletter_category =& $this->create_db_object("NewsletterCategory");
-                if ($newsletter_category->fetch("newsletter_category.id = {$newsletter_category_id}")) {
-                    $user_subscription =& $this->create_db_object("UserSubscription");
+
+            $newsletter_category =& $this->create_db_object("NewsletterCategory");
+            foreach ($newsletter_categories_is_checked as
+                $newsletter_category_id => $newsletter_category_checked_status
+            ) {
+                if (
+                    $newsletter_category->fetch(
+                        "newsletter_category.id = {$newsletter_category_id}"
+                    )
+                ) {
                     $user_subscription->user_id = $user_id;
                     $user_subscription->newsletter_category_id = $newsletter_category_id;
-                    $user_subscription->save();
+                    $user_subscription->store();
+                    $user_subscription->reset_field_values();
                 }
             }
             break;
         }
 
         $this->add_session_status_message(new OkStatusMsg("user_subscription.subscribed"));
+        
         $this->create_self_redirect_response(array("action" => "user_subscription"));
     }
-
 //
     function action_categories() {
         $templates_dir = "categories";
@@ -1394,7 +1386,7 @@ class UserApp extends CustomApp {
         $templates_dir = "products";
 
         $product =& $this->create_db_object("Product");
-
+        $product->insert_filters();
         $products_list =& $this->create_object(
             "PagedQueryObjectsList",
             array(
@@ -1407,7 +1399,6 @@ class UserApp extends CustomApp {
                     "category3_position ASC",
                 ),
                 "filter_form.visible" => true,
-                "context" => "list_item_admin",
             )
         );
         $products_list->print_values();

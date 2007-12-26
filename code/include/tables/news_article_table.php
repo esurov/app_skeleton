@@ -52,7 +52,9 @@ class NewsArticleTable extends CustomDbObject {
             "type" => "foreign_key",
             "read" => 0,
         ));
+    }
 //
+    function insert_filters() {
         $this->insert_filter(array(
             "name" => "full_text",
             "relation" => "like_many",
@@ -138,7 +140,11 @@ class NewsArticleTable extends CustomDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        if ($this->_context == "list_item" || $this->_context == "list_item_admin") {
+        if (
+            $this->_context == "index_list_item" ||
+            $this->_context == "news_articles_list_item" ||
+            $this->_context == "news_articles_admin_list_item"
+        ) {
             $title_short_len = $this->get_config_value("news_article_title_short_length");
             $this->app->print_varchar_value(
                 "news_article.title.short",
@@ -159,7 +165,7 @@ class NewsArticleTable extends CustomDbObject {
                 "_thumbnail_image_empty.html"
             );
             
-            if ($this->_context == "list_item_admin") {
+            if ($this->_context == "news_articles_admin_list_item") {
                 $this->app->print_db_object_info(
                     $this->app->fetch_file_without_content($this->file_id),
                     $this->_templates_dir,
@@ -170,7 +176,10 @@ class NewsArticleTable extends CustomDbObject {
             }
         }
         
-        if ($this->_context == "view" || $this->_context == "edit") {
+        if (
+            $this->_context == "news_article_edit" ||
+            $this->_context == "news_article_view"
+        ) {
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->image_id),
                 $this->_templates_dir,

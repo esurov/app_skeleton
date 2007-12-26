@@ -161,15 +161,66 @@ function doFormSubmit(form, elementName, elementValue) {
     element.form.submit();
 }
 
+function ifConfirmed(message_text) {
+    return confirm(message_text);
+}
+
 function copyToClipboard(element) {
     selectElement(element);
     element.createTextRange().execCommand("Copy");
 }
 
+function getCurrentYear() {
+    var d = new Date();
+    return d.getFullYear();
+}
+
+// Popup windows
+
+// Opens new window with automatically calculated at server side width and height
+// Usually used to open popup windows with dynamic content
+function openPopup(url, windowName, useScroll) {
+    if (windowName == null) {
+        windowName = 'popup';
+    }
+
+    var useScrollStr = (useScroll == null) ? 'yes' : '';
+
+    var w = null;
+    if (window.name == windowName) {
+        w = window;
+        w.location.href = url;
+    } else {
+        // Default width and height of new popup
+        var popupWidth = 500;
+        var popupHeight = 400;
+        var cornerX = (screen.width - popupWidth) / 2;
+        var cornerY = (screen.height - popupHeight) / 2 - 32;
+        
+        w = window.open(
+            url + '&new_popup=1',
+            windowName,
+            'width=' + popupWidth + ',height=' + popupHeight +
+            ',left=' + cornerX + ',top=' + cornerY +
+            ',scrollbars=' + useScrollStr + ',resizable'
+        );
+    }
+
+    if (w != null) {
+        w.focus();
+    }
+    
+    return w;
+}
+
+// Opens new window with specified width and height
+// Usually used to open popup windows with static content
 function openWindow(url, width, height, useScroll, windowName) {
     var cornerX = (screen.width - width) / 2;
     var cornerY = (screen.height - height) / 2 - 32;
     
+    var useScrollStr = (useScroll == null) ? 'yes' : '';
+
     if (windowName == null) {
         windowName = 'popup';
     }
@@ -179,36 +230,32 @@ function openWindow(url, width, height, useScroll, windowName) {
         windowName,
         'width=' + width + ',height=' + height +
         ',left=' + cornerX + ',top=' + cornerY +
-        ',scrollbars=' + useScroll + ',resizable'
+        ',scrollbars=' + useScrollStr + ',resizable'
     );
+    
     if (w != null) {
         w.focus();
     }
+    
     return w;
-}
-
-function openPopupWindow(url, width, height, useScroll, windowName) {
-    return openWindow(url + '&popup=1', width, height, useScroll, windowName);
 }
 
 function closeWindow(w) {
     if (w == null) {
         w = window;
     }
-    w.close();
+    
     if (w.opener != null) {
         w.opener.focus();
     }
+    
+    w.close();
 }
 
-function reloadParentWindow() {
+function reloadOpenerWindow() {
     if (window.opener != null) {
         window.opener.location.reload();
     }
-}
-
-function ifConfirmed(message_text) {
-    return confirm(message_text);
 }
 
 function acceptChoice(formName, element1Name, value1, element2Name, value2) {
@@ -226,11 +273,6 @@ function acceptChoice(formName, element1Name, value1, element2Name, value2) {
     }
     window.opener.focus();
     window.close();
-}
-
-function getCurrentYear() {
-    var d = new Date();
-    return d.getFullYear();
 }
 
 //
@@ -537,69 +579,6 @@ function formatNumber(num, decimals, decPoint, thousandsSep) {
     return ((sign) ? '' : '-') + num + decPoint + dec;
 }
 
-//        case 'url':
-//            result = true;
-//                case 'date':
-//                    if (value != '' && !isCorrectDate(value)) {
-//                    }
-//                    break;
-//                case 'currency':
-//                    if (value != '' && !isCorrectCurrency(value)) {
-//                    }
-//                    break;
-//                case 'currency/date':
-//                    if (value != '') {
-//                        parts = value.split('/');
-//                        if (parts.length != 4) {
-//                            fail(message_text, formName, elem);
-//                            return false;
-//                        }
-//                        price = parts[0];
-//                        date = parts[1] + '/' + parts[2] + '/' + parts[3];
-//
-//                        if (!(
-//                            isCorrectCurrency(price) &&
-//                            isCorrectDate(date)
-//                        )) {
-//                        }
-//                    }
-//                    break;
-//            }
-//    }
-///**
-// * Checks if given string is a correct date in format mm/dd/yyyy.
-// *
-// * @param  string
-// * @return bool
-// */
-//function isCorrectDate(str) {
-//    parts = str.split('/');
-//    if (parts.length != 3) {
-//        return false;
-//    }
-//    date = new Date(parts[2], parts[0] - 1, parts[1]);
-//
-//    if(
-//        (Number(date.getDate()) == Number(parts[1])) &&
-//        (Number(date.getMonth()) + 1 == Number(parts[0])) &&
-//        (Number(date.getFullYear()) == Number(parts[2]))
-//    ) {
-//        return true;
-//    } else {
-//        return false;
-//    }
-//}
-//
-///**
-// * Checks if given string is a correct currency with thouthands and decimals separators.
-// *
-// * @param  string
-// * @return bool
-// */
-//function isCorrectCurrency(value) {
-//    return value.match(/^\d+(,\d{3})*(\.\d+)?$/);
-//}
-
 // App specific js functions
 function getJsIntegerStr(appIntegerStr) {
     var str = appIntegerStr.replace(/\./g, '');
@@ -638,10 +617,11 @@ function getAppDouble(jsDouble) {
 function getAppCurrency(jsDouble) {
     return formatNumber(jsDouble, 2, ',', '.');
 }
+
 //
 function openPolicyTermsOfUsePopupWindow() {
-    return openPopupWindow(
-        '?action=static&page=policy_terms_of_use',
+    return openWindow(
+        '?action=static&page=policy_terms_of_use&popup=1',
         600,
         400,
         'yes'
@@ -649,8 +629,8 @@ function openPolicyTermsOfUsePopupWindow() {
 }
 
 function openPolicyTermsAndConditionsPopupWindow() {
-    return openPopupWindow(
-        '?action=static&page=policy_terms_and_conditions',
+    return openWindow(
+        '?action=static&page=policy_terms_and_conditions&popup=1',
         600,
         400,
         'yes'
@@ -658,8 +638,8 @@ function openPolicyTermsAndConditionsPopupWindow() {
 }
 
 function openPolicyPrivacyPopupWindow() {
-    return openPopupWindow(
-        '?action=static&page=policy_privacy',
+    return openWindow(
+        '?action=static&page=policy_privacy&popup=1',
         600,
         400,
         'yes'
@@ -667,8 +647,8 @@ function openPolicyPrivacyPopupWindow() {
 }
 
 function openPolicyDisclaimerPopupWindow() {
-    return openPopupWindow(
-        '?action=static&page=policy_disclaimer',
+    return openWindow(
+        '?action=static&page=policy_disclaimer&popup=1',
         600,
         400,
         'yes'
