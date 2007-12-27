@@ -30,4 +30,13 @@ class ErrorStatusMsg extends StatusMsg {
 
 }
 
+class NotifyStatusMsg extends StatusMsg {
+
+    function NotifyStatusMsg($resource, $resource_params = array()) {
+        parent::StatusMsg("notify", $resource, $resource_params);
+    }
+
+}
+
+
 ?>

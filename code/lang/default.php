@@ -22,5 +22,8 @@ return array(
     "nothing_to_drop" => "Nothing to drop",
     
     "email_contact_form_processed_subject" => "Contatti",
+
+    "status_msg.sample_notify_message" => "!!Sample notify message", 
+
 );
 ?>

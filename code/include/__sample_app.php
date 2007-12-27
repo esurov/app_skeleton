@@ -29,6 +29,8 @@ class SampleApp extends CustomApp {
     }
 //
     function action_index() {
+        $this->add_session_status_message(new NotifyStatusMsg("sample_notify_message"));
+
         foreach (array_keys($this->actions) as $action) {
             $this->print_varchar_value("action_name", $action);
             $this->print_varchar_value(
