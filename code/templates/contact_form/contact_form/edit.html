@@ -1,45 +1,65 @@
 <form action="?action=contact_form" method="post" name="form">
 <input type="hidden" name="command" value="process" />
 
-<table>
-<tr>
-    <th>{%global:first_name%}:&nbsp;<span class="required">*</span></th>
-    <td>{%contact_info.first_name.input%}</td>
+    <div class="contact_info">
+        <div class="primary">
+            <table>
+            <tr>
+                <th>{%global:first_name%}:&nbsp;<span class="required">*</span></th>
+                <td>{%contact_info.first_name.input%}</td>
 
-    <th>{%global:company_name%}:</th>
-    <td>{%contact_info.company_name.input%}</td>
-</tr>
-<tr>
-    <th>{%global:last_name%}:&nbsp;<span class="required">*</span></th>
-    <td>{%contact_info.last_name.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:last_name%}:&nbsp;<span class="required">*</span></th>
+                <td>{%contact_info.last_name.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:email%}:&nbsp;<span class="required">*</span></th>
+                <td>{%contact_info.email.input%}</td>
 
-    <th>{%global:city%}:</th>
-    <td>{%contact_info.city.input%}</td>
-</tr>
-<tr>
-    <th>{%global:email%}:&nbsp;<span class="required">*</span></th>
-    <td>{%contact_info.email.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:phone%}:</th>
+                <td>{%contact_info.phone.input%}</td>
+            </tr>
+            </table>
+        </div>
 
-    <th>{%global:address%}:</th>
-    <td>{%contact_info.address.input%}</td>
-</tr>
-<tr>
-    <th>{%global:phone%}:</th>
-    <td>{%contact_info.phone.input%}</td>
+        <div class="secondary">
+            <table>
+            <tr>
+                <th>{%global:company_name%}:</th>
+                <td>{%contact_info.company_name.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:city%}:</th>
+                <td>{%contact_info.city.input%}</td>
+            </tr>        
+            <tr>
+                <th>{%global:address%}:</th>
+                <td>{%contact_info.address.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:fax%}:</th>
+                <td>{%contact_info.fax.input%}</td>
+            </tr>
+            </table>
+        </div>
 
-    <th>{%global:fax%}:</th>
-    <td>{%contact_info.fax.input%}</td>
-</tr>
-<tr>
-    <th valign="middle">{%global:message_text%}:&nbsp;<span class="required">*</span></th>
-    <td colspan="3">{%contact_info.message_text.input%}</td>
-</tr>
-<tr>
-    <td colspan="4" align="center">
-        <input name="submit_btn" type="submit" value="{%global:send%}" />
-    </td>
-</tr>
-</table>
+        <div class="message">
+            <table>
+            <tr>
+                <th valign="middle">{%global:message_text%}:&nbsp;<span class="required">*</span></th>
+                <td>{%contact_info.message_text.input%}</td>
+            </tr>
+            <tr>
+                <td align="center" colspan="2">
+                    <input name="submit_btn" type="submit" value="{%global:send%}" />
+                </td>
+            </tr>
+            </table>
+        </div>
+</div>
 
 </form>
 
@@ -52,5 +72,5 @@ focusFormElement('form', '{%contact_info.first_name.input_name%}');
 </script>
 
 <span class="info">
-    {{contact_form/contact_form/_notice}}
+{{contact_form/contact_form/_notice}}
 </span>

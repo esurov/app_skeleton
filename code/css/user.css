@@ -85,3 +85,38 @@
 table.category_browser>tbody>tr>td {
     vertical-align: top;
 }
+
+
+/* Contact Form */
+
+.contact_info {
+    white-space: nowrap;
+    min-width: 760px;
+}
+
+.contact_info div.primary {
+    margin: 0;
+    padding: 0;
+    float: left;
+}
+
+.contact_info div.secondary {
+   margin: 0;
+   padding: 0;
+   margin-left: 26px;
+   float: left;
+}
+
+.contact_info div.message {
+    margin: 0;
+    padding: 0;
+    clear: left;
+}
+
+.contact_info div table th {
+    width: 100px;
+}
+
+.contact_info div table td {
+    padding-left: 20px;
+}
