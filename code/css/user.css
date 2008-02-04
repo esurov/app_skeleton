@@ -86,6 +86,13 @@ table.category_browser>tbody>tr>td {
     vertical-align: top;
 }
 
+table.category_browser tbody tr td {
+    vertical-align: top;
+}
+
+table.category_browser tbody tr td td {
+    vertical-align: middle;
+}
 
 /* Contact Form */
 
