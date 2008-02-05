@@ -1,12 +1,25 @@
 <?php
 
 // Debug functions
-function v($obj) {
-    var_dump($obj);
+function v($var, $dump_all = false) {
+    $var_to_dump = $var;
+    
+    if (!$dump_all) {
+        if (is_subclass_of($var, "DbObject")) {
+            $var_to_dump = array();
+            foreach ($var->_fields as $field_name => $field_info) {
+                if ($field_info["create"]) {
+                    $var_to_dump[$field_name] = $var->{$field_name};
+                }
+            }
+        }
+    }
+    
+    var_dump($var_to_dump);
 }
 
-function vx($obj) {
-    v($obj);
+function vx($obj, $dump_all = false) {
+    v($obj, $dump_all);
     exit;
 }
 
