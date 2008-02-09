@@ -4,7 +4,7 @@ return array(
     "global:head_page_title.app" => "!!AppSkeleton",
 
     // Parts of page
-    "global:sure_delete" => "Are you sure you want to delete record?",
+    "global:sure_delete.js" => get_js_safe_string("Are you sure you want to delete record?"),
     "global:and" => "and",
     "global:or" => "or",
     "global:from" => "from",
