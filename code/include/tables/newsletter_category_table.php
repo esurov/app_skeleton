@@ -16,7 +16,7 @@ class NewsletterCategoryTable extends CustomDbObject {
             "multilingual" => 1,
             "input" => array(
                 "type_attrs" => array(
-                    "class" => "wide",
+                    "class" => "varchar_wide",
                 ),
             ),
         ));
