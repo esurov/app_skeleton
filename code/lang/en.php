@@ -68,18 +68,18 @@ return array(
     "users" => "users",
 
     "guest_menu_item.signup" => "Signup",
-    "user_menu_item.user" => "My Account",
+    "user_menu_item.user" => "My account",
     "admin_menu_item.users" => "Users",
 
     "page_title.signup" => "Signup",
-    "page_title.signup_almost_completed" => "Il nuovo account stato creato",
+    "page_title.signup_almost_completed" => "New account created",
     "page_title.confirm_signup" => "Account confirmed",
     "page_title.users" => "Users",
     "page_title.user_view" => "View user",
-    "page_title.user_view_my_account" => "My Account",
+    "page_title.user_view_my_account" => "My account",
     "page_title.user_edit_new" => "Add user",
     "page_title.user_edit" => "Edit user",
-    "page_title.user_edit_my_account" => "Edit My Account",
+    "page_title.user_edit_my_account" => "Edit my account",
 
     "status_msg.user.added" => "User added",
     "status_msg.user.updated" => "User updated",
@@ -98,12 +98,6 @@ return array(
     "status_msg.user.role_empty" => "Specify user role",
     "status_msg.user.should_accept_agreement" => "You should check \"Accept agreement\" to continue",
     "status_msg.user.cannot_delete_main_admin" => "Cannot delete main administrator account",
-//    "status_msg.user.zip_empty" => "Please input ZIP Code ",
-//    "status_msg.user.zip_bad" => "ZIP Code should be a number with minimum 5 digits",
-//    "status_msg.user.country_empty" => "Please input country",
-//    "status_msg.user.city_empty" => "Please input city",
-//    "status_msg.user.phone_empty" => "Please input contact phone",
-//    "status_msg.user.phone_bad" => "Bad phone number format",
 
     "email_signup_form_processed_subject" => "Welcome to !!AppSkeleton website",
 
@@ -148,23 +142,21 @@ return array(
     "status_msg.news_article.files_max_total_size_reached" => "Total uploaded files size is more than 100 Mb",
 
     // Newsletters
-    "newsletter" => "news article",
-    "newsletters" => "news articles",
+    "newsletter" => "newsletter",
+    "newsletters" => "newsletters",
 
-    "guest_menu_item.newsletters" => "Newsletters",
     "admin_menu_item.newsletters" => "Newsletters",
     "admin_sub_menu_item.newsletters" => "Newsletters list",
-    "admin_sub_menu_item.newsletter_edit" => "New newsletter",
     "admin_sub_menu_item.newsletter_category" => "Newsletter categories",
-    "admin_sub_menu_item.newsletter_edit_new" => "Add newsletter",
-    "admin_sub_menu_item.newsletter_edit" => "Edit newsletter",
+    "admin_sub_menu_item.newsletter_edit" => "Create newsletter",
 
     "page_title.newsletters" => "Newsletters",
     "page_title.newsletter_view" => "View newsletter",
-    "page_title.newsletter_edit_new" => "Add newsletter",
+    "page_title.newsletter_edit_new" => "Create newsletter",
     "page_title.newsletter_edit" => "Edit newsletter",
+    "page_title.newsletter_categories" => "Newsletter categories",
  
-    "status_msg.newsletter.added" => "Newsletter added",
+    "status_msg.newsletter.added" => "Newsletter sent",
     "status_msg.newsletter.updated" => "Newsletter updated",
     "status_msg.newsletter.deleted" => "Newsletter deleted",
     "status_msg.newsletter.image_deleted" => "Newsletter image deleted",
@@ -188,7 +180,7 @@ return array(
 
     "admin_menu_item.newsletter_category" => "Newsletter categories",
 
-    "page_title.newsletter_category" => "Newsletter categories",
+    "page_title.newsletter_categories" => "Newsletter categories",
     "page_title.newsletter_category_edit_new" => "Add newsletter category",
     "page_title.newsletter_category_edit" => "Edit category",
 
@@ -199,14 +191,14 @@ return array(
     "status_msg.newsletter_category.name_empty" => "Specify newsletter category name",
 
     // User subscription
-    "user_subscription" => "!!user_subscription",
-    "user_subscriptions" => "!!user_subscriptions",
+    "user_subscription" => "newsletter subscription",
+    "user_subscriptions" => "newsletter subscriptions",
 
-    "user_menu_item.user_subscription" => "!!user_subscription",
+    "user_menu_item.user_subscription" => "My newletter subscriptions",
 
-    "page_title.user_subscription" => "!!user_subscription",
+    "page_title.user_subscription" => "My newsletter subscriptions",
 
-    "status_msg.user_subscription.subscribed" => "!!user_subscription subscribed",
+    "status_msg.user_subscription.updated" => "Newsletter subscriptions updated",
 
     // Contact form
     "guest_menu_item.contact_form" => "Contacts",

@@ -3,12 +3,12 @@
 <tr>
     <th><a href="?{%action_filters.suburl%}&amp;order_by=id+asc">{%global:id%}</a></th>
     <th><a href="?{%action_filters.suburl%}&amp;order_by[]=created+desc&amp;order_by[]=id+desc">{%global:date_created%}</a></th>
-    <th><a href="?{%action_filters.suburl%}&amp;order_by=login+asc">{%global:login%}</a></th>
-    <th><a href="?{%action_filters.suburl%}&amp;order_by[]=last_name+asc&amp;order_by[]=first_name+asc">{%global:name%}</a></th>
-    <th>{%global:email%}</th>
-    <th>{%global:role%}</th>
-    <th>{%global:is_confirmed%}</th>
-    <th>{%global:is_active%}</th>
+    <th><a href="?{%action_filters.suburl%}&amp;order_by=login+asc">{%global:user.login%}</a></th>
+    <th><a href="?{%action_filters.suburl%}&amp;order_by[]=last_name+asc&amp;order_by[]=first_name+asc">{%global:user.name%}</a></th>
+    <th>{%global:user.email%}</th>
+    <th>{%global:user.role%}</th>
+    <th>{%global:user.is_confirmed%}</th>
+    <th>{%global:user.is_active%}</th>
     <th>{%global:actions%}</th>
 </tr>
 </thead>

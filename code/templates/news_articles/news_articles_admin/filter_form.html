@@ -2,8 +2,7 @@
 <input type="hidden" name="action" value="news_articles" />
 
 <strong>{%global:filter_by%}:</strong> 
-{%global:text%}:
-{%news_article.full_text.like_many.input%}
+{%global:news_article.text%}: {%news_article.full_text.like_many.input%}
 <input type="submit" name="submit_btn" value="{%global:filter%}" />
 
 </form>

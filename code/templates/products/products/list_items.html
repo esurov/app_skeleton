@@ -2,9 +2,9 @@
 <thead>
 <tr>
     <th><a href="?{%action_filters.suburl%}&amp;order_by=id+asc">{%global:id%}</a></th>
-    <th>{%global:category%}</th>
-    <th><a href="?{%action_filters.suburl%}&amp;order_by[]=category1_position+asc&amp;order_by[]=category2_position+asc&amp;order_by[]=category3_position+asc&amp;order_by[]=name+asc">{%global:name%}</a></th>
-    <th><a href="?{%action_filters.suburl%}&amp;order_by=price+asc">{%global:price%}</a></th>
+    <th>{%global:product.category%}</th>
+    <th><a href="?{%action_filters.suburl%}&amp;order_by[]=category1_position+asc&amp;order_by[]=category2_position+asc&amp;order_by[]=category3_position+asc&amp;order_by[]=name+asc">{%global:product.name%}</a></th>
+    <th><a href="?{%action_filters.suburl%}&amp;order_by=price+desc">{%global:price%}</a></th>
     <th>{%global:actions%}</th>
 </tr>
 </thead>

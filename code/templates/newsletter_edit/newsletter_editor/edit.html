@@ -1,5 +1,5 @@
 <div class="toolbar">
-    [<a href="?action=newsletters">{%global:back_to_newsletters%}</a>]
+    [<a href="?action=newsletters">{%global:newsletter.back_to_list%}</a>]
 </div>
 
 <form action="?action=newsletter_edit&amp;newsletter_id={%newsletter.id%}"
@@ -8,35 +8,35 @@
 
 <table>
 <tr>
-    <th>{%global:title%}:&nbsp;<span class="required">*</span></th>
-    <td>{%newsletter.title.input%}</td>
-</tr>
-<tr>
-    <th>{%global:date%}:&nbsp;<span class="required">*</span></th>
-    <td>{%newsletter.sent_date.input%}</td>
-</tr>
-<tr>
-    <th>{%global:category%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:newsletter.category%}:&nbsp;<span class="required">*</span></th>
     <td>{%newsletter.newsletter_category_id.input%}</td>
 </tr>
 <tr>
-    <th>{%global:body%}:</th>
+    <th>{%global:newsletter.sent_date%}:&nbsp;<span class="required">*</span></th>
+    <td>{%newsletter.sent_date.input%}</td>
+</tr>
+<tr>
+    <th>{%global:newsletter.title%}:&nbsp;<span class="required">*</span></th>
+    <td>{%newsletter.title.input%}</td>
+</tr>
+<tr>
+    <th>{%global:newsletter.body%}:</th>
     <td>{%newsletter.body.input%}</td>
 </tr>
 <tr>
-    <th>{%global:current_image%}:</th>
+    <th>{%global:newsletter.current_image%}:</th>
     <td>{%newsletter.image%}</td>
 </tr>
 <tr>
-    <th>{%global:upload_new_image%}:</th>
+    <th>{%global:newsletter.upload_new_image%}:</th>
     <td><input type="file" name="image_file" /></td>
 </tr>
 <tr>
-    <th>{%global:current_file%}:</th>
+    <th>{%global:newsletter.current_file%}:</th>
     <td>{%newsletter.file_info%}</td>
 </tr>
 <tr>
-    <th>{%global:upload_new_file%}:</th>
+    <th>{%global:newsletter.upload_new_file%}:</th>
     <td><input type="file" name="file" /></td>
 </tr>
 <tr>

@@ -4,7 +4,6 @@ return array(
     "global:head_page_title.app" => "!!AppSkeleton",
 
     // Parts of page
-    "global:sure_delete.js" => get_js_safe_string("Are you sure you want to delete record?"),
     "global:and" => "and",
     "global:or" => "or",
     "global:from" => "from",
@@ -13,12 +12,43 @@ return array(
     "global:no_records_found" => "No records found",
     "global:no_image" => "No image uploaded",
     "global:no_file" => "No file uploaded",
+    "global:sure_delete.js" => get_js_safe_string("Are you sure you want to delete record?"),
+
+    "global:month_long_1" => "January",
+    "global:month_long_2" => "February",
+    "global:month_long_3" => "March",
+    "global:month_long_4" => "April",
+    "global:month_long_5" => "May",
+    "global:month_long_6" => "June",
+    "global:month_long_7" => "July",
+    "global:month_long_8" => "August",
+    "global:month_long_9" => "September",
+    "global:month_long_10" => "October",
+    "global:month_long_11" => "November",
+    "global:month_long_12" => "December",
+
+    "global:weekday_short_0" => "Su",
+    "global:weekday_short_1" => "Mo",
+    "global:weekday_short_2" => "Tu",
+    "global:weekday_short_3" => "We",
+    "global:weekday_short_4" => "Th",
+    "global:weekday_short_5" => "Fr",
+    "global:weekday_short_6" => "Sa",
+
+    "global:weekday_long_0" => "Sunday",
+    "global:weekday_long_1" => "Monday",
+    "global:weekday_long_2" => "Tuesday",
+    "global:weekday_long_3" => "Wednesday",
+    "global:weekday_long_4" => "Thursday",
+    "global:weekday_long_5" => "Friday",
+    "global:weekday_long_6" => "Saturday",
 
     // Titles
     "global:actions" => "Actions",
     "global:id" => "ID",
     "global:date" => "Date",
-    "global:date_created" => "Creation date",
+    "global:created_date" => "Creation date",
+    "global:updated_date" => "Modification date",
     "global:title" => "Title",
     "global:body" => "Body",
     "global:text" => "Text",
@@ -64,10 +94,6 @@ return array(
     "global:upload_new_image" => "Upload new image",
     "global:current_file" => "Current file",
     "global:upload_new_file" => "Upload new file",
-    "global:category" => "Category",
-    "global:category1" => "Category1",
-    "global:category2" => "Category2",
-    "global:category3" => "Category3",
 
     // Link/button titles
     "global:view" => "View",
@@ -81,6 +107,7 @@ return array(
     "global:select" => "Select",
     "global:back" => "Back",
     "global:send" => "Send",
+    "global:update" => "Update",
     "global:save" => "Save",
     "global:save_and_send" => "Save and Send",
     "global:filter" => "Filter",
@@ -113,27 +140,104 @@ return array(
     "global:delete_file" => "Delete file",
     "global:activate_deactivate" => "Activate/Deactivate",
 
-    "global:view_all_news" => "View all news",
-    "global:add_news_article" => "Add news article",
-    "global:back_to_news_articles" => "Back to news articles",
+    // Users
+    "global:user.add" => "Add user",
+    "global:user.back_to_list" => "Back to users list",
+    "global:user.back_to_view" => "Back to user view",
+    "global:user.back_to_my_account" => "Back to my account",
 
-    "global:add_user" => "Add user",
-    "global:back_to_users" => "Back to users",
-    "global:back_to_user_view" => "Back to user view",
+    "global:user.login" => "Login",
+    "global:user.role" => "Role",
+    "global:user.password" => "Password",
+    "global:user.password_confirm" => "Confirm password",
+    "global:user.first_name" => "First Name",
+    "global:user.last_name" => "Last Name",
+    "global:user.email" => "Email",
+    "global:user.extra_info" => "Extra info",
+    "global:user.is_confirmed" => "Confirmed?",
+    "global:user.is_active" => "Active?",
+    "global:user.accept_agreement" => "I Accept",
+    "global:user.should_remember" => "Remember me", 
+    "global:user.date_created" => "Creation date",
+    "global:user.name" => "Name",
 
-    "global:add_category1" => "Add category1",
+    // Contact info
+    "global:contact_info.first_name" => "First Name",
+    "global:contact_info.last_name" => "Last Name",
+    "global:contact_info.email" => "Email",
+    "global:contact_info.phone" => "Phone",
+    "global:contact_info.company_name" => "Company",
+    "global:contact_info.city" => "City",
+    "global:contact_info.address" => "Address",
+    "global:contact_info.fax" => "Fax",
+    "global:contact_info.message_text" => "Message",
+    
+    // News articles
+    "global:news_article.add" => "Add news article",
+    "global:news_article.back_to_list" => "Back to news articles",
 
-    "global:add_category2" => "Add category2",
+    "global:news_article.created_date" => "Date",
+    "global:news_article.title" => "Title",
+    "global:news_article.body" => "Body",
+    "global:news_article.image" => "Image",
+    "global:news_article.file" => "File",
+    "global:news_article.current_image" => "Current image",
+    "global:news_article.upload_new_image" => "Upload new image",
+    "global:news_article.current_file" => "Current file",
+    "global:news_article.upload_new_file" => "Upload new file",
+    "global:news_article.text" => "Text",
 
-    "global:add_category3" => "Add category3",
+    // Newsletters and newsletter categories
+    "global:newsletter.add" => "Create newsletter",
+    "global:newsletter.back_to_list" => "Back to newsletters",
 
-    "global:add_product" => "Add product",
-    "global:back_to_products" => "Back to products",
+    "global:newsletter.category" => "Category",
+    "global:newsletter.sent_date" => "Sending date",
+    "global:newsletter.title" => "Title",
+    "global:newsletter.body" => "Body",
+    "global:newsletter.image" => "Image",
+    "global:newsletter.file" => "File",
+    "global:newsletter.current_image" => "Current image",
+    "global:newsletter.upload_new_image" => "Upload new image",
+    "global:newsletter.current_file" => "Current file",
+    "global:newsletter.upload_new_file" => "Upload new file",
+    "global:newsletter.text" => "Text",
 
-    "global:add_newsletter" => "Add newsletter",
-    "global:back_to_newsletters" => "Back to newsletters",
+    "global:newsletter_category.add" => "Add newsletter category",
+    "global:newsletter_category.back_to_list" => "Back to newsletter categories",
 
-    "global:add_newsletter_category" => "Add newsletter category",
-    "global:back_to_newsletter_categories" => "Back to newsletter categories",
+    "global:newsletter_category.name" => "Name",
+    "global:newsletter_category.is_active" => "Active?",
+    "global:newsletter_category.is_subscribed" => "Subscribed?",
+    "global:newsletter_category.name.full" => "Category",
+
+    // Categories
+    "global:category1.add" => "Add category1",
+
+    "global:category1.title" => "Category1",
+    "global:category1.name" => "Name",
+    
+    "global:category2.add" => "Add category2",
+
+    "global:category2.title" => "Category2",
+    "global:category2.name" => "Name",
+
+    "global:category3.add" => "Add category3",
+
+    "global:category3.title" => "Category3",
+    "global:category3.name" => "Name",
+
+    // Products
+    "global:product.add" => "Add product",
+    "global:product.back_to_list" => "Back to products",
+
+    "global:product.category1" => "Category1",
+    "global:product.category2" => "Category2",
+    "global:product.category3" => "Category3",
+    "global:product.name" => "Name",
+    "global:product.description" => "Description",
+    "global:product.price" => "Price",
+    "global:product.category" => "Category",
+    "global:product.keywords" => "Keywords",
 );
 ?>

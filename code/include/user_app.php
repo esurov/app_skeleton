@@ -963,7 +963,7 @@ class UserApp extends CustomApp {
                  "obj" => $newsletter,
                  "filter_form.visible" => true,
                  "context" => "newsletters_list_item",
-                 "default_order_by" => array("id DESC"),    
+                 "default_order_by" => array("sent_date DESC"),    
              )
         );
         $newsletters_list->print_values();
@@ -1153,8 +1153,10 @@ class UserApp extends CustomApp {
                 "templates_dir" => "{$templates_dir}/newsletter_categories",
                 "template_var" => "newsletter_categories",
                 "obj" => $newsletter_category,
+                "query_ex" => array(
+                    "order_by" => "name ASC",
+                ),
                 "context" => "newsletter_categories_list_item",
-                "default_order_by" => array("id DESC"),
             )
         );
 
@@ -1218,9 +1220,9 @@ class UserApp extends CustomApp {
                  "template_var" => "categories_to_subscribe",
                  "obj" => $newsletter_category,
                  "query_ex" => array(
-                    "where" => "is_active = 1",
+                    "where" => "newsletter_category.is_active = 1",
+                    "order_by" => "name ASC",
                  ), 
-                 "default_order_by" => array("id DESC"),    
                  "pager.visible" => false,
                  "context" => "user_subscription_list_item",
              )
@@ -1258,7 +1260,7 @@ class UserApp extends CustomApp {
             break;
         }
 
-        $this->add_session_status_message(new OkStatusMsg("user_subscription.subscribed"));
+        $this->add_session_status_message(new OkStatusMsg("user_subscription.updated"));
         
         $this->create_self_redirect_response(array("action" => "user_subscription"));
     }

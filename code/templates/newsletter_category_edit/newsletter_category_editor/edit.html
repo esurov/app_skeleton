@@ -1,5 +1,5 @@
 <div class="toolbar">
-    [<a href="?action=newsletter_categories">{%global:back_to_newsletter_categories%}</a>]
+    [<a href="?action=newsletter_categories">{%global:newsletter_category.back_to_list%}</a>]
 </div>
 
 <form action="?action=newsletter_category_edit&amp;newsletter_category_id={%newsletter_category.id%}"
@@ -8,15 +8,11 @@
 
 <table>
 <tr>
-    <th>{%global:id%}:</th>
-    <td>{%newsletter_category.id%}</td>
-</tr>
-<tr>
-    <th>{%global:name%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:newsletter_category.name%}:&nbsp;<span class="required">*</span></th>
     <td>{%newsletter_category.name.input%}</td>
 </tr>
 <tr>
-    <th>{%global:is_active%}:</th>
+    <th>{%global:newsletter_category.is_active%}:</th>
     <td>{%newsletter_category.is_active.input%}</td>
 </tr>
 <tr>

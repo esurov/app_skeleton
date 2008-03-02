@@ -99,12 +99,6 @@ return array(
     "status_msg.user.role_empty" => "Specificare ruolo utente",
     "status_msg.user.should_accept_agreement" => "Devi selezionare \"Accetta\" per continuare",
     "status_msg.user.cannot_delete_main_admin" => "Impossibile cancellare l'account principale di amministrazione",
-//    "status_msg.user.zip_empty" => "Inserire il CAP",
-//    "status_msg.user.zip_bad" => "Il CAP dovrebbe essere un numero di 5 cifre",
-//    "status_msg.user.country_empty" => "Inserire la nazione",
-//    "status_msg.user.city_empty" => "Inserire la città",
-//    "status_msg.user.phone_empty" => "Inserire il nr. di telefono",
-//    "status_msg.user.phone_bad" => "Nr. di telefono non valido",
 
     "email_signup_form_processed_subject" => "Benvenuto al sito !!AppSkeleton",
 
@@ -152,20 +146,18 @@ return array(
     "newsletter" => "!!newsletter",
     "newsletters" => "!!newsletters",
 
-    "guest_menu_item.newsletters" => "!!Newsletters",
     "admin_menu_item.newsletters" => "!!Newsletters",
     "admin_sub_menu_item.newsletters" => "!!Newsletters list",
-    "admin_sub_menu_item.newsletter_edit" => "!!New newsletter",
     "admin_sub_menu_item.newsletter_category" => "!!Newsletter categories",
-    "admin_sub_menu_item.newsletter_edit_new" => "!!Add newsletter",
-    "admin_sub_menu_item.newsletter_edit" => "!!Edit newsletter",
+    "admin_sub_menu_item.newsletter_edit" => "!!Create newsletter",
 
     "page_title.newsletters" => "!!Newsletters",
     "page_title.newsletter_view" => "!!View newsletter",
-    "page_title.newsletter_edit_new" => "!!Add newsletter",
+    "page_title.newsletter_edit_new" => "!!Create newsletter",
     "page_title.newsletter_edit" => "!!Edit newsletter",
+    "page_title.newsletter_categories" => "!!Newsletter categories",
 
-    "status_msg.newsletter.added" => "!!Newsletter added",
+    "status_msg.newsletter.added" => "!!Newsletter sent",
     "status_msg.newsletter.updated" => "!!Newsletter updated",
     "status_msg.newsletter.deleted" => "!!Newsletter deleted",
     "status_msg.newsletter.image_deleted" => "!!Newsletter image deleted",
@@ -200,15 +192,14 @@ return array(
     "status_msg.newsletter_category.name_empty" => "!!Specify newsletter category name",
 
     // User subscription
-    "user_subscription" => "!!user_subscription",
-    "user_subscriptions" => "!!user_subscriptions",
+    "user_subscription" => "!!newsletter subscription",
+    "user_subscriptions" => "!!newsletter subscriptions",
 
-    "user_menu_item.user_subscription" => "!!user_subscription",
+    "user_menu_item.user_subscription" => "!!My newletter subscriptions",
 
-    "page_title.user_subscription" => "!!user_subscription",
+    "page_title.user_subscription" => "!!My newsletter subscriptions",
 
-    "status_msg.user_subscription.subscribed" => "!!user_subscription subscribed",
-    "status_msg.newsletter_category.unsubscribed" => "!!user_subscription unsubscribed",
+    "status_msg.user_subscription.updated" => "!!Newsletter subscriptions updated",
 
     // Contact form
     "guest_menu_item.contact_form" => "Contatti",

@@ -1,12 +1,12 @@
 <table class="table">
 <thead>
 <tr>
-    <th><a href="?{%action_filters.suburl%}&amp;order_by=id+asc">{%global:id%}</a></th>
-    <th><a href="?{%action_filters.suburl%}&amp;order_by=created+desc">{%global:date%}</a></th>
-    <th>{%global:category%}</th>
-    <th><a href="?{%action_filters.suburl%}&amp;order_by=title+asc">{%global:title%}</a></th>
-    <th>{%global:image%}</th>
-    <th>{%global:file%}</th>
+    <th><a href="?{%action_filters.suburl%}&amp;order_by=id+desc">{%global:id%}</a></th>
+    <th><a href="?{%action_filters.suburl%}&amp;order_by=sent_date+desc">{%global:newsletter.sent_date%}</a></th>
+    <th>{%global:newsletter.category%}</th>
+    <th>{%global:newsletter.title%}</th>
+    <th>{%global:newsletter.image%}</th>
+    <th>{%global:newsletter.file%}</th>
     <th>{%global:actions%}</th>
 </tr>
 </thead>

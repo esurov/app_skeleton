@@ -1,10 +1,9 @@
 <!DOCTYPE html
     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{%sys:lang%}" lang="{%sys:lang%}" dir="ltr">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    
+    <meta http-equiv="Content-Type" content="text/html; charset={%sys:html_charset%}" />
     <title>{%newsletter.title%}</title>
 </head>
 <body>
@@ -15,6 +14,5 @@
     {%newsletter.body.orig%}
 
     {%newsletter.file_info%}
-
 </body>
 </html>

@@ -526,11 +526,14 @@ class UserTable extends CustomDbObject {
             }
             $this->app->print_file("{$this->_templates_dir}/_is_active.html", "_is_active");
             $this->app->print_file("{$this->_templates_dir}/_is_confirmed.html", "_is_confirmed");
-            $this->app->print_file("{$this->_templates_dir}/_link_back_admin.html", "_link_back");
+            $this->app->print_file("{$this->_templates_dir}/_link_back_to_users.html", "_link_back");
         }
         
         if ($this->_context == "user_edit_user") {
-            $this->app->print_file("{$this->_templates_dir}/_link_back_user.html", "_link_back");
+            $this->app->print_file(
+                "{$this->_templates_dir}/_link_back_to_my_account.html",
+                "_link_back"
+            );
         }
     }
 //
