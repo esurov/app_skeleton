@@ -7,38 +7,36 @@
     <input type="hidden" name="action" value="users" />
 
     <table>
-        <tr>
-            <th colspan="2"><strong>{%global:filter_by%}:</strong></th>
-        </tr>
-        <tr>
-            <th>{%global:user.login%}:</th>
-            <td>{%user.login.like.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.name%}:</th>
-            <td>{%user.full_name.like_many.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.email%}:</th>
-            <td>{%user.email.like.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.role%}:</th>
-            <td>{%user.role.equal.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.is_confirmed%}:</th>
-            <td>{%user.is_confirmed.equal.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.is_active%}:</th>
-            <td>{%user.is_active.equal.input%}</td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center">
-                <input type="submit" name="submit_btn" value="{%global:filter%}" />
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <th colspan="2"><strong>{%global:filter_by%}:</strong></th>
+            </tr>
+            <tr>
+                <th>{%global:user.login%}:</th>
+                <td>{%user.login.like.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.name%}:</th>
+                <td>{%user.full_name.like_many.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.email%}:</th>
+                <td>{%user.email.like.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.role%}:</th>
+                <td>{%user.role.equal.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.is_confirmed%}:</th>
+                <td>{%user.is_confirmed.equal.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.is_active%}:</th>
+                <td>{%user.is_active.equal.input%}</td>
+            </tr>
+        </tbody>
     </table>
+    <input type="submit" name="submit_btn" value="{%global:filter%}" />
 
 </form>

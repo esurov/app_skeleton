@@ -7,35 +7,33 @@
     <input type="hidden" name="action" value="products" />
 
     <table>
-        <tr>
-            <th colspan="2"><strong>{%global:filter_by%}:</strong></th>
-        </tr>
-        <tr>
-            <th>{%global:product.keywords%}:</th>
-            <td>{%product.keywords.like_many.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:product.category1%}:</th>
-            <td>{%product.category2_category1_id.equal.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:product.category2%}:</th>
-            <td>{%product.category3_category2_id.equal.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:product.category3%}:</th>
-            <td>{%product.category3_id.equal.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:product.price%}:</th>
-            <td>{%global:from%}:&nbsp;{%product.price.greater_equal.input%}&nbsp;{%global:to%}:&nbsp;{%product.price.less_equal.input%}</td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center">
-                <input type="submit" name="submit_btn" value="{%global:filter%}" />
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <th colspan="2"><strong>{%global:filter_by%}:</strong></th>
+            </tr>
+            <tr>
+                <th>{%global:product.keywords%}:</th>
+                <td>{%product.keywords.like_many.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:product.category1%}:</th>
+                <td>{%product.category2_category1_id.equal.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:product.category2%}:</th>
+                <td>{%product.category3_category2_id.equal.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:product.category3%}:</th>
+                <td>{%product.category3_id.equal.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:product.price%}:</th>
+                <td>{%global:from%}:&nbsp;{%product.price.greater_equal.input%}&nbsp;{%global:to%}:&nbsp;{%product.price.less_equal.input%}</td>
+            </tr>
+        </tbody>
     </table>
+    <input type="submit" name="submit_btn" value="{%global:filter%}" />
 
 </form>
 

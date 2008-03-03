@@ -1,27 +1,37 @@
-<div>
-<form action="?" method="get" name="form" onsubmit="onsubmitFormHandler(this);">
-<input type="hidden" name="action" value="tables_dump_url" />
-<br />
-<h3>Actual tables:</h3>
-<table class="table">
-<thead>
-<tr>
-    <th>Table name</th>
-    <th>
-        Include in dump? [<a
-            href="#" onclick="checkFormCheckboxes('form', 'table_names[]', true); return false;"
-        >+</a>]&nbsp;[<a
-            href="#" onclick="checkFormCheckboxes('form', 'table_names[]', false); return false;"
-        >-</a>]
-    </th>
-</tr>
-</thead>
-<tbody>
-    {%form_items%}
-</tbody>
+<form
+    action="?"
+    method="get"
+    name="form"
+    onsubmit="onsubmitFormHandler(this);">
 
-</table>
-<br />
-<input type="submit" name="submit_btn" value="Generate URL for dump download" />
+    <input type="hidden" name="action" value="tables_dump_url" />
+    <br />
+    <h3>Actual tables:</h3>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Table name</th>
+                <th>
+                    <div class="toolbar">
+                        Include in dump?
+                        [<a
+                            href="#"
+                            onclick="checkFormCheckboxes('form', 'table_names[]', true); return false;"
+                            >+</a>]
+                        [<a
+                            href="#"
+                            onclick="checkFormCheckboxes('form', 'table_names[]', false); return false;"
+                            >-</a>]
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            {%form_items%}
+        </tbody>
+    </table>
+    <br />
+    <input type="submit" name="submit_btn" value="Generate URL for dump download" />
+
 </form>
-</div>

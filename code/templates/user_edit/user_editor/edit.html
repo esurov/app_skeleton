@@ -10,43 +10,41 @@
     <input type="hidden" name="command" value="update" />
 
     <table>
-        {%_role%}
-        <tr>
-            <th>{%global:user.login%}:{%global:_required_field%}</th>
-            <td>{%user.login.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.password%}:</th>
-            <td>{%user.password.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.password_confirm%}:</th>
-            <td>{%user.password_confirm.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.first_name%}:{%global:_required_field%}</th>
-            <td>{%user.first_name.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.last_name%}:{%global:_required_field%}</th>
-            <td>{%user.last_name.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.email%}:{%global:_required_field%}</th>
-            <td>{%user.email.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.extra_info%}:</th>
-            <td>{%user.extra_info.input%}</td>
-        </tr>
-        {%_is_confirmed%}
-        {%_is_active%}
-        <tr>
-            <td colspan="2" align="center">
-                <input name="submit_btn" type="submit" value="{%global:save%}" />
-            </td>
-        </tr>
+        <tbody>
+            {%_role%}
+            <tr>
+                <th>{%global:user.login%}:{%global:_required_field%}</th>
+                <td>{%user.login.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.password%}:</th>
+                <td>{%user.password.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.password_confirm%}:</th>
+                <td>{%user.password_confirm.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.first_name%}:{%global:_required_field%}</th>
+                <td>{%user.first_name.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.last_name%}:{%global:_required_field%}</th>
+                <td>{%user.last_name.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.email%}:{%global:_required_field%}</th>
+                <td>{%user.email.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.extra_info%}:</th>
+                <td>{%user.extra_info.input%}</td>
+            </tr>
+            {%_is_confirmed%}
+            {%_is_active%}
+        </tbody>
     </table>
+    <input name="submit_btn" type="submit" value="{%global:save%}" />
 
 </form>
 

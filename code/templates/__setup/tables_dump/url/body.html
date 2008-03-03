@@ -1,22 +1,23 @@
-<div>
-<form action="?" method="get" name="form" onsubmit="onsubmitFormHandler(this);">
-<input type="hidden" name="action" value="tables_dump_view" />
-<input type="hidden" name="table_names" value="{%table_names_str%}" />
+<form
+    action="?"
+    method="get"
+    name="form"
+    onsubmit="onsubmitFormHandler(this);">
 
-<table>
-<tr>
-<td align="center" colspan="2">
-<a href="{%download_dump_url%}">Download gzipped dump</a><br /><br />
-<textarea name="url" cols="120" rows="9">{%download_dump_url%}</textarea>
-</td>
-</tr>
-<tr>
-<td align="center" colspan="2">
-<input type="button" value="Copy URL to clipboard" onclick="copyToClipboard(this.form.url);" />
-<input type="submit" name="submit_btn" value="View dump in browser" />
-</td>
-</tr>
-</table>
+    <input type="hidden" name="action" value="tables_dump_view" />
+    <input type="hidden" name="table_names" value="{%table_names_str%}" />
 
+    <a href="{%download_dump_url%}">Download gzipped dump</a><br />
+    <br />
+    <textarea name="url" cols="120" rows="9">{%download_dump_url%}</textarea><br />
+    <br />
+
+    <input
+        type="button"
+        value="Copy URL to clipboard"
+        onclick="copyToClipboard(this.form.url);" />
+    <input
+        type="submit"
+        name="submit_btn"
+        value="View dump in browser" />
 </form>
-</div>

@@ -11,19 +11,21 @@
     <input type="hidden" name="command" value="update" />
 
     <table>
-        <tr>
-            <th>{%global:newsletter_category.name%}:{%global:_required_field%}</th>
-            <td>{%newsletter_category.name.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:newsletter_category.is_active%}:</th>
-            <td>{%newsletter_category.is_active.input%}</td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <input type="submit" name="submit_btn" value="{%global:save%}" />
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <th>{%global:newsletter_category.name%}:{%global:_required_field%}</th>
+                <td>{%newsletter_category.name.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:newsletter_category.is_active%}:</th>
+                <td>{%newsletter_category.is_active.input%}</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" name="submit_btn" value="{%global:save%}" />
+                </td>
+            </tr>
+        </tbody>
     </table>
 
 </form>

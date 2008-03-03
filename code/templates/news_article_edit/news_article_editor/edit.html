@@ -11,39 +11,41 @@
     <input type="hidden" name="command" value="update" />
 
     <table>
-        <tr>
-            <th>{%global:news_article.created_date%}:</th>
-            <td>{%news_article.created_date.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:news_article.title%}:{%global:_required_field%}</th>
-            <td>{%news_article.title.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:news_article.body%}:</th>
-            <td>{%news_article.body.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:news_article.current_image%}:</th>
-            <td>{%news_article.image%}</td>
-        </tr>
-        <tr>
-            <th>{%global:news_article.upload_new_image%}:</th>
-            <td><input type="file" name="image_file" /></td>
-        </tr>
-        <tr>
-            <th>{%global:news_article.current_file%}:</th>
-            <td>{%news_article.file_info%}</td>
-        </tr>
-        <tr>
-            <th>{%global:news_article.upload_new_file%}:</th>
-            <td><input type="file" name="file" /></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <input type="submit" name="submit_btn" value="{%global:save%}" />
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <th>{%global:news_article.created_date%}:</th>
+                <td>{%news_article.created_date.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:news_article.title%}:{%global:_required_field%}</th>
+                <td>{%news_article.title.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:news_article.body%}:</th>
+                <td>{%news_article.body.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:news_article.current_image%}:</th>
+                <td>{%news_article.image%}</td>
+            </tr>
+            <tr>
+                <th>{%global:news_article.upload_new_image%}:</th>
+                <td><input type="file" name="image_file" /></td>
+            </tr>
+            <tr>
+                <th>{%global:news_article.current_file%}:</th>
+                <td>{%news_article.file_info%}</td>
+            </tr>
+            <tr>
+                <th>{%global:news_article.upload_new_file%}:</th>
+                <td><input type="file" name="file" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" name="submit_btn" value="{%global:save%}" />
+                </td>
+            </tr>
+        </tbody>
     </table>
 
 </form>

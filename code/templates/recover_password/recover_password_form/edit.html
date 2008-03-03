@@ -8,20 +8,18 @@
     <input type="hidden" name="command" value="recover" />
 
     <table>
-        <tr>
-            <th>{%global:user.login%}:</th>
-            <td>{%user.login.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:user.email%}:</th>
-            <td>{%user.email.input%}</td>
-        </tr>
-        <tr>
-            <td colspan="5" align="center">
-               <input type="submit" name="submit_btn" value="{%global:send%}" />
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <th>{%global:user.login%}:</th>
+                <td>{%user.login.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.email%}:</th>
+                <td>{%user.email.input%}</td>
+            </tr>
+        </tbody>
     </table>
+    <input type="submit" name="submit_btn" value="{%global:send%}" />
 
 </form>
 

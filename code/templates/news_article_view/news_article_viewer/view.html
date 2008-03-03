@@ -1,3 +1,7 @@
+<div class="toolbar">
+    <a href="?action=news_articles">{%global:news_article.back_to_list%}</a>
+</div>
+
 <div class="news_article">
     <h1>{%news_article.title%}</h1>
     <strong>{%news_article.created_date%}</strong><br />
@@ -5,10 +9,4 @@
     <p>{%news_article.body.orig%}</p>
     <br class="clear" />
     {%news_article.file_info%}
-</div>
-
-<hr />
-
-<div class="toolbar">
-    <a href="?action=news_articles">{%local:view_all_news%}</a>
 </div>

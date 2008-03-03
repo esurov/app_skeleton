@@ -7,22 +7,20 @@
     <input type="hidden" name="action" value="newsletters" />
 
     <table>
-        <tr>
-            <th colspan="2"><strong>{%global:filter_by%}:</strong></th>
-        </tr>
-        <tr>
-            <th>{%global:newsletter.text%}:</th>
-            <td>{%newsletter.full_text.like_many.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:newsletter.category%}:</th>
-            <td>{%newsletter.newsletter_category_id.equal.input%}</td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center">
-                <input type="submit" name="submit_btn" value="{%global:filter%}" />
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <th colspan="2"><strong>{%global:filter_by%}:</strong></th>
+            </tr>
+            <tr>
+                <th>{%global:newsletter.text%}:</th>
+                <td>{%newsletter.full_text.like_many.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:newsletter.category%}:</th>
+                <td>{%newsletter.newsletter_category_id.equal.input%}</td>
+            </tr>
+        </tbody>
     </table>
+    <input type="submit" name="submit_btn" value="{%global:filter%}" />
 
 </form>

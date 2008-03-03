@@ -8,62 +8,65 @@
     <div class="contact_info">
         <div class="primary">
             <table>
-                <tr>
-                    <th>{%global:contact_info.first_name%}:{%global:_required_field%}</th>
-                    <td>{%contact_info.first_name.input%}</td>
+                <tbody>
+                    <tr>
+                        <th>{%global:contact_info.first_name%}:{%global:_required_field%}</th>
+                        <td>{%contact_info.first_name.input%}</td>
 
-                </tr>
-                <tr>
-                    <th>{%global:contact_info.last_name%}:{%global:_required_field%}</th>
-                    <td>{%contact_info.last_name.input%}</td>
-                </tr>
-                <tr>
-                    <th>{%global:contact_info.email%}:{%global:_required_field%}</th>
-                    <td>{%contact_info.email.input%}</td>
+                    </tr>
+                    <tr>
+                        <th>{%global:contact_info.last_name%}:{%global:_required_field%}</th>
+                        <td>{%contact_info.last_name.input%}</td>
+                    </tr>
+                    <tr>
+                        <th>{%global:contact_info.email%}:{%global:_required_field%}</th>
+                        <td>{%contact_info.email.input%}</td>
 
-                </tr>
-                <tr>
-                    <th>{%global:contact_info.phone%}:</th>
-                    <td>{%contact_info.phone.input%}</td>
-                </tr>
+                    </tr>
+                    <tr>
+                        <th>{%global:contact_info.phone%}:</th>
+                        <td>{%contact_info.phone.input%}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
         <div class="secondary">
             <table>
-                <tr>
-                    <th>{%global:contact_info.company_name%}:</th>
-                    <td>{%contact_info.company_name.input%}</td>
-                </tr>
-                <tr>
-                    <th>{%global:contact_info.city%}:</th>
-                    <td>{%contact_info.city.input%}</td>
-                </tr>        
-                <tr>
-                    <th>{%global:contact_info.address%}:</th>
-                    <td>{%contact_info.address.input%}</td>
-                </tr>
-                <tr>
-                    <th>{%global:contact_info.fax%}:</th>
-                    <td>{%contact_info.fax.input%}</td>
-                </tr>
+                <tbody>
+                    <tr>
+                        <th>{%global:contact_info.company_name%}:</th>
+                        <td>{%contact_info.company_name.input%}</td>
+                    </tr>
+                    <tr>
+                        <th>{%global:contact_info.city%}:</th>
+                        <td>{%contact_info.city.input%}</td>
+                    </tr>        
+                    <tr>
+                        <th>{%global:contact_info.address%}:</th>
+                        <td>{%contact_info.address.input%}</td>
+                    </tr>
+                    <tr>
+                        <th>{%global:contact_info.fax%}:</th>
+                        <td>{%contact_info.fax.input%}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
 
         <div class="message">
             <table>
-                <tr>
-                    <th valign="middle">{%global:contact_info.message_text%}:{%global:_required_field%}</th>
-                    <td>{%contact_info.message_text.input%}</td>
-                </tr>
-                <tr>
-                    <td align="center" colspan="2">
-                        <input name="submit_btn" type="submit" value="{%global:send%}" />
-                    </td>
-                </tr>
+                <tbody>
+                    <tr>
+                        <th valign="middle">{%global:contact_info.message_text%}:{%global:_required_field%}</th>
+                        <td>{%contact_info.message_text.input%}</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
+
+    <input name="submit_btn" type="submit" value="{%global:send%}" />
 
 </form>
 

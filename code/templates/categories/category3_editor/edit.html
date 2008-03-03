@@ -8,16 +8,14 @@
     <input type="hidden" name="obj_id" value="{%category3.id%}" />
 
     <table>
-        <tr>
-            <th>{%global:category3.name%}:{%global:_required_field%}</th>
-            <td>{%category3.name.input%}</td>
-        </tr>
-        <tr>
-            <td colspan="2" align="center">
-                <input name="submit_btn" type="submit" value="{%global:save%}" />
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <th>{%global:category3.name%}:{%global:_required_field%}</th>
+                <td>{%category3.name.input%}</td>
+            </tr>
+        </tbody>
     </table>
+    <input name="submit_btn" type="submit" value="{%global:save%}" />
 
 </form>
 

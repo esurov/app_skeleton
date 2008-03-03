@@ -11,43 +11,45 @@
     <input type="hidden" name="command" value="update" />
 
     <table>
-        <tr>
-            <th>{%global:newsletter.category%}:{%global:_required_field%}</th>
-            <td>{%newsletter.newsletter_category_id.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:newsletter.sent_date%}:{%global:_required_field%}</th>
-            <td>{%newsletter.sent_date.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:newsletter.title%}:{%global:_required_field%}</th>
-            <td>{%newsletter.title.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:newsletter.body%}:</th>
-            <td>{%newsletter.body.input%}</td>
-        </tr>
-        <tr>
-            <th>{%global:newsletter.current_image%}:</th>
-            <td>{%newsletter.image%}</td>
-        </tr>
-        <tr>
-            <th>{%global:newsletter.upload_new_image%}:</th>
-            <td><input type="file" name="image_file" /></td>
-        </tr>
-        <tr>
-            <th>{%global:newsletter.current_file%}:</th>
-            <td>{%newsletter.file_info%}</td>
-        </tr>
-        <tr>
-            <th>{%global:newsletter.upload_new_file%}:</th>
-            <td><input type="file" name="file" /></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <input type="submit" name="submit_btn" value="{%global:save_and_send%}" />
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <th>{%global:newsletter.category%}:{%global:_required_field%}</th>
+                <td>{%newsletter.newsletter_category_id.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:newsletter.sent_date%}:{%global:_required_field%}</th>
+                <td>{%newsletter.sent_date.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:newsletter.title%}:{%global:_required_field%}</th>
+                <td>{%newsletter.title.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:newsletter.body%}:</th>
+                <td>{%newsletter.body.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:newsletter.current_image%}:</th>
+                <td>{%newsletter.image%}</td>
+            </tr>
+            <tr>
+                <th>{%global:newsletter.upload_new_image%}:</th>
+                <td><input type="file" name="image_file" /></td>
+            </tr>
+            <tr>
+                <th>{%global:newsletter.current_file%}:</th>
+                <td>{%newsletter.file_info%}</td>
+            </tr>
+            <tr>
+                <th>{%global:newsletter.upload_new_file%}:</th>
+                <td><input type="file" name="file" /></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <input type="submit" name="submit_btn" value="{%global:save_and_send%}" />
+                </td>
+            </tr>
+        </tbody>
     </table>
 
 </form>
