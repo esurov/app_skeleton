@@ -6,7 +6,7 @@
 <table>
 {%_role%}
 <tr>
-    <th>{%global:user.login%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:user.login%}:{%global:_required_field%}</th>
     <td>{%user.login.input%}</td>
 </tr>
 <tr>
@@ -18,15 +18,15 @@
     <td>{%user.password_confirm.input%}</td>
 </tr>
 <tr>
-    <th>{%global:user.first_name%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:user.first_name%}:{%global:_required_field%}</th>
     <td>{%user.first_name.input%}</td>
 </tr>
 <tr>
-    <th>{%global:user.last_name%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:user.last_name%}:{%global:_required_field%}</th>
     <td>{%user.last_name.input%}</td>
 </tr>
 <tr>
-    <th>{%global:user.email%}:&nbsp;<span class="required">*</span></th>
+    <th>{%global:user.email%}:{%global:_required_field%}</th>
     <td>{%user.email.input%}</td>
 </tr>
 <tr>

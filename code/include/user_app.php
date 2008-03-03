@@ -237,6 +237,12 @@ class UserApp extends CustomApp {
 
         $this->add_current_lang_cookie();
     }
+
+    function init_page_template_lang_resources() {
+        parent::init_page_template_lang_resources();
+
+        $this->print_file("_global/required_field/body.html", "global:_required_field");
+    }
 //
     function action_index() {
         $templates_dir = "index";

@@ -5,16 +5,16 @@
         <div class="primary">
             <table>
             <tr>
-                <th>{%global:contact_info.first_name%}:&nbsp;<span class="required">*</span></th>
+                <th>{%global:contact_info.first_name%}:{%global:_required_field%}</th>
                 <td>{%contact_info.first_name.input%}</td>
 
             </tr>
             <tr>
-                <th>{%global:contact_info.last_name%}:&nbsp;<span class="required">*</span></th>
+                <th>{%global:contact_info.last_name%}:{%global:_required_field%}</th>
                 <td>{%contact_info.last_name.input%}</td>
             </tr>
             <tr>
-                <th>{%global:contact_info.email%}:&nbsp;<span class="required">*</span></th>
+                <th>{%global:contact_info.email%}:{%global:_required_field%}</th>
                 <td>{%contact_info.email.input%}</td>
 
             </tr>
@@ -49,7 +49,7 @@
         <div class="message">
             <table>
             <tr>
-                <th valign="middle">{%global:contact_info.message_text%}:&nbsp;<span class="required">*</span></th>
+                <th valign="middle">{%global:contact_info.message_text%}:{%global:_required_field%}</th>
                 <td>{%contact_info.message_text.input%}</td>
             </tr>
             <tr>
