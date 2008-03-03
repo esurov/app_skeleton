@@ -38,7 +38,7 @@ class UserApp extends CustomApp {
 
             // Users management
             "users" => $a,
-            "user_view" => $u_a,
+            "user_view" => $u,
             "user_edit" => $u_a,
 
             // News articles
