@@ -1,25 +1,26 @@
-[<a href="?action=user_edit&amp;user_id={%user.id%}">{%global:edit%}</a>]
-<br />
-<br />
+<div class="toolbar">
+    [<a href="?action=user_edit&amp;user_id={%user.id%}">{%global:edit%}</a>]
+</div>
+
 <table class="table">
-<tr>
-    <td>{%global:user.login%}:</td>
-    <td>{%user.login%}</td>
-</tr>
-<tr>
-    <td>{%global:user.first_name%}:</td>
-    <td>{%user.first_name%}</td>
-</tr>
-<tr>
-    <td>{%global:user.last_name%}:</td>
-    <td>{%user.last_name%}</td>
-</tr>
-<tr>
-    <td>{%global:user.email%}:</td>
-    <td>{%user.email%}</td>
-</tr>
-<tr>
-    <td valign="middle">{%global:user.extra_info%}:</td>
-    <td>{%user.extra_info.lf2br%}</td>
-</tr>
+    <tr>
+        <td>{%global:user.login%}:</td>
+        <td>{%user.login%}</td>
+    </tr>
+    <tr>
+        <td>{%global:user.first_name%}:</td>
+        <td>{%user.first_name%}</td>
+    </tr>
+    <tr>
+        <td>{%global:user.last_name%}:</td>
+        <td>{%user.last_name%}</td>
+    </tr>
+    <tr>
+        <td>{%global:user.email%}:</td>
+        <td>{%user.email%}</td>
+    </tr>
+    <tr>
+        <td>{%global:user.extra_info%}:</td>
+        <td>{%user.extra_info.lf2br%}</td>
+    </tr>
 </table>

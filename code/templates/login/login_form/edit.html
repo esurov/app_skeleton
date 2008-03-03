@@ -1,39 +1,49 @@
-<form action="?action=login" method="post" name="form">
-<input type="hidden" name="command" value="login" />
+<form
+    action="?action=login"
+    method="post"
+    name="form">
+    
+    <input type="hidden" name="command" value="login" />
 
-<table>
-<tr>
-    <td>{%global:user.login%}:</td>
-    <td>{%user.login.input%}</td>
-</tr>
-<tr>
-    <td>{%global:user.password%}:</td>
-    <td>{%user.password.input%}</td>
-</tr>
-<tr>
-    <td>{%global:user.should_remember%}:</td>
-    <td>{%user.should_remember.input%}</td>
-</tr>
-<tr>
-    <td colspan="2" align="center">
-        <input name="submit_btn" type="submit" value="{%global:login%}" />
-    </td>
-</tr>
-</table>
+    <table>
+    <tr>
+        <td>{%global:user.login%}:</td>
+        <td>{%user.login.input%}</td>
+    </tr>
+    <tr>
+        <td>{%global:user.password%}:</td>
+        <td>{%user.password.input%}</td>
+    </tr>
+    <tr>
+        <td>{%global:user.should_remember%}:</td>
+        <td>{%user.should_remember.input%}</td>
+    </tr>
+    <tr>
+        <td colspan="2" align="center">
+            <input name="submit_btn" type="submit" value="{%global:login%}" />
+        </td>
+    </tr>
+    </table>
 
 </form>
 
 <ul>
-    <li>{%local:dont_have_account%} <a href="?action=signup"
-        >{%local:please_signup%}</a></li>
-    <li>{%local:did_forget_password%} <a href="?action=recover_password"
-        >{%local:recover_password%}</a></li>
+    <li>
+        {%local:dont_have_account%} <a
+            href="?action=signup"
+            >{%local:please_signup%}</a>
+    </li>
+    <li>
+        {%local:did_forget_password%} <a
+            href="?action=recover_password"
+            >{%local:recover_password%}</a>
+    </li>
 </ul>
 
 <script type="text/javascript">
-focusFormElement('form', '{%user.login.input_name%}');
+    focusFormElement('form', '{%user.login.input_name%}');
 </script>
 
 <script type="text/javascript">
-{%user.client_validation_js%}
+    {%user.client_validation_js%}
 </script>

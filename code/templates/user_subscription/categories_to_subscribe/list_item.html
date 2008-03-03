@@ -1,4 +1,9 @@
 <tr class="{%list_item_class%}">
     <td>{%newsletter_category.name%}</td>
-    <td><input type="checkbox" name="newsletter_category_is_checked[{%newsletter_category.id%}]" {%newsletter_category.is_checked%} /></td>
+    <td>
+        <input
+            type="checkbox"
+            name="newsletter_category_is_checked[{%newsletter_category.id%}]"
+                {%newsletter_category.is_checked%} />
+    </td>
 </tr>

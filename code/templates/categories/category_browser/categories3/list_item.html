@@ -1,17 +1,20 @@
 <tr class="{%list_item_class%}{%list_item_selected_class%}">
     <td>{%category3.name%}</td>
     <td>
-    <div class="toolbar">
-        [<a
-            href="?action=categories&amp;command=move&amp;obj=category3&amp;obj_id={%category3.id%}&amp;to=prev&amp;{%current_category_ids_suburl%}"
-        >{%global:move_up%}</a>]&nbsp;[<a
-            href="?action=categories&amp;command=move&amp;obj=category3&amp;obj_id={%category3.id%}&amp;to=next&amp;{%current_category_ids_suburl%}"
-        >{%global:move_down%}</a>]&nbsp;[<a
-            href="?action=categories&amp;command=edit&amp;obj=category3&amp;obj_id={%category3.id%}&amp;{%current_category_ids_suburl%}&amp;current_category3_id={%category3.id%}"
-        >{%global:edit%}</a>]&nbsp;[<a
-            href="?action=categories&amp;command=delete&amp;obj=category3&amp;obj_id={%category3.id%}&amp;{%current_category_ids_suburl%}"
-            onclick="return confirm('{%global:sure_delete.js%}')"
-        >{%global:delete%}</a>]
-    </div>
+        <div class="toolbar">
+            [<a
+                href="?action=categories&amp;command=move&amp;obj=category3&amp;obj_id={%category3.id%}&amp;to=prev&amp;{%current_category_ids_suburl%}"
+                >{%global:move_up%}</a>]
+            [<a
+                href="?action=categories&amp;command=move&amp;obj=category3&amp;obj_id={%category3.id%}&amp;to=next&amp;{%current_category_ids_suburl%}"
+                >{%global:move_down%}</a>]
+            [<a
+                href="?action=categories&amp;command=edit&amp;obj=category3&amp;obj_id={%category3.id%}&amp;{%current_category_ids_suburl%}&amp;current_category3_id={%category3.id%}"
+                >{%global:edit%}</a>]
+            [<a
+                href="?action=categories&amp;command=delete&amp;obj=category3&amp;obj_id={%category3.id%}&amp;{%current_category_ids_suburl%}"
+                onclick="return confirm('{%global:sure_delete.js%}')"
+                >{%global:delete%}</a>]
+        </div>
     </td>
 </tr>

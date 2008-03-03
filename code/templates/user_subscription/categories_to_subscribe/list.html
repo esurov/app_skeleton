@@ -1,8 +1,10 @@
-<!-- <div class="toolbar">[ <a href="?action=newsletter_edit">{%global:add%}</a> ]</div> -->
-
-<form action="?action=user_subscription_edit"
-    method="post" name="form" enctype="multipart/form-data">
-<input type="hidden" name="command" value="update" />
+<form
+    action="?action=user_subscription_edit"
+    method="post"
+    name="form"
+    enctype="multipart/form-data">
+    
+    <input type="hidden" name="command" value="update" />
 
     {%newsletter_category_list%}
 

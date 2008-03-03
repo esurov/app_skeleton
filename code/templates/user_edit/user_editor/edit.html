@@ -1,49 +1,55 @@
-<div class="toolbar">{%_link_back%}</div>
+<div class="toolbar">
+    {%_link_back%}
+</div>
 
-<form action="?action=user_edit&amp;user_id={%user.id%}" method="post" name="form">
-<input type="hidden" name="command" value="update" />
+<form
+    action="?action=user_edit&amp;user_id={%user.id%}"
+    method="post"
+    name="form">
+    
+    <input type="hidden" name="command" value="update" />
 
-<table>
-{%_role%}
-<tr>
-    <th>{%global:user.login%}:{%global:_required_field%}</th>
-    <td>{%user.login.input%}</td>
-</tr>
-<tr>
-    <th>{%global:user.password%}:</th>
-    <td>{%user.password.input%}</td>
-</tr>
-<tr>
-    <th>{%global:user.password_confirm%}:</th>
-    <td>{%user.password_confirm.input%}</td>
-</tr>
-<tr>
-    <th>{%global:user.first_name%}:{%global:_required_field%}</th>
-    <td>{%user.first_name.input%}</td>
-</tr>
-<tr>
-    <th>{%global:user.last_name%}:{%global:_required_field%}</th>
-    <td>{%user.last_name.input%}</td>
-</tr>
-<tr>
-    <th>{%global:user.email%}:{%global:_required_field%}</th>
-    <td>{%user.email.input%}</td>
-</tr>
-<tr>
-    <th>{%global:user.extra_info%}:</th>
-    <td>{%user.extra_info.input%}</td>
-</tr>
-{%_is_confirmed%}
-{%_is_active%}
-<tr>
-    <td colspan="2" align="center">
-        <input name="submit_btn" type="submit" value="{%global:save%}" />
-    </td>
-</tr>
-</table>
+    <table>
+        {%_role%}
+        <tr>
+            <th>{%global:user.login%}:{%global:_required_field%}</th>
+            <td>{%user.login.input%}</td>
+        </tr>
+        <tr>
+            <th>{%global:user.password%}:</th>
+            <td>{%user.password.input%}</td>
+        </tr>
+        <tr>
+            <th>{%global:user.password_confirm%}:</th>
+            <td>{%user.password_confirm.input%}</td>
+        </tr>
+        <tr>
+            <th>{%global:user.first_name%}:{%global:_required_field%}</th>
+            <td>{%user.first_name.input%}</td>
+        </tr>
+        <tr>
+            <th>{%global:user.last_name%}:{%global:_required_field%}</th>
+            <td>{%user.last_name.input%}</td>
+        </tr>
+        <tr>
+            <th>{%global:user.email%}:{%global:_required_field%}</th>
+            <td>{%user.email.input%}</td>
+        </tr>
+        <tr>
+            <th>{%global:user.extra_info%}:</th>
+            <td>{%user.extra_info.input%}</td>
+        </tr>
+        {%_is_confirmed%}
+        {%_is_active%}
+        <tr>
+            <td colspan="2" align="center">
+                <input name="submit_btn" type="submit" value="{%global:save%}" />
+            </td>
+        </tr>
+    </table>
 
 </form>
 
 <script type="text/javascript">
-{%user.client_validation_js%}
+    {%user.client_validation_js%}
 </script>

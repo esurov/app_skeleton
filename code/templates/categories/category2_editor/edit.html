@@ -1,23 +1,26 @@
-<form action="?action=categories&amp;{%current_category_ids_suburl%}"
-    method="post" name="form">
-<input type="hidden" name="command" value="update" />
-<input type="hidden" name="obj" value="category2" />
-<input type="hidden" name="obj_id" value="{%category2.id%}" />
+<form
+    action="?action=categories&amp;{%current_category_ids_suburl%}"
+    method="post"
+    name="form">
 
-<table>
-<tr>
-    <th>{%global:category2.name%}:{%global:_required_field%}</th>
-    <td>{%category2.name.input%}</td>
-</tr>
-<tr>
-    <td colspan="2" align="center">
-        <input name="submit_btn" type="submit" value="{%global:save%}" />
-    </td>
-</tr>
-</table>
+    <input type="hidden" name="command" value="update" />
+    <input type="hidden" name="obj" value="category2" />
+    <input type="hidden" name="obj_id" value="{%category2.id%}" />
+
+    <table>
+        <tr>
+            <th>{%global:category2.name%}:{%global:_required_field%}</th>
+            <td>{%category2.name.input%}</td>
+        </tr>
+        <tr>
+            <td colspan="2" align="center">
+                <input name="submit_btn" type="submit" value="{%global:save%}" />
+            </td>
+        </tr>
+    </table>
 
 </form>
 
 <script type="text/javascript">
-{%category2.client_validation_js%}
+    {%category2.client_validation_js%}
 </script>

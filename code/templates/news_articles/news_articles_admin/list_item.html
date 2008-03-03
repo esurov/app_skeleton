@@ -5,11 +5,14 @@
     <td>{%news_article.thumbnail_image%}</td>
     <td>{%news_article.file_info%}</td>
     <td>
-        [<a
-            href="?action=news_article_edit&amp;news_article_id={%news_article.id%}"
-        >{%global:edit%}</a>]&nbsp;[<a
-            href="?action=news_article_edit&amp;news_article_id={%news_article.id%}&amp;command=delete"
-            onclick="return confirm('{%global:sure_delete.js%}')"
-        >{%global:delete%}</a>]
+        <div class="toolbar">
+            [<a
+                href="?action=news_article_edit&amp;news_article_id={%news_article.id%}"
+                >{%global:edit%}</a>]
+            [<a
+                href="?action=news_article_edit&amp;news_article_id={%news_article.id%}&amp;command=delete"
+                onclick="return confirm('{%global:sure_delete.js%}')"
+                >{%global:delete%}</a>]
+        </div>
     </td>
 </tr>

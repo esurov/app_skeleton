@@ -6,7 +6,9 @@
     <td>{%newsletter.thumbnail_image%}</td>
     <td>{%newsletter.file_info%}</td>
     <td>
-        [<a href="?action=newsletter_view&amp;newsletter_id={%newsletter.id%}"
-            >{%global:view%}</a>]
+        <div class="toolbar">
+            [<a href="?action=newsletter_view&amp;newsletter_id={%newsletter.id%}"
+                >{%global:view%}</a>]
+        </div>
     </td>
 </tr>

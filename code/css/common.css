@@ -311,6 +311,7 @@ ul.menu li.menu_item_delimiter, ul.sub-menu li.sub-menu_item_delimiter, ul.sub-s
 
 .toolbar {
     margin: 20px auto;
+    white-space: nowrap;
 }
 
 td .toolbar, th .toolbar {
