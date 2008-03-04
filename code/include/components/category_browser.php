@@ -13,7 +13,13 @@ class CategoryBrowser extends TemplateComponent {
         $this->current_category2_id = 0;
         $this->current_category3_id = 0;
     }
-
+//
+    function set_current_ids($ids) {
+        foreach ($ids as $var_name => $var_value) {
+            $this->{$var_name} = $var_value;
+        }
+    }
+//
     function _print_values() {
         parent::_print_values();
 

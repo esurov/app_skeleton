@@ -1276,8 +1276,6 @@ class UserApp extends CustomApp {
 
         $current_category_ids = $this->_read_and_print_current_category_ids();
 
-        $should_redirect = false;
-
         $avail_obj_names = array(
             "category1" => "Category1",
             "category2" => "Category2",
@@ -1294,11 +1292,16 @@ class UserApp extends CustomApp {
             }
             $obj =& $this->read_id_fetch_db_object($avail_obj_names[$obj_name], "1", "obj_id");
             if (!$obj->is_definite()) {
-                $parent_id_field_name = null;
-                if ($obj_name == "category2") {
+                switch ($obj_name) {
+                case "category1":
+                    $parent_id_field_name = null;
+                    break;
+                case "category2":
                     $parent_id_field_name = "category1_id";
-                } else if ($obj_name == "category3") {
+                    break;
+                case "category3":
                     $parent_id_field_name = "category2_id";
+                    break;
                 }
                 if (!is_null($parent_id_field_name)) {
                     $obj->set_field_value(
@@ -1317,10 +1320,33 @@ class UserApp extends CustomApp {
                 } else {
                     $this->print_status_message_db_object_updated($obj);
 
-                    $obj->save();
+                    $was_definite = $obj->save();
 
-                    $should_redirect = true;
-                    break;
+                    if ($was_definite) {
+                        $suburl_params = $current_category_ids;
+                    } else {
+                        $suburl_params = array();
+                        switch ($obj_name) {
+                        case "category1":
+                            $suburl_params["current_category1_id"] = $obj->id;
+                            break;
+                        case "category2":
+                            $suburl_params["current_category1_id"] =
+                                $current_category_ids["current_category1_id"];
+                            $suburl_params["current_category2_id"] = $obj->id;
+                            break;
+                        case "category3":
+                            $suburl_params["current_category1_id"] =
+                                $current_category_ids["current_category1_id"];
+                            $suburl_params["current_category2_id"] =
+                                $current_category_ids["current_category2_id"];
+                            $suburl_params["current_category3_id"] = $obj->id;
+                            break;
+                        }
+                    }
+
+                    $this->create_self_action_redirect_response($suburl_params);
+                    return;
                 }
             }
 
@@ -1350,31 +1376,22 @@ class UserApp extends CustomApp {
             } else {
                 $obj->update_position((string) param("to"));
             }
-            $should_redirect = true;
+            
+            $this->create_self_action_redirect_response($current_category_ids);
             break;
         }
 
-        if ($should_redirect) {
-            $this->create_self_action_redirect_response(array(
-                "current_category1_id" => $current_category_ids["current_category1_id"],
-                "current_category2_id" => $current_category_ids["current_category2_id"],
-                "current_category3_id" => $current_category_ids["current_category3_id"],
-            ));
-        } else {
-            $category_browser =& $this->create_object(
-                "CategoryBrowser",
-                array(
-                    "templates_dir" => "{$templates_dir}/category_browser",
-                    "template_var" => "category_browser",
-                )
-            );
-            $category_browser->current_category1_id = $current_category_ids["current_category1_id"];
-            $category_browser->current_category2_id = $current_category_ids["current_category2_id"];
-            $category_browser->current_category3_id = $current_category_ids["current_category3_id"];
-            $category_browser->print_values();
+        $category_browser =& $this->create_object(
+            "CategoryBrowser",
+            array(
+                "templates_dir" => "{$templates_dir}/category_browser",
+                "template_var" => "category_browser",
+            )
+        );
+        $category_browser->set_current_ids($current_category_ids);
+        $category_browser->print_values();
 
-            $this->print_file("{$templates_dir}/body.html", "body");
-        }
+        $this->print_file("{$templates_dir}/body.html", "body");
     }
 
     function _read_and_print_current_category_ids() {
