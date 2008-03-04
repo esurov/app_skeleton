@@ -1,28 +1,31 @@
 <div>
-<h3>Setup will make these changes in database '{%db_name%}':</h3>
-<strong>Tables to create</strong>: <span style="color: green">{%table_names_to_create%}</span><br />
-<strong>Tables to update</strong>: <span style="color: blue">{%table_names_to_update%}</span><br />
-<strong>Tables to drop</strong>: <span style="color: red">{%table_names_to_drop%}</span><br />
-<br />
-Below is SQL script which will make these changes:<br />
-<textarea name="sql_script_text" class="sql" cols="100" rows="25">
-{%sql_script_text%}
-</textarea><br /><br />
+    <h3>Setup will make these changes in database '{%db_name%}':</h3>
+    <strong>Tables to create</strong>: <span style="color: green">{%table_names_to_create%}</span><br />
+    <strong>Tables to update</strong>: <span style="color: blue">{%table_names_to_update%}</span><br />
+    <strong>Tables to drop</strong>: <span style="color: red">{%table_names_to_drop%}</span><br />
+    <br />
+    Below is SQL script which will make these changes:<br />
+    <textarea
+        name="sql_script_text"
+        class="sql"
+        cols="100"
+        rows="25">{%sql_script_text%}</textarea><br />
+    <br />
 </div>
 
 <form action="?action=create_update_tables" method="post" onsubmit="onsubmitFormHandler(this);">
-<input type="hidden" name="command" value="create_update" />
-<input type="submit" name="submit_btn" value="Execute SQL script" />
+    <input type="hidden" name="command" value="create_update" />
+    <input type="submit" name="submit_btn" value="Execute SQL script" />
 </form>
 
 <style type="text/css">
-@import url("css/dp.SyntaxHighlighter/SyntaxHighlighter.css");
+    @import url("css/dp.SyntaxHighlighter/SyntaxHighlighter.css");
 </style>
 
 <script type="text/javascript" src="js/dp.SyntaxHighlighter/shCore.js"></script>
 <script type="text/javascript" src="js/dp.SyntaxHighlighter/shBrushSql.js"></script>
 
 <script class="javascript">
-dp.SyntaxHighlighter.ClipboardSwf = 'js/dp.SyntaxHighlighter/clipboard.swf';
-dp.SyntaxHighlighter.HighlightAll('sql_script_text');
+    dp.SyntaxHighlighter.ClipboardSwf = 'js/dp.SyntaxHighlighter/clipboard.swf';
+    dp.SyntaxHighlighter.HighlightAll('sql_script_text');
 </script>
