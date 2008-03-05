@@ -2706,15 +2706,19 @@ class App extends AppObject {
                 if ($should_redirect) {
                     $this->create_self_redirect_response($error_url_params);
                 }
-                return;
+                return false;
             } else {
                 $obj->del();
             }
         }
+        
         $this->print_status_message_db_object_deleted($obj);
+        
         if ($should_redirect) {
             $this->create_self_redirect_response($success_url_params);
         }
+        
+        return true;
     }
 //
     // Uploaded image

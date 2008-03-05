@@ -1362,23 +1362,59 @@ class UserApp extends CustomApp {
             $category_editor->print_values();
             break;
         case "delete":
-        case "move":
             if (!in_array($obj_name, array_keys($avail_obj_names))) {
                 break;
             }
             $obj =& $this->read_id_fetch_db_object($avail_obj_names[$obj_name], "1", "obj_id");
 
-            if ($command == "delete") {
-                $this->delete_db_object(array(
-                    "obj" => $obj,
-                    "should_redirect" => false,
-                ));
+            $prev_obj =& $obj->fetch_neighbor_db_object(
+                "prev",
+                $obj->get_position_where_str()
+            );
+            $was_deleted = $this->delete_db_object(array(
+                "obj" => $obj,
+                "should_redirect" => false,
+            ));
+
+            if ($was_deleted) {
+                $suburl_params = array();
+                switch ($obj_name) {
+                case "category1":
+                    $suburl_params["current_category1_id"] = $prev_obj->id;
+                    break;
+                case "category2":
+                    $suburl_params["current_category1_id"] =
+                        $current_category_ids["current_category1_id"];
+                    if (!is_null($prev_obj)) {
+                        $suburl_params["current_category2_id"] = $prev_obj->id;
+                    }
+                    break;
+                case "category3":
+                    $suburl_params["current_category1_id"] =
+                        $current_category_ids["current_category1_id"];
+                    $suburl_params["current_category2_id"] =
+                        $current_category_ids["current_category2_id"];
+                    if (!is_null($prev_obj)) {
+                        $suburl_params["current_category3_id"] = $prev_obj->id;
+                    }
+                    break;
+                }
             } else {
-                $obj->update_position((string) param("to"));
+                $suburl_params = $current_category_ids;
             }
             
+            $this->create_self_action_redirect_response($suburl_params);
+            return;
+        case "move":
+            if (!in_array($obj_name, array_keys($avail_obj_names))) {
+                break;
+            }
+            
+            $obj =& $this->read_id_fetch_db_object($avail_obj_names[$obj_name], "1", "obj_id");
+            $obj->update_position((string) param("to"));
+
             $this->create_self_action_redirect_response($current_category_ids);
-            break;
+            return;
         }
 
         $category_browser =& $this->create_object(
