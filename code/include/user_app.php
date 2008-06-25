@@ -417,12 +417,12 @@ class UserApp extends CustomApp {
     }
 
     function action_logout() {
-        $this->add_session_status_message(new OkStatusMsg("logged_out"));
-
         $this->create_self_redirect_response(array("action" => "login"));
         
         $this->destroy_login_state();
         $this->remove_remember_user_id_and_password_cookies();
+
+        $this->add_session_status_message(new OkStatusMsg("logged_out"));
     }
 //
     function action_signup() {
