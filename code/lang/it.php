@@ -117,20 +117,20 @@ return array(
     "email_recover_password_form_processed_subject" => "Recupera la password per il sito !!AppSkeleton",
 
     // News articles
-    "news_article" => "notizia",
-    "news_articles" => "notizie",
+    "news_article" => "articolo news",
+    "news_articles" => "articoli news",
 
-    "guest_menu_item.news" => "Notizie",
-    "admin_menu_item.news" => "Notizie",
+    "guest_menu_item.news" => "News",
+    "admin_menu_item.news" => "News",
 
-    "page_title.news_articles" => "Notizie",
-    "page_title.news_article_view" => "Visualizza notizia",
-    "page_title.news_article_edit_new" => "Aggiungi notizia",
-    "page_title.news_article_edit" => "Modifica notizia",
+    "page_title.news_articles" => "News",
+    "page_title.news_article_view" => "Visualizza news",
+    "page_title.news_article_edit_admin_new" => "Aggiungi news",
+    "page_title.news_article_edit_admin" => "Modifica news",
 
-    "status_msg.news_article.added" => "Aggiunta nuova notizia",
-    "status_msg.news_article.updated" => "Notizia è stata modificata",
-    "status_msg.news_article.deleted" => "Notizia è stata eliminata",
+    "status_msg.news_article.added" => "Aggiunto articolo news",
+    "status_msg.news_article.updated" => "L'articolo è stato modificato",
+    "status_msg.news_article.deleted" => "L'articolo è stato eliminato",
     "status_msg.news_article.image_deleted" => "L'immagine relativa all'articolo è stata cancellata",
     "status_msg.news_article.file_deleted" => "Il file relativo all'articolo è stata cancellato",
 
