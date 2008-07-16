@@ -93,6 +93,10 @@ $app_classes = array(
             "filename" => "image_processor.php",
             "required_classes" => array("AppComponent"),
         ),
+        "GD2" => array(
+            "filename" => "image_processor.php",
+            "required_classes" => array("AppComponent"),
+        ),
 
         // File
         "_File" => array(

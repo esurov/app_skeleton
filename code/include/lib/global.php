@@ -841,7 +841,8 @@ function get_image_file_extension_by_type($image_type) {
     case IMAGETYPE_BMP:
         $file_ext = "bmp";
         break;
-    case IMAGETYPE_TIFF:
+    case IMAGETYPE_TIFF_II:
+    case IMAGETYPE_TIFF_MM:
         $file_ext = "tiff";
         break;
     case IMAGETYPE_IFF:
