@@ -874,7 +874,6 @@ class UserApp extends CustomApp {
                             "image_processor.actions" => array(
                                 array(
                                     "name" => "crop_and_resize",
-                                    "name" => "resize",
                                     "width" => $this->get_config_value("news_article_image_width"),
                                     "height" => $this->get_config_value("news_article_image_height"),
                                 ),
@@ -898,11 +897,11 @@ class UserApp extends CustomApp {
                                         "news_article_thumbnail_image_height"
                                     ),
                                 ),
-//                                // This is example of second image processor action
-//                                // Remove if grayscale is not needed (almost always ;) )
-//                                array(
-//                                    "name" => "convert_to_grayscale",
-//                                ),
+                                // This is example of second image processor action
+                                // Remove if grayscale is not needed (almost always ;) )
+                                array(
+                                    "name" => "convert_to_grayscale",
+                                ),
                             ),
                             "is_thumbnail" => 1,
                         )

@@ -403,17 +403,6 @@ class GD2 extends _ImageProcessor {
             $crop_offset_y = (int) (($input_height - $crop_height) / 2);
         }
 
-//        $this->_cmdline = $this->create_convert_cmdline(array(
-//            get_param_value($this->_action_params, "begin_subcmdline", ""),
-//            $this->create_crop_subcmdline(
-//                $crop_width,
-//                $crop_height,
-//                $crop_offset_x,
-//                $crop_offset_y
-//            ),
-//            $this->create_resize_subcmdline($output_width, $output_height),
-//            get_param_value($this->_action_params, "end_subcmdline", ""),
-//        ));
         $src_image_resource = $this->_run_image_import_func($image_type);
         
         $dst_image_resource = imagecreatetruecolor($output_width, $output_height);
@@ -427,19 +416,43 @@ class GD2 extends _ImageProcessor {
             $crop_offset_y,
             $output_width,
             $output_height,
-            $input_width,
-            $input_height
+            $crop_width,
+            $crop_height
         );
 
         return $this->_run_image_export_func($this->_output_image_type, $dst_image_resource);
     }
-//
-//    function action_convert_to_grayscale() {
-//        $this->_cmdline = $this->create_convert_cmdline(array(
-//            $this->create_grayscale_subcmdline(),
-//        ));
-//        return true;
-//    }
+
+    function action_convert_to_grayscale() {
+        $image_type = $this->_image->get_type();
+        if (!$this->_is_image_type_allowed($image_type)) {
+            return false;
+        }
+        $output_width = $this->_image->get_width();
+        $output_height = $this->_image->get_height();
+
+        $dst_image_resource = $this->_run_image_import_func($image_type);
+
+        for ($x = 0; $x < $output_width; $x++) {
+            for ($y = 0; $y < $output_height; $y++) {
+                $rgb = imagecolorat($dst_image_resource, $x, $y);
+                
+                $red = ($rgb >> 16) & 0xFF;
+                $green = ($rgb >> 8) & 0xFF;
+                $blue = $rgb & 0xFF;
+                $gray = round(0.299 * $red + 0.587 * $green + 0.114 * $blue);
+
+                imagesetpixel(
+                    $dst_image_resource,
+                    $x,
+                    $y, 
+                    imagecolorallocate($dst_image_resource, $gray, $gray, $gray)
+                );
+            }
+        }
+
+        return $this->_run_image_export_func($this->_output_image_type, $dst_image_resource);
+    }
 
 }
 
