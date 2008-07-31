@@ -199,7 +199,7 @@ class PagedQueryObjectsList extends QueryObjectsList {
         $this->filter_form_template_name = get_param_value(
             $params,
             "filter_form_template_name",
-            "filter_form.html"
+            "filter_form.{$this->templates_ext}"
         );
 
         // Make sub-URL params with all necessary parameters stored
@@ -284,8 +284,10 @@ class PagedQueryObjectsList extends QueryObjectsList {
 
     function _print_list() {
         if ($this->filter_form_visible) {
-            $this->obj->print_filter_form_values();
-            $this->app->print_file_new(
+            $this->obj->print_filter_form_values(
+                $this->template_var_prefix
+            );
+            $this->app->print_file_new_if_exists(
                 "{$this->templates_dir}/{$this->filter_form_template_name}",
                 "{$this->template_var_prefix}_filter_form"
             );

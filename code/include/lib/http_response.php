@@ -249,6 +249,18 @@ class XmlDocumentResponse extends BinaryContentResponse {
 
 }
 
+class CsvDocumentResponse extends BinaryContentResponse {
+    
+    function CsvDocumentResponse($content, $filename, $is_attachment) {
+        parent::BinaryContentResponse("text/csv", $content);
+
+        if ($filename != "") {
+            $this->add_content_disposition_header($filename, $is_attachment);
+        }
+    }
+
+}
+
 class PdfDocumentResponse extends BinaryContentResponse {
     
     function PdfDocumentResponse($content, $filename, $is_attachment) {

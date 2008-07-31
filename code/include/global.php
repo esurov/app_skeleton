@@ -20,4 +20,10 @@ function get_full_name_reversed($first_name, $last_name) {
     }
 }
 
+function get_excel_csv_safe_string($unsafe_str) {
+    $str = str_replace("\n", " ", $unsafe_str);
+    $str = str_replace("\r", "", $str);
+    return str_replace('"', '""', $str);
+}
+
 ?>

@@ -539,6 +539,14 @@ class App extends AppObject {
         $this->response = new PlainTextDocumentResponse($content, $filename, $is_attachment);
     }
 
+    function create_csv_document_response(
+        $content,
+        $filename = null,
+        $is_attachment = false
+    ) {
+        $this->response = new CsvDocumentResponse($content, $filename, $is_attachment);
+    }
+
     function create_pdf_document_response(
         $content,
         $filename = null,
