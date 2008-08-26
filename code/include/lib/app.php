@@ -2896,6 +2896,10 @@ class App extends AppObject {
     function &create_email_sender() {
         $email_sender =& $this->create_object("CustomPHPMailer");
         $email_sender->IsSendmail();
+        $sendmail_path = $this->get_config_value("sendmail_path", null);
+        if (!is_null($sendmail_path)) {
+            $email_sender->Sendmail = $sendmail_path;
+        }
         $email_sender->IsHTML($this->get_config_value("email_is_html"));
         $email_sender->CharSet = $this->get_config_value("email_charset");
         return $email_sender;
