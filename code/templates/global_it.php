@@ -173,8 +173,8 @@ return array(
     "global:contact_info.message_text" => "Messaggio",
     
     // News articles
-    "global:news_article.add" => "Aggiungi notizia",
-    "global:news_article.back_to_list" => "!!Torna alla lista dei notizie",
+    "global:news_article.add" => "Aggiungi news",
+    "global:news_article.back_to_list" => "!!Torna alla lista delle news",
 
     "global:news_article.created_date" => "Data",
     "global:news_article.title" => "Titolo",

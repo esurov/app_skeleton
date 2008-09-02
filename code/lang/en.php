@@ -24,34 +24,32 @@ return array(
 
     "status_msg.cannot_delete_record_because_it_has_restrict_relations" => "Cannot delete {%main_obj_name%} because it has links to {%dep_objs_info_str%}",
 
-    // Static head and page titles
+    // Static head/page titles and their menu items
     "page_title.access_denied" => "Access denied!",
 
+    "guest_menu_item.index" => "Home",
+    "admin_menu_item.index" => "Home",
+    "user_menu_item.index" => "Home",
     "head_page_title.index" => "Home",
-    "page_title.static.policy_terms_of_use" => "Terms of use",
-    "page_title.static.policy_terms_and_conditions" => "Terms and conditions",
-    "page_title.static.policy_privacy" => "Privacy policy",
-    "page_title.static.policy_disclaimer" => "Disclaimer",
 
+    "guest_menu_item.sample_static_pages" => "SampleStaticPages",
+
+    "guest_sub_menu_item.sample_static_page1" => "SampleStaticPage1",
     "page_title.static.sample_page1" => "SampleStaticPage1",
+
+    "guest_sub_menu_item.sample_static_page2" => "SampleStaticPage2",
     "page_title.static.sample_page2" => "SampleStaticPage2",
+    
+    "guest_sub_sub_menu_item.sample_static_page2_1" => "SampleStaticPage2_1",
     "page_title.static.sample_page2_1" => "SampleStaticPage2_1",
+
+    "guest_sub_sub_menu_item.sample_static_page2_2" => "SampleStaticPage2_2",
     "page_title.static.sample_page2_2" => "SampleStaticPage2_2",
 
-    // Menu items
-    "guest_menu_item.index" => "Home",
-    "guest_menu_item.sample_static_pages" => "SampleStaticPages",
-    "guest_sub_menu_item.sample_static_page1" => "SampleStaticPage1",
-    "guest_sub_menu_item.sample_static_page2" => "SampleStaticPage2",
     "guest_sub_menu_item.sample_popup" => "SamplePopup",
     "guest_sub_menu_item.sample_new_window" => "SampleNewWindow",
+
     "guest_sub_menu_item.sample_static_pages2" => "SampleStaticPages2",
-    "guest_sub_sub_menu_item.sample_static_page2_1" => "SampleStaticPage2_1",
-    "guest_sub_sub_menu_item.sample_static_page2_2" => "SampleStaticPage2_2",
-
-    "user_menu_item.index" => "Home",
-
-    "admin_menu_item.index" => "Home",
 
     // Login/Logout
     "page_title.login" => "Log In",
@@ -80,6 +78,11 @@ return array(
     "page_title.user_edit_new" => "Add user",
     "page_title.user_edit" => "Edit user",
     "page_title.user_edit_my_account" => "Edit my account",
+
+    "page_title.static.policy_terms_of_use" => "Terms of use",
+    "page_title.static.policy_terms_and_conditions" => "Terms and conditions",
+    "page_title.static.policy_privacy" => "Privacy policy",
+    "page_title.static.policy_disclaimer" => "Disclaimer",
 
     "status_msg.user.added" => "User added",
     "status_msg.user.updated" => "User updated",
@@ -123,9 +126,10 @@ return array(
     "admin_menu_item.news" => "News",
 
     "page_title.news_articles" => "News",
+    "page_title.news_articles_admin" => "News",
     "page_title.news_article_view" => "View news article",
-    "page_title.news_article_edit_new" => "Add news article",
-    "page_title.news_article_edit" => "Edit news article",
+    "page_title.news_article_edit_admin_new" => "Add news article",
+    "page_title.news_article_edit_admin" => "Edit news article",
 
     "status_msg.news_article.added" => "News article added",
     "status_msg.news_article.updated" => "News article updated",
@@ -146,7 +150,7 @@ return array(
     "newsletters" => "newsletters",
 
     "admin_menu_item.newsletters" => "Newsletters",
-    "admin_sub_menu_item.newsletters" => "Newsletters list",
+    "admin_sub_menu_item.newsletters" => "Newsletters",
     "admin_sub_menu_item.newsletter_category" => "Newsletter categories",
     "admin_sub_menu_item.newsletter_edit" => "Create newsletter",
 

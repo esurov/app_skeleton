@@ -21,8 +21,8 @@
     />
     <menu_item
         name="news"
-        url="?action=news_articles"
-        contexts="news_articles, news_article_edit"
+        url="?action=news_articles_admin"
+        contexts="news_articles_admin, news_article_edit_admin"
     />
     <menu_item
         name="newsletters"

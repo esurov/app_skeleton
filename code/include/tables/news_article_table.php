@@ -177,7 +177,7 @@ class NewsArticleTable extends CustomDbObject {
         }
         
         if (
-            $this->_context == "news_article_edit" ||
+            $this->_context == "news_article_edit_admin" ||
             $this->_context == "news_article_view"
         ) {
             $this->app->print_db_object_info(

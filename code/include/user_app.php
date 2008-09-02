@@ -45,8 +45,9 @@ class UserApp extends CustomApp {
 
             // News articles
             "news_articles" => $e,
+            "news_articles_admin" => $a,
             "news_article_view" => $e,
-            "news_article_edit" => $a,
+            "news_article_edit_admin" => $a,
 
             // Newsletters
             "newsletters" => $a,
@@ -767,36 +768,40 @@ class UserApp extends CustomApp {
     function action_news_articles() {
         $templates_dir = "news_articles";
 
-        $user_role = $this->get_user_role();
-        if ($user_role == "admin") {
-            $templates_subdir = "news_articles_admin";
-            $default_order_by = array(
-                "default_order_by" => array("created_date DESC", "id DESC"),    
-            );
-            $context = "news_articles_admin_list_item";
-        } else {
-            $templates_subdir = "news_articles";
-            $default_order_by = array(
-                "query_ex" => array(
-                    "order_by" => "created_date DESC, id DESC",
-                ),    
-            );
-            $context = "news_articles_list_item";
-        }
-        
         $news_article =& $this->create_db_object("NewsArticle");
         $news_article->insert_filters();
         $news_articles_list =& $this->create_object(
             "PagedQueryObjectsList",
-            array_merge(
-                array(
-                    "templates_dir" => "{$templates_dir}/{$templates_subdir}",
-                    "template_var" => "news_articles",
-                    "obj" => $news_article,
-                    "filter_form.visible" => true,
-                    "context" => $context,
-                ),
-                $default_order_by
+            array(
+                "templates_dir" => "{$templates_dir}/news_articles",
+                "template_var" => "news_articles",
+                "obj" => $news_article,
+                "query_ex" => array(
+                    "order_by" => "created_date DESC, id DESC",
+                ),    
+                "filter_form.visible" => true,
+                "context" => "news_articles_list_item",
+            )
+        );
+        $news_articles_list->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_news_articles_admin() {
+        $templates_dir = "news_articles_admin";
+
+        $news_article =& $this->create_db_object("NewsArticle");
+        $news_article->insert_filters();
+        $news_articles_list =& $this->create_object(
+            "PagedQueryObjectsList",
+            array(
+                "templates_dir" => "{$templates_dir}/news_articles",
+                "template_var" => "news_articles",
+                "obj" => $news_article,
+                "default_order_by" => array("created_date DESC", "id DESC"),    
+                "filter_form.visible" => true,
+                "context" => "news_articles_admin_list_item",
             )
         );
         $news_articles_list->print_values();
@@ -822,8 +827,8 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_news_article_edit() {
-        $templates_dir = "news_article_edit";
+    function action_news_article_edit_admin() {
+        $templates_dir = "news_article_edit_admin";
 
         $news_article =& $this->read_id_fetch_db_object("NewsArticle");
 
@@ -849,8 +854,12 @@ class UserApp extends CustomApp {
                             "image_processor.actions" => array(
                                 array(
                                     "name" => "crop_and_resize",
-                                    "width" => $this->get_config_value("news_article_image_width"),
-                                    "height" => $this->get_config_value("news_article_image_height"),
+                                    "width" => $this->get_config_value(
+                                        "news_article_image_width"
+                                    ),
+                                    "height" => $this->get_config_value(
+                                        "news_article_image_height"
+                                    ),
                                 ),
                             ),
                             "is_thumbnail" => 0,
@@ -886,7 +895,7 @@ class UserApp extends CustomApp {
 
                     $news_article->save();
                     
-                    $this->create_self_redirect_response(array("action" => "news_articles"));
+                    $this->create_self_redirect_response(array("action" => "news_articles_admin"));
                     break;
                 }
             }
@@ -897,7 +906,7 @@ class UserApp extends CustomApp {
                     "templates_dir" => "{$templates_dir}/news_article_editor",
                     "template_var" => "news_article_editor",
                     "obj" => $news_article,
-                    "context" => "news_article_edit",
+                    "context" => "news_article_edit_admin",
                 )
             );
             $news_article_editor->print_values();
@@ -1004,8 +1013,12 @@ class UserApp extends CustomApp {
                             "image_processor.actions" => array(
                                 array(
                                     "name" => "crop_and_resize",
-                                    "width" => $this->get_config_value("newsletter_image_width"),
-                                    "height" => $this->get_config_value("newsletter_image_height"),
+                                    "width" => $this->get_config_value(
+                                        "newsletter_image_width"
+                                    ),
+                                    "height" => $this->get_config_value(
+                                        "newsletter_image_height"
+                                    ),
                                 ),
                             ),
                             "is_thumbnail" => 0,
@@ -1158,7 +1171,9 @@ class UserApp extends CustomApp {
                 } else {
                     $this->print_status_message_db_object_updated($newsletter_category);
                     $newsletter_category->save();
-                    $this->create_self_redirect_response(array("action" => "newsletter_categories"));
+                    $this->create_self_redirect_response(array(
+                        "action" => "newsletter_categories",
+                    ));
                     break;
                 }
             }
