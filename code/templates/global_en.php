@@ -143,8 +143,6 @@ return array(
     // Users
     "global:user.add" => "Add user",
     "global:user.back_to_list" => "Back to users list",
-    "global:user.back_to_view" => "Back to user view",
-    "global:user.back_to_my_account" => "Back to my account",
 
     "global:user.login" => "Login",
     "global:user.role" => "Role",

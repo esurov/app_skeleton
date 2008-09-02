@@ -214,13 +214,13 @@ class UserTable extends CustomDbObject {
         case "signup_form":
             $field_names_to_not_read = array("role", "is_confirmed", "is_active");
             break;
+        case "my_account":
+            $field_names_to_not_read = array("login", "role", "is_confirmed", "is_active");
+            break;
         case "user_edit_admin":
             if ($this->is_definite()) {
                 $field_names_to_not_read = array("role");
             }
-            break;
-        case "user_edit_user":
-            $field_names_to_not_read = array("login", "role", "is_confirmed", "is_active");
             break;
         case "recover_password_form":
             $field_names_to_read = array("login", "email");
@@ -333,14 +333,9 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
+        case "my_account":
         case "user_edit_admin":
-        case "user_edit_user":
             $conditions = array(
-                array(
-                    "field" => "role",
-                    "type" => "not_empty",
-                    "message" => "user.role_empty",
-                ),
                 array(
                     "field" => "first_name",
                     "type" => "not_empty",
@@ -436,7 +431,7 @@ class UserTable extends CustomDbObject {
         }
 
         if (
-            ($context == "user_edit_admin" || $context == "user_edit_user") &&
+            ($context == "my_account" || $context == "user_edit_admin") &&
             is_value_not_empty($this->password)
         ) {
             $this->validate_passwords($messages);
@@ -520,20 +515,28 @@ class UserTable extends CustomDbObject {
     function print_form_values($params = array()) {
         parent::print_form_values($params);
 
-        if ($this->_context == "user_edit_admin") {
-            if (!$this->is_definite()) {
-                $this->app->print_file("{$this->_templates_dir}/_role.html", "_role");
+        if (
+            $this->_context == "my_account" ||
+            $this->_context == "user_edit_admin"
+        ) {
+            if ($this->is_definite()) {
+                $this->app->print_file(
+                    "{$this->_templates_dir}/_passwords_note.html",
+                    "_passwords_note"
+                );
+            } else {
+                $this->app->print_file(
+                    "{$this->_templates_dir}/_passwords_required.html",
+                    "_passwords_required"
+                );
+
+                if ($this->_context == "user_edit_admin") {
+                    $this->app->print_file(
+                        "{$this->_templates_dir}/_role.html",
+                        "_role"
+                    );
+                }
             }
-            $this->app->print_file("{$this->_templates_dir}/_is_active.html", "_is_active");
-            $this->app->print_file("{$this->_templates_dir}/_is_confirmed.html", "_is_confirmed");
-            $this->app->print_file("{$this->_templates_dir}/_link_back_to_users.html", "_link_back");
-        }
-        
-        if ($this->_context == "user_edit_user") {
-            $this->app->print_file(
-                "{$this->_templates_dir}/_link_back_to_my_account.html",
-                "_link_back"
-            );
         }
     }
 //

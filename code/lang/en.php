@@ -66,18 +66,17 @@ return array(
     "users" => "users",
 
     "guest_menu_item.signup" => "Signup",
-    "user_menu_item.user" => "My account",
+    "user_menu_item.my_account" => "My account",
+    "admin_menu_item.my_account" => "My account",
     "admin_menu_item.users" => "Users",
 
     "page_title.signup" => "Signup",
     "page_title.signup_almost_completed" => "New account created",
     "page_title.confirm_signup" => "Account confirmed",
-    "page_title.users" => "Users",
-    "page_title.user_view" => "View user",
-    "page_title.user_view_my_account" => "My account",
-    "page_title.user_edit_new" => "Add user",
-    "page_title.user_edit" => "Edit user",
-    "page_title.user_edit_my_account" => "Edit my account",
+    "page_title.my_account" => "My account",
+    "page_title.users_admin" => "Users",
+    "page_title.user_edit_new_admin" => "Add user",
+    "page_title.user_edit_admin" => "Edit user",
 
     "page_title.static.policy_terms_of_use" => "Terms of use",
     "page_title.static.policy_terms_and_conditions" => "Terms and conditions",
@@ -87,6 +86,7 @@ return array(
     "status_msg.user.added" => "User added",
     "status_msg.user.updated" => "User updated",
     "status_msg.user.deleted" => "User deleted",
+    "status_msg.user.account_updated" => "Account updated",
     
     "status_msg.user.login_empty" => "Specify login",
     "status_msg.user.login_exists" => "Login \"{%login%}\" already exists, specify another one",

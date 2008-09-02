@@ -39,9 +39,9 @@ class UserApp extends CustomApp {
             "contact_form" => $e,
 
             // Users management
-            "users" => $a,
-            "user_view" => $u,
-            "user_edit" => $u_a,
+            "my_account" => $u_a,
+            "users_admin" => $a,
+            "user_edit_admin" => $a,
 
             // News articles
             "news_articles" => $e,
@@ -260,7 +260,7 @@ class UserApp extends CustomApp {
     }
 
     function action_user_home() {
-        $this->create_self_redirect_response(array("action" => "user_view"));
+        $this->create_self_redirect_response(array("action" => "my_account"));
     }
 
     function action_admin_home() {
@@ -302,7 +302,7 @@ class UserApp extends CustomApp {
                 }
                 if (count($messages) != 0) {
                     $this->print_status_messages($messages);
-                    
+
                     $user->login = "";
                     $user->password = "";
                     $user->should_remember = $should_remember;
@@ -615,8 +615,69 @@ class UserApp extends CustomApp {
         $email_sender->Send();
     }
 //
-    function action_users() {
-        $templates_dir = "users";
+    function action_my_account() {
+        $templates_dir = "my_account";
+
+        $user_role = $this->get_user_role();
+
+        $user =& $this->user;
+
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "update":
+            $context = "my_account";
+
+            $user->insert_edit_form_extra_fields();
+
+            $field_info =& $user->get_field_info("login");
+            $field_info["input"]["type_attrs"]["disabled"] = "disabled";
+
+            $user->password = "";
+            $user->password_confirm = "";
+
+            if ($command == "update") {
+                $user->read($context);
+
+                $messages = $user->validate($context);
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+
+                    $user->password = "";
+                    $user->password_confirm = "";
+                } else {
+                    $this->add_session_status_message(new OkStatusMsg("user.account_updated"));
+
+                    $user->save(
+                        false,
+                        is_value_empty($user->password) ? "skip_password" : null
+                    );
+
+                    $this->create_self_redirect_response(array(
+                        "action" => "my_account", 
+                    ));
+                    break;
+                }
+            }
+            
+            $user_editor =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/user_editor",
+                    "template_var" => "user_editor",
+                    "obj" => $user,
+                    "context" => $context,
+                )
+            );
+            $user_editor->print_values();
+
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
+        }
+    }
+
+    function action_users_admin() {
+        $templates_dir = "users_admin";
         
         $user =& $this->create_db_object("User");
         $user->insert_filters();
@@ -628,7 +689,7 @@ class UserApp extends CustomApp {
                 "obj" => $user,
                 "default_order_by" => array("created DESC", "id DESC"),
                 "filter_form.visible" => true,
-                "context" => "users_list_item",
+                "context" => "users_admin_list_item",
             )
         );
         $users_list->print_values();
@@ -636,44 +697,84 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function read_id_fetch_user() {
-        $user_role = $this->get_user_role();
-        if ($user_role == "user") {
-            $user =& $this->user;
-        } else {
-            $user =& $this->read_id_fetch_db_object("User");
-        }
-        return $user;
-    }
+    function action_user_edit_admin() {
+        $templates_dir = "user_edit_admin";
 
-    function action_user_view() {
-        $templates_dir = "user_view";
+        $user =& $this->read_id_fetch_db_object("User");
 
-        $user_role = $this->get_user_role();
-        
-        $context = ($user_role == "admin") ? "view_by_admin" : "view_by_user";
+        $command = (string) param("command");
+        switch ($command) {
+        case "":
+        case "update":
+            $context = "user_edit_admin";
 
-        $user = $this->read_id_fetch_user();
-        $user_viewer =& $this->create_object(
-            "ObjectViewer",
-            array(
-                "templates_dir" => "{$templates_dir}/user_viewer",
-                "template_var" => "user_viewer",
+            $user->insert_edit_form_extra_fields();
+            if (!$user->is_definite()) {
+                // Set initial values for user which will be created by admin
+                $user->is_confirmed = 1;
+                $user->is_active = 1;
+            }
+            $user->password = "";
+            $user->password_confirm = "";
+
+            if ($command == "update") {
+                $user->read($context);
+
+                $messages = $user->validate($context);
+                if (count($messages) != 0) {
+                    $this->print_status_messages($messages);
+
+                    $user->password = "";
+                    $user->password_confirm = "";
+                } else {
+                    $this->print_status_message_db_object_updated($user);
+
+                    $user->save(
+                        false,
+                        is_value_empty($user->password) ? "skip_password" : null
+                    );
+
+                    $this->create_self_redirect_response(array(
+                        "action" => "users_admin",
+                    ));
+                    break;
+                }
+            }
+            
+            $user_editor =& $this->create_object(
+                "ObjectEditor",
+                array(
+                    "templates_dir" => "{$templates_dir}/user_editor",
+                    "template_var" => "user_editor",
+                    "obj" => $user,
+                    "context" => $context,
+                )
+            );
+            $user_editor->print_values();
+
+            $this->print_file("{$templates_dir}/body.html", "body");
+            break;
+        case "delete":
+            if ($user->role == "admin" && $user->get_num_admins() <= 1) {
+                $this->add_session_status_message(
+                    new ErrorStatusMsg("user.cannot_delete_main_admin")
+                );
+
+                $this->create_self_redirect_response(array("action" => "users_admin"));
+                break;
+            }
+            $redirect_url_params = array("action" => "users_admin");
+            $this->delete_db_object(array(
                 "obj" => $user,
-                "context" => $context,
-            )
-        );
-        $user_viewer->print_values();
-
-        if ($user_role == "user") {
-            $this->print_head_and_page_titles("user_view_my_account");
+                "success_url_params" => $redirect_url_params,
+                "error_url_params" => $redirect_url_params,
+            ));
+            break;
         }
-
-        $this->print_file("{$templates_dir}/body.html", "body");
     }
-
-    function action_user_edit() {
-        $templates_dir = "user_edit";
+/*
+    function action_my_account() {
+        $templates_dir = "my_account";
 
         $user_role = $this->get_user_role();
         
@@ -764,6 +865,7 @@ class UserApp extends CustomApp {
             break;
         }
     }
+*/
 //
     function action_news_articles() {
         $templates_dir = "news_articles";
@@ -1046,6 +1148,7 @@ class UserApp extends CustomApp {
                     );
 
                     $this->process_uploaded_file($newsletter, "file_id", "file");
+                    
                     $newsletter->save();
 
                     $this->send_email_newsletter_to_subscribed_users(

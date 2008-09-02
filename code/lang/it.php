@@ -66,18 +66,17 @@ return array(
     "users" => "utenti",
 
     "guest_menu_item.signup" => "Iscriviti",
-    "user_menu_item.user" => "Il mio account",
+    "user_menu_item.my_account" => "Il mio account",
+    "admin_menu_item.my_account" => "Il mio account",
     "admin_menu_item.users" => "Utenti",
 
     "page_title.signup" => "Iscriviti",
     "page_title.signup_almost_completed" => "Il nuovo account stato creato",
     "page_title.confirm_signup" => "Account è stato confermato",
-    "page_title.users" => "Utenti",
-    "page_title.user_view" => "Visualizza utente",
-    "page_title.user_view_my_account" => "Il mio account",
-    "page_title.user_edit_new" => "Aggiungi utente",
-    "page_title.user_edit" => "Modifica utente",
-    "page_title.user_edit_my_account" => "Modifica account",
+    "page_title.my_account" => "Il mio account",
+    "page_title.users_admin" => "Utenti",
+    "page_title.user_edit_new_admin" => "Aggiungi utente",
+    "page_title.user_edit_admin" => "Modifica utente",
 
     "page_title.static.policy_terms_of_use" => "Condizioni di utilizzo",
     "page_title.static.policy_terms_and_conditions" => "Termini e condizioni",
@@ -87,6 +86,7 @@ return array(
     "status_msg.user.added" => "Utente aggiunto",
     "status_msg.user.updated" => "Utente aggiornato",
     "status_msg.user.deleted" => "Utente cancellato",
+    "status_msg.user.account_updated" => "Account aggiornato",
 
     "status_msg.user.login_empty" => "Inserire login",
     "status_msg.user.login_exists" => "Il login inserito esiste già, specificarne un altro",

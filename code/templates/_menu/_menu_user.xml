@@ -13,9 +13,9 @@
         contexts="index"
     />
     <menu_item
-        name="user"
-        url="?action=user_view"
-        contexts="user_view, user_edit"
+        name="my_account"
+        url="?action=my_account"
+        contexts="my_account"
     />
     <menu_item
         name="user_subscription"

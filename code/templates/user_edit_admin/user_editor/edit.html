@@ -1,0 +1,61 @@
+<div class="toolbar">
+    [<a href="?action=users_admin">{%global:user.back_to_list%}</a>]
+</div>
+
+<form
+    action="?action=user_edit_admin&amp;user_id={%user.id%}"
+    method="post"
+    name="form"
+>
+    
+    <input type="hidden" name="command" value="update" />
+
+    <table>
+        <tbody>
+            {%_role%}
+            <tr>
+                <th>{%global:user.login%}:{%global:_required_field%}</th>
+                <td>{%user.login.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.password%}:{%_passwords_required%}</th>
+                <td>{%user.password.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.password_confirm%}:{%_passwords_required%}</th>
+                <td>{%user.password_confirm.input%}</td>
+            </tr>
+            {%_passwords_note%}
+            <tr>
+                <th>{%global:user.first_name%}:{%global:_required_field%}</th>
+                <td>{%user.first_name.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.last_name%}:{%global:_required_field%}</th>
+                <td>{%user.last_name.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.email%}:{%global:_required_field%}</th>
+                <td>{%user.email.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.extra_info%}:</th>
+                <td>{%user.extra_info.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.is_confirmed%}:</th>
+                <td>{%user.is_confirmed.input%}</td>
+            </tr>
+            <tr>
+                <th>{%global:user.is_active%}:</th>
+                <td>{%user.is_active.input%}</td>
+            </tr>
+        </tbody>
+    </table>
+    <input name="submit_btn" type="submit" value="{%global:save%}" />
+
+</form>
+
+<script type="text/javascript">
+    {%user.client_validation_js%}
+</script>
