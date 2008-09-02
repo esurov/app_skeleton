@@ -249,6 +249,14 @@ class XmlDocumentResponse extends BinaryContentResponse {
 
 }
 
+class RssDocumentResponse extends BinaryContentResponse {
+    
+    function RssDocumentResponse($content) {
+        parent::BinaryContentResponse("application/rss+xml", $content);
+    }
+
+}
+
 class CsvDocumentResponse extends BinaryContentResponse {
     
     function CsvDocumentResponse($content, $filename, $is_attachment) {

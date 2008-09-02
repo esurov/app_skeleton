@@ -185,6 +185,8 @@ return array(
     "global:news_article.upload_new_file" => "Upload new file",
     "global:news_article.text" => "Text",
 
+    "global:news_article.rss_feed.title" => "News rss feed",
+
     // Newsletters and newsletter categories
     "global:newsletter.add" => "Create newsletter",
     "global:newsletter.back_to_list" => "Back to newsletters",

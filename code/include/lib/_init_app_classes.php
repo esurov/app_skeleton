@@ -120,6 +120,9 @@ $app_classes = array(
             "filename" => "custom_phpmailer.php",
             "required_classes" => array("PHPMailer"),
         ),
+        "UniversalFeedCreator" => array(
+            "filename" => "feedcreator.php",
+        ),
 
     ),
 );

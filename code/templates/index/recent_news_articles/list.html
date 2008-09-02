@@ -1,3 +1,10 @@
-<h1>{%local:recent_news%}</h1>
+<h1>{%local:recent_news%}
+    <a
+        href="?action=news_articles_rss"
+        ><img
+            src="{%sys:self_url%}images/feed_icon.gif"
+            alt="RSS"
+            title="RSS"
+        /></a></h1>
 
 {%news_article_list%}

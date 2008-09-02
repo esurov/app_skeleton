@@ -566,6 +566,10 @@ class App extends AppObject {
         $this->response = new XmlDocumentResponse($content);
     }
 
+    function create_rss_document_response($content) {
+        $this->response = new RssDocumentResponse($content);
+    }
+
     function create_plain_text_document_response(
         $content,
         $filename = null,

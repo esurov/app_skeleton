@@ -48,6 +48,7 @@ class UserApp extends CustomApp {
             "news_articles_admin" => $a,
             "news_article_view" => $e,
             "news_article_edit_admin" => $a,
+            "news_articles_rss" => $e,
 
             // Newsletters
             "newsletters" => $a,
@@ -772,100 +773,6 @@ class UserApp extends CustomApp {
             break;
         }
     }
-/*
-    function action_my_account() {
-        $templates_dir = "my_account";
-
-        $user_role = $this->get_user_role();
-        
-        $user = $this->read_id_fetch_user();
-
-        $command = (string) param("command");
-        switch ($command) {
-        case "":
-        case "update":
-            $context = ($user_role == "admin") ? "user_edit_admin" : "user_edit_user";
-
-            $user->insert_edit_form_extra_fields();
-            if ($user->is_definite()) {
-                if ($user_role == "user") {
-                    $field_info =& $user->get_field_info("login");
-                    $field_info["input"]["type_attrs"]["disabled"] = "disabled";
-                }
-            } else {
-                // Set initial values for user which will be created by admin
-                $user->is_confirmed = 1;
-                $user->is_active = 1;
-            }
-            $user->password = "";
-            $user->password_confirm = "";
-
-            if ($command == "update") {
-                $user->read($context);
-
-                $messages = $user->validate($context);
-                if (count($messages) != 0) {
-                    $this->print_status_messages($messages);
-                } else {
-                    $this->print_status_message_db_object_updated($user);
-
-                    $user->save(
-                        false,
-                        is_value_empty($user->password) ? "skip_password" : null
-                    );
-
-                    if ($user_role == "admin") {
-                        $this->create_self_redirect_response(array(
-                            "action" => "users",
-                        ));
-                    } else {
-                        $this->create_self_redirect_response(array(
-                            "action" => "user_view", 
-                            "user_id" => $user->id, 
-                        ));
-                    }
-                    break;
-                }
-            }
-            
-            $user_editor =& $this->create_object(
-                "ObjectEditor",
-                array(
-                    "templates_dir" => "{$templates_dir}/user_editor",
-                    "template_var" => "user_editor",
-                    "obj" => $user,
-                    "context" => $context,
-                )
-            );
-            $user_editor->print_values();
-
-            if ($user_role == "user") {
-                $this->print_head_and_page_titles("user_edit_my_account");
-            }
-
-            $this->print_file("{$templates_dir}/body.html", "body");
-            break;
-        case "delete":
-            if ($user_role == "admin") {
-                if ($user->role == "admin" && $user->get_num_admins() <= 1) {
-                    $this->add_session_status_message(
-                        new ErrorStatusMsg("user.cannot_delete_main_admin")
-                    );
-
-                    $this->create_self_redirect_response(array("action" => "users"));
-                    break;
-                }
-                $redirect_url_params = array("action" => "users");
-                $this->delete_db_object(array(
-                    "obj" => $user,
-                    "success_url_params" => $redirect_url_params,
-                    "error_url_params" => $redirect_url_params,
-                ));
-            }
-            break;
-        }
-    }
-*/
 //
     function action_news_articles() {
         $templates_dir = "news_articles";
@@ -1041,6 +948,51 @@ class UserApp extends CustomApp {
             ));
             break;
         }
+    }
+
+    function action_news_articles_rss() {
+        $feed_creator =& $this->create_object("UniversalFeedCreator");
+
+        //$feed_creator->useCached(); 
+        $feed_creator->title = $this->get_lang_str("news_article.rss_feed.title");
+        $feed_creator->description = $this->get_lang_str("news_article.rss_feed.description");
+        $feed_creator->link = create_self_full_url(
+            array(
+                "action" => "news_articles",
+            ),
+            $this->lang
+        ); 
+//        $feed_creator->feedURL = "http://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}"; 
+//        $feed_creator->syndicationURL = "http://www.dailyphp.net/".$PHP_SELF;
+
+        $n_recent_rss_news_articles = $this->get_config_value("recent_rss_news_articles_number");
+        $news_articles = $this->fetch_db_objects_list(
+            "NewsArticle",
+            array(
+                "order_by" => "created_date DESC, id DESC",
+                "limit" => "0, {$n_recent_rss_news_articles}",
+            )
+        );
+        foreach ($news_articles as $news_article) {
+            $feed_item = new FeedItem();
+            $feed_item->title = $news_article->title;
+            $feed_item->link = create_self_full_url(
+                array(
+                    "action" => "news_article_view",
+                    "news_article_id" => $news_article->id,
+                ),
+                $this->lang
+            );
+            $feed_item->description = $news_article->body;
+            $feed_item->date = $this->get_timestamp_from_db_date($news_article->created_date);
+            $feed_item->source = create_self_full_url();
+            $feed_item->author = "admin";
+            
+            $feed_creator->addItem($feed_item);
+        }
+
+        $rss_content = $feed_creator->createFeed("RSS2.0");
+        $this->create_rss_document_response($rss_content);
     }
 //
     function action_newsletters() {

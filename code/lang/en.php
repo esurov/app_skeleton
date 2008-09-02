@@ -145,6 +145,9 @@ return array(
     "status_msg.news_article.file_max_size_reached" => "Uploaded file size is more than 2 Mb",
     "status_msg.news_article.files_max_total_size_reached" => "Total uploaded files size is more than 100 Mb",
 
+    "news_article.rss_feed.title" => "News rss feed",
+    "news_article.rss_feed.description" => "News rss feed",
+
     // Newsletters
     "newsletter" => "newsletter",
     "newsletters" => "newsletters",
