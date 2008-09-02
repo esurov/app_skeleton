@@ -8,6 +8,8 @@ class UserApp extends CustomApp {
     function UserApp() {
         parent::CustomApp("UserApp", "user_app");
 
+        $this->use_cur_lang_from_cgi = true;
+
         $e = array("roles" => array("guest", "user", "admin"));
         $u = array("roles" => array("user"));
         $a = array("roles" => array("admin"));
@@ -71,21 +73,6 @@ class UserApp extends CustomApp {
         );
     }
 //
-    function get_current_lang() {
-        $cur_lang = $this->get_current_lang_from_session();
-        if (is_null($cur_lang)) {
-            $cur_lang = $this->get_current_lang_from_cookie();
-        }
-        if (!$this->is_valid_lang($cur_lang)) {
-            $cur_lang = $this->dlang;
-        }
-        return $cur_lang;
-    }
-
-    function get_current_lang_from_cookie() {
-        return get_param_value($_COOKIE, "current_lang", null);
-    }
-
     function create_session() {
         $this->session =& $this->create_object("LoginSession");
     }
@@ -232,12 +219,6 @@ class UserApp extends CustomApp {
         return $this->print_static_page_file($full_page_name, $template_var);
     }
 
-    function action_change_lang() {
-        parent::action_change_lang();
-
-        $this->add_current_lang_cookie();
-    }
-
     function init_page_template_lang_resources() {
         parent::init_page_template_lang_resources();
 
@@ -329,6 +310,9 @@ class UserApp extends CustomApp {
                     if (is_null(get_param_value($saved_request_params, "action", null))) {
                         $saved_request_params = array("action" => "home") + $saved_request_params;
                     }
+                    if (!is_null(get_param_value($saved_request_params, "_current_lang", null))) {
+                        unset($saved_request_params["_current_lang"]);
+                    }
                     $this->session->destroy_saved_request_params();
                     
                     $this->create_self_redirect_response($saved_request_params);
@@ -381,15 +365,6 @@ class UserApp extends CustomApp {
         $this->response->add_cookie(new Cookie(
             "user_password_hash",
             sha1($user->password),
-            $cookie_expiration_ts
-        ));
-    }
-
-    function add_current_lang_cookie() {
-        $cookie_expiration_ts = $this->create_remember_user_cookie_expiration_ts();
-        $this->response->add_cookie(new Cookie(
-            "current_lang",
-            $this->lang,
             $cookie_expiration_ts
         ));
     }
@@ -1051,11 +1026,6 @@ class UserApp extends CustomApp {
                                     "height" => $this->get_config_value(
                                         "newsletter_thumbnail_image_height"
                                     ),
-                                ),
-                                // This is example of second image processor action
-                                // Remove if grayscale is not needed (almost always ;) )
-                                array(
-                                    "name" => "convert_to_grayscale",
                                 ),
                             ),
                             "is_thumbnail" => 1,

@@ -77,7 +77,7 @@ function create_suburl($params = array(), $params_delimiter = "&") {
     return join($params_delimiter, $pairs);
 }
 
-function create_self_url($params = array()) {
+function create_self_url($params = array(), $lang = null) {
     $params_suburl = create_suburl($params);
     
     $script_path = dirname($_SERVER["SCRIPT_NAME"]);
@@ -86,9 +86,11 @@ function create_self_url($params = array()) {
     }
     $script_name = basename($_SERVER["SCRIPT_NAME"]);
 
+    $lang_path = (is_null($lang)) ? "" : "{$lang}/";
+
     $self_suburl = ($script_name == "index.php") ?
-        "{$script_path}/" :
-        "{$script_path}/{$script_name}";
+        "{$script_path}/{$lang_path}" :
+        "{$script_path}/{$lang_path}{$script_name}";
     if (count($params) == 0) {
         return $self_suburl;            
     } else {
@@ -96,9 +98,9 @@ function create_self_url($params = array()) {
     }
 }
 
-function create_self_full_url($params = array(), $protocol = "http") {
+function create_self_full_url($params = array(), $lang = null, $protocol = "http") {
     $host = $_SERVER["HTTP_HOST"];
-    $self_url = create_self_url($params);
+    $self_url = create_self_url($params, $lang);
     return "{$protocol}://{$host}{$self_url}";
 }
 

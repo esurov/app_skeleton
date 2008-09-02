@@ -4,7 +4,8 @@ class LangMenu extends TemplateComponent {
 
     var $avail_langs = array();
     var $current_lang = "";
-    var $redirect_url = "";
+    var $redirect_url_params = array();
+    var $use_lang_in_redirect_url = false;
 
     function print_values() {
         $this->app->print_raw_value("lang_menu_items", "");
@@ -26,7 +27,10 @@ class LangMenu extends TemplateComponent {
                     "new_lang.name_native" => $this->get_lang_str("{$lang}_native"),
                     "new_lang.image_url" => $this->get_config_value("lang_image_url_{$lang}"),
                     "redirect_url_suburl" => create_suburl(array(
-                        "redirect_url" => $this->redirect_url,
+                        "redirect_url" => create_self_full_url(
+                            $this->redirect_url_params,
+                            ($this->use_lang_in_redirect_url) ? $lang : null
+                        ),
                     )),
                 ));
                 $item_template_name = "menu_item.html";

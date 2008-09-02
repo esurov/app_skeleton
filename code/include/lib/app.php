@@ -29,6 +29,7 @@ class App extends AppObject {
     var $dlang; // Default language
     var $avail_langs; // Available languages
     var $lang_resources; // Language resources
+    var $use_cur_lang_from_cgi; // True if app reads current language from CGI with mod_rewrite
 
     // Action vars
     var $actions;
@@ -40,6 +41,8 @@ class App extends AppObject {
 
         $this->set_class_name($app_class_name); 
         $this->app_name = $app_name;
+
+        $this->use_cur_lang_from_cgi = false;
 
         // One action defined, but nobody can access it
         $this->actions = array(
@@ -117,6 +120,20 @@ class App extends AppObject {
         $this->dlang = $this->get_config_value("default_language");
         $this->lang = $this->get_current_lang();
 
+        // Sentry redirect
+        if ($this->use_cur_lang_from_cgi) {
+            if (is_null($this->get_current_lang_from_cgi())) {
+                $redirect_response =& new RedirectResponse(
+                    create_self_full_url(
+                        array(),
+                        $this->lang
+                    )
+                );
+                $redirect_response->send();
+                exit;
+            }
+        }
+
         $this->init_lang_resources();
         $this->init_page_template_lang_resources();
     }
@@ -132,6 +149,7 @@ class App extends AppObject {
         $this->page->init_fillings();
         $this->print_raw_value("sys:html_charset", $this->html_charset);
         $this->print_raw_value("sys:lang", $this->lang);
+        $this->print_raw_value("sys:self_url", create_self_url());
     }
 //
     // App objects creation functions
@@ -406,18 +424,35 @@ class App extends AppObject {
         );
     }
 
-    function create_self_redirect_response($suburl_params = array(), $protocol = "http") {
+    function create_self_redirect_response(
+        $suburl_params = array(),
+        $lang = null,
+        $protocol = "http"
+    ) {
+        if ($this->use_cur_lang_from_cgi) {
+            if (is_null($lang)) {
+                $lang = $this->lang;
+            }
+        }
+
         $this->create_redirect_response(
             create_self_full_url(
                 $suburl_params + $this->get_app_extra_suburl_params(),
+                $lang,
                 $protocol
             )
         );
     }
 
-    function create_self_action_redirect_response($suburl_params = array(), $protocol = "http") {
+    function create_self_action_redirect_response(
+        $suburl_params = array(),
+        $lang = null,
+        $protocol = "http"
+    ) {
         $this->create_self_redirect_response(
-            $this->get_self_action_suburl_params() + $suburl_params
+            $this->get_self_action_suburl_params() + $suburl_params,
+            $lang,
+            $protocol
         );
     }
 
@@ -2117,11 +2152,29 @@ class App extends AppObject {
     }
 
     function get_current_lang() {
-        $cur_lang = $this->get_current_lang_from_session();
+        if ($this->use_cur_lang_from_cgi) {
+            $cur_lang = $this->get_current_lang_from_cgi();
+            if (is_null($cur_lang)) {
+                $cur_lang = $this->get_current_lang_from_cookie();
+            }
+        } else {
+            $cur_lang = $this->get_current_lang_from_session();
+            if (is_null($cur_lang)) {
+                $cur_lang = $this->get_current_lang_from_cookie();
+            }
+        }
         if (!$this->is_valid_lang($cur_lang)) {
             $cur_lang = $this->dlang;
         }
         return $cur_lang;
+    }
+
+    function get_current_lang_from_cgi() {
+        return param("_current_lang");
+    }
+
+    function get_current_lang_from_cookie() {
+        return get_param_value($_COOKIE, "current_lang", null);
     }
 
     function get_current_lang_from_session() {
@@ -2132,7 +2185,9 @@ class App extends AppObject {
 
     function set_current_lang($new_lang) {
         if ($this->is_valid_lang($new_lang)) {
-            $this->session->set_param("current_lang", $new_lang);
+            if (!$this->use_cur_lang_from_cgi) {
+                $this->session->set_param("current_lang", $new_lang);
+            }
             $this->lang = $new_lang;
         }
     }
@@ -2290,7 +2345,8 @@ class App extends AppObject {
 
         $lang_menu->avail_langs = $this->get_avail_langs();
         $lang_menu->current_lang = $this->lang;
-        $lang_menu->redirect_url = create_self_full_url($this->get_self_action_suburl_params());
+        $lang_menu->use_lang_in_redirect_url = $this->use_cur_lang_from_cgi;
+        $lang_menu->redirect_url_params = $this->get_self_action_suburl_params();
 
         return $lang_menu->print_values();
     }
@@ -2310,6 +2366,22 @@ class App extends AppObject {
         $this->set_current_lang(trim(param("new_lang")));
 
         $this->create_redirect_response((string) param("redirect_url"));
+
+        $this->add_current_lang_cookie();
+    }
+
+    function add_current_lang_cookie() {
+        $cookie_expiration_ts = $this->create_current_lang_cookie_expiration_ts();
+        $this->response->add_cookie(new Cookie(
+            "current_lang",
+            $this->lang,
+            $cookie_expiration_ts,
+            create_self_url()
+        ));
+    }
+
+    function create_current_lang_cookie_expiration_ts() {
+        return time() + 60 * 60 * 24 * 365;
     }
 //
     function action_static() {
@@ -2943,6 +3015,7 @@ class App extends AppObject {
     ) {
         $this->create_self_redirect_response(
             $suburl_params + array("reload_opener" => 1),
+            null,
             $protocol
         );
     }
@@ -2951,7 +3024,10 @@ class App extends AppObject {
         if (is_null($opener_suburl_params)) {
             $location_js = "reload()";
         } else {
-            $url = create_self_full_url($opener_suburl_params);
+            $url = create_self_full_url(
+                $opener_suburl_params,
+                $this->lang
+            );
             $location_js = "href = '{$url}'";
         }
         $this->print_raw_value("location_js", $location_js);

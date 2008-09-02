@@ -10,3 +10,6 @@ Options -Indexes
 <FilesMatch "^(\.svn|entries)$">
     Deny from all
 </FilesMatch>
+
+RewriteEngine On
+RewriteRule ^(it|en)\/?$ index.php?_current_lang=$1 [L,QSA]
