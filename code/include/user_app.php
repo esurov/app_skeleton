@@ -951,9 +951,10 @@ class UserApp extends CustomApp {
     }
 
     function action_news_articles_rss() {
+        $templates_dir = "news_articles_rss";
+
         $feed_creator =& $this->create_object("UniversalFeedCreator");
 
-        //$feed_creator->useCached(); 
         $feed_creator->title = $this->get_lang_str("news_article.rss_feed.title");
         $feed_creator->description = $this->get_lang_str("news_article.rss_feed.description");
         $feed_creator->link = create_self_full_url(
@@ -974,6 +975,11 @@ class UserApp extends CustomApp {
             )
         );
         foreach ($news_articles as $news_article) {
+            $news_article->print_values(array(
+                "templates_dir" => "news_articles_rss",
+                "context" => "news_articles_rss_list_item",
+            ));
+            
             $feed_item = new FeedItem();
             $feed_item->title = $news_article->title;
             $feed_item->link = create_self_full_url(
@@ -983,7 +989,9 @@ class UserApp extends CustomApp {
                 ),
                 $this->lang
             );
-            $feed_item->description = $news_article->body;
+            $feed_item->description = $this->print_file(
+                "{$templates_dir}/feed_item_description.html"
+            );
             $feed_item->date = $this->get_timestamp_from_db_date($news_article->created_date);
             $feed_item->source = create_self_full_url();
             $feed_item->author = "admin";

@@ -150,6 +150,11 @@ class App extends AppObject {
         $this->print_raw_value("sys:html_charset", $this->html_charset);
         $this->print_raw_value("sys:lang", $this->lang);
         $this->print_raw_value("sys:self_url", create_self_url());
+        $this->print_raw_value("sys:self_full_url", create_self_full_url());
+        $this->print_raw_value(
+            "sys:self_full_lang_url",
+            create_self_full_url(array(), $this->use_cur_lang_from_cgi ? $this->lang : null)
+        );
     }
 //
     // App objects creation functions

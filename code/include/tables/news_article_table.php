@@ -143,7 +143,8 @@ class NewsArticleTable extends CustomDbObject {
         if (
             $this->_context == "index_list_item" ||
             $this->_context == "news_articles_list_item" ||
-            $this->_context == "news_articles_admin_list_item"
+            $this->_context == "news_articles_admin_list_item" ||
+            $this->_context == "news_articles_rss_list_item"
         ) {
             $title_short_len = $this->get_config_value("news_article_title_short_length");
             $this->app->print_varchar_value(
