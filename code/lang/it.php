@@ -265,13 +265,19 @@ return array(
     "page_title.product_edit_new" => "Aggiungi prodotto",
     "page_title.product_edit" => "Modifica prodotto",
 
-    "status_msg.product.added" => "!!Product added",
-    "status_msg.product.updated" => "!!Product updated",
-    "status_msg.product.deleted" => "!!Product deleted",
+    "status_msg.product.added" => "Prodotto aggiunto",
+    "status_msg.product.updated" => "Prodotto aggiornato",
+    "status_msg.product.deleted" => "Prodotto cancellato",
+    "status_msg.product.primary_image_deleted" => "!!L'immagine primario relativa all'prodotto è stata cancellata",
+    "status_msg.product.image_deleted" => "!!L'immagine relativa all'prodotto è stata cancellata",
 
     "status_msg.product.category1_empty" => "!!Category1 empty",
     "status_msg.product.category2_empty" => "!!Category2 empty",
     "status_msg.product.category3_empty" => "!!Category3 empty",
     "status_msg.product.name_empty" => "!!Specify product name",
+    "status_msg.product.primary_image_empty" => "!!Prego caricare immagine primario",
+    "status_msg.product.primary_image_bad" => "!!Prego caricare immagine primario valida",
+    "status_msg.product.image_empty" => "Prego caricare immagine",
+    "status_msg.product.image_bad" => "Prego caricare immagine valida",
 );
 ?>

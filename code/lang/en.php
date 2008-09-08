@@ -268,10 +268,16 @@ return array(
     "status_msg.product.added" => "Product added",
     "status_msg.product.updated" => "Product updated",
     "status_msg.product.deleted" => "Product deleted",
+    "status_msg.product.primary_image_deleted" => "Product primary image deleted",
+    "status_msg.product.image_deleted" => "Product image deleted",
 
     "status_msg.product.category1_empty" => "Category1 empty",
     "status_msg.product.category2_empty" => "Category2 empty",
     "status_msg.product.category3_empty" => "Category3 empty",
     "status_msg.product.name_empty" => "Specify product name",
+    "status_msg.product.primary_image_empty" => "Please upload primary image",
+    "status_msg.product.primary_image_bad" => "Please upload valid primary image",
+    "status_msg.product.image_empty" => "Please upload image",
+    "status_msg.product.image_bad" => "Please upload valid image",
 );
 ?>

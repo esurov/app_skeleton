@@ -68,6 +68,11 @@ $db_classes["classes"] = array(
         "required_classes" => array("CustomDbObject"),
         "params" => array("table_name" => "product", "create" => true),
     ),
+    "ProductImage" => array(
+        "filename" => "product_image_table.php",
+        "required_classes" => array("CustomDbObject"),
+        "params" => array("table_name" => "product_image", "create" => true),
+    ),
 
     // These are fake tables (no '_table' suffix in filename),
     // for now are just used here because of their print_values/print_form_values feature

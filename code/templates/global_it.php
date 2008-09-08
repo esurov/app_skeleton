@@ -11,6 +11,7 @@ return array(
     "global:filter_by" => "Filtra per",
     "global:no_records_found" => "Non sono stati trovati dati",
     "global:no_image" => "No immagine",
+    "global:no_images" => "!!No immagini",
     "global:no_file" => "No file",
     "global:sure_delete.js" => get_js_safe_string("Sei sicuro di voler cancellare l'informazione?"),
 
@@ -55,6 +56,7 @@ return array(
     "global:notes" => "Note",
     "global:description" => "Descrizione",
     "global:extra_info" => "Maggiori informazioni",
+    "global:thumbnail" => "!!Thumbnail",
     "global:image" => "Immagine",
     "global:file" => "File",
     "global:first_name" => "Nome",
@@ -91,6 +93,7 @@ return array(
     "global:status" => "Stato",
     "global:price" => "Prezzo",
     "global:current_image" => "Immagine corrente",
+    "global:current_images" => "!!Immagini corrente",
     "global:upload_new_image" => "Carica nuova immagine",
     "global:current_file" => "File corrente",
     "global:upload_new_file" => "Carica nuovo file",
@@ -139,6 +142,7 @@ return array(
     "global:delete_image" => "Cancella immagine",
     "global:delete_file" => "Cancella file",
     "global:activate_deactivate" => "!!Activate/Deactivate",
+    "global:save_and_products" => "Salva e Visualizza prodotti",
 
     // Users
     "global:user.add" => "Aggiungi utente",
@@ -239,5 +243,9 @@ return array(
     "global:product.price" => "Prezzo",
     "global:product.category" => "Categoria",
     "global:product.keywords" => "Parole Chiavi",
+    "global:product.primary_thumbnail_image" => "!!Immagine primario",
+    "global:product.current_primary_image" => "!!Immagine primario corrente",
+    "global:product.upload_new_primary_image" => "!!Carica nuova immagine primario",
+    "global:product.upload_new_image" => "Carica nuova immagine",
 );
 ?>

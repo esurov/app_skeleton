@@ -1,0 +1,11 @@
+<tr class="{%list_item_class%}">
+    <td>{%product.image.thumbnail_image%}</td>
+    <td>{%product.image.image%}</td>
+    <td>
+        <div class="toolbar">
+            [<a
+                href="?action=product_edit&amp;product_id={%product.id%}&amp;command=delete_image&amp;product_image_id={%product.image.id%}"
+                >{%global:delete_image%}</a>]
+        </div>
+    </td>
+</tr>

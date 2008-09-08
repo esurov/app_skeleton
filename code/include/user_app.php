@@ -450,6 +450,7 @@ class UserApp extends CustomApp {
 
             $this->print_file("{$templates_dir}/body.html", "body");
             break;
+        
         case "signup_almost_completed":
             $this->print_file("signup/body_signup_almost_completed.html", "body");
             break;
@@ -530,6 +531,7 @@ class UserApp extends CustomApp {
 
             $this->print_file("{$templates_dir}/body.html", "body");
             break;
+        
         case "password_sent":
             $this->print_file("recover_password/body_password_sent.html", "body");
             break;
@@ -755,6 +757,7 @@ class UserApp extends CustomApp {
 
             $this->print_file("{$templates_dir}/body.html", "body");
             break;
+        
         case "delete":
             if ($user->role == "admin" && $user->get_num_admins() <= 1) {
                 $this->add_session_status_message(
@@ -845,10 +848,12 @@ class UserApp extends CustomApp {
         switch ($command) {
         case "":
         case "update":
-            if ($command == "update") {
-                $news_article->read();
+            $context = "news_article_edit_admin";
 
-                $messages = $news_article->validate();
+            if ($command == "update") {
+                $news_article->read($context);
+
+                $messages = $news_article->validate($context);
                 if (count($messages) != 0) {
                     $this->print_status_messages($messages);
                 } else {
@@ -922,6 +927,7 @@ class UserApp extends CustomApp {
 
             $this->print_file("{$templates_dir}/body.html", "body");
             break;
+        
         case "delete":
             $this->delete_db_object(array(
                 "obj" => $news_article,
@@ -1013,9 +1019,9 @@ class UserApp extends CustomApp {
                  "templates_dir" => "{$templates_dir}/newsletters",
                  "template_var" => "newsletters",
                  "obj" => $newsletter,
+                 "default_order_by" => array("sent_date DESC"),    
                  "filter_form.visible" => true,
                  "context" => "newsletters_list_item",
-                 "default_order_by" => array("sent_date DESC"),    
              )
         );
         $newsletters_list->print_values();
@@ -1057,10 +1063,12 @@ class UserApp extends CustomApp {
         switch ($command) {
         case "":
         case "update":
-            if ($command == "update") {
-                $newsletter->read();
+            $context = "newsletter_edit";
 
-                $messages = $newsletter->validate();
+            if ($command == "update") {
+                $newsletter->read($context);
+
+                $messages = $newsletter->validate($context);
                 if (count($messages) != 0) {
                     $this->print_status_messages($messages);
                 } else {
@@ -1128,7 +1136,7 @@ class UserApp extends CustomApp {
                     "templates_dir" => "{$templates_dir}/newsletter_editor",
                     "template_var" => "newsletter_editor",
                     "obj" => $newsletter,
-                    "context" => "newsletter_edit",
+                    "context" => $context,
                 )
             );
             $newsletter_editor->print_values();
@@ -1211,8 +1219,8 @@ class UserApp extends CustomApp {
                 "context" => "newsletter_categories_list_item",
             )
         );
-
         $newsletter_categories_list->print_values();
+
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
@@ -1225,10 +1233,12 @@ class UserApp extends CustomApp {
         switch ($command) {
         case "":
         case "update":
-            if ($command == "update") {
-                $newsletter_category->read();
+            $context = "newsletter_category_edit";
 
-                $messages = $newsletter_category->validate();
+            if ($command == "update") {
+                $newsletter_category->read($context);
+
+                $messages = $newsletter_category->validate($context);
                 if (count($messages) != 0) {
                     $this->print_status_messages($messages);
                 } else {
@@ -1247,16 +1257,19 @@ class UserApp extends CustomApp {
                     "templates_dir" => "{$templates_dir}/newsletter_category_editor",
                     "template_var" => "newsletter_category_editor",
                     "obj" => $newsletter_category,
-                    "context" => "newsletter_category_edit",
+                    "context" => $context,
                 )
             );
             $newsletter_category_editor->print_values();
+
             $this->print_file("{$templates_dir}/body.html", "body");
             break;
 
         case "activate_deactivate":
             $newsletter_category->activate_deactivate();
+
             $this->add_session_status_message(new OkStatusMsg("newsletter_category.updated"));
+            
             $this->create_self_redirect_response(array("action" => "newsletter_categories"));
             break;
         }
@@ -1282,6 +1295,7 @@ class UserApp extends CustomApp {
              )
         );
         $categories_to_subscribe_list->print_values();
+
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
@@ -1409,6 +1423,7 @@ class UserApp extends CustomApp {
             );
             $category_editor->print_values();
             break;
+        
         case "delete":
             if (!in_array($obj_name, array_keys($avail_obj_names))) {
                 break;
@@ -1430,6 +1445,7 @@ class UserApp extends CustomApp {
                 case "category1":
                     $suburl_params["current_category1_id"] = $prev_obj->id;
                     break;
+                
                 case "category2":
                     $suburl_params["current_category1_id"] =
                         $current_category_ids["current_category1_id"];
@@ -1437,6 +1453,7 @@ class UserApp extends CustomApp {
                         $suburl_params["current_category2_id"] = $prev_obj->id;
                     }
                     break;
+                
                 case "category3":
                     $suburl_params["current_category1_id"] =
                         $current_category_ids["current_category1_id"];
@@ -1453,6 +1470,7 @@ class UserApp extends CustomApp {
             
             $this->create_self_action_redirect_response($suburl_params);
             return;
+        
         case "move":
             if (!in_array($obj_name, array_keys($avail_obj_names))) {
                 break;
@@ -1508,6 +1526,7 @@ class UserApp extends CustomApp {
                     "category3_position ASC",
                 ),
                 "filter_form.visible" => true,
+                "context" => "products_list_item",
             )
         );
         $products_list->print_values();
@@ -1524,18 +1543,122 @@ class UserApp extends CustomApp {
         switch ($command) {
         case "":
         case "update":
+            $context = "product_edit";
+                
             if ($command == "update") {
-                $product->read();
+                $product->read($context);
 
-                $messages = $product->validate();
+                $messages = $product->validate($context);
                 if (count($messages) != 0) {
                     $this->print_status_messages($messages);
                 } else {
                     $this->print_status_message_db_object_updated($product);
 
+                    $this->process_uploaded_image(
+                        $product,
+                        "primary_image_id",
+                        "primary_image_file",
+                        array(
+                            "image_processor.class" => $this->get_config_value("image_processor"),
+                            "image_processor.actions" => array(
+                                array(
+                                    "name" => "crop_and_resize",
+                                    "width" => $this->get_config_value(
+                                        "product_primary_image_width"
+                                    ),
+                                    "height" => $this->get_config_value(
+                                        "product_primary_image_height"
+                                    ),
+                                ),
+                            ),
+                            "is_thumbnail" => 0,
+                        )
+                    );
+                    $this->process_uploaded_image(
+                        $product,
+                        "primary_thumbnail_image_id",
+                        "primary_image_file",
+                        array(
+                            "image_processor.class" => $this->get_config_value("image_processor"),
+                            "image_processor.actions" => array(
+                                array(
+                                    "name" => "crop_and_resize",
+                                    "width" => $this->get_config_value(
+                                        "product_primary_thumbnail_image_width"
+                                    ),
+                                    "height" => $this->get_config_value(
+                                        "product_primary_thumbnail_image_height"
+                                    ),
+                                ),
+                            ),
+                            "is_thumbnail" => 1,
+                        )
+                    );
+                    
                     $product->save();
 
-                    $this->create_self_redirect_response(array("action" => "products"));
+                    $product_image =& $this->create_db_object("ProductImage");
+                    $product_image->product_id = $product->id;
+
+                    if (was_file_uploaded("image_file")) {
+                        $this->process_uploaded_image(
+                            $product_image,
+                            "image_id",
+                            "image_file",
+                            array(
+                                "image_processor.class" => $this->get_config_value(
+                                    "image_processor"
+                                ),
+                                "image_processor.actions" => array(
+                                    array(
+                                        "name" => "crop_and_resize",
+                                        "width" => $this->get_config_value(
+                                            "product_image_width"
+                                        ),
+                                        "height" => $this->get_config_value(
+                                            "product_image_height"
+                                        ),
+                                    ),
+                                ),
+                                "is_thumbnail" => 0,
+                            )
+                        );
+                        $this->process_uploaded_image(
+                            $product_image,
+                            "thumbnail_image_id",
+                            "image_file",
+                            array(
+                                "image_processor.class" => $this->get_config_value(
+                                    "image_processor"
+                                ),
+                                "image_processor.actions" => array(
+                                    array(
+                                        "name" => "crop_and_resize",
+                                        "width" => $this->get_config_value(
+                                            "product_thumbnail_image_width"
+                                        ),
+                                        "height" => $this->get_config_value(
+                                            "product_thumbnail_image_height"
+                                        ),
+                                    ),
+                                ),
+                                "is_thumbnail" => 1,
+                            )
+                        );
+                        $product_image->save();
+                    }
+
+                    $next_page = (string) param("next_page");
+                    if ($next_page == "products") {
+                        $this->create_self_redirect_response(array(
+                            "action" => "products",
+                        ));
+                    } else {
+                        $this->create_self_action_redirect_response(array(
+                            "action" => "product_edit",
+                            "product_id" => $product->id,
+                        ));
+                    }
                     break;
                 }
             }
@@ -1546,17 +1669,52 @@ class UserApp extends CustomApp {
                     "templates_dir" => "{$templates_dir}/product_editor",
                     "template_var" => "product_editor",
                     "obj" => $product,
+                    "context" => $context,
                 )
             );
             $product_editor->print_values();
   
             $this->print_file("{$templates_dir}/body.html", "body");
             break;
+  
         case "delete":
             $this->delete_db_object(array(
                 "obj" => $product,
                 "success_url_params" => array("action" => "products"),
                 "error_url_params" => array("action" => "products"),
+            ));
+            break;
+
+        case "delete_primary_image":
+            $this->delete_db_object_image($product, "primary_image_id");
+            
+            $this->add_session_status_message(new OkStatusMsg("product.primary_image_deleted"));
+
+            $this->create_self_action_redirect_response(array(
+                "product_id" => $product->id,
+            ));
+            break;
+
+        case "delete_image":
+            $product_image =& $this->read_id_fetch_db_object("ProductImage");
+            
+            if (
+                !$product->is_definite() ||
+                !$product_image->is_definite() ||
+                $product_image->product_id != $product->id
+            ) {
+                $this->create_self_redirect_response(array(
+                    "action" => "products",
+                ));
+                break;
+            }
+            
+            $product_image->del();
+            
+            $this->add_session_status_message(new OkStatusMsg("product.image_deleted"));
+
+            $this->create_self_action_redirect_response(array(
+                "product_id" => $product->id,
             ));
             break;
         }

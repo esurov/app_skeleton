@@ -6,40 +6,56 @@
     action="?action=product_edit&amp;product_id={%product.id%}"
     method="post"
     name="form"
+    enctype="multipart/form-data"
 >
     
     <input type="hidden" name="command" value="update" />
+    <input type="hidden" name="next_page" value="" />
 
     <table>
-        <tr>
-            <td>{%global:product.category1%}:{%global:_required_field%}</td>
-            <td>{%product.category2_category1_id.input%}</td>
-        </tr>
-        <tr>
-            <td>{%global:product.category2%}:{%global:_required_field%}</td>
-            <td>{%product.category3_category2_id.input%}</td>
-        </tr>
-        <tr>
-            <td>{%global:product.category3%}:{%global:_required_field%}</td>
-            <td>{%product.category3_id.input%}</td>
-        </tr>
-        <tr>
-            <td>{%global:product.name%}:{%global:_required_field%}</td>
-            <td>{%product.name.input%}</td>
-        </tr>
-        <tr>
-            <td>{%global:product.description%}:</td>
-            <td>{%product.description.input%}</td>
-        </tr>
-        <tr>
-            <td>{%global:product.price%}:</td>
-            <td>{%product.price.input%}</td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <input type="submit" name="submit_btn" value="{%global:save%}" />
-            </td>
-        </tr>
+        <tbody>
+            <tr>
+                <td>{%global:product.category1%}:{%global:_required_field%}</td>
+                <td>{%product.category2_category1_id.input%}</td>
+            </tr>
+            <tr>
+                <td>{%global:product.category2%}:{%global:_required_field%}</td>
+                <td>{%product.category3_category2_id.input%}</td>
+            </tr>
+            <tr>
+                <td>{%global:product.category3%}:{%global:_required_field%}</td>
+                <td>{%product.category3_id.input%}</td>
+            </tr>
+            <tr>
+                <td>{%global:product.name%}:{%global:_required_field%}</td>
+                <td>{%product.name.input%}</td>
+            </tr>
+            <tr>
+                <td>{%global:product.description%}:</td>
+                <td>{%product.description.input%}</td>
+            </tr>
+            <tr>
+                <td>{%global:product.price%}:</td>
+                <td>{%product.price.input%}</td>
+            </tr>
+            <tr>
+                <td>{%global:product.current_primary_image%}:</td>
+                <td>{%product.primary_image%}</td>
+            </tr>
+            <tr>
+                <td>{%global:product.upload_new_primary_image%}:{%global:_required_field%}</td>
+                <td><input type="file" name="primary_image_file" /></td>
+            </tr>
+            {%product.images%}
+            <tr>
+                <td colspan="2">
+                    <input type="submit" name="submit_btn" value="{%global:save%}"
+                        onclick="setElementValue(this.form.next_page, ''); return true;" />
+                    <input type="submit" name="submit_btn2" value="{%global:save_and_products%}"
+                        onclick="setElementValue(this.form.next_page, 'products'); return true;" />
+                </td>
+            </tr>
+        </tbody>
     </table>
 
 </form>
@@ -53,4 +69,17 @@
 
 <script type="text/javascript">
     {%product.client_validation_js%}
+</script>
+
+<script type="text/javascript">
+    // Disabling second button too if all is ok
+    document.forms['form'].onsubmit = function() {
+        var form = document.forms['form'];
+        if (onsubmitValidateFormHandler(form)) {
+            form.submit_btn2.disabled = true;
+            return true;
+        } else {
+            return false;
+        }
+    }
 </script>

@@ -51,6 +51,18 @@ class ProductTable extends CustomDbObject {
             "field" => "price",
             "type" => "currency",
         ));
+
+        $this->insert_field(array(
+            "field" => "primary_image_id",
+            "type" => "foreign_key",
+            "read" => 0,
+        ));
+
+        $this->insert_field(array(
+            "field" => "primary_thumbnail_image_id",
+            "type" => "foreign_key",
+            "read" => 0,
+        ));
 //
         $this->insert_join(array(
             "type" => "left",
@@ -233,6 +245,18 @@ class ProductTable extends CustomDbObject {
         ));
     }
 //
+    function del() {
+        $this->del_image("primary_image_id");
+        $this->del_image("primary_thumbnail_image_id");
+
+        $product_images = $this->fetch_product_images();
+        foreach ($product_images as $product_image) {
+            $product_image->del();
+        }
+
+        parent::del();
+    }
+//
     function get_validate_conditions($context, $context_params) {
         return array(
             array(
@@ -259,6 +283,104 @@ class ProductTable extends CustomDbObject {
                 "message" => "product.name_empty",
             ),
         );
+    }
+
+    function validate($context = null, $context_params = array()) {
+        $messages = parent::validate($context, $context_params);
+
+        if (was_file_uploaded("primary_image_file")) {
+            $this->validate_condition(
+                $messages,
+                array(
+                    "field" => "primary_image_id",
+                    "type" => "uploaded_file_types",
+                    "param" => array(
+                        "input_name" => "primary_image_file",
+                        "type" => "images",
+                    ),
+                    "message" => "product.primary_image_bad",
+                )
+            );
+        } else {
+            $orig_image_id = $this->get_orig_field_value("primary_image_id");
+            if ($orig_image_id == 0) {
+                $messages[] = new ErrorStatusMsg("product.primary_image_empty");
+            }
+        }
+
+        if (was_file_uploaded("image_file")) {
+            $this->validate_condition(
+                $messages,
+                array(
+                    "field" => "image_id",
+                    "type" => "uploaded_file_types",
+                    "param" => array(
+                        "input_name" => "image_file",
+                        "type" => "images",
+                    ),
+                    "message" => "product.image_bad",
+                )
+            );
+        } else {
+            if ($this->get_num_product_images() == 0) {
+                $messages[] = new ErrorStatusMsg("product.image_empty");
+            }
+        }
+            
+        return $messages;
+    }
+//
+    function print_values($params = array()) {
+        parent::print_values($params);
+
+        if ($this->_context == "products_list_item") {
+            $this->app->print_db_object_info(
+                $this->app->fetch_image_without_content($this->primary_thumbnail_image_id),
+                $this->_templates_dir,
+                "{$this->_template_var_prefix}.primary_thumbnail_image",
+                "_primary_thumbnail_image.html",
+                "_primary_thumbnail_image_empty.html"
+            );
+        }
+
+        if ($this->_context == "product_edit") {
+            $this->app->print_db_object_info(
+                $this->app->fetch_image_without_content($this->primary_image_id),
+                $this->_templates_dir,
+                "{$this->_template_var_prefix}.primary_image",
+                "_primary_image.html",
+                "_primary_image_empty.html"
+            );
+
+            $product_images_list =& $this->create_object(
+                "ObjectsList",
+                array(
+                    "templates_dir" => "{$this->_templates_dir}/images",
+                    "template_var" => "product.images",
+                    "template_var_prefix" => "product.image",
+                    "objects" => $this->fetch_product_images(),
+                    "context" => "product_edit_list_item",
+                )
+            );
+            $product_images_list->print_values();
+        }
+    }
+//
+    function fetch_product_images() {
+        if (!$this->is_definite()) {
+            return array();
+        }
+
+        $query_ex = new SelectQueryEx(array(
+            "where" => "product_image.product_id = {$this->id}",
+            "order_by" => "product_image.id ASC",
+        ));
+
+        return $this->fetch_db_objects_list("ProductImage", $query_ex);
+    }
+
+    function get_num_product_images() {
+        return count($this->fetch_product_images());
     }
 
 }

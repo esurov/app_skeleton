@@ -11,6 +11,7 @@ return array(
     "global:filter_by" => "Filter by",
     "global:no_records_found" => "No records found",
     "global:no_image" => "No image uploaded",
+    "global:no_images" => "No images uploaded",
     "global:no_file" => "No file uploaded",
     "global:sure_delete.js" => get_js_safe_string("Are you sure you want to delete record?"),
 
@@ -55,6 +56,7 @@ return array(
     "global:notes" => "Notes",
     "global:description" => "Description",
     "global:extra_info" => "Extra info",
+    "global:thumbnail" => "Thumbnail",
     "global:image" => "Image",
     "global:file" => "File",
     "global:first_name" => "First Name",
@@ -91,6 +93,7 @@ return array(
     "global:status" => "Status",
     "global:price" => "Price",
     "global:current_image" => "Current image",
+    "global:current_images" => "Current images",
     "global:upload_new_image" => "Upload new image",
     "global:current_file" => "Current file",
     "global:upload_new_file" => "Upload new file",
@@ -139,6 +142,7 @@ return array(
     "global:delete_image" => "Delete image",
     "global:delete_file" => "Delete file",
     "global:activate_deactivate" => "Activate/Deactivate",
+    "global:save_and_products" => "Save and View products",
 
     // Users
     "global:user.add" => "Add user",
@@ -239,5 +243,9 @@ return array(
     "global:product.price" => "Price",
     "global:product.category" => "Category",
     "global:product.keywords" => "Keywords",
+    "global:product.primary_thumbnail_image" => "Primary image",
+    "global:product.current_primary_image" => "Current primary image",
+    "global:product.upload_new_primary_image" => "Upload new primary image",
+    "global:product.upload_new_image" => "Upload new image",
 );
 ?>
