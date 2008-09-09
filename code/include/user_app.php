@@ -1717,6 +1717,27 @@ class UserApp extends CustomApp {
                 "product_id" => $product->id,
             ));
             break;
+
+        case "move_image":
+            $product_image =& $this->read_id_fetch_db_object("ProductImage");
+            
+            if (
+                !$product->is_definite() ||
+                !$product_image->is_definite() ||
+                $product_image->product_id != $product->id
+            ) {
+                $this->create_self_redirect_response(array(
+                    "action" => "products",
+                ));
+                break;
+            }
+
+            $product_image->update_position((string) param("to"));
+
+            $this->create_self_action_redirect_response(array(
+                "product_id" => $product->id,
+            ));
+            break;
         }
     }
 

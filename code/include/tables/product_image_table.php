@@ -1,6 +1,6 @@
 <?php
 
-class ProductImageTable extends CustomDbObject {
+class ProductImageTable extends OrderedDbObject {
     
     function _init($params) {
         parent::_init($params);
@@ -52,6 +52,10 @@ class ProductImageTable extends CustomDbObject {
                 null
             );
         }
+    }
+//
+    function get_position_where_str() {
+        return "product_id = {$this->product_id}";
     }
 
 }

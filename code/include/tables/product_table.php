@@ -373,7 +373,7 @@ class ProductTable extends CustomDbObject {
 
         $query_ex = new SelectQueryEx(array(
             "where" => "product_image.product_id = {$this->id}",
-            "order_by" => "product_image.id ASC",
+            "order_by" => "product_image.position ASC",
         ));
 
         return $this->fetch_db_objects_list("ProductImage", $query_ex);
