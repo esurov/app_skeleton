@@ -265,7 +265,7 @@ class UserApp extends CustomApp {
     }
 
     function action_admin_home() {
-        $this->create_self_redirect_response(array("action" => "users"));
+        $this->create_self_redirect_response(array("action" => "users_admin"));
     }
 //
     function action_login() {
