@@ -1,0 +1,21 @@
+<script type="text/javascript" src="{%sys:yui_url%}container/container_core{%sys:yui_debug_suffix%}.js"></script>
+<script type="text/javascript" src="{%sys:yui_url%}menu/menu{%sys:yui_debug_suffix%}.js"></script>
+<link rel="stylesheet" type="text/css" href="{%sys:yui_url%}menu/assets/menu.css" />
+
+<div id="menu" class="yuimenubar yuimenubarnav">
+    <div class="bd">
+        <ul>
+            {%menu_items%}
+        </ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+    new YAHOO.widget.MenuBar(
+        'menu',
+        {
+            autosubmenudisplay: true,
+            hidedelay: 750
+        }
+    ).render();
+</script>

@@ -5,11 +5,12 @@ class Menu extends TemplateComponent {
     var $name;
     var $template_name;
     var $item_template_name;
-    var $item_selected_template_name;
+    var $item_selected_template_name = "";
     var $item_delimiter_template_name = "";
     var $item_has_sub_menu_template_name = "";
     var $print_delimiter_before_selected_item = true;
     var $print_delimiter_after_selected_item = true;
+    var $print_sub_menu_always = false;
 
     var $items = array();
 
@@ -56,6 +57,10 @@ class Menu extends TemplateComponent {
         return $result_item;
     }
 //
+    function get_sub_menu_template_var() {
+        return "sub_{$this->template_var}";
+    }
+//
     function load_from_xml($xml_filename) {
         $this->app->page->verbose_turn_off();
         $xml_file_content = $this->app->print_file_if_exists(
@@ -83,9 +88,13 @@ class Menu extends TemplateComponent {
                 continue;
             }
         
-            if ($menu_item->is_selected) {
+            if ($menu->print_sub_menu_always || $menu_item->is_selected) {
                 if ($menu_item->has_sub_menu()) {
                     $this->print_menu_items($menu_item->sub_menu);
+                } else {
+                    if ($menu->print_sub_menu_always) {
+                        $this->app->print_raw_value($menu->get_sub_menu_template_var(), "");
+                    }
                 }
                 $item_template_name = $menu_item->item_selected_template_name;
             } else {
@@ -224,7 +233,7 @@ class MenuXml extends XML {
                 $menu = new Menu($this->current_menu->app);
                 $menu->parent_menu =& $this->current_menu;
                 $menu->templates_dir = $menu->parent_menu->templates_dir;
-                $menu->template_var = "sub_{$menu->parent_menu->template_var}";
+                $menu->template_var = $menu->parent_menu->get_sub_menu_template_var();
 
                 $this->current_menu =& $menu;
                 $this->current_menu_item->sub_menu =& $menu;
@@ -240,7 +249,7 @@ class MenuXml extends XML {
             $menu->item_selected_template_name = get_param_value(
                 $attributes,
                 "item_selected_template",
-                ""
+                $menu->item_template_name
             );
             $menu->item_delimiter_template_name = get_param_value(
                 $attributes,
@@ -266,6 +275,14 @@ class MenuXml extends XML {
             );
             $menu->print_delimiter_after_selected_item =
                 ($print_delimiter_after_selected_item_str == "true") ? true : false;
+
+            $print_sub_menu_always_str = get_param_value(
+                $attributes,
+                "print_sub_menu_always",
+                "false"
+            );
+            $menu->print_sub_menu_always =
+                ($print_sub_menu_always_str == "true") ? true : false;
             break;
         case "menu_item":
             $menu_item = new MenuItem();

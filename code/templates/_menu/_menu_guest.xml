@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!--
     Optional attributes with default values for <menu>:
+    item_selected_template=menu->item_template
     item_delimiter_template=""
     item_has_sub_menu_template=""
     print_delimiter_before_selected_item="true"
     print_delimiter_after_selected_item="true"
+    print_sub_menu_always="false"
 
     Optional attributes with default values for <menu_item>:
     item_template=owner_menu->item_template
-    item_current_template=owner_menu->item_current_template
+    item_selected_template=owner_menu->item_selected_template
     is_html="true"
     contexts=""
 -->
+<!--
 <menu
     name="guest_menu"
     template="menu.html"
@@ -21,6 +24,14 @@
     item_has_sub_menu_template="menu_item_has_sub_menu.html"
     print_delimiter_before_selected_item="false"
     print_delimiter_after_selected_item="false"
+>
+-->
+<menu
+    name="guest_menu"
+    template="yui_menu/menu.html"
+    item_template="yui_menu/menu_item.html"
+    item_selected_template="yui_menu/menu_item_selected.html"
+    print_sub_menu_always="true"
 >
     <menu_item
         name="index"
@@ -41,6 +52,7 @@
         name="sample_static_pages"
         url="?action=static&amp;page=sample_page1"
     >
+<!--
         <menu
             name="guest_sub_menu"
             template="sub_menu.html"
@@ -48,6 +60,13 @@
             item_selected_template="sub_menu_item_selected.html"
             item_delimiter_template="sub_menu_item_delimiter.html"
             item_has_sub_menu_template="menu_item_has_sub_menu.html"
+        >
+-->
+        <menu
+            name="guest_sub_menu"
+            template="yui_menu/sub_menu.html"
+            item_template="yui_menu/sub_menu_item.html"
+            print_sub_menu_always="true"
         >
             <menu_item
                 name="sample_static_page1"
@@ -63,15 +82,23 @@
                 name="sample_popup"
                 url="javascript:void(openWindow('?action=static&amp;page=sample_page1&amp;popup=1', 600, 500, 'yes', ''));"
             />
+<!--
             <menu_item
                 name="sample_new_window"
                 item_template="sub_menu_item_sample_new_window.html"
+                url="?action=static&amp;page=sample_page1"
+            />
+-->
+            <menu_item
+                name="sample_new_window"
+                item_template="yui_menu/sub_menu_item_sample_new_window.html"
                 url="?action=static&amp;page=sample_page1"
             />
             <menu_item
                 name="sample_static_pages2"
                 url="?action=static&amp;page=sample_page2_1"
             >
+<!--
                 <menu
                     name="guest_sub_sub_menu"
                     template="sub_sub_menu.html"
@@ -79,6 +106,12 @@
                     item_selected_template="sub_sub_menu_item_selected.html"
                     item_delimiter_template="sub_sub_menu_item_delimiter.html"
                     item_has_sub_menu_template="menu_item_has_sub_menu.html"
+                >
+-->
+                <menu
+                    name="guest_sub_sub_menu"
+                    template="yui_menu/sub_sub_menu.html"
+                    item_template="yui_menu/sub_sub_menu_item.html"
                 >
                     <menu_item
                         name="sample_static_page2_1"
