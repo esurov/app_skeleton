@@ -133,6 +133,7 @@ class UserApp extends CustomApp {
         
         $this->print_lang_menu();
         $this->print_login_state();
+        $this->init_yui_core();
     }
 
     function print_login_state() {
@@ -144,6 +145,31 @@ class UserApp extends CustomApp {
             $template_name = "_logged_in.html";
         }
         $this->print_file_new("_login_state/{$template_name}", "login_state");
+    }
+
+    function init_yui_core() {
+        $templates_dir = "_global/yui/init_core";
+
+        $this->init_sys_var("yui_debug", ($this->get_log_debug_level() >= DL_DEBUG));
+        $this->init_sys_var("yui_url", create_self_url() . "yui/");
+
+        if ($this->yui_debug) {
+            $this->print_file(
+                "{$templates_dir}/_core_js_debug.html",
+                "_core_js"
+            );
+        } else {
+            $this->print_file(
+                "{$templates_dir}/_core_js.html",
+                "_core_js"
+            );
+        }
+        $this->print_raw_value(
+            "sys:yui_debug_suffix",
+            $this->yui_debug ? "" : "-min"
+        );
+
+        $this->print_file("{$templates_dir}/init_yui_js.html", "init_yui_core_js");
     }
 
     function run_access_denied_action() {
