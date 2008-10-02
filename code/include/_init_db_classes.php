@@ -70,7 +70,7 @@ $db_classes["classes"] = array(
     ),
     "ProductImage" => array(
         "filename" => "product_image_table.php",
-        "required_classes" => array("CustomDbObject"),
+        "required_classes" => array("OrderedDbObject"),
         "params" => array("table_name" => "product_image", "create" => true),
     ),
 
