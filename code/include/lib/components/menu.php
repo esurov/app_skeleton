@@ -96,10 +96,11 @@ class Menu extends TemplateComponent {
                         $this->app->print_raw_value($menu->get_sub_menu_template_var(), "");
                     }
                 }
-                $item_template_name = $menu_item->item_selected_template_name;
-            } else {
-                $item_template_name = $menu_item->item_template_name;
             }
+            $item_template_name = ($menu_item->is_selected) ?
+                $menu_item->item_selected_template_name :
+                $menu_item->item_template_name;
+
             $caption = $menu_item->caption;
             if (is_null($caption)) {
                 $caption_resource = "{$menu->name}_item.{$menu_item->name}";

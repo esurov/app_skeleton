@@ -1,0 +1,158 @@
+/* MenuBar style rules */
+
+.yuimenubar {
+
+    background: #dcdcdc;
+    border-bottom: 1px solid #ffffff;
+    border-top: 1px solid #ffffff;
+    
+}
+
+
+
+/* Menu style rules */
+
+.yuimenu {
+
+    background: #dcdcdc;
+    border: solid 1px #fff;
+    padding: 0;
+    
+}
+
+
+.yuimenu ul {
+
+    border: 0;
+    padding: 0;
+
+}
+
+
+/* MenuItem and MenuBarItem styles */
+
+.yuimenuitem {
+
+    /*
+        For IE: Used to collapse superfluous white space between <li> elements
+        that is triggered by the "display" property of the <a> elements being
+        set to "block."
+    */
+
+    *border-bottom: solid 1px #f6f7ee;
+
+}
+
+.yuimenubaritem {
+
+    border-right: 1px solid #ffffff;
+
+}
+
+.yuimenuitemlabel,
+.yuimenubaritemlabel {
+
+    padding: 6px 20px;
+    color: #3f4447;
+    text-decoration: none;
+
+}
+
+.yuimenuitemlabel {
+
+    padding: 2px 24px;
+    
+}
+
+.yuimenubaritemlabel {
+
+    padding: 4px 24px;
+
+}
+
+a.yuimenuitemlabel,
+a.yuimenubaritemlabel {
+
+    padding: 6px 20px;
+    color: #3f4447;
+    text-decoration: none;
+
+}
+
+a:visited.yuimenuitemlabel,
+a:visited.yuimenubaritemlabel {
+
+    color: #3f4447;
+
+}
+
+a:hover.yuimenuitemlabel,
+a:hover.yuimenubaritemlabel {
+
+    color: #1c1f20;
+
+}
+
+.yuimenubar li.first-of-type .yuimenubaritemlabel {
+
+    border-width: 0;
+
+}
+
+.yuimenubaritem-hassubmenu {
+
+    background: url(menubaritem_submenuindicator.png) right center no-repeat;
+
+}
+
+.yuimenuitem-hassubmenu {
+
+    background: url(menuitem_submenuindicator.png) right center no-repeat;
+
+}
+
+
+/* MenuItem states */
+
+
+/* Selected MenuItem */
+
+.yuimenubaritem-selected,
+.yuimenuitem-selected {
+
+    background-color: #e8e8e8;
+
+}
+
+.yuimenubaritemlabel-selected,
+.yuimenuitemlabel-selected {
+
+}
+
+.yuimenubaritem-hassubmenu-selected {
+
+    background-image: url(menubaritem_submenuindicator_selected.png);
+
+}
+
+.yuimenuitem-hassubmenu-selected {
+
+    background-image: url(menuitem_submenuindicator_selected.png);
+
+}
+
+.yuimenuitem-checked-selected {
+
+    background-image: url(menuitem_checkbox_selected.png);
+
+}
+
+
+/* Current MenuItem */
+
+.yuimenubaritem-current,
+.yuimenuitem-current {
+
+    background-color: #ffffff;
+
+}

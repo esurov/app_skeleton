@@ -66,6 +66,7 @@
             name="guest_sub_menu"
             template="yui_menu/sub_menu.html"
             item_template="yui_menu/sub_menu_item.html"
+            item_selected_template="yui_menu/sub_menu_item_selected.html"
             print_sub_menu_always="true"
         >
             <menu_item
@@ -112,6 +113,7 @@
                     name="guest_sub_sub_menu"
                     template="yui_menu/sub_sub_menu.html"
                     item_template="yui_menu/sub_sub_menu_item.html"
+                    item_selected_template="yui_menu/sub_sub_menu_item_selected.html"
                 >
                     <menu_item
                         name="sample_static_page2_1"
