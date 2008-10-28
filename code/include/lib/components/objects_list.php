@@ -275,6 +275,7 @@ class PagedQueryObjectsList extends QueryObjectsList {
         $this->app->print_values(array(
             "action.suburl" => create_suburl($this->_action_suburl_params),
             "filters.suburl" => create_suburl($this->_filters_suburl_params),
+            "order_by.suburl" => create_suburl($this->_order_by_suburl_params),
             "action_filters.suburl" => create_suburl($this->_action_filters_suburl_params),
             "action_filters_order_by.suburl" => create_suburl(
                 $this->_action_filters_order_by_suburl_params

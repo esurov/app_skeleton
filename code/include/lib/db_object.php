@@ -642,27 +642,43 @@ class DbObject extends AppObject {
     }
 
     function get_nonset_filter_value($filter_info) {
-        if (isset($filter_info["input"]["values"]["data"]["nonset_value_caption_pair"])) {
-            $nonset_value_caption_pair =
-                $filter_info["input"]["values"]["data"]["nonset_value_caption_pair"];
-            $nonset_value = get_value_from_value_caption_pair($nonset_value_caption_pair);
+        $filter_relation = $filter_info["relation"];
+        if ($filter_relation == "equal_many") {
+            $nonset_value = array();
         } else {
-            $nonset_value = "";
+            if (isset($filter_info["input"]["values"]["data"]["nonset_value_caption_pair"])) {
+                $nonset_value = get_value_from_value_caption_pair(
+                    $filter_info["input"]["values"]["data"]["nonset_value_caption_pair"]
+                );
+            } else {
+                $nonset_value = "";
+            }
         }
         return $nonset_value;
     }
 
-    function has_nonset_filters() {
-        $result = false;
-        foreach ($this->_filters as $filter_info) {
-            $filter_value = $filter_info["value"];
-            $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
+    function is_filter_nonset($filter_info) {
+        $filter_value = $filter_info["value"];
+        $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
+        if (is_array($filter_value)) {
+            if ($filter_value == $nonset_filter_value) {
+                return true;
+            }
+        } else {
             if ((string) $filter_value == (string) $nonset_filter_value) {
-                $result = true;
-                break;
+                return true;
             }
         }
-        return $result;
+        return false;
+    }
+
+    function has_nonset_filters() {
+        foreach ($this->_filters as $filter_info) {
+            if ($this->is_filter_nonset($filter_info)) {
+                return true;
+            }
+        }
+        return false;
     }
 //
     function insert_select_from($select_from = null) {
@@ -1311,15 +1327,20 @@ class DbObject extends AppObject {
         }
 
         $param_name = "{$input_name_prefix}_{$filter_name}_{$filter_relation}";
-        $param_sent_name = "__sent_{$param_name}";
-        $param_value = param($param_name);
+        
+        if ($filter_relation == "equal_many") {
+            $filter_info["value"] = param_array($param_name);
+        } else {
+            $param_sent_name = "__sent_{$param_name}";
+            $param_value = param($param_name);
 
-        // Hack: For boolean values represented by HTML checkbox
-        if (!is_null(param($param_sent_name))) {
-            $param_value = $this->app->read_boolean_value($param_name);
-        }
-        if (!is_null($param_value)) {
-            $filter_info["value"] = $param_value;
+            // Hack: For boolean values represented by HTML checkbox
+            if (!is_null(param($param_sent_name))) {
+                $param_value = $this->app->read_boolean_value($param_name);
+            }
+            if (!is_null($param_value)) {
+                $filter_info["value"] = $param_value;
+            }
         }
     }
 
@@ -1333,8 +1354,7 @@ class DbObject extends AppObject {
 
     function get_filter_query_ex($filter_info) {
         $filter_value = $filter_info["value"];
-        $nonset_filter_value = $this->get_nonset_filter_value($filter_info);
-        if ((string) $filter_value == (string) $nonset_filter_value) {
+        if ($this->is_filter_nonset($filter_info)) {
             $filter_query_ex = array();
         } else {
             $filter_name = $filter_info["name"];
@@ -1346,7 +1366,15 @@ class DbObject extends AppObject {
             }
             $type = $filter_info["type"];
 
-            $db_value = $this->app->get_db_value_by_type($filter_value, $type);
+            if (is_array($filter_value)) {
+                $filter_values = $filter_value;
+                $db_value = array();
+                foreach ($filter_values as $filter_value) {
+                    $db_value[] = $this->app->get_db_value_by_type($filter_value, $type);
+                }
+            } else {
+                $db_value = $this->app->get_db_value_by_type($filter_value, $type);
+            }
             
             // If filter has no 'select' (field select expression) take it
             // from field with filter's name
@@ -1392,6 +1420,19 @@ class DbObject extends AppObject {
             }
             $filter_query_ex["where"] = "(" . join(" OR ", $subwheres_or) . ")";
             break;
+        case "equal_many":
+            $relation_sign = $this->get_filter_relation_sign_by_relation($filter_relation);
+            if (is_array($db_value) && count($db_value) > 0) {
+                $subwheres_or = array();
+                $db_values = $db_value;
+                foreach ($db_values as $db_value) {
+                    $db_value_quoted = qw($db_value);
+                    $subwheres_or[] =
+                        "{$field_select_expression} {$relation_sign} {$db_value_quoted}";
+                }
+                $filter_query_ex["where"] = "(" . join(" OR ", $subwheres_or) . ")";
+            }
+            break;
         case "like":
         case "like_many":
             if ($filter_relation == "like") {
@@ -1435,6 +1476,7 @@ class DbObject extends AppObject {
     function get_filter_relation_sign_by_relation($filter_relation) {
         switch ($filter_relation) {
         case "equal":
+        case "equal_many":
         case "having_equal":
             $filter_relation_sign = "=";
             break;
@@ -1918,17 +1960,28 @@ class DbObject extends AppObject {
         if (is_null($input_name_prefix)) {
             $input_name_prefix = $this->_table_name;
         }
-        if (is_null($input_name_prefix)) {
+        if (is_null($input_name_suffix)) {
             $input_name_suffix = "";
         }
 
+        if (is_array($filter_value)) {
+            $input_name_suffix .= "[]";
+        }
+        
         $template_var = "{$template_var_prefix}.{$filter_name}.{$filter_relation}";
         $filter_input_name =
             "{$input_name_prefix}_{$filter_name}_{$filter_relation}{$input_name_suffix}";
 
-        $this->app->print_value($template_var, $filter_value);
-        $this->app->print_hidden_input_form_value($template_var, $filter_input_name, $filter_value);
-
+        // NB: Nothing printed when value is array
+        if (!is_array($filter_value)) {
+            $this->app->print_value($template_var, $filter_value);
+            $this->app->print_hidden_input_form_value(
+                $template_var,
+                $filter_input_name,
+                $filter_value
+            );
+        }
+        
         switch ($filter_input_type) {
         case "text":
             $this->app->print_text_input_form_value(
@@ -1948,6 +2001,16 @@ class DbObject extends AppObject {
                 1,
                 ($filter_value != 0),
                 $filter_input_attrs
+            );
+            break;
+        case "checkboxes":
+            $this->app->print_checkboxes_group_input_form_value(
+                $template_var,
+                $filter_input_name,
+                $filter_value,
+                $filter_input_attrs,
+                $values_info,
+                $alt_values_info
             );
             break;
         case "radio":
@@ -1970,8 +2033,8 @@ class DbObject extends AppObject {
                 $alt_values_info
             );
             break;
-        case "listbox":
-            $filter_input_attrs["multiple"] = null;
+        case "multiselect":
+            $filter_input_attrs["multiple"] = "multiple";
             $this->app->print_select_input_form_value(
                 $template_var,
                 $filter_input_name,

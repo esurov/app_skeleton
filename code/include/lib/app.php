@@ -1793,6 +1793,33 @@ class App extends AppObject {
         return $printed_value;
     }
 
+    function print_checkboxes_group_input_form_value(
+        $template_var,
+        $input_name,
+        $input_value,
+        $input_attrs,
+        $values_info,
+        $alt_values_info = null
+    ) {
+        $value_caption_pairs = $this->get_value_caption_pairs($values_info, $alt_values_info);
+
+        $values_data_info = get_param_value($values_info, "data", array());
+        $delimiter = get_param_value($values_data_info, "delimiter", "");
+
+        $printed_value = print_html_checkboxes_group(
+            $input_name,
+            $value_caption_pairs,
+            $input_value,
+            $input_attrs,
+            $delimiter
+        );
+        
+        $this->print_input_name($template_var, $input_name);
+        $this->print_raw_value("{$template_var}.input", $printed_value);
+        
+        return $printed_value;
+    }
+
     function print_radio_group_input_form_value(
         $template_var,
         $input_name,
@@ -1922,10 +1949,12 @@ class App extends AppObject {
     }
 //
     function get_value_caption_pairs($values_info, $alt_values_info = null) {
+        $values_data_info = get_param_value($values_info, "data", array());
+
         $value_caption_pairs = $this->get_value_caption_pairs_from_source($values_info);
         $value_caption_pairs = $this->expand_value_caption_pairs_with_begin_end(
             $value_caption_pairs,
-            $values_info["data"]
+            $values_data_info
         );
         
         if (!is_null($alt_values_info)) {
@@ -1933,7 +1962,7 @@ class App extends AppObject {
         }
         $value_caption_pairs = $this->expand_value_caption_pairs_with_nonset(
             $value_caption_pairs,
-            $values_info["data"]
+            $values_data_info
         );
         return $value_caption_pairs;
     }

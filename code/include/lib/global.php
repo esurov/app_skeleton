@@ -282,33 +282,44 @@ function print_html_select(
 }
 
 function print_html_select_options($value_caption_pairs, $current_value) {
-    if (is_array($current_value)) {
-//        $selected_value = get_multiple_selected_values(
-//            $value_caption_pairs, $current_values
-//        );
-    } else {
-        $selected_value = get_actual_current_value($value_caption_pairs, $current_value);
-    }
-
     $output = "";
-    foreach ($value_caption_pairs as $value_caption_pair) {
-        $value = get_value_from_value_caption_pair($value_caption_pair);
-        $caption = get_caption_from_value_caption_pair($value_caption_pair);
-        
-        $option_attrs = array();
-        if (!is_null($selected_value)) {
-            if (is_array($selected_value)) {
-                if (in_array($value, $selected_value)) {
+    
+    if (is_array($current_value)) {
+        $current_values = $current_value;
+        $actual_current_values = get_actual_current_values(
+            $value_caption_pairs,
+            $current_values
+        );
+        foreach ($value_caption_pairs as $value_caption_pair) {
+            $value = get_value_from_value_caption_pair($value_caption_pair);
+            $caption = get_caption_from_value_caption_pair($value_caption_pair);
+            
+            $option_attrs = array();
+            if (in_array($value, $actual_current_values)) {
+                $option_attrs[] = "selected";
+            }
+            $output .= print_html_select_option($value, $caption, $option_attrs);
+        }
+    } else {
+        $actual_current_value = get_actual_current_value(
+            $value_caption_pairs,
+            $current_value
+        );
+        if (!is_null($actual_current_value)) {
+            foreach ($value_caption_pairs as $value_caption_pair) {
+                $value = get_value_from_value_caption_pair($value_caption_pair);
+                $caption = get_caption_from_value_caption_pair($value_caption_pair);
+                
+                $option_attrs = array();
+                if ((string) $value == (string) $actual_current_value) {
                     $option_attrs[] = "selected";
                 }
-            } else {
-                if ((string) $value == (string) $selected_value) {
-                    $option_attrs[] = "selected";
-                }
+
+                $output .= print_html_select_option($value, $caption, $option_attrs);
             }
         }
-        $output .= print_html_select_option($value, $caption, $option_attrs);
     }
+
     return $output;
 }
 
@@ -317,6 +328,29 @@ function print_html_select_option($value, $caption, $attrs = array()) {
     $value_safe = get_html_safe_string($value);
     $caption_safe = get_html_safe_string($caption);
     return "<option value=\"{$value_safe}\"{$attrs_str}>{$caption_safe}</option>\n";
+}
+
+function print_html_checkboxes_group(
+    $name,
+    $value_caption_pairs,
+    $current_values,
+    $attrs = array(),
+    $delimiter = ""
+) {
+    $output = "";
+    $delimiter_str = "";
+    foreach ($value_caption_pairs as $value_caption_pair) {
+        $value = get_value_from_value_caption_pair($value_caption_pair);
+        $caption = get_caption_from_value_caption_pair($value_caption_pair);
+
+        $is_checked = (in_array($value, $current_values));
+
+        $output .= $delimiter_str;
+        $output .= print_html_checkbox($name, $value, $is_checked, $attrs);
+        $output .= get_html_safe_string($caption);
+        $delimiter_str = $delimiter;
+    }
+    return $output;
 }
 
 function print_html_radio_group(
@@ -370,16 +404,16 @@ function get_actual_current_value($value_caption_pairs, $current_value) {
     }
 }
 
-//function get_multiple_selected_values($value_caption_pairs, $current_values) {
-//    $values = get_values_from_value_caption_pairs($value_caption_pairs);
-//    $selected_values = array();
-//    foreach ($current_values as $current_value) {
-//        if (in_array($current_value, $values)) {
-//            $selected_values[] = $current_value;
-//        }
-//    }
-//    return $selected_values;
-//}
+function get_actual_current_values($value_caption_pairs, $current_values) {
+    $values = get_values_from_value_caption_pairs($value_caption_pairs);
+    $actual_current_values = array();
+    foreach ($current_values as $current_value) {
+        if (in_array($current_value, $values)) {
+            $actual_current_values[] = $current_value;
+        }
+    }
+    return $actual_current_values;
+}
 
 function get_html_attrs_str($attrs) {
     $attrs_str = "";
