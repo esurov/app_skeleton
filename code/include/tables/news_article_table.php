@@ -148,20 +148,20 @@ class NewsArticleTable extends CustomDbObject {
         ) {
             $title_short_len = $this->get_config_value("news_article_title_short_length");
             $this->app->print_varchar_value(
-                "news_article.title.short",
+                "{$this->_template_var_prefix}.title.short",
                 get_word_shortened_string(strip_tags($this->title), $title_short_len, "...")
             );
             
             $body_short_len = $this->get_config_value("news_article_body_short_length");
             $this->app->print_varchar_value(
-                "news_article.body.short",
+                "{$this->_template_var_prefix}.body.short",
                 get_word_shortened_string(strip_tags($this->body), $body_short_len, "...")
             );
 
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->thumbnail_image_id),
                 $this->_templates_dir,
-                "news_article.thumbnail_image",
+                "{$this->_template_var_prefix}.thumbnail_image",
                 "_thumbnail_image.html",
                 "_thumbnail_image_empty.html"
             );
@@ -170,7 +170,7 @@ class NewsArticleTable extends CustomDbObject {
                 $this->app->print_db_object_info(
                     $this->app->fetch_file_without_content($this->file_id),
                     $this->_templates_dir,
-                    "news_article.file_info",
+                    "{$this->_template_var_prefix}.file_info",
                     "_file_info.html",
                     "_file_info_empty.html"
                 );
@@ -184,14 +184,14 @@ class NewsArticleTable extends CustomDbObject {
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->image_id),
                 $this->_templates_dir,
-                "news_article.image",
+                "{$this->_template_var_prefix}.image",
                 "_image.html",
                 "_image_empty.html"
             );
             $this->app->print_db_object_info(
                 $this->app->fetch_file_without_content($this->file_id),
                 $this->_templates_dir,
-                "news_article.file_info",
+                "{$this->_template_var_prefix}.file_info",
                 "_file_info.html",
                 "_file_info_empty.html"
             );
