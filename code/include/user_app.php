@@ -251,6 +251,7 @@ class UserApp extends CustomApp {
         parent::init_page_template_lang_resources();
 
         $this->print_file("_global/required_field/body.html", "global:_required_field");
+        $this->print_raw_value("sys:current_year", date("Y"));
     }
 //
     function action_index() {
