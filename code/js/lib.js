@@ -105,7 +105,7 @@ function setElementValue(element, value) {
 
 function displayElement(element) {
     if (element != null) {
-        element.style.display = "inline";
+        element.style.display = "block";
     }
 }
 
