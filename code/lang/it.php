@@ -153,15 +153,12 @@ return array(
     "newsletters" => "!!newsletters",
 
     "admin_menu_item.newsletters" => "!!Newsletters",
-    "admin_sub_menu_item.newsletters" => "!!Newsletters",
-    "admin_sub_menu_item.newsletter_category" => "!!Newsletter categories",
-    "admin_sub_menu_item.newsletter_edit" => "!!Create newsletter",
+    "admin_newsletters_sub_menu_item.newsletters" => "!!Newsletters",
 
-    "page_title.newsletters" => "!!Newsletters",
-    "page_title.newsletter_view" => "!!View newsletter",
-    "page_title.newsletter_edit_new" => "!!Create newsletter",
-    "page_title.newsletter_edit" => "!!Edit newsletter",
-    "page_title.newsletter_categories" => "!!Newsletter categories",
+    "page_title.newsletters_admin" => "!!Newsletters",
+    "page_title.newsletter_view_admin" => "!!View newsletter",
+    "page_title.newsletter_edit_admin_new" => "!!Create newsletter",
+    "page_title.newsletter_edit_admin" => "!!Edit newsletter",
 
     "status_msg.newsletter.added" => "!!Newsletter sent",
     "status_msg.newsletter.updated" => "!!Newsletter updated",
@@ -185,11 +182,11 @@ return array(
     "newsletter_category" => "!!newsletter category",
     "newsletter_categorys" => "!!newsletter categories",
 
-    "admin_menu_item.newsletter_category" => "!!Newsletter categories",
+    "admin_newsletters_sub_menu_item.newsletter_categories" => "!!Newsletter categories",
 
-    "page_title.newsletter_categories" => "!!Newsletter categories",
-    "page_title.newsletter_category_edit_new" => "!!Add newsletter category",
-    "page_title.newsletter_category_edit" => "!!Edit category",
+    "page_title.newsletter_categories_admin" => "!!Newsletter categories",
+    "page_title.newsletter_category_edit_admin_new" => "!!Add newsletter category",
+    "page_title.newsletter_category_edit_admin" => "!!Edit category",
 
     "status_msg.newsletter_category.added" => "!!Newsletter category added",
     "status_msg.newsletter_category.updated" => "!!Newsletter category updated",

@@ -191,7 +191,7 @@ class NewsletterTable extends CustomDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        if ($this->_context == "newsletters_list_item") {
+        if ($this->_context == "newsletters_admin_list_item") {
             $title_short_len = $this->get_config_value("newsletter_title_short_length");
             $this->app->print_varchar_value(
                 "{$this->_template_var_prefix}.title.short",
@@ -216,8 +216,8 @@ class NewsletterTable extends CustomDbObject {
         }
         
         if (
-            $this->_context == "newsletter_view" ||
-            $this->_context == "newsletter_edit"
+            $this->_context == "newsletter_view_admin" ||
+            $this->_context == "newsletter_edit_admin"
         ) {
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->image_id),

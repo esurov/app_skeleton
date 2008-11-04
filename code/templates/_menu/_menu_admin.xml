@@ -31,11 +31,10 @@
     />
     <menu_item
         name="newsletters"
-        url="?action=newsletter_edit"
-        contexts="newsletters, newsletter_edit, newsletter_category, newsletter_category_edit"
+        url="?action=newsletters_admin"
     >
         <menu
-            name="admin_sub_menu"
+            name="admin_newsletters_sub_menu"
             template="sub_menu.html"
             item_template="sub_menu_item.html"
             item_selected_template="sub_menu_item_selected.html"
@@ -43,29 +42,24 @@
             item_has_sub_menu_template="menu_item_has_sub_menu.html"
         >
             <menu_item
-                name="newsletter_edit"
-                url="?action=newsletter_edit"
-                contexts="newsletter_edit"
-            />
-            <menu_item
                 name="newsletters"
-                url="?action=newsletters"
-                contexts="newsletters, newsletter_view"
+                url="?action=newsletters_admin"
+                contexts="newsletters_admin, newsletter_view_admin, newsletter_edit_admin"
             />
             <menu_item
-                name="newsletter_category"
-                url="?action=newsletter_categories"
-                contexts="newsletter_categories, newsletter_category_edit"
+                name="newsletter_categories"
+                url="?action=newsletter_categories_admin"
+                contexts="newsletter_categories_admin, newsletter_category_edit_admin"
             />
         </menu>
     </menu_item>
     <menu_item
-        name="categories_admin"
+        name="categories"
         url="?action=categories_admin"
         contexts="categories_admin"
     />
     <menu_item
-        name="products_admin"
+        name="products"
         url="?action=products_admin"
         contexts="products_admin, product_edit_admin"
     />

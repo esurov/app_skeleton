@@ -51,13 +51,13 @@ class UserApp extends CustomApp {
             "news_article_edit_admin" => $a,
 
             // Newsletters
-            "newsletters" => $a,
-            "newsletter_view" => $a,
-            "newsletter_edit" => $a,
+            "newsletters_admin" => $a,
+            "newsletter_view_admin" => $a,
+            "newsletter_edit_admin" => $a,
 
             // Newsletter categories
-            "newsletter_categories" => $a,
-            "newsletter_category_edit" => $a,
+            "newsletter_categories_admin" => $a,
+            "newsletter_category_edit_admin" => $a,
 
             // User subscription
             "user_subscription" => $u,
@@ -1036,8 +1036,8 @@ class UserApp extends CustomApp {
         }
     }
 //
-    function action_newsletters() {
-        $templates_dir = "newsletters";
+    function action_newsletters_admin() {
+        $templates_dir = "newsletters_admin";
 
         $newsletter =& $this->create_db_object("Newsletter");
         $newsletters_list =& $this->create_object(
@@ -1048,7 +1048,7 @@ class UserApp extends CustomApp {
                  "obj" => $newsletter,
                  "default_order_by" => array("sent_date DESC"),    
                  "filter_form.visible" => true,
-                 "context" => "newsletters_list_item",
+                 "context" => "newsletters_admin_list_item",
              )
         );
         $newsletters_list->print_values();
@@ -1056,8 +1056,8 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_newsletter_view() {
-        $templates_dir = "newsletter_view";
+    function action_newsletter_view_admin() {
+        $templates_dir = "newsletter_view_admin";
 
         $newsletter =& $this->read_id_fetch_db_object("Newsletter");
         $newsletter_viewer =& $this->create_object(
@@ -1066,7 +1066,7 @@ class UserApp extends CustomApp {
                 "templates_dir" => "{$templates_dir}/newsletter_viewer",
                 "template_var" => "newsletter_viewer",
                 "obj" => $newsletter,
-                "context" => "newsletter_view",
+                "context" => "newsletter_view_admin",
             )
         );
         $newsletter_viewer->print_values();
@@ -1074,13 +1074,13 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_newsletter_edit() {
-        $templates_dir = "newsletter_edit";
+    function action_newsletter_edit_admin() {
+        $templates_dir = "newsletter_edit_admin";
 
         $newsletter =& $this->read_id_fetch_db_object("Newsletter");
         if ($newsletter->is_definite()) {
             $this->create_self_redirect_response(array(
-                "action" => "newsletters",
+                "action" => "newsletters_admin",
             ));
             return;
         }
@@ -1090,7 +1090,7 @@ class UserApp extends CustomApp {
         switch ($command) {
         case "":
         case "update":
-            $context = "newsletter_edit";
+            $context = "newsletter_edit_admin";
 
             if ($command == "update") {
                 $newsletter->read($context);
@@ -1152,7 +1152,7 @@ class UserApp extends CustomApp {
                     );
 
                     $this->create_self_action_redirect_response(array(
-                        "action" => "newsletters",
+                        "action" => "newsletters_admin",
                     ));
                 }
             }
@@ -1230,8 +1230,8 @@ class UserApp extends CustomApp {
         }
     }
 // 
-    function action_newsletter_categories() {
-        $templates_dir = "newsletter_categories";
+    function action_newsletter_categories_admin() {
+        $templates_dir = "newsletter_categories_admin";
 
         $newsletter_category =& $this->create_db_object("NewsletterCategory");
         $newsletter_categories_list =& $this->create_object(
@@ -1243,7 +1243,7 @@ class UserApp extends CustomApp {
                 "query_ex" => array(
                     "order_by" => "name ASC",
                 ),
-                "context" => "newsletter_categories_list_item",
+                "context" => "newsletter_categories_admin_list_item",
             )
         );
         $newsletter_categories_list->print_values();
@@ -1251,8 +1251,8 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_newsletter_category_edit() {
-        $templates_dir = "newsletter_category_edit";
+    function action_newsletter_category_edit_admin() {
+        $templates_dir = "newsletter_category_edit_admin";
 
         $newsletter_category =& $this->read_id_fetch_db_object("NewsletterCategory");
 
@@ -1260,7 +1260,7 @@ class UserApp extends CustomApp {
         switch ($command) {
         case "":
         case "update":
-            $context = "newsletter_category_edit";
+            $context = "newsletter_category_edit_admin";
 
             if ($command == "update") {
                 $newsletter_category->read($context);
@@ -1272,7 +1272,7 @@ class UserApp extends CustomApp {
                     $this->print_status_message_db_object_updated($newsletter_category);
                     $newsletter_category->save();
                     $this->create_self_redirect_response(array(
-                        "action" => "newsletter_categories",
+                        "action" => "newsletter_categories_admin",
                     ));
                     break;
                 }
@@ -1297,7 +1297,9 @@ class UserApp extends CustomApp {
 
             $this->add_session_status_message(new OkStatusMsg("newsletter_category.updated"));
             
-            $this->create_self_redirect_response(array("action" => "newsletter_categories"));
+            $this->create_self_redirect_response(array(
+                "action" => "newsletter_categories_admin",
+            ));
             break;
         }
     }
