@@ -60,9 +60,9 @@
         </menu>
     </menu_item>
     <menu_item
-        name="categories"
-        url="?action=categories"
-        contexts="categories"
+        name="categories_admin"
+        url="?action=categories_admin"
+        contexts="categories_admin"
     />
     <menu_item
         name="products_admin"

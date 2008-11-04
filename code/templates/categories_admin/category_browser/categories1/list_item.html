@@ -1,0 +1,24 @@
+<tr class="{%list_item_class%}{%list_item_selected_class%}">
+    <td>
+        <a
+            href="?action=categories_admin&amp;current_category1_id={%category1.id%}"
+            >{%category1.name%}</a>
+    </td>
+    <td>
+        <div class="toolbar">
+            [<a
+                href="?action=categories_admin&amp;command=move&amp;obj=category1&amp;obj_id={%category1.id%}&amp;to=prev&amp;{%current_category_ids_suburl%}"
+                >{%global:move_up%}</a>]
+            [<a
+                href="?action=categories_admin&amp;command=move&amp;obj=category1&amp;obj_id={%category1.id%}&amp;to=next&amp;{%current_category_ids_suburl%}"
+                >{%global:move_down%}</a>]
+            [<a
+                href="?action=categories_admin&amp;command=edit&amp;obj=category1&amp;obj_id={%category1.id%}&amp;{%current_category_ids_suburl%}&amp;current_category1_id={%category1.id%}"
+                >{%global:edit%}</a>]
+            [<a
+                href="?action=categories_admin&amp;command=delete&amp;obj=category1&amp;obj_id={%category1.id%}&amp;{%current_category_ids_suburl%}"
+                onclick="return confirm('{%global:sure_delete.js%}')"
+                >{%global:delete%}</a>]
+        </div>
+    </td>
+</tr>

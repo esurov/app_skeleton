@@ -227,15 +227,15 @@ return array(
     "category3" => "category3",
     "category3s" => "categories3",
 
-    "admin_menu_item.categories" => "Categories",
+    "admin_menu_item.categories_admin" => "Categories",
 
-    "page_title.categories" => "Categories",
-    "page_title.categories_category1_edit_new" => "Add category1",
-    "page_title.categories_category1_edit" => "Edit category1",
-    "page_title.categories_category2_edit_new" => "Add category2",
-    "page_title.categories_category2_edit" => "Edit category2",
-    "page_title.categories_category3_edit_new" => "Add category3",
-    "page_title.categories_category3_edit" => "Edit category3",
+    "page_title.categories_admin" => "Categories",
+    "page_title.categories_category1_edit_admin_new" => "Add category1",
+    "page_title.categories_category1_edit_admin" => "Edit category1",
+    "page_title.categories_category2_edit_admin_new" => "Add category2",
+    "page_title.categories_category2_edit_admin" => "Edit category2",
+    "page_title.categories_category3_edit_admin_new" => "Add category3",
+    "page_title.categories_category3_edit_admin" => "Edit category3",
 
     "status_msg.category1.added" => "Category1 added",
     "status_msg.category1.updated" => "Category1 updated",

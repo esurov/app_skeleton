@@ -64,10 +64,10 @@ class UserApp extends CustomApp {
             "user_subscription_edit" => $u,
 
             // Categories management
-            "categories" => $a,
-            "category1_edit" => $a,
-            "category2_edit" => $a,
-            "category3_edit" => $a,
+            "categories_admin" => $a,
+            "category1_edit_admin" => $a,
+            "category2_edit_admin" => $a,
+            "category3_edit_admin" => $a,
 
             // Products management
             "products_admin" => $a,
@@ -1360,8 +1360,8 @@ class UserApp extends CustomApp {
         $this->create_self_redirect_response(array("action" => "user_subscription"));
     }
 //
-    function action_categories() {
-        $templates_dir = "categories";
+    function action_categories_admin() {
+        $templates_dir = "categories_admin";
 
         $current_category_ids = $this->_read_and_print_current_category_ids();
 
@@ -1445,7 +1445,7 @@ class UserApp extends CustomApp {
                     "templates_dir" => "{$templates_dir}/{$obj_name}_editor",
                     "template_var" => "category_editor",
                     "obj" => $obj,
-                    "page_title_resource" => "categories_{$obj_name}_edit",
+                    "page_title_resource" => "categories_{$obj_name}_edit_admin",
                 )
             );
             $category_editor->print_values();
