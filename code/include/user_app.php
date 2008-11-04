@@ -45,10 +45,10 @@ class UserApp extends CustomApp {
 
             // News articles
             "news_articles" => $e,
-            "news_articles_admin" => $a,
             "news_article_view" => $e,
-            "news_article_edit_admin" => $a,
             "news_articles_rss" => $e,
+            "news_articles_admin" => $a,
+            "news_article_edit_admin" => $a,
 
             // Newsletters
             "newsletters" => $a,
@@ -827,6 +827,77 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
+    function action_news_article_view() {
+        $templates_dir = "news_article_view";
+
+        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
+        $news_article_viewer =& $this->create_object(
+            "ObjectViewer",
+            array(
+                "templates_dir" => "{$templates_dir}/news_article_viewer",
+                "template_var" => "news_article_viewer",
+                "obj" => $news_article,
+                "context" => "news_article_view",
+            )
+        );
+        $news_article_viewer->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_news_articles_rss() {
+        $templates_dir = "news_articles_rss";
+
+        $feed_creator =& $this->create_object("UniversalFeedCreator");
+
+        $feed_creator->title = $this->get_lang_str("news_article.rss_feed.title");
+        $feed_creator->description = $this->get_lang_str("news_article.rss_feed.description");
+        $feed_creator->link = create_self_full_url(
+            array(
+                "action" => "news_articles",
+            ),
+            $this->lang
+        ); 
+//        $feed_creator->feedURL = "http://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}"; 
+//        $feed_creator->syndicationURL = "http://www.dailyphp.net/".$PHP_SELF;
+
+        $n_recent_rss_news_articles = $this->get_config_value("recent_rss_news_articles_number");
+        $news_articles = $this->fetch_db_objects_list(
+            "NewsArticle",
+            array(
+                "order_by" => "created_date DESC, id DESC",
+                "limit" => "0, {$n_recent_rss_news_articles}",
+            )
+        );
+        foreach ($news_articles as $news_article) {
+            $news_article->print_values(array(
+                "templates_dir" => "news_articles_rss",
+                "context" => "news_articles_rss_list_item",
+            ));
+            
+            $feed_item = new FeedItem();
+            $feed_item->title = $news_article->title;
+            $feed_item->link = create_self_full_url(
+                array(
+                    "action" => "news_article_view",
+                    "news_article_id" => $news_article->id,
+                ),
+                $this->lang
+            );
+            $feed_item->description = $this->print_file(
+                "{$templates_dir}/feed_item_description.html"
+            );
+            $feed_item->date = $this->get_timestamp_from_db_date($news_article->created_date);
+            $feed_item->source = create_self_full_url();
+            $feed_item->author = "admin";
+            
+            $feed_creator->addItem($feed_item);
+        }
+
+        $rss_content = $feed_creator->createFeed("RSS2.0");
+        $this->create_rss_document_response($rss_content);
+    }
+
     function action_news_articles_admin() {
         $templates_dir = "news_articles_admin";
 
@@ -844,24 +915,6 @@ class UserApp extends CustomApp {
             )
         );
         $news_articles_list->print_values();
-
-        $this->print_file("{$templates_dir}/body.html", "body");
-    }
-
-    function action_news_article_view() {
-        $templates_dir = "news_article_view";
-
-        $news_article =& $this->read_id_fetch_db_object("NewsArticle");
-        $news_article_viewer =& $this->create_object(
-            "ObjectViewer",
-            array(
-                "templates_dir" => "{$templates_dir}/news_article_viewer",
-                "template_var" => "news_article_viewer",
-                "obj" => $news_article,
-                "context" => "news_article_view",
-            )
-        );
-        $news_article_viewer->print_values();
 
         $this->print_file("{$templates_dir}/body.html", "body");
     }
@@ -981,59 +1034,6 @@ class UserApp extends CustomApp {
             ));
             break;
         }
-    }
-
-    function action_news_articles_rss() {
-        $templates_dir = "news_articles_rss";
-
-        $feed_creator =& $this->create_object("UniversalFeedCreator");
-
-        $feed_creator->title = $this->get_lang_str("news_article.rss_feed.title");
-        $feed_creator->description = $this->get_lang_str("news_article.rss_feed.description");
-        $feed_creator->link = create_self_full_url(
-            array(
-                "action" => "news_articles",
-            ),
-            $this->lang
-        ); 
-//        $feed_creator->feedURL = "http://{$_SERVER['HTTP_HOST']}{$_SERVER['SCRIPT_NAME']}"; 
-//        $feed_creator->syndicationURL = "http://www.dailyphp.net/".$PHP_SELF;
-
-        $n_recent_rss_news_articles = $this->get_config_value("recent_rss_news_articles_number");
-        $news_articles = $this->fetch_db_objects_list(
-            "NewsArticle",
-            array(
-                "order_by" => "created_date DESC, id DESC",
-                "limit" => "0, {$n_recent_rss_news_articles}",
-            )
-        );
-        foreach ($news_articles as $news_article) {
-            $news_article->print_values(array(
-                "templates_dir" => "news_articles_rss",
-                "context" => "news_articles_rss_list_item",
-            ));
-            
-            $feed_item = new FeedItem();
-            $feed_item->title = $news_article->title;
-            $feed_item->link = create_self_full_url(
-                array(
-                    "action" => "news_article_view",
-                    "news_article_id" => $news_article->id,
-                ),
-                $this->lang
-            );
-            $feed_item->description = $this->print_file(
-                "{$templates_dir}/feed_item_description.html"
-            );
-            $feed_item->date = $this->get_timestamp_from_db_date($news_article->created_date);
-            $feed_item->source = create_self_full_url();
-            $feed_item->author = "admin";
-            
-            $feed_creator->addItem($feed_item);
-        }
-
-        $rss_content = $feed_creator->createFeed("RSS2.0");
-        $this->create_rss_document_response($rss_content);
     }
 //
     function action_newsletters() {
