@@ -259,11 +259,11 @@ return array(
     "product" => "product",
     "products" => "products",
 
-    "admin_menu_item.products" => "Products",
+    "admin_menu_item.products_admin" => "Products",
 
-    "page_title.products" => "Products",
-    "page_title.product_edit_new" => "Add product",
-    "page_title.product_edit" => "Edit product",
+    "page_title.products_admin" => "Products",
+    "page_title.product_edit_admin_new" => "Add product",
+    "page_title.product_edit_admin" => "Edit product",
 
     "status_msg.product.added" => "Product added",
     "status_msg.product.updated" => "Product updated",

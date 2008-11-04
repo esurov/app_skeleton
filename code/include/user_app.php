@@ -70,8 +70,8 @@ class UserApp extends CustomApp {
             "category3_edit" => $a,
 
             // Products management
-            "products" => $a,
-            "product_edit" => $a,
+            "products_admin" => $a,
+            "product_edit_admin" => $a,
         );
     }
 //
@@ -1536,8 +1536,8 @@ class UserApp extends CustomApp {
         return $category_ids;
     }
 //
-    function action_products() {
-        $templates_dir = "products";
+    function action_products_admin() {
+        $templates_dir = "products_admin";
 
         $product =& $this->create_db_object("Product");
         $product->insert_filters();
@@ -1553,7 +1553,7 @@ class UserApp extends CustomApp {
                     "category3_position ASC",
                 ),
                 "filter_form.visible" => true,
-                "context" => "products_list_item",
+                "context" => "products_admin_list_item",
             )
         );
         $products_list->print_values();
@@ -1561,8 +1561,8 @@ class UserApp extends CustomApp {
         $this->print_file("{$templates_dir}/body.html", "body");
     }
 
-    function action_product_edit() {
-        $templates_dir = "product_edit";
+    function action_product_edit_admin() {
+        $templates_dir = "product_edit_admin";
 
         $product =& $this->read_id_fetch_db_object("Product");
 
@@ -1570,7 +1570,7 @@ class UserApp extends CustomApp {
         switch ($command) {
         case "":
         case "update":
-            $context = "product_edit";
+            $context = "product_edit_admin";
                 
             if ($command == "update") {
                 $product->read($context);
@@ -1678,11 +1678,11 @@ class UserApp extends CustomApp {
                     $next_page = (string) param("next_page");
                     if ($next_page == "products") {
                         $this->create_self_redirect_response(array(
-                            "action" => "products",
+                            "action" => "products_admin",
                         ));
                     } else {
                         $this->create_self_action_redirect_response(array(
-                            "action" => "product_edit",
+                            "action" => "product_edit_admin",
                             "product_id" => $product->id,
                         ));
                     }
@@ -1707,8 +1707,8 @@ class UserApp extends CustomApp {
         case "delete":
             $this->delete_db_object(array(
                 "obj" => $product,
-                "success_url_params" => array("action" => "products"),
-                "error_url_params" => array("action" => "products"),
+                "success_url_params" => array("action" => "products_admin"),
+                "error_url_params" => array("action" => "products_admin"),
             ));
             break;
 
@@ -1731,7 +1731,7 @@ class UserApp extends CustomApp {
                 $product_image->product_id != $product->id
             ) {
                 $this->create_self_redirect_response(array(
-                    "action" => "products",
+                    "action" => "products_admin",
                 ));
                 break;
             }
@@ -1754,7 +1754,7 @@ class UserApp extends CustomApp {
                 $product_image->product_id != $product->id
             ) {
                 $this->create_self_redirect_response(array(
-                    "action" => "products",
+                    "action" => "products_admin",
                 ));
                 break;
             }

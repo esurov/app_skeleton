@@ -333,7 +333,7 @@ class ProductTable extends CustomDbObject {
     function print_values($params = array()) {
         parent::print_values($params);
 
-        if ($this->_context == "products_list_item") {
+        if ($this->_context == "products_admin_list_item") {
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->primary_thumbnail_image_id),
                 $this->_templates_dir,
@@ -343,7 +343,7 @@ class ProductTable extends CustomDbObject {
             );
         }
 
-        if ($this->_context == "product_edit") {
+        if ($this->_context == "product_edit_admin") {
             $this->app->print_db_object_info(
                 $this->app->fetch_image_without_content($this->primary_image_id),
                 $this->_templates_dir,

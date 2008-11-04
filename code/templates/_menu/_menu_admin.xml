@@ -65,8 +65,8 @@
         contexts="categories"
     />
     <menu_item
-        name="products"
-        url="?action=products"
-        contexts="products, product_edit"
+        name="products_admin"
+        url="?action=products_admin"
+        contexts="products_admin, product_edit_admin"
     />
 </menu>
