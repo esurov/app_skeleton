@@ -1,5 +1,5 @@
 <?php
 return array(
-    "local:no_category2_selected" => "!!No category2 selected",
+    "local:no_category2_selected" => "Nessuna Category2 selezionata",
 );
 ?>

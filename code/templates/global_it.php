@@ -10,8 +10,8 @@ return array(
     "global:to" => "al",
     "global:filter_by" => "Filtra per",
     "global:no_records_found" => "Non sono stati trovati dati",
-    "global:no_image" => "No immagine",
-    "global:no_images" => "!!No immagini",
+    "global:no_image" => "Immagine non presente",
+    "global:no_images" => "Nessuna immagine",
     "global:no_file" => "No file",
     "global:sure_delete.js" => get_js_safe_string("Sei sicuro di voler cancellare l'informazione?"),
 
@@ -56,7 +56,7 @@ return array(
     "global:notes" => "Note",
     "global:description" => "Descrizione",
     "global:extra_info" => "Maggiori informazioni",
-    "global:thumbnail" => "!!Thumbnail",
+    "global:thumbnail" => "Anteprima",
     "global:image" => "Immagine",
     "global:file" => "File",
     "global:first_name" => "Nome",
@@ -93,7 +93,7 @@ return array(
     "global:status" => "Stato",
     "global:price" => "Prezzo",
     "global:current_image" => "Immagine corrente",
-    "global:current_images" => "!!Immagini corrente",
+    "global:current_images" => "Immagini correnti",
     "global:upload_new_image" => "Carica nuova immagine",
     "global:current_file" => "File corrente",
     "global:upload_new_file" => "Carica nuovo file",
@@ -141,7 +141,7 @@ return array(
 
     "global:delete_image" => "Cancella immagine",
     "global:delete_file" => "Cancella file",
-    "global:activate_deactivate" => "!!Activate/Deactivate",
+    "global:activate_deactivate" => "Attiva/Disattiva",
     "global:save_and_products" => "Salva e Visualizza prodotti",
 
     // Users
@@ -168,7 +168,7 @@ return array(
     "global:contact_info.last_name" => "Cognome",
     "global:contact_info.email" => "Email",
     "global:contact_info.phone" => "Phone",
-    "global:contact_info.company_name" => "!!Company",
+    "global:contact_info.company_name" => "Azienda",
     "global:contact_info.city" => "Città",
     "global:contact_info.address" => "Indirizzo",
     "global:contact_info.fax" => "Fax",
