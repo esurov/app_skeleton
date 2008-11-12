@@ -175,8 +175,8 @@ return array(
     "status_msg.newsletter.file_bad" => "Please upload valid file",
     "status_msg.newsletter.file_max_size_reached" => "Uploaded file size is more than 2 Mb",
     "status_msg.newsletter.files_max_total_size_reached" => "Total uploaded files size is more than 100 Mb",
-    "status_msg.newsletter.send_mail_failed" => "!!Function \"Send mail\" not realized",
-    "status_msg.newsletter.send_emails_done" => "!!Emails were sent",
+    "status_msg.newsletter.send_mail_failed" => "Function \"Send mail\" failed",
+    "status_msg.newsletter.send_emails_done" => "Emails were sent",
 
     // Newsletter categories
     "newsletter_category" => "newsletter category",
