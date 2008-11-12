@@ -198,9 +198,9 @@ return array(
     "user_subscription" => "newsletter subscription",
     "user_subscriptions" => "newsletter subscriptions",
 
-    "user_menu_item.user_subscription" => "My newletter subscriptions",
+    "user_menu_item.my_subscriptions" => "My newletter subscriptions",
 
-    "page_title.user_subscription" => "My newsletter subscriptions",
+    "page_title.my_subscriptions" => "My newsletter subscriptions",
 
     "status_msg.user_subscription.updated" => "Newsletter subscriptions updated",
 

@@ -2256,6 +2256,8 @@ class App extends AppObject {
 
     function print_page_title($resource, $is_html = true) {
         $page_title_resource = "page_title.{$resource}";
+        $this->print_raw_value("page_title.resource", $resource);
+        $this->print_raw_value("page_title.lang_resource", $page_title_resource);
         $page_title_text = $this->get_lang_str($page_title_resource);
         if (!is_null($page_title_text)) {
             if ($is_html) {
@@ -2265,7 +2267,6 @@ class App extends AppObject {
             }
             $this->print_file_new_if_exists("_page_title.html", "page_title");
         }
-        $this->print_raw_value("page_title.lang_resource", $page_title_resource);
     }
 
     function print_head_page_title($resource, $is_html = true) {
@@ -2283,6 +2284,7 @@ class App extends AppObject {
                 $this->print_value("head_page_title", $head_page_title_text);
             }
         }
+        $this->print_raw_value("head_page_title.resource", $resource);
         $this->print_raw_value("head_page_title.lang_resource", $head_page_title_resource);
     }
 

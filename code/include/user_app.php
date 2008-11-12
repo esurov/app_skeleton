@@ -60,8 +60,8 @@ class UserApp extends CustomApp {
             "newsletter_category_edit_admin" => $a,
 
             // User subscription
-            "user_subscription" => $u,
-            "user_subscription_edit" => $u,
+            "my_subscriptions" => $u,
+            "my_subscription_edit" => $u,
 
             // Categories management
             "categories_admin" => $a,
@@ -1304,8 +1304,8 @@ class UserApp extends CustomApp {
         }
     }
 
-    function action_user_subscription() {
-        $templates_dir = "user_subscription";
+    function action_my_subscriptions() {
+        $templates_dir = "my_subscriptions";
 
         $newsletter_category =& $this->create_db_object("NewsletterCategory");
         $newsletter_category->insert_list_extra_fields($this->user->id);
@@ -1320,7 +1320,7 @@ class UserApp extends CustomApp {
                     "order_by" => "name ASC",
                  ), 
                  "pager.visible" => false,
-                 "context" => "user_subscription_list_item",
+                 "context" => "my_subscriptions_list_item",
              )
         );
         $categories_to_subscribe_list->print_values();
@@ -1329,7 +1329,7 @@ class UserApp extends CustomApp {
     }
 
     // !!NB: Check inactive categories!
-    function action_user_subscription_edit() {
+    function action_my_subscription_edit() {
         $command = (string) param("command");
         switch ($command) {
         case "update":
@@ -1359,7 +1359,7 @@ class UserApp extends CustomApp {
 
         $this->add_session_status_message(new OkStatusMsg("user_subscription.updated"));
         
-        $this->create_self_redirect_response(array("action" => "user_subscription"));
+        $this->create_self_redirect_response(array("action" => "my_subscriptions"));
     }
 //
     function action_categories_admin() {

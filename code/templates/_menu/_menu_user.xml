@@ -18,8 +18,8 @@
         contexts="my_account"
     />
     <menu_item
-        name="user_subscription"
-        url="?action=user_subscription"
-        contexts="user_subscription"
+        name="my_subscriptions"
+        url="?action=my_subscriptions"
+        contexts="my_subscriptions"
     />
 </menu>
