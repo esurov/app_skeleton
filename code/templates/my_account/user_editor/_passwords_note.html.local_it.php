@@ -1,5 +1,5 @@
 <?php
 return array(
-    "local:leave_passwords_empty" => "!!Note: Leave passwords empty if you don't want to change password",
+    "local:leave_passwords_empty" => "Attenzione: lasciare vuoti gli spazi per l'inserimento password nel caso non si desideri modificarla",
 );
 ?>

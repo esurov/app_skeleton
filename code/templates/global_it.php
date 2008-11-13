@@ -6,13 +6,13 @@ return array(
     // Parts of page
     "global:and" => "e",
     "global:or" => "o",
-    "global:from" => "dal",
-    "global:to" => "al",
+    "global:from" => "da",
+    "global:to" => "a",
     "global:filter_by" => "Filtra per",
     "global:no_records_found" => "Non sono stati trovati dati",
     "global:no_image" => "Immagine non presente",
     "global:no_images" => "Nessuna immagine",
-    "global:no_file" => "No file",
+    "global:no_file" => "Nessun file",
     "global:sure_delete.js" => get_js_safe_string("Sei sicuro di voler cancellare l'informazione?"),
 
     "global:month_long_1" => "Gennaio",
@@ -38,10 +38,10 @@ return array(
 
     "global:weekday_long_0" => "Domenica",
     "global:weekday_long_1" => "Lunedì",
-    "global:weekday_long_2" => "Martedì",  
-    "global:weekday_long_3" => "Mercoledì",       
+    "global:weekday_long_2" => "Martedì",
+    "global:weekday_long_3" => "Mercoledì",
     "global:weekday_long_4" => "Giovedì",
-    "global:weekday_long_5" => "Venerdì",  
+    "global:weekday_long_5" => "Venerdì",
     "global:weekday_long_6" => "Sabato",
 
     // Titles
@@ -146,10 +146,10 @@ return array(
 
     // Users
     "global:user.add" => "Aggiungi utente",
-    "global:user.back_to_list" => "!!Torna alla lista degli utenti",
+    "global:user.back_to_list" => "Torna all'elenco utenti",
 
     "global:user.login" => "Login",
-    "global:user.role" => "Role",
+    "global:user.role" => "Ruolo",
     "global:user.password" => "Password",
     "global:user.password_confirm" => "Conferma password",
     "global:user.first_name" => "Nome",
@@ -158,8 +158,8 @@ return array(
     "global:user.extra_info" => "Maggiori informazioni",
     "global:user.is_confirmed" => "Confermato?",
     "global:user.is_active" => "Attivo?",
-    "global:user.accept_agreement" => "!!I Accept",
-    "global:user.should_remember" => "Ricorda dati d'accesso", 
+    "global:user.accept_agreement" => "Accetto",
+    "global:user.should_remember" => "Ricorda dati d'accesso",
     "global:user.date_created" => "Data di creazione",
     "global:user.name" => "Nome",
 
@@ -167,16 +167,16 @@ return array(
     "global:contact_info.first_name" => "Nome",
     "global:contact_info.last_name" => "Cognome",
     "global:contact_info.email" => "Email",
-    "global:contact_info.phone" => "Phone",
+    "global:contact_info.phone" => "Telefono",
     "global:contact_info.company_name" => "Azienda",
     "global:contact_info.city" => "Città",
     "global:contact_info.address" => "Indirizzo",
     "global:contact_info.fax" => "Fax",
     "global:contact_info.message_text" => "Messaggio",
-    
+
     // News articles
     "global:news_article.add" => "Aggiungi news",
-    "global:news_article.back_to_list" => "!!Torna alla lista delle news",
+    "global:news_article.back_to_list" => "Torna all'elenco news",
 
     "global:news_article.created_date" => "Data",
     "global:news_article.title" => "Titolo",
@@ -189,30 +189,30 @@ return array(
     "global:news_article.upload_new_file" => "Carica nuovo file",
     "global:news_article.text" => "Text",
 
-    "global:news_article.rss_feed.title" => "!!News rss feed",
+    "global:news_article.rss_feed.title" => "News rss feed",
 
     // Newsletters and newsletter categories
-    "global:newsletter.add" => "!!Crea newsletter",
-    "global:newsletter.back_to_list" => "!!Torna alla lista dei newsletters",
+    "global:newsletter.add" => "Crea newsletter",
+    "global:newsletter.back_to_list" => "Torna all'elenco newsletter",
 
     "global:newsletter.category" => "Categoria",
-    "global:newsletter.sent_date" => "Sending date",
-    "global:newsletter.title" => "Title",
-    "global:newsletter.body" => "Body",
-    "global:newsletter.image" => "Image",
+    "global:newsletter.sent_date" => "Data di invio",
+    "global:newsletter.title" => "Titolo",
+    "global:newsletter.body" => "Testo",
+    "global:newsletter.image" => "Immagine",
     "global:newsletter.file" => "File",
     "global:newsletter.current_image" => "Immagine corrente",
     "global:newsletter.upload_new_image" => "Carica nuova immagine",
     "global:newsletter.current_file" => "File corrente",
     "global:newsletter.upload_new_file" => "Carica nuovo file",
-    "global:newsletter.text" => "Text",
+    "global:newsletter.text" => "Testo",
 
-    "global:newsletter_category.add" => "!!Aggiungi newsletter categoria",
-    "global:newsletter_category.back_to_list" => "!!Torna alla lista dei newsletter categorie",
+    "global:newsletter_category.add" => "Aggiungi categoria newsletter",
+    "global:newsletter_category.back_to_list" => "Torna all'elenco delle categorie newsletter",
 
     "global:newsletter_category.name" => "Nome",
     "global:newsletter_category.is_active" => "Attivo?",
-    "global:newsletter_category.is_subscribed" => "!!Subscribed?",
+    "global:newsletter_category.is_subscribed" => "Iscritto?",
     "global:newsletter_category.name.full" => "Categoria",
 
     // Categories
@@ -220,7 +220,7 @@ return array(
 
     "global:category1.title" => "Categoria1",
     "global:category1.name" => "Name",
-    
+
     "global:category2.add" => "Aggiungi categoria2",
 
     "global:category2.title" => "Categoria2",
@@ -233,7 +233,7 @@ return array(
 
     // Products
     "global:product.add" => "Aggiungi prodotto",
-    "global:product.back_to_list" => "!!Torna alla lista dei prodotti",
+    "global:product.back_to_list" => "Torna all'elenco prodotti",
 
     "global:product.category1" => "Categoria1",
     "global:product.category2" => "Categoria2",
@@ -242,10 +242,10 @@ return array(
     "global:product.description" => "Descrizione",
     "global:product.price" => "Prezzo",
     "global:product.category" => "Categoria",
-    "global:product.keywords" => "Parole Chiavi",
-    "global:product.primary_thumbnail_image" => "!!Immagine primario",
-    "global:product.current_primary_image" => "!!Immagine primario corrente",
-    "global:product.upload_new_primary_image" => "!!Carica nuova immagine primario",
+    "global:product.keywords" => "Parole Chiave",
+    "global:product.primary_thumbnail_image" => "Immagine primaria",
+    "global:product.current_primary_image" => "Immagine primaria corrente",
+    "global:product.upload_new_primary_image" => "Carica nuova immagine primaria",
     "global:product.upload_new_image" => "Carica nuova immagine",
 );
 ?>

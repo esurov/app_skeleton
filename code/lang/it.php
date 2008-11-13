@@ -10,11 +10,11 @@ return array(
 
     // Status messages and parts of page
     "any" => "Qualsiasi",
-    "all" => "Tutti",
+    "all" => "Tutti/e",
     "choose_one" => "Selezionare:",
     "yes" => "Sì",
     "no" => "No",
-    "none" => "None",
+    "none" => "Nessuno/a",
     "other" => "Altro",
     "not_specified" => "Non specificato",
 
@@ -54,11 +54,11 @@ return array(
     // Login/Logout
     "page_title.login" => "Log In",
 
-    "status_msg.resource_access_denied" => "La pagina richiesta non può essere visualizzata. Prego effettuare l'accesso mediante login/password.",
+    "status_msg.resource_access_denied" => "La pagina richiesta non può essere visualizzata. Effettuare l'accesso mediante login/password.",
     "status_msg.logged_out" => "Logout effettuato con successo",
 
     "status_msg.user.login_or_password_unknown" => "Login \"{%login%}\" o password non corretti",
-    "status_msg.user.not_confirmed_yet" => "L'utente \"{%login%}\" non è ancora confermato. Utilizza il link di conferma che trovi all'interno della email di avvenuta iscrizione.",
+    "status_msg.user.not_confirmed_yet" => "L'utente \"{%login%}\" non è ancora stato abilitato. Utilizza il link di conferma che trovi all'interno della email di avvenuta iscrizione.",
     "status_msg.user.disabled_by_admin" => "L'utente \"{%login%}\" è attualmente disabilitato dall'amministratore di sistema.",
 
     // Signup/Users
@@ -71,8 +71,8 @@ return array(
     "admin_menu_item.users" => "Utenti",
 
     "page_title.signup" => "Iscriviti",
-    "page_title.signup_almost_completed" => "Il nuovo account stato creato",
-    "page_title.confirm_signup" => "Account è stato confermato",
+    "page_title.signup_almost_completed" => "Il nuovo account è stato creato",
+    "page_title.confirm_signup" => "L'account è stato confermato",
     "page_title.my_account" => "Il mio account",
     "page_title.users_admin" => "Utenti",
     "page_title.user_edit_new_admin" => "Aggiungi utente",
@@ -91,15 +91,15 @@ return array(
     "status_msg.user.login_empty" => "Inserire login",
     "status_msg.user.login_exists" => "Il login inserito esiste già, specificarne un altro",
     "status_msg.user.password_empty" => "Inserire password",
-    "status_msg.user.password_at_least_6_chars" => "La password deve essere almeno 6 caratteri",
+    "status_msg.user.password_at_least_6_chars" => "La password deve contenere almeno 6 caratteri",
     "status_msg.user.passwords_do_not_match" => "Le password inserite non corrispondono tra loro",
     "status_msg.user.email_empty" => "Inserire email",
     "status_msg.user.email_bad" => "L'indirizzo email specificato non è corretto",
-    "status_msg.user.email_exists" => "L'indirizzo email è attualmente in uso con ul altro account",
+    "status_msg.user.email_exists" => "L'indirizzo email è attualmente in uso da altro account",
     "status_msg.user.first_name_empty" => "Inserire nome",
     "status_msg.user.last_name_empty" => "Inserire cognome",
     "status_msg.user.role_empty" => "Specificare ruolo utente",
-    "status_msg.user.should_accept_agreement" => "Devi selezionare \"Accetta\" per continuare",
+    "status_msg.user.should_accept_agreement" => "Per continuare, seleziona \"Accetta\" ",
     "status_msg.user.cannot_delete_main_admin" => "Impossibile cancellare l'account principale di amministrazione",
 
     "email_signup_form_processed_subject" => "Benvenuto al sito !!AppSkeleton",
@@ -108,8 +108,8 @@ return array(
     "user_role.admin" => "Amministratore",
 
     // Recover password
-    "page_title.recover_password" => "Ritrovamento password",
-    "page_title.recover_password_sent" => "Password è stata inviata",
+    "page_title.recover_password" => "Recupera password",
+    "page_title.recover_password_sent" => "La password è stata inviata",
 
     "status_msg.recover_password.login_or_email_empty" => "Login o indirizzo email non specificati",
     "status_msg.recover_password.bad_email" => "Indirizzo email non corretto",
@@ -133,83 +133,83 @@ return array(
 
     "status_msg.news_article.added" => "Aggiunto articolo news",
     "status_msg.news_article.updated" => "L'articolo è stato modificato",
-    "status_msg.news_article.deleted" => "L'articolo è stato eliminato",
+    "status_msg.news_article.deleted" => "L'articolo è stato cancellato",
     "status_msg.news_article.image_deleted" => "L'immagine relativa all'articolo è stata cancellata",
     "status_msg.news_article.file_deleted" => "Il file relativo all'articolo è stata cancellato",
 
     "status_msg.news_article.title_empty" => "Inserire titolo",
     "status_msg.news_article.image_empty" => "Prego caricare immagine",
-    "status_msg.news_article.image_bad" => "Prego caricare immagine valida",
+    "status_msg.news_article.image_bad" => "Prego caricare un'immagine valida",
     "status_msg.news_article.file_empty" => "Prego caricare file",
-    "status_msg.news_article.file_bad" => "Prego caricare file valido",
+    "status_msg.news_article.file_bad" => "Prego caricare un file valido",
     "status_msg.news_article.file_max_size_reached" => "La dimensione del file caricato supera i 2 Mb",
-    "status_msg.news_article.files_max_total_size_reached" => "La dimensione totale dei file caricati è maggiore di 100 Mb",
+    "status_msg.news_article.files_max_total_size_reached" => "La dimensione totale dei file caricati supera i 100 Mb",
 
-    "news_article.rss_feed.title" => "!!News rss feed",
-    "news_article.rss_feed.description" => "!!News rss feed",
+    "news_article.rss_feed.title" => "News rss feed",
+    "news_article.rss_feed.description" => "News rss feed",
 
     // Newsletters
-    "newsletter" => "!!newsletter",
-    "newsletters" => "!!newsletters",
+    "newsletter" => "newsletter",
+    "newsletters" => "newsletter",
 
-    "admin_menu_item.newsletters" => "!!Newsletters",
-    "admin_newsletters_sub_menu_item.newsletters" => "!!Newsletters",
+    "admin_menu_item.newsletters" => "Newsletter",
+    "admin_newsletters_sub_menu_item.newsletters" => "Newsletter",
 
-    "page_title.newsletters_admin" => "!!Newsletters",
-    "page_title.newsletter_view_admin" => "!!View newsletter",
-    "page_title.newsletter_edit_admin_new" => "!!Create newsletter",
-    "page_title.newsletter_edit_admin" => "!!Edit newsletter",
+    "page_title.newsletters_admin" => "Newsletter",
+    "page_title.newsletter_view_admin" => "Visualizza Newsletter",
+    "page_title.newsletter_edit_admin_new" => "Crea Newsletter",
+    "page_title.newsletter_edit_admin" => "Modifica Newsletter",
 
-    "status_msg.newsletter.added" => "!!Newsletter sent",
-    "status_msg.newsletter.updated" => "!!Newsletter updated",
-    "status_msg.newsletter.deleted" => "!!Newsletter deleted",
-    "status_msg.newsletter.image_deleted" => "!!Newsletter image deleted",
-    "status_msg.newsletter.file_deleted" => "!!Newsletter file deleted",
+    "status_msg.newsletter.added" => "Newsletter inviata",
+    "status_msg.newsletter.updated" => "Newsletter aggiornata",
+    "status_msg.newsletter.deleted" => "Newsletter cancellata",
+    "status_msg.newsletter.image_deleted" => "Immagine Newsletter cancellata",
+    "status_msg.newsletter.file_deleted" => "File Newsletter cancellato",
 
-    "status_msg.newsletter.title_empty" => "!!Specify title",
-    "status_msg.newsletter.body_empty" => "!!Specify body",
-    "status_msg.newsletter.category_empty" => "!!Category is empty",
-    "status_msg.newsletter.image_empty" => "!!Please upload image",
-    "status_msg.newsletter.image_bad" => "!!Please upload valid image",
-    "status_msg.newsletter.file_empty" => "!!Please upload file",
-    "status_msg.newsletter.file_bad" => "!!Please upload valid file",
-    "status_msg.newsletter.file_max_size_reached" => "!!Uploaded file size is more than 2 Mb",
-    "status_msg.newsletter.files_max_total_size_reached" => "!!Total uploaded files size is more than 100 Mb",
-    "status_msg.newsletter.send_mail_failed" => "!!Function \"Send mail\" not realized",
-    "status_msg.newsletter.send_emails_done" => "!!Emails were sent",
+    "status_msg.newsletter.title_empty" => "Specificare titolo",
+    "status_msg.newsletter.body_empty" => "Il testo è vuoto",
+    "status_msg.newsletter.category_empty" => "La categoria è vuota",
+    "status_msg.newsletter.image_empty" => "È necessario caricare un'immagine",
+    "status_msg.newsletter.image_bad" => "Caricare un'immagine valida",
+    "status_msg.newsletter.file_empty" => "È necessario caricare un file",
+    "status_msg.newsletter.file_bad" => "Caricare un file valido",
+    "status_msg.newsletter.file_max_size_reached" => "Il file caricato ha una dimensione maggiore di 2 Mb",
+    "status_msg.newsletter.files_max_total_size_reached" => "La dimensione totale dei file caricati supera i 100 Mb",
+    "status_msg.newsletter.send_mail_failed" => "La funzione \"Send mail\" non è andata a buon fine",
+    "status_msg.newsletter.send_emails_done" => "Email inviate",
 
     // Newsletter categories
-    "newsletter_category" => "!!newsletter category",
-    "newsletter_categorys" => "!!newsletter categories",
+    "newsletter_category" => "Categoria Newsletter",
+    "newsletter_categorys" => "Categorie Newsletter",
 
-    "admin_newsletters_sub_menu_item.newsletter_categories" => "!!Newsletter categories",
+    "admin_newsletters_sub_menu_item.newsletter_categories" => "Categorie Newsletter",
 
-    "page_title.newsletter_categories_admin" => "!!Newsletter categories",
-    "page_title.newsletter_category_edit_admin_new" => "!!Add newsletter category",
-    "page_title.newsletter_category_edit_admin" => "!!Edit category",
+    "page_title.newsletter_categories_admin" => "Categorie Newsletter",
+    "page_title.newsletter_category_edit_admin_new" => "Aggiungi categoria Newsletter",
+    "page_title.newsletter_category_edit_admin" => "Modifica categoria",
 
-    "status_msg.newsletter_category.added" => "!!Newsletter category added",
-    "status_msg.newsletter_category.updated" => "!!Newsletter category updated",
-    "status_msg.newsletter_category.deleted" => "!!Newsletter category deleted",
+    "status_msg.newsletter_category.added" => "Categoria Newsletter aggiunta",
+    "status_msg.newsletter_category.updated" => "Categoria Newsletter aggiornata",
+    "status_msg.newsletter_category.deleted" => "Categoria Newsletter cancellata",
 
-    "status_msg.newsletter_category.name_empty" => "!!Specify newsletter category name",
+    "status_msg.newsletter_category.name_empty" => "Specificare il nome della categoria Newsletter",
 
     // User subscriptions
-    "user_subscription" => "!!newsletter subscription",
-    "user_subscriptions" => "!!newsletter subscriptions",
+    "user_subscription" => "Iscrizione alla Newsletter",
+    "user_subscriptions" => "Iscrizioni alla Newsletter",
 
-    "user_menu_item.my_subscriptions" => "!!My newletter subscriptions",
+    "user_menu_item.my_subscriptions" => "Le mie Newsletter",
 
-    "page_title.my_subscriptions" => "!!My newsletter subscriptions",
+    "page_title.my_subscriptions" => "Le mie iscrizioni alle Newsletter",
 
-    "status_msg.user_subscription.updated" => "!!Newsletter subscriptions updated",
+    "status_msg.user_subscription.updated" => "Iscrizioni Newsletter aggiornate",
 
     // Contact form
     "guest_menu_item.contact_form" => "Contatti",
 
     "page_title.contact_form" => "Contatti",
 
-    "status_msg.contact_info.processed" => "I suoi dati sono stati registrati. Grazie!",
+    "status_msg.contact_info.processed" => "I tuoi dati sono stati registrati. Grazie!",
     "status_msg.contact_info.first_name_empty" => "Inserire il nome",
     "status_msg.contact_info.last_name_empty" => "Inserire il cognome",
     "status_msg.contact_info.email_empty" => "Inserire l'email",
@@ -265,16 +265,16 @@ return array(
     "status_msg.product.added" => "Prodotto aggiunto",
     "status_msg.product.updated" => "Prodotto aggiornato",
     "status_msg.product.deleted" => "Prodotto cancellato",
-    "status_msg.product.primary_image_deleted" => "!!L'immagine primario relativa all'prodotto è stata cancellata",
-    "status_msg.product.image_deleted" => "!!L'immagine relativa all'prodotto è stata cancellata",
+    "status_msg.product.primary_image_deleted" => "Immagine primaria cancellata",
+    "status_msg.product.image_deleted" => "Immagine cancellata",
 
-    "status_msg.product.category1_empty" => "!!Category1 empty",
-    "status_msg.product.category2_empty" => "!!Category2 empty",
-    "status_msg.product.category3_empty" => "!!Category3 empty",
-    "status_msg.product.name_empty" => "!!Specify product name",
-    "status_msg.product.primary_image_empty" => "!!Prego caricare immagine primario",
-    "status_msg.product.primary_image_bad" => "!!Prego caricare immagine primario valida",
-    "status_msg.product.image_empty" => "Prego caricare immagine",
-    "status_msg.product.image_bad" => "Prego caricare immagine valida",
+    "status_msg.product.category1_empty" => "Categoria1 vuota",
+    "status_msg.product.category2_empty" => "Categoria2 vuota",
+    "status_msg.product.category3_empty" => "Categoria3 vuota",
+    "status_msg.product.name_empty" => "Specificare Nome Prodotto",
+    "status_msg.product.primary_image_empty" => "Caricare immagine primaria",
+    "status_msg.product.primary_image_bad" => "Caricare immagine primaria valida",
+    "status_msg.product.image_empty" => "Caricare immagine",
+    "status_msg.product.image_bad" => "Caricare immagine valida",
 );
 ?>
