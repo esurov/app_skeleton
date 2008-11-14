@@ -297,7 +297,9 @@ class FileResponse extends BinaryContentResponse {
             new HttpHeader("Expires", "0"),
             new HttpHeader("Cache-Control", "must-revalidate, post-check=0, pre-check=0"),
         ));
-        $this->add_last_modified_header($updated_gmt_str);
+        if ($updated_gmt_str != "") {
+            $this->add_last_modified_header($updated_gmt_str);
+        }
     }
 
 }

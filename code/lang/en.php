@@ -215,6 +215,7 @@ return array(
     "status_msg.contact_info.email_empty" => "Please input your email",
     "status_msg.contact_info.email_bad" => "Please input correct email address",
     "status_msg.contact_info.message_text_empty" => "Input message",
+    "status_msg.contact_info.security_code_bad" => "Bad security code",
 
     // Categories
     "category1" => "category1",

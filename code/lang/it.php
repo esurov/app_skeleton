@@ -215,6 +215,7 @@ return array(
     "status_msg.contact_info.email_empty" => "Inserire l'email",
     "status_msg.contact_info.email_bad" => "Inserire un indirizzo email valido",
     "status_msg.contact_info.message_text_empty" => "Inserire il messaggio",
+    "status_msg.contact_info.security_code_bad" => "!!Bad security code",
 
     // Categories
     "category1" => "categoria1",

@@ -61,6 +61,11 @@ class ContactInfoTable extends CustomDbObject {
                 ),
             ),
         ));
+
+        $this->insert_field(array(
+            "field" => "security_code",
+            "type" => "varchar",
+        ));
     }
 //
     function get_validate_conditions($context, $context_params) {
@@ -91,6 +96,38 @@ class ContactInfoTable extends CustomDbObject {
                 "message" => "contact_info.message_text_empty",
             ),
         );
+    }
+//
+    function validate($context = null, $context_params = array()) {
+        $messages = parent::validate($context, $context_params);
+
+        if ($this->get_config_value("security_image_enabled") == 1) {
+            $security_image_generator =& $this->create_object("SecurityImageGenerator");
+            $this->validate_condition(
+                $messages,
+                array(
+                    "field" => "security_code",
+                    "type" => "equal",
+                    "param" => $security_image_generator->get_security_code(),
+                    "message" => "contact_info.security_code_bad",
+                )
+            );
+        }
+        
+        return $messages;
+    }
+
+    function print_form_values($params = array()) {
+        parent::print_form_values($params);
+
+        if ($this->get_config_value("security_image_enabled") == 1) {
+            $security_image_generator =& $this->create_object("SecurityImageGenerator");
+            $security_image_generator->set_security_code();
+            $this->app->print_file(
+                "{$this->_templates_dir}/_security_image.html",
+                "{$this->_template_var_prefix}.security_image"
+            );
+        }
     }
 
 }

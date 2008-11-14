@@ -37,6 +37,7 @@ class UserApp extends CustomApp {
 
             // Contact form
             "contact_form" => $e,
+            "get_security_image" => $e,
 
             // Users management
             "my_account" => $u_a,
@@ -600,6 +601,8 @@ class UserApp extends CustomApp {
                 $messages = $contact_info->validate();
                 if (count($messages) != 0) {
                     $this->print_status_messages($messages);
+
+                    $contact_info->security_code = "";
                 } else {
                     $this->add_session_status_message(new OkStatusMsg("contact_info.processed"));
 

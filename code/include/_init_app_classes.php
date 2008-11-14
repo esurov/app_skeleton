@@ -13,6 +13,10 @@ $app_classes["classes"] += array(
         "filename" => "category_browser.php",
         "required_classes" => array("TemplateComponent"),
     ),
+    "SecurityImageGenerator" => array(
+        "filename" => "security_image_generator.php",
+        "required_classes" => array("AppComponent"),
+    ),
 
     // Note: Declarations below are just for sample purposes and
     // should be removed in real app

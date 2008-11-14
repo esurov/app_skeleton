@@ -173,6 +173,7 @@ return array(
     "global:contact_info.address" => "Indirizzo",
     "global:contact_info.fax" => "Fax",
     "global:contact_info.message_text" => "Messaggio",
+    "global:contact_info.security_code" => "Codice di sicurezza",
 
     // News articles
     "global:news_article.add" => "Aggiungi news",

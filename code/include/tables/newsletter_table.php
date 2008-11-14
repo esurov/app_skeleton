@@ -115,7 +115,6 @@ class NewsletterTable extends CustomDbObject {
 //
     function get_validate_conditions($context, $context_params) {
         return array(
-
             array(
                 "field" => "newsletter_category_id",
                 "type" => "not_equal",
