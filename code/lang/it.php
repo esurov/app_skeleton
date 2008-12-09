@@ -227,13 +227,13 @@ return array(
 
     "admin_menu_item.categories" => "Categorie",
 
-    "page_title.categories" => "Categorie",
-    "page_title.categories_category1_edit_new" => "Aggiungi categoria1",
-    "page_title.categories_category1_edit" => "Modifica categoria1",
-    "page_title.categories_category2_edit_new" => "Aggiungi categoria2",
-    "page_title.categories_category2_edit" => "Modifica categoria2",
-    "page_title.categories_category3_edit_new" => "Aggiungi categoria3",
-    "page_title.categories_category3_edit" => "Modifica categoria3",
+    "page_title.categories_admin" => "Categorie",
+    "page_title.categories_category1_edit_admin_new" => "Aggiungi categoria1",
+    "page_title.categories_category1_edit_admin" => "Modifica categoria1",
+    "page_title.categories_category2_edit_admin_new" => "Aggiungi categoria2",
+    "page_title.categories_category2_edit_admin" => "Modifica categoria2",
+    "page_title.categories_category3_edit_admin_new" => "Aggiungi categoria3",
+    "page_title.categories_category3_edit_admin" => "Modifica categoria3",
 
     "status_msg.category1.added" => "Categoria1 aggiunta",
     "status_msg.category1.updated" => "Categoria1 aggiornata",
@@ -259,9 +259,9 @@ return array(
 
     "admin_menu_item.products" => "Prodotti",
 
-    "page_title.products" => "Prodotti",
-    "page_title.product_edit_new" => "Aggiungi prodotto",
-    "page_title.product_edit" => "Modifica prodotto",
+    "page_title.products_admin" => "Prodotti",
+    "page_title.product_edit_admin_new" => "Aggiungi prodotto",
+    "page_title.product_edit_admin" => "Modifica prodotto",
 
     "status_msg.product.added" => "Prodotto aggiunto",
     "status_msg.product.updated" => "Prodotto aggiornato",
