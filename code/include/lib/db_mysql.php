@@ -150,7 +150,7 @@ class MySqlDb extends AppObject {
 
     function get_select_query_num_rows($query) {
         // Return number of rows in SelectQuery object
-        $count_query = $query;
+        $count_query = clone($query);
         $count_query->order_by = "";
         if ($query->group_by == "" && !$query->distinct) {
             $count_query->select = "COUNT(*) AS n_rows";
