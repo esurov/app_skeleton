@@ -2774,7 +2774,7 @@ class App extends AppObject {
         );
         $objects = array();
         while ($row = $res->fetch_next_row_to_db_object($obj)) {
-            $objects[] = $obj;
+            $objects[] = clone($obj);
         }
         return $objects;
     }
