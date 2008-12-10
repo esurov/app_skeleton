@@ -322,9 +322,11 @@ class ProductTable extends CustomDbObject {
                 )
             );
         } else {
+            /*
             if ($this->get_num_product_images() == 0) {
                 $messages[] = new ErrorStatusMsg("product.image_empty");
             }
+            */
         }
             
         return $messages;
