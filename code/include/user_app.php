@@ -72,6 +72,7 @@ class UserApp extends CustomApp {
 
             // Products management
             "products_admin" => $a,
+            "products_pdf_admin" => $a,
             "product_edit_admin" => $a,
         );
     }
@@ -1564,6 +1565,54 @@ class UserApp extends CustomApp {
         $products_list->print_values();
 
         $this->print_file("{$templates_dir}/body.html", "body");
+    }
+
+    function action_products_pdf_admin() {
+        $this->page_template_name = "page_pdf.html";
+        $templates_dir = "products_pdf_admin";
+
+        $debug = (string) param("debug");
+
+        $product =& $this->create_db_object("Product");
+        $product->insert_filters();
+        $products_list =& $this->create_object(
+            "PagedQueryObjectsList",
+            array(
+                "templates_dir" => "{$templates_dir}/products",
+                "template_var" => "products",
+                "obj" => $product,
+                "default_order_by" => array(
+                    "category1_position ASC",
+                    "category2_position ASC",
+                    "category3_position ASC",
+                ),
+                "filter_form.visible" => false,
+                "pager.visible" => false,
+                "context" => "products_admin_list_item",
+            )
+        );
+        $products_list->print_values();
+
+        $this->print_file("{$templates_dir}/body.html", "body");
+
+        if ($debug != 1) {
+            $products_pdf =& $this->create_object(
+                "HtmlToPdfConverter",
+                array(
+                    "html" => utf8_decode($this->create_html_document_body_content()),
+                    "paper" => "a4",
+                    "orientation" => "portrait",
+                )
+            );
+            $content = $products_pdf->print_values();
+
+            $db_now_date = $this->get_db_now_date();
+            $this->create_pdf_document_response(
+                $content,
+                "Products_{$db_now_date}.pdf",
+                true
+            );
+        }
     }
 
     function action_product_edit_admin() {

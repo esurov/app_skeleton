@@ -14,6 +14,8 @@ return array(
     "global:no_images" => "Nessuna immagine",
     "global:no_file" => "Nessun file",
     "global:sure_delete.js" => get_js_safe_string("Sei sicuro di voler cancellare l'informazione?"),
+    "global:pdf.page_num_format" => "{PAGE_NUM} di {PAGE_COUNT}",
+    "global:pdf.euro_sign" => "Euro ",
 
     "global:month_long_1" => "Gennaio",
     "global:month_long_2" => "Febbraio",
@@ -235,6 +237,7 @@ return array(
     // Products
     "global:product.add" => "Aggiungi prodotto",
     "global:product.back_to_list" => "Torna all'elenco prodotti",
+    "global:product.download_pdf" => "Scarica PDF",
 
     "global:product.category1" => "Categoria1",
     "global:product.category2" => "Categoria2",

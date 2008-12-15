@@ -14,6 +14,8 @@ return array(
     "global:no_images" => "No images uploaded",
     "global:no_file" => "No file uploaded",
     "global:sure_delete.js" => get_js_safe_string("Are you sure you want to delete record?"),
+    "global:pdf.page_num_format" => "{PAGE_NUM} of {PAGE_COUNT}",
+    "global:pdf.euro_sign" => "Euro ",
 
     "global:month_long_1" => "January",
     "global:month_long_2" => "February",
@@ -235,6 +237,7 @@ return array(
     // Products
     "global:product.add" => "Add product",
     "global:product.back_to_list" => "Back to products",
+    "global:product.download_pdf" => "Download PDF",
 
     "global:product.category1" => "Category1",
     "global:product.category2" => "Category2",
