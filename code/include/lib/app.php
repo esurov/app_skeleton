@@ -1958,7 +1958,7 @@ class App extends AppObject {
         );
         
         if (!is_null($alt_values_info)) {
-            $values_info = $alt_values_info;
+            $values_data_info = get_param_value($alt_values_info, "data", array());
         }
         $value_caption_pairs = $this->expand_value_caption_pairs_with_nonset(
             $value_caption_pairs,
