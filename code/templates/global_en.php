@@ -99,6 +99,10 @@ return array(
     "global:upload_new_image" => "Upload new image",
     "global:current_file" => "Current file",
     "global:upload_new_file" => "Upload new file",
+    "global:email_from" => "From",
+    "global:email_to" => "To",
+    "global:email_subject" => "Subject",
+    "global:code" => "Code",
 
     // Link/button titles
     "global:view" => "View",
@@ -140,6 +144,8 @@ return array(
     "global:finish" => "Finish",
     "global:done" => "Done",
     "global:generate" => "Generate",
+    "global:export" => "Export",
+    "global:import" => "Import",
 
     "global:delete_image" => "Delete image",
     "global:delete_file" => "Delete file",

@@ -14,7 +14,7 @@ return array(
     "choose_one" => "Selezionare:",
     "yes" => "Sì",
     "no" => "No",
-    "none" => "Nessuno/a",
+    "none" => "Nessuno",
     "other" => "Altro",
     "not_specified" => "Non specificato",
 
