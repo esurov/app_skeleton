@@ -33,6 +33,13 @@ class NewsArticleTable extends CustomDbObject {
             "field" => "body",
             "type" => "text",
             "multilingual" => 1,
+            "input" => array(
+                "type" => "textarea",
+                "type_attrs" => array(
+                    "cols" => 60,
+                    "rows" => 15,
+                ),
+            ),
         ));
 
         $this->insert_field(array(

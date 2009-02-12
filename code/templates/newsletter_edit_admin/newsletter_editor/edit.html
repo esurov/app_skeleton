@@ -3,6 +3,7 @@
 </div>
 
 {{_global/yui/date_picker/include_js}}
+{{_global/tiny_mce/include_js}}
 
 <form
     action="?action=newsletter_edit_admin&amp;newsletter_id={%newsletter.id%}"
@@ -58,6 +59,7 @@
 </form>
 
 {{_global/yui/date_picker/init_js}}
+{{_global/tiny_mce/init_simple_js}}
 
 <script type="text/javascript">
     {%newsletter.client_validation_js%}

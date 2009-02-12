@@ -3,6 +3,7 @@
 </div>
 
 {{_global/yui/date_picker/include_js}}
+{{_global/tiny_mce/include_js}}
 
 <form
     action="?action=news_article_edit_admin&amp;news_article_id={%news_article.id%}"
@@ -54,6 +55,7 @@
 </form>
 
 {{_global/yui/date_picker/init_js}}
+{{_global/tiny_mce/init_simple_js}}
 
 <script type="text/javascript">
     {%news_article.client_validation_js%}
