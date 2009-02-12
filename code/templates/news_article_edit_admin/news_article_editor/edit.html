@@ -2,6 +2,8 @@
     [<a href="?action=news_articles_admin">{%global:news_article.back_to_list%}</a>]
 </div>
 
+{{_global/yui/date_picker/include_js}}
+
 <form
     action="?action=news_article_edit_admin&amp;news_article_id={%news_article.id%}"
     method="post"
@@ -50,6 +52,8 @@
     </table>
 
 </form>
+
+{{_global/yui/date_picker/init_js}}
 
 <script type="text/javascript">
     {%news_article.client_validation_js%}

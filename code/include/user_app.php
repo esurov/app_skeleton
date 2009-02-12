@@ -150,7 +150,7 @@ class UserApp extends CustomApp {
     }
 
     function init_yui_core() {
-        $templates_dir = "_global/yui/init_core";
+        $templates_dir = "_global/yui/core";
 
         $this->init_sys_var("yui_debug", ($this->get_log_debug_level() >= DL_DEBUG));
         $this->init_sys_var("yui_url", create_self_url() . "yui/");
@@ -171,7 +171,7 @@ class UserApp extends CustomApp {
             $this->yui_debug ? "" : "-min"
         );
 
-        $this->print_file("{$templates_dir}/init_yui_js.html", "init_yui_core_js");
+        $this->print_file("{$templates_dir}/include_core_js.html", "include_yui_core_js");
     }
 
     function run_access_denied_action() {

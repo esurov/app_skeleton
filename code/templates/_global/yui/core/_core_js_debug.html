@@ -1,0 +1,24 @@
+<script type="text/javascript" src="{%sys:yui_url%}yahoo/yahoo.js"></script>
+<script type="text/javascript" src="{%sys:yui_url%}dom/dom.js"></script>
+<script type="text/javascript" src="{%sys:yui_url%}event/event.js"></script>
+
+<link rel="stylesheet" type="text/css" href="{%sys:yui_url%}logger/assets/logger.css" />
+<script type="text/javascript" src="{%sys:yui_url%}dragdrop/dragdrop{%sys:yui_debug_suffix%}.js"></script>
+<script type="text/javascript" src="{%sys:yui_url%}logger/logger{%sys:yui_debug_suffix%}.js"></script>
+<script type="text/javascript">
+    YAHOO.util.Event.addListener(window, 'load', function() {
+        logger = new YAHOO.widget.LogReader(
+            null,
+            {
+                width: '300px',
+                height: '450px',
+                footerEnabled: true,
+                fontSize: '1em'
+            }
+        );
+        YAHOO.widget.Logger.handleWindowErrors();
+        logger.hide();
+        YAHOO.widget.Logger.enableBrowserConsole();
+    });
+</script>
+<script type="text/javascript" src="{%sys:self_url%}js/logger.js"></script>

@@ -1,0 +1,20 @@
+.date_picker_button {
+    width: 40px;
+    height: 25px;
+    background: #cbcccd url(../images/date_picker_btn.gif) center center no-repeat;
+    vertical-align: middle;
+}
+
+.yui-calendar-container {
+    width: 170px;
+}
+
+.yui-calendar tbody tr td.wd6,
+.yui-calendar tbody tr td.wd0 {
+    background-color: #ffe0e0;
+}
+
+.yui-calendar tbody tr td.today {
+    background-color: #fffbe3;
+    border: 1px solid #e0e0e0 !important;
+}

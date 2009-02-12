@@ -46,6 +46,13 @@ return array(
     "global:weekday_long_5" => "Friday",
     "global:weekday_long_6" => "Saturday",
 
+    "global:calendar_date_format" => $this->get_config_value("app_date_format_en"),
+    "global:calendar_choose_month" => "Choose Month",
+    "global:calendar_enter_year" => "Enter Year",
+    "global:calendar_submit" => "OK",
+    "global:calendar_cancel" => "Cancel",
+    "global:calendar_message_year_bad" => "Please enter a valid year",
+
     // Titles
     "global:actions" => "Actions",
     "global:id" => "ID",

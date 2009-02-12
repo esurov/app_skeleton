@@ -571,7 +571,7 @@ function parse_date_by_format($format, $value) {
         for ($i = 0; $i < $format_len; $i++) {
             $format_char = $format{$i};
             switch ($format_char) {
-            case "y":
+            case "Y":
                 $date_parts["year"] = (int) $date_parts_unordered[$p++];
                 break;
             case "m":
@@ -634,7 +634,7 @@ function create_date_regexp_by_format($format) {
     for ($i = 0; $i < $format_len; $i++) {
         $format_char = $format{$i};
         switch ($format_char) {
-        case "y":
+        case "Y":
             $res .= '(\d{1,4})';
             break;
         case "m":
@@ -682,7 +682,7 @@ function create_date_by_format($format, $date_parts, $date_if_unknown) {
     for ($i = 0; $i < $format_len; $i++) {
         $format_char = $format{$i};
         switch ($format_char) {
-        case "y":
+        case "Y":
             $res .= sprintf("%04d", $date_parts["year"]);
             break;
         case "m":

@@ -654,3 +654,5 @@ function openPolicyDisclaimerPopupWindow() {
         'yes'
     );
 }
+
+

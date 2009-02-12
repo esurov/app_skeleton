@@ -2,6 +2,8 @@
     [<a href="?action=newsletters_admin">{%global:newsletter.back_to_list%}</a>]
 </div>
 
+{{_global/yui/date_picker/include_js}}
+
 <form
     action="?action=newsletter_edit_admin&amp;newsletter_id={%newsletter.id%}"
     method="post"
@@ -54,6 +56,8 @@
     </table>
 
 </form>
+
+{{_global/yui/date_picker/init_js}}
 
 <script type="text/javascript">
     {%newsletter.client_validation_js%}

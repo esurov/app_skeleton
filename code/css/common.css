@@ -62,14 +62,14 @@ table {
 
 table th {
     border: 0;
-    vertical-align: top;
     padding: 5px;
     font-size: 12px;
     font-weight: bold;
+    vertical-align: top;
 }
 
 table td {
-    vertical-align: middle;
+    vertical-align: top;
 }
 
 form table th {
@@ -81,16 +81,16 @@ form table td {
     padding-left: 30px;
 }
 
+form table th {
+    text-align: left;
+}
+
 table.table tr th {
     text-align: center;
 }
 
 table.table tr td, table.table tr th {
     padding: 5px;
-}
-
-form table th {
-    text-align: left;
 }
 
 table.table td, table.table th {
