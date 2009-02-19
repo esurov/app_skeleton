@@ -672,36 +672,47 @@ class App extends AppObject {
         case "foreign_key":
             $app_value = $this->get_app_key_value($db_value);
             break;
+        
         case "integer":
             $app_value = $this->get_app_integer_value($db_value);
             break;
+        
         case "double":
             $app_value = $this->get_app_double_value($db_value, $type_params["prec"]);
             break;
+        
         case "currency":
             $app_value = $this->get_app_currency_value($db_value, $type_params["prec"]);
             break;
+        
         case "boolean":
             $app_value = $this->get_app_boolean_value($db_value);
             break;
+        
         case "enum":
             $app_value = $this->get_app_enum_value($db_value);
             break;
+        
         case "varchar":
             $app_value = $this->get_app_varchar_value($db_value);
             break;
+        
         case "text":
             $app_value = $this->get_app_text_value($db_value);
             break;
+        
         case "blob":
             $app_value = $this->get_app_blob_value($db_value);
             break;
+        
         case "datetime":
             $app_value = $this->get_app_datetime_value($db_value);
             break;
+        
         case "date":
             $app_value = $this->get_app_date_value($db_value);
             break;
+        
         case "time":
             $app_value = $this->get_app_time_value($db_value);
             break;
@@ -844,36 +855,47 @@ class App extends AppObject {
         case "foreign_key":
             $db_value = $this->get_db_key_value($app_value);
             break;
+        
         case "integer":
             $db_value = $this->get_db_integer_value($app_value);
             break;
+        
         case "double":
             $db_value = $this->get_db_double_value($app_value);
             break;
+        
         case "currency":
             $db_value = $this->get_db_currency_value($app_value);
             break;
+        
         case "boolean":
             $db_value = $this->get_db_boolean_value($app_value);
             break;
+        
         case "enum":
             $db_value = $this->get_db_enum_value($app_value);
             break;
+        
         case "varchar":
             $db_value = $this->get_db_varchar_value($app_value);
             break;
+        
         case "text":
             $db_value = $this->get_db_text_value($app_value);
             break;
+        
         case "blob":
             $db_value = $this->get_db_blob_value($app_value);
             break;
+        
         case "datetime":
             $db_value = $this->get_db_datetime_value($app_value);
             break;
+        
         case "date":
             $db_value = $this->get_db_date_value($app_value);
             break;
+        
         case "time":
             $db_value = $this->get_db_time_value($app_value);
             break;
@@ -985,18 +1007,23 @@ class App extends AppObject {
         case "foreign_key":
             $db_value = $this->read_key_value($input_name, true);
             break;
+        
         case "integer":
             $db_value = $this->read_integer_value($input_name, true);
             break;
+        
         case "double":
             $db_value = $this->read_double_value($input_name, true);
             break;
+        
         case "currency":
             $db_value = $this->read_currency_value($input_name, true);
             break;
+        
         case "boolean":
             $db_value = $this->read_boolean_value($input_name, true);
             break;
+        
         case "enum":
             $db_value = $this->read_enum_value(
                 $input_name,
@@ -1004,21 +1031,27 @@ class App extends AppObject {
                 true
             );
             break;
+        
         case "varchar":
             $db_value = $this->read_varchar_value($input_name, true);
             break;
+        
         case "text":
             $db_value = $this->read_text_value($input_name, true);
             break;
+        
         case "blob":
             $db_value = $this->read_blob_value($input_name, true);
             break;
+        
         case "datetime":
             $db_value = $this->read_datetime_value($input_name, true);
             break;
+        
         case "date":
             $db_value = $this->read_date_value($input_name, true);
             break;
+        
         case "time":
             $db_value = $this->read_time_value($input_name, true);
             break;
@@ -1370,6 +1403,7 @@ class App extends AppObject {
                 $input_attrs
             );
             break;
+        
         case "radio":
             $printed_value = $this->print_radio_group_input_form_value(
                 $template_var,
@@ -1380,6 +1414,7 @@ class App extends AppObject {
                 $alt_values_info
             );
             break;
+        
         case "select":
             $printed_value = $this->print_select_input_form_value(
                 $template_var,
@@ -1390,6 +1425,7 @@ class App extends AppObject {
                 $alt_values_info
             );
             break;
+        
         case "main_select":
             $printed_value = $this->print_main_select_input_form_value(
                 $template_var,
@@ -1403,6 +1439,7 @@ class App extends AppObject {
                 $alt_values_info
             );
             break;
+        
         default:
             $printed_value = "";
         }
@@ -1556,6 +1593,7 @@ class App extends AppObject {
                 $values_info
             );
             break;
+        
         case "select":
             $printed_value = $this->print_select_input_form_value(
                 $template_var,
@@ -1565,6 +1603,7 @@ class App extends AppObject {
                 $values_info
             );
             break;
+        
         default:
             $printed_value = "";
         }
@@ -1595,6 +1634,7 @@ class App extends AppObject {
                 )
             );
             break;
+        
         default:
             $printed_value = "";
         }
@@ -1620,6 +1660,7 @@ class App extends AppObject {
                 $input_attrs
             );
             break;
+        
         default:
             $printed_value = "";
         }
@@ -1972,6 +2013,7 @@ class App extends AppObject {
         case "array":
             $value_caption_pairs = $values_info["data"]["array"];
             break;
+        
         case "db_object_query":
             $data_info = $values_info["data"];
             
@@ -1987,6 +2029,7 @@ class App extends AppObject {
                 $captions_field_name
             );
             break;
+        
         case "query":
             $data_info = $values_info["data"];
             

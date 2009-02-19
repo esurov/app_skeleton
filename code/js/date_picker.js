@@ -360,11 +360,11 @@ function parseDateByFormat(format, value, params) {
                 res += '(\\d{1,2})';
                 break;
             
-            case 'h':
+            case 'H':
                 res += '(\\d{1,2})';
                 break;
             
-            case 'H':
+            case 'h':
                 res += '(\\d{1,2})';
                 break;
             
@@ -441,11 +441,11 @@ function parseDateByFormat(format, value, params) {
                 dateParts['day'] = parseFloat(datePartsUnordered[p++]);
                 break;
             
-            case 'h':
+            case 'H':
                 dateParts['hour'] = parseFloat(datePartsUnordered[p++]);
                 break;
             
-            case 'H':
+            case 'h':
                 dateParts['hour'] = parseFloat(datePartsUnordered[p++]);
                 break;
             
@@ -519,7 +519,13 @@ function createDateByFormat(format, dateParts, dateIfUnknown) {
             break;
         
         case 'y':
-            res += jsPrintF('2', dateParts['year']);
+            var year = date_parts['year'];
+            if (year < 2000) {
+                year -= 1900;
+            } else {
+                year -= 2000;
+            }
+            res += jsPrintF('2', year);
             break;
 
         case 'm':
@@ -530,11 +536,11 @@ function createDateByFormat(format, dateParts, dateIfUnknown) {
             res += jsPrintF('2', dateParts['day']);
             break;
         
-        case 'h':
+        case 'H':
             res += jsPrintF('2', dateParts['hour']);
             break;
         
-        case 'H':
+        case 'h':
             var hour = dateParts['hour'];
             if (hour <= 12) {
                 ampmStr = 'AM';

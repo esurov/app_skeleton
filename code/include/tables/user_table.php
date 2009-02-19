@@ -211,21 +211,26 @@ class UserTable extends CustomDbObject {
         case "login_form":
             $field_names_to_read = array("login", "password", "should_remember");
             break;
+        
         case "signup_form":
             $field_names_to_not_read = array("role", "is_confirmed", "is_active");
             break;
+        
         case "my_account":
             $field_names_to_not_read = array("login", "role", "is_confirmed", "is_active");
             break;
+        
         case "user_edit_admin":
             if ($this->is_definite()) {
                 $field_names_to_not_read = array("role");
             }
             break;
+        
         case "recover_password_form":
             $field_names_to_read = array("login", "email");
             break;
         }
+        
         return array(
             "field_names_to_read" => $field_names_to_read,
             "field_names_to_not_read" => $field_names_to_not_read,
@@ -243,6 +248,7 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
+        
         case "login":
             $login = $context_params["login"];
             $password = $context_params["password"];
@@ -278,6 +284,7 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
+        
         case "signup_form":
             $conditions = array(
                 array(
@@ -333,6 +340,7 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
+        
         case "my_account":
         case "user_edit_admin":
             $conditions = array(
@@ -366,6 +374,7 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
+        
         case "recover_password_form":
             $conditions = array(
                 array(
@@ -395,6 +404,7 @@ class UserTable extends CustomDbObject {
                 ),
             );
             break;
+        
         default:
             $conditions = array();
         }
@@ -474,6 +484,7 @@ class UserTable extends CustomDbObject {
             $field_names_to_not_update = array("password");
             break;
         }
+        
         return array(
             "field_names_to_not_update" => $field_names_to_not_update,
         );

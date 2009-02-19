@@ -207,6 +207,7 @@ class BinaryStreamResponse extends HttpResponse {
         case "socket":
             fclose($this->stream);
             break;
+        
         case "process":
             pclose($this->stream);
             break;

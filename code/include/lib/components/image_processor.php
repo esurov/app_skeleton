@@ -304,12 +304,15 @@ class GD2 extends _ImageProcessor {
         case "jpg":
             $image_type_func_name = "jpeg";
             break;
+        
         case "gif":
             $image_type_func_name = "gif";
             break;
+        
         case "png":
             $image_type_func_name = "png";
             break;
+        
         default:
             $image_type_func_name = "";
         }
@@ -333,6 +336,7 @@ class GD2 extends _ImageProcessor {
                 $this->_output_image_jpg_quality
             );
             break;
+        
         case "gif":
         case "png":
             $result = $image_export_func_name(
@@ -340,6 +344,7 @@ class GD2 extends _ImageProcessor {
                 $this->_output_file_full_filename
             );
             break;
+        
         default:
             $result = false;
         }

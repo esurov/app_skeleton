@@ -41,6 +41,7 @@ class OrderedDbObject extends CustomDbObject {
             $field_names_to_update = array("position");
             break;
         }
+        
         return array(
             "field_names_to_update" => $field_names_to_update,
         );

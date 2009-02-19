@@ -285,6 +285,7 @@ class MenuXml extends XML {
             $menu->print_sub_menu_always =
                 ($print_sub_menu_always_str == "true") ? true : false;
             break;
+        
         case "menu_item":
             $menu_item = new MenuItem();
 

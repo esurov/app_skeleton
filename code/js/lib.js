@@ -73,6 +73,7 @@ function getElementValue(element) {
             }
         }
         break;
+    
     default:
         return element.value;
     }
@@ -97,6 +98,7 @@ function setElementValue(element, value) {
             }
         }
         break;
+    
     default:
         element.value = value;
     }
@@ -472,51 +474,67 @@ function ValidateCondition(elementName, type, messageText, params, dependentCond
             var re = eval(params[0]);
             result = (value.match(re)) ? true : false;
             break;
+        
         case 'empty':
             result = (value.match(/^\s*$/)) ? true : false;
             break;
+        
         case 'not_empty':
             result = (value.match(/^\s*$/)) ? false : true;
             break;
+        
         case 'email':
             result = (value.match(/.+@.+\..+/)) ? true : false;
             break;
+        
         case 'equal':
             result = (value == params[0]);
             break;
+        
         case 'not_equal':
             result = (value != params[0]);
             break;
+        
         case 'zip':
             result = (value.match(/^\d{5,}$/)) ? true : false;
             break;
+        
         case 'phone':
             result = (value.match(/^[0-9 \+\-\(\)]+$/)) ? true : false;
             break;
+        
         case 'number_integer':
             result = isInteger(value);
             break;
+        
         case 'number_double':
             result = isDouble(value);
             break;
+        
         case 'number_equal':
             result = (getJsDouble(value) == parseFloat(params[0]));
             break;
+        
         case 'number_not_equal':
             result = (getJsDouble(value) != parseFloat(params[0]));
             break;
+        
         case 'number_greater':
             result = (getJsDouble(value) > parseFloat(params[0]));
             break;
+        
         case 'number_greater_equal':
             result = (getJsDouble(value) >= parseFloat(params[0]));
             break;
+        
         case 'number_less':
             result = (getJsDouble(value) < parseFloat(params[0]));
             break;
+        
         case 'number_less_equal':
             result = (getJsDouble(value) <= parseFloat(params[0]));
             break;
+        
         default:
             result = true;
         }

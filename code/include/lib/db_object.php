@@ -353,6 +353,7 @@ class DbObject extends AppObject {
                 $width = get_param_value($field_info, "width", 11);
                 $default_index_type = "primary_key";
                 break;
+            
             case "foreign_key":
                 $initial_field_value = 0;
                 $width = get_param_value($field_info, "width", 11);
@@ -360,24 +361,29 @@ class DbObject extends AppObject {
                 $input["values"] = get_param_value($input, "values", null);
                 $default_index_type = "index";
                 break;
+            
             case "integer":
                 $initial_field_value = get_param_value($field_info, "value", 0);
                 $width = get_param_value($field_info, "width", 11);
                 break;
+            
             case "double":
                 $initial_field_value = get_param_value($field_info, "value", 0.0);
                 $width = get_param_value($field_info, "width", 16);
                 $prec = get_param_value($field_info, "prec", 2);
                 break;
+            
             case "currency":
                 $initial_field_value = get_param_value($field_info, "value", 0.0);
                 $width = get_param_value($field_info, "width", 10);
                 $prec = get_param_value($field_info, "prec", 2);
                 break;
+            
             case "boolean":
                 $initial_field_value = get_param_value($field_info, "value", 0);
                 $width = get_param_value($field_info, "width", 1);
                 break;
+            
             case "enum":
                 $initial_field_value = get_param_value($field_info, "value", null);
                 if (is_null($initial_field_value)) {
@@ -391,6 +397,7 @@ class DbObject extends AppObject {
                     );
                 }
                 break;
+            
             case "varchar":
                 $width = get_param_value($field_info, "width", 255);
                 $initial_field_value = get_param_value($field_info, "value", "");
@@ -401,24 +408,30 @@ class DbObject extends AppObject {
                     $width
                 );
                 break;
+            
             case "text":
                 $initial_field_value = get_param_value($field_info, "value", "");
                 $input["type"] = get_param_value($input, "type", "textarea");
                 $input["type_attrs"]["cols"] = get_param_value($input["type_attrs"], "cols", 60);
                 $input["type_attrs"]["rows"] = get_param_value($input["type_attrs"], "rows", 9);
                 break;
+            
             case "blob":
                 $initial_field_value = get_param_value($field_info, "value", "");
                 break;
+            
             case "datetime":
                 $initial_field_value = get_param_value($field_info, "value", "0000-00-00 00:00:00");
                 break;
+            
             case "date":
                 $initial_field_value = get_param_value($field_info, "value", "0000-00-00");
                 break;
+            
             case "time":
                 $initial_field_value = get_param_value($field_info, "value", "00:00:00");
                 break;
+            
             default:
                 $this->process_fatal_error(
                     "Unknown field type '{$field_type}' for field '{$field_name}'"
@@ -568,12 +581,15 @@ class DbObject extends AppObject {
         case "inner":
             $join_type_str = "INNER";
             break;
+        
         case "left":
             $join_type_str = "LEFT";
             break;
+        
         case "right":
             $join_type_str = "RIGHT";
             break;
+        
         default:
             $this->process_fatal_error(
                 "Bad join type '{$join_type}'{$field_name_error_str}!"
@@ -746,24 +762,30 @@ class DbObject extends AppObject {
         case "foreign_key":
             $type_expression = "INT({$field_info['width']})";
             break;
+        
         case "integer":
             $type_expression = "INT({$field_info['width']})";
             break;
+        
         case "double":
             $type_expression = "DOUBLE({$field_info['width']},{$field_info['prec']})";
             break;
+        
         case "currency":
             $type_expression = "DECIMAL({$field_info['width']},{$field_info['prec']})";
             break;
+        
         case "boolean":
             $type_expression = "TINYINT({$field_info['width']})";
             break;
+        
         case "enum":
             $enum_value_caption_pairs = $field_info["input"]["values"]["data"]["array"];
             $enum_values = get_values_from_value_caption_pairs($enum_value_caption_pairs);
             $enum_values_expression = "'" . join("','", $enum_values) . "'";
             $type_expression = "ENUM({$enum_values_expression})";
             break;
+        
         case "varchar":
             if ($field_info["width"] <= 3) {
                 $type_expression = "CHAR({$field_info['width']})";
@@ -771,21 +793,27 @@ class DbObject extends AppObject {
                 $type_expression = "VARCHAR({$field_info['width']})";
             }
             break;
+        
         case "text":
             $type_expression = "LONGTEXT";
             break;
+        
         case "blob":
             $type_expression = "LONGBLOB";
             break;
+        
         case "datetime":
             $type_expression = "DATETIME";
             break;
+        
         case "date":
             $type_expression = "DATE";
             break;
+        
         case "time":
             $type_expression = "TIME";
             break;
+        
         default:
             $this->process_fatal_error(
                 "{$this->_table_name}: Unknown field type '{$field_type}'!"
@@ -804,15 +832,19 @@ class DbObject extends AppObject {
         case "primary_key":
             $expression = "PRIMARY KEY ({$index_field_names_str})";
             break;
+        
         case "index":
             $expression = "INDEX {$index_name} ({$index_field_names_str})";
             break;
+        
         case "unique":
             $expression = "UNIQUE {$index_name} ({$index_field_names_str})";
             break;
+        
         case "fulltext":
             $expression = "FULLTEXT {$index_name} ({$index_field_names_str})";
             break;
+        
         default:
             $this->process_fatal_error(
                 "{$this->_table_name}: Unknown index type '{$index_type}'!"
@@ -1130,6 +1162,7 @@ class DbObject extends AppObject {
         case "boolean":
             $field_value_str = $field_value;
             break;
+        
         case "enum":
         case "varchar":
         case "text":
@@ -1420,6 +1453,7 @@ class DbObject extends AppObject {
             }
             $filter_query_ex["where"] = "(" . join(" OR ", $subwheres_or) . ")";
             break;
+        
         case "equal_many":
             $relation_sign = $this->get_filter_relation_sign_by_relation($filter_relation);
             if (is_array($db_value) && count($db_value) > 0) {
@@ -1433,6 +1467,7 @@ class DbObject extends AppObject {
                 $filter_query_ex["where"] = "(" . join(" OR ", $subwheres_or) . ")";
             }
             break;
+        
         case "like":
         case "like_many":
             if ($filter_relation == "like") {
@@ -1458,6 +1493,7 @@ class DbObject extends AppObject {
                 $filter_query_ex["where"] = "(" . join(" AND ", $subwheres_and) . ")";
             }
             break;
+        
         case "having_equal":
         case "having_less":
         case "having_less_equal":
@@ -1480,22 +1516,27 @@ class DbObject extends AppObject {
         case "having_equal":
             $filter_relation_sign = "=";
             break;
+        
         case "less":
         case "having_less":
             $filter_relation_sign = "<";
             break;
+        
         case "less_equal":
         case "having_less_equal":
             $filter_relation_sign = "<=";
             break;
+        
         case "greater":
         case "having_greater":
             $filter_relation_sign = ">";
             break;
+        
         case "greater_equal":
         case "having_greater_equal":
             $filter_relation_sign = ">=";
             break;
+        
         default:
             $filter_relation_sign = "";
         }
@@ -1653,12 +1694,14 @@ class DbObject extends AppObject {
                 $db_value
             );
             break;
+        
         case "foreign_key":
             $this->app->print_foreign_key_value(
                 $template_var,
                 $db_value
             );
             break;
+        
         case "integer":
             $input_info = get_param_value($field_info, "input", array());
             $this->app->print_integer_value(
@@ -1667,6 +1710,7 @@ class DbObject extends AppObject {
                 get_param_value($input_info, "nonset_value_caption_pair", null)
             );
             break;
+        
         case "double":
             $input_info = get_param_value($field_info, "input", array());
             $this->app->print_double_value(
@@ -1676,6 +1720,7 @@ class DbObject extends AppObject {
                 get_param_value($input_info, "nonset_value_caption_pair", null)
             );
             break;
+        
         case "currency":
             $values_data_info = get_param_value($values_info, "data", array());
             $this->app->print_currency_value(
@@ -1687,6 +1732,7 @@ class DbObject extends AppObject {
                 get_param_value($values_data_info, "nonset_value_caption_pair", null)
             );
             break;
+        
         case "boolean":
             $values_data_info = get_param_value($values_info, "data", array());
             $this->app->print_boolean_value(
@@ -1695,6 +1741,7 @@ class DbObject extends AppObject {
                 get_param_value($values_data_info, "value_caption_pairs", null)
             );
             break;
+        
         case "enum":
             $this->app->print_enum_value(
                 $template_var,
@@ -1702,30 +1749,35 @@ class DbObject extends AppObject {
                 $values_info["data"]["array"]
             );
             break;
+        
         case "varchar":
             $this->app->print_varchar_value(
                 $template_var,
                 $db_value
             );
             break;
+        
         case "text":
             $this->app->print_text_value(
                 $template_var,
                 $db_value
             );
             break;
+        
         case "datetime":
             $this->app->print_datetime_value(
                 $template_var,
                 $db_value
             );
             break;
+        
         case "date":
             $this->app->print_date_value(
                 $template_var,
                 $db_value
             );
             break;
+        
         case "time":
             $this->app->print_time_value(
                 $template_var,
@@ -1783,6 +1835,7 @@ class DbObject extends AppObject {
                 $db_value
             );
             break;
+        
         case "foreign_key":
             $dependency_info = get_param_value($values_info, "dependency", null);
             if (is_null($dependency_info)) {
@@ -1808,6 +1861,7 @@ class DbObject extends AppObject {
                 $input_type_params
             );
             break;
+        
         case "integer":
             $input_info = get_param_value($field_info, "input", array());
             $this->app->print_integer_form_value(
@@ -1818,6 +1872,7 @@ class DbObject extends AppObject {
                 get_param_value($input_info, "nonset_value_caption_pair", null)
             );
             break;
+        
         case "double":
             $input_info = get_param_value($field_info, "input", array());
             $this->app->print_double_form_value(
@@ -1829,6 +1884,7 @@ class DbObject extends AppObject {
                 get_param_value($input_info, "nonset_value_caption_pair", null)
             );
             break;
+        
         case "currency":
             $this->app->print_currency_form_value(
                 $template_var,
@@ -1839,6 +1895,7 @@ class DbObject extends AppObject {
                 $values_info
             );
             break;
+        
         case "boolean":
             $this->app->print_boolean_form_value(
                 $template_var,
@@ -1847,6 +1904,7 @@ class DbObject extends AppObject {
                 $input_attrs
             );
             break;
+        
         case "enum":
             $this->app->print_enum_form_value(
                 $template_var,
@@ -1857,6 +1915,7 @@ class DbObject extends AppObject {
                 $values_info
             );
             break;
+        
         case "varchar":
             if ($this->is_field_multilingual(null, $field_info)) {
                 $this->app->print_multilingual_form_value($template_var);
@@ -1870,6 +1929,7 @@ class DbObject extends AppObject {
                 );
             }
             break;
+        
         case "text":
             if ($this->is_field_multilingual(null, $field_info)) {
                 $this->app->print_multilingual_form_value($template_var);
@@ -1883,6 +1943,7 @@ class DbObject extends AppObject {
                 );
             }
             break;
+        
         case "datetime":
             $this->app->print_datetime_form_value(
                 $template_var,
@@ -1994,6 +2055,7 @@ class DbObject extends AppObject {
                 )
             );
             break;
+        
         case "checkbox":
             $this->app->print_checkbox_input_form_value(
                 $template_var,
@@ -2003,6 +2065,7 @@ class DbObject extends AppObject {
                 $filter_input_attrs
             );
             break;
+        
         case "checkboxes":
             $this->app->print_checkboxes_group_input_form_value(
                 $template_var,
@@ -2013,6 +2076,7 @@ class DbObject extends AppObject {
                 $alt_values_info
             );
             break;
+        
         case "radio":
             $this->app->print_radio_group_input_form_value(
                 $template_var,
@@ -2023,6 +2087,7 @@ class DbObject extends AppObject {
                 $alt_values_info
             );
             break;
+        
         case "select":
             $this->app->print_select_input_form_value(
                 $template_var,
@@ -2033,6 +2098,7 @@ class DbObject extends AppObject {
                 $alt_values_info
             );
             break;
+        
         case "multiselect":
             $filter_input_attrs["multiple"] = "multiple";
             $this->app->print_select_input_form_value(
@@ -2044,6 +2110,7 @@ class DbObject extends AppObject {
                 $alt_values_info
             );
             break;
+        
         case "main_select":
             $dependency_info = $values_info["dependency"];
             if ($values_source == "field") {
@@ -2129,42 +2196,55 @@ class DbObject extends AppObject {
         case "regexp":
             $result = $this->validate_regexp_condition($field_name, $param);
             break;
+        
         case "empty":
             $result = $this->validate_empty_condition($field_name);
             break;
+        
         case "not_empty":
             $result = $this->validate_not_empty_condition($field_name);
             break;
+        
         case "email":
             $result = $this->validate_email_condition($field_name);
             break;
+        
         case "unique":
             $result = $this->validate_unique_condition($field_name);
             break;
+        
         case "equal":
             $result = $this->validate_equal_condition($field_name, $param);
             break;
+        
         case "not_equal":
             $result = $this->validate_not_equal_condition($field_name, $param);
             break;
+        
         case "less":
             $result = $this->validate_less_condition($field_name, $param);
             break;
+        
         case "less_equal":
             $result = $this->validate_less_equal_condition($field_name, $param);
             break;
+        
         case "greater":
             $result = $this->validate_greater_condition($field_name, $param);
             break;
+        
         case "greater_equal":
             $result = $this->validate_greater_equal_condition($field_name, $param);
             break;
+        
         case "simple_url":
             $result = $this->validate_simple_url_condition($field_name, $param);
             break;
+        
         case "has_substring":
             $result = $this->validate_has_substring_condition($field_name, $param);
             break;
+        
         case "uploaded_file_types":
             $type = get_param_value($param, "type", "files");
             $custom_types_str = get_param_value($param, "custom_types", "*");
@@ -2183,6 +2263,7 @@ class DbObject extends AppObject {
                 $file_types_allowed
             );
             break;
+        
         default:
             $result = true;
         }
@@ -2420,6 +2501,7 @@ class DbObject extends AppObject {
                 $dependent_validate_condition_str
             );
             break;
+        
         default:
             $validate_condition_str = null;
         }

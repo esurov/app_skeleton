@@ -574,24 +574,41 @@ function parse_date_by_format($format, $value) {
             case "Y":
                 $date_parts["year"] = (int) $date_parts_unordered[$p++];
                 break;
+            
+            case "y": 
+                $year = (int) $date_parts_unordered[$p++];
+                if ($year < 70) {
+                    $year += 2000;    
+                } else {
+                    $year += 1900;
+                }
+                $date_parts["year"] = $year;
+                break;
+
             case "m":
                 $date_parts["month"] = (int) $date_parts_unordered[$p++];
                 break;
+            
             case "d":
                 $date_parts["day"] = (int) $date_parts_unordered[$p++];
                 break;
-            case "h":
-                $date_parts["hour"] = (int) $date_parts_unordered[$p++];
-                break;
+            
             case "H":
                 $date_parts["hour"] = (int) $date_parts_unordered[$p++];
                 break;
+            
+            case "h":
+                $date_parts["hour"] = (int) $date_parts_unordered[$p++];
+                break;
+            
             case "i":
                 $date_parts["minute"] = (int) $date_parts_unordered[$p++];
                 break;
+            
             case "s":
                 $date_parts["second"] = (int) $date_parts_unordered[$p++];
                 break;
+            
             case "t":
                 $hour = $date_parts["hour"];
                 $am_pm_str = strtoupper($date_parts_unordered[$p++]);
@@ -637,36 +654,51 @@ function create_date_regexp_by_format($format) {
         case "Y":
             $res .= '(\d{1,4})';
             break;
+
+        case "y":
+            $res .= '(\d{1,2})';
+            break;
+
         case "m":
             $res .= '(\d{1,2})';
             break;
+        
         case "d":
             $res .= '(\d{1,2})';
             break;
-        case "h":
-            $res .= '(\d{1,2})';
-            break;
+        
         case "H":
             $res .= '(\d{1,2})';
             break;
+        
+        case "h":
+            $res .= '(\d{1,2})';
+            break;
+        
         case "i":
             $res .= '(\d{1,2})';
             break;
+        
         case "s":
             $res .= '(\d{1,2})';
             break;
+        
         case "t":
             $res .= '(AM|PM)?';
             break;
+        
         case ".":
             $res .= '\.';
             break;
+        
         case "/":
             $res .= '\/';
             break;
+        
         case "\\":
             $res .= "\\\\";
             break;
+        
         default:
             $res .= $format_char;
         }
@@ -685,16 +717,30 @@ function create_date_by_format($format, $date_parts, $date_if_unknown) {
         case "Y":
             $res .= sprintf("%04d", $date_parts["year"]);
             break;
+
+        case "y":
+            $year = $date_parts["year"];
+            if ($year < 2000) {
+                $year -= 1900;
+            } else {
+                $year -= 2000;
+            }
+            $res .= sprintf("%02d", $year);
+            break;
+
         case "m":
             $res .= sprintf("%02d", $date_parts["month"]);
             break;
+        
         case "d":
             $res .= sprintf("%02d", $date_parts["day"]);
             break;
-        case "h":
+        
+        case "H":
             $res .= sprintf("%02d", $date_parts["hour"]);
             break;
-        case "H":
+        
+        case "h":
             $hour = $date_parts["hour"];
             if ($hour <= 12) {
                 $am_pm_str = "AM";
@@ -707,15 +753,19 @@ function create_date_by_format($format, $date_parts, $date_if_unknown) {
             }
             $res .= sprintf("%02d", $hour);
             break;
+        
         case "i":
             $res .= sprintf("%02d", $date_parts["minute"]);
             break;
+        
         case "s":
             $res .= sprintf("%02d", $date_parts["second"]);
             break;
+        
         case "t":
             $res .= sprintf("%s", $am_pm_str);
             break;
+        
         default:
             $res .= $format_char;
         }

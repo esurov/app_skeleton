@@ -151,12 +151,15 @@ class Pager extends AppComponent {
         case "prev_next":
             $nav_str = $this->_create_prev_next_nav_str();
             break;
+        
         case "exponential":
             $nav_str = $this->_create_exponential_nav_str();
             break;
+        
         case "exponential_prev_next":
             $nav_str = $this->_create_exponential_prev_next_nav_str();
             break;
+        
         default:
             $nav_str = "";
         }
