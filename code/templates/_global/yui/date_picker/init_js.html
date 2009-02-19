@@ -1,48 +1,7 @@
 <script type="text/javascript">
     (function() {
-        var datePickerConfig = {
-            formatDate: '{%global:calendar_date_format%}',
-            navigator: {
-                strings: {
-                    month: '{%global:calendar_choose_month%}',
-                    year: '{%global:calendar_enter_year%}',
-                    submit: '{%global:calendar_submit%}',
-                    cancel: '{%global:calendar_cancel%}',
-                    invalidYear: '{%global:calendar_message_year_bad%}'
-                },
-                initialFocus: 'month'
-            },
-            MONTHS_LONG: [
-                '{%global:month_long_1%}',
-                '{%global:month_long_2%}',
-                '{%global:month_long_3%}',
-                '{%global:month_long_4%}',
-                '{%global:month_long_5%}',
-                '{%global:month_long_6%}',
-                '{%global:month_long_7%}',
-                '{%global:month_long_8%}',
-                '{%global:month_long_9%}',
-                '{%global:month_long_10%}',
-                '{%global:month_long_11%}',
-                '{%global:month_long_12%}'
-            ],
-            WEEKDAYS_SHORT: [
-                '{%global:weekday_short_0%}',
-                '{%global:weekday_short_1%}',
-                '{%global:weekday_short_2%}',
-                '{%global:weekday_short_3%}',
-                '{%global:weekday_short_4%}',
-                '{%global:weekday_short_5%}',
-                '{%global:weekday_short_6%}'
-            ],
-            START_WEEKDAY: 1,
-            HIDE_BLANK_WEEKS: true//, 
-            // title: "Title",
-            // pages: 3,
-            // close: true, 
-            // MULTI_SELECT: true, 
-            // button_caption: "Select Date"
-        };
+        {{_global/yui/date_picker/_config_js}}
+
         var dateInputElements = YAHOO.util.Dom.getElementsByClassName("date", "input");
         for (var i = 0; i < dateInputElements.length; i++) {
             createDatePicker(dateInputElements[i], datePickerConfig);

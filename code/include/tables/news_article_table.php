@@ -71,6 +71,26 @@ class NewsArticleTable extends CustomDbObject {
                 "news_article.body_{$this->app->lang}",
             ),
         ));
+
+        $this->insert_filter(array(
+            "name" => "created_date",
+            "relation" => "greater_equal",
+            "input" => array(
+                "type_attrs" => array(
+                    "class" => "date_range",
+                ),
+            ),
+        ));
+
+        $this->insert_filter(array(
+            "name" => "created_date",
+            "relation" => "less_equal",
+            "input" => array(
+                "type_attrs" => array(
+                    "class" => "date_range",
+                ),
+            ),
+        ));
     }
 //
     function del() {

@@ -15,11 +15,13 @@
     <link rel="alternate" type="application/rss+xml" title="{%global:news_article.rss_feed.title%}"
         href="{%sys:self_url%}?action=news_articles_rss" />
 
+    <script type="text/javascript" src="{%sys:self_url%}js/lib.js"></script>
+
+    {%include_yui_core_js%}
+    
     <!--[if lte IE 6]>
     <script type="text/javascript" src="{%sys:self_url%}js/minmax.js"></script>
     <![endif]-->
-    <script type="text/javascript" src="{%sys:self_url%}js/lib.js"></script>
-    {%include_yui_core_js%}
 </head>
 <body>
 <div id="all">

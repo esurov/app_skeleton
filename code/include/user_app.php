@@ -1044,6 +1044,7 @@ class UserApp extends CustomApp {
         $templates_dir = "newsletters_admin";
 
         $newsletter =& $this->create_db_object("Newsletter");
+        $newsletter->insert_filters();
         $newsletters_list =& $this->create_object(
             "PagedQueryObjectsList",
              array(

@@ -82,7 +82,9 @@ class NewsletterTable extends CustomDbObject {
             "obj_class" => "NewsletterCategory",
             "field" => "name",
         ));
+    }
 //
+    function insert_filters() {
         $this->insert_filter(array(
             "name" => "full_text",
             "relation" => "like_many",
@@ -108,6 +110,26 @@ class NewsletterTable extends CustomDbObject {
                         ),
                         "captions_field_name" => "name",
                     ),
+                ),
+            ),
+        ));
+
+        $this->insert_filter(array(
+            "name" => "sent_date",
+            "relation" => "greater_equal",
+            "input" => array(
+                "type_attrs" => array(
+                    "class" => "date_range",
+                ),
+            ),
+        ));
+
+        $this->insert_filter(array(
+            "name" => "sent_date",
+            "relation" => "less_equal",
+            "input" => array(
+                "type_attrs" => array(
+                    "class" => "date_range",
                 ),
             ),
         ));

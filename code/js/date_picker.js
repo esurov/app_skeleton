@@ -15,7 +15,6 @@ DatePicker.prototype = {
     init : function(inputElement, config) {
         this.config = config;
         this.config.formatDate = this.config.formatDate || 'Y-m-d';
-        this.config.max_2000_date = this.config.max_2000_date || 70;
         this.config.button_class = this.config.button_class || 'date_picker_button';
         this.config.button_caption = this.config.button_caption || '';
         this.config.calendar_container_class =
@@ -31,6 +30,7 @@ DatePicker.prototype = {
             this._calendarContainerElement,
             this.config
         );
+        this._calendar.selectEvent.subscribe(this.onCalendarDateSelect, this, true);
         this._calendar.beforeShowEvent.subscribe(this.onBeforeShowCalendar, this, true);
         this._calendar.hideEvent.subscribe(this.onHideCalendar, this, true);
         this._calendar.render();
@@ -109,26 +109,28 @@ DatePicker.prototype = {
         }, 300);
     },
 
-    setCalendarDate : function() {
+    setCalendarDate : function(shouldRender) {
         var selectedDate = parseDateByFormat(this.config.formatDate, this._inputElement.value);
         if (selectedDate.year == 0) {
             writeLog('Year is not valid' , 'warn');
-            return;
+        } else {
+            var date = new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day);
+
+            // Unsubscribe from select event so its handler will not be
+            // executed after Calendar.select() call
+            this._calendar.selectEvent.unsubscribe(this.onCalendarDateSelect, this);
+
+            this._calendar.deselectAll();
+            this._calendar.select(date);
+            this._calendar.setMonth(date.getMonth());
+            this._calendar.setYear(date.getFullYear());
+
+            // Restore select event handler
+            this._calendar.selectEvent.subscribe(this.onCalendarDateSelect, this, true);
         }
-        var date = new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day);
-
-        // Unsubscribe from select event so its handler will not be
-        // executed after Calendar.select() call
-        this._calendar.selectEvent.unsubscribe(this.onCalendarDateSelect, this);
-
-        this._calendar.deselectAll();
-        this._calendar.select(date);
-        this._calendar.setMonth(date.getMonth());
-        this._calendar.setYear(date.getFullYear());
-        this._calendar.render();
-
-        // Restore select event handler
-        this._calendar.selectEvent.subscribe(this.onCalendarDateSelect, this, true);
+        if (shouldRender == null || shouldRender == true) {
+            this._calendar.render();
+        }
     },
 
     showOrHideCalendar : function() {
@@ -174,21 +176,127 @@ DatePicker.prototype = {
         return fullscreenLayerElement;
     }
 
-//    setParamsFromDependency : function() {
-//        if (this.config.dependency_mindate) {
-//            var mindateCalendar = this.config.dependency_mindate;
-//            var dates = mindateCalendar.getSelectedDates();
-//            var mindate = createDateByFormat('Y-m-d', dates[0], '0000-00-00');
-//            _calendar.mindate = mindate;
-//        }
-//    }
-
 };
 
 function createDatePicker(inputElement, config) {
     YAHOO.util.Event.onDOMReady(function() {
         writeLog('Creating DatePicker for input ' + inputElement.name,  'info');
         new DatePicker(inputElement, config);
+    });
+}
+//
+
+function DateRangePicker(inputElement, rangeFromInputElement, rangeToInputElement, config) {
+    // DateRangePicker.superclass.constructor.call(this, inputElement, config);
+    this.init(inputElement, rangeFromInputElement, rangeToInputElement, config);
+}
+
+YAHOO.lang.extend(DateRangePicker, DatePicker, {
+
+    _rangeFromInputElement : null,
+    _rangeToInputElement : null,
+    _minDateTimer : null,
+    _maxDateTimer : null,
+
+    init : function(inputElement, rangeFromInputElement, rangeToInputElement, config) {
+        DateRangePicker.superclass.init.call(this, inputElement, config);
+
+        this._rangeFromInputElement = rangeFromInputElement;
+        this._rangeToInputElement = rangeToInputElement;
+
+        if (this._rangeFromInputElement != null) {
+            YAHOO.util.Event.addListener(
+                this._rangeFromInputElement,
+                'keypress',
+                this.setCalendarMinDateAfterTimeout,
+                this,
+                true
+            );
+        }
+        if (this._rangeToInputElement != null) {
+            YAHOO.util.Event.addListener(
+                this._rangeToInputElement,
+                'keypress',
+                this.setCalendarMaxDateAfterTimeout,
+                this,
+                true
+            );
+        }
+    },
+
+    setCalendarMinDateAfterTimeout : function() {
+        clearTimeout(this._minDateTimer);
+
+        var that = this;
+        this._minDateTimer = setTimeout(function() {
+            that.setCalendarMinDate();
+        }, 300);
+    },
+    
+    setCalendarMinDate : function(shouldRender) {
+        if (this._rangeFromInputElement == null) {
+            return;
+        }
+        var minDate = parseDateByFormat(this.config.formatDate, this._rangeFromInputElement.value);
+        var minDateNew = null;
+        if (minDate.year != 0) {
+            minDateNew = new Date(minDate.year, minDate.month - 1, minDate.day);
+        }
+        this._calendar.cfg.setProperty('mindate', minDateNew);
+        if (shouldRender == null || shouldRender == true) {
+            this._calendar.render();
+        }
+    },
+
+    setCalendarMaxDateAfterTimeout : function() {
+        clearTimeout(this._maxDateTimer);
+
+        var that = this;
+        this._maxDateTimer = setTimeout(function() {
+            that.setCalendarMaxDate();
+        }, 300);
+    },
+    
+    setCalendarMaxDate : function(shouldRender) {
+        if (this._rangeToInputElement == null) {
+            return;
+        }
+        var maxDate = parseDateByFormat(this.config.formatDate, this._rangeToInputElement.value);
+        var maxDateNew = null;
+        if (maxDate.year != 0) {
+            maxDateNew = new Date(maxDate.year, maxDate.month - 1, maxDate.day);
+        }
+        this._calendar.cfg.setProperty('maxdate', maxDateNew);
+        if (shouldRender == null || shouldRender == true) {
+            this._calendar.render();
+        }
+    },
+
+    onBeforeShowCalendar : function() {
+        this.setCalendarMinDate(false);
+        this.setCalendarMaxDate(false);
+
+        DateRangePicker.superclass.onBeforeShowCalendar.call(this);
+    }
+
+});
+
+function createDateRangePickers(rangeFromInputElement, rangeToInputElement, config) {
+    YAHOO.util.Event.onDOMReady(function() {
+        writeLog('Creating DateRangePicker for input ' + rangeFromInputElement.name,  'info');
+        new DateRangePicker(
+            rangeFromInputElement,
+            null,
+            rangeToInputElement,
+            config
+        );
+        writeLog('Creating DateRangePicker for input ' + rangeToInputElement.name,  'info');
+        new DateRangePicker(
+            rangeToInputElement,
+            rangeFromInputElement,
+            null,
+            config
+        );
     });
 }
 

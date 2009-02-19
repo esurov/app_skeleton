@@ -1,3 +1,5 @@
+{{_global/yui/date_picker/include_js}}
+
 <form
     action="?"
     method="get"
@@ -20,8 +22,25 @@
                 <th>{%global:newsletter.category%}:</th>
                 <td>{%newsletter.newsletter_category_id.equal.input%}</td>
             </tr>
+            <tr>
+                <th>{%global:newsletter.sent_date%}:</th>
+                <td>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <th>{%global:from%}:</th>
+                                <td>{%newsletter.sent_date.greater_equal.input%}</td>
+                                <th>{%global:to%}:</th>
+                                <td>{%newsletter.sent_date.less_equal.input%}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
         </tbody>
     </table>
     <input type="submit" name="submit_btn" value="{%global:filter%}" />
 
 </form>
+
+{{_global/yui/date_picker/init_range_js}}

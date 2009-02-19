@@ -208,7 +208,7 @@ a img {
     width: 100px;
 }
 
-.date {
+.date, .date_range {
     width: 80px;
 }
 

@@ -14,7 +14,17 @@
     background-color: #ffe0e0;
 }
 
-.yui-calendar tbody tr td.today {
+.yui-calendar td.calcell.today {
     background-color: #fffbe3;
-    border: 1px solid #e0e0e0 !important;
+    border: 1px solid #e09900;
+}
+
+.yui-calendar td.calcell.selected, .yui-calendar td.calcell.calcellhover {
+    background-color: #fff19f;
+    border: 1px solid #ff9900;
+    color: #003db8;
+}
+
+.yui-calendar td.calcell.calcellhover a {
+    color: #003db8;
 }

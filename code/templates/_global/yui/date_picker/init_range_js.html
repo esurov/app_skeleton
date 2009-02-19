@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    (function() {
+        {{_global/yui/date_picker/_config_js}}
+
+        var dateRangeInputElements = YAHOO.util.Dom.getElementsByClassName('date_range', 'input');
+        var dateRangeFromInputElements = [];
+        var dateRangeToInputElements = [];
+        for (var i = 0; i < dateRangeInputElements.length; i++) {
+            if (i % 2 == 0) {
+                dateRangeFromInputElements[dateRangeFromInputElements.length] =
+                    dateRangeInputElements[i];
+            } else {
+                dateRangeToInputElements[dateRangeToInputElements.length] =
+                    dateRangeInputElements[i];
+            }
+        }
+    
+        for (i = 0; i < dateRangeFromInputElements.length; i++) {
+//            createDateRangePickers(null, null, null);
+            createDateRangePickers(
+                dateRangeFromInputElements[i],
+                dateRangeToInputElements[i],
+                datePickerConfig
+            );
+        }
+    })();
+</script>
