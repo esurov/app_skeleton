@@ -1557,11 +1557,18 @@ class DbObject extends AppObject {
     }
 
     function get_filter_suburl_param($filter_info, $input_name_prefix = null) {
-        $filter_name = $filter_info["name"];
-        $filter_relation = $filter_info["relation"];
-        $filter_value = $filter_info["value"];
-        $suburl_param_name = "{$input_name_prefix}_{$filter_name}_{$filter_relation}";
-        return array($suburl_param_name => $filter_value);
+        if ($this->is_filter_nonset($filter_info)) {
+            $suburl_param = array();
+        } else {
+            $filter_name = $filter_info["name"];
+            $filter_relation = $filter_info["relation"];
+            $filter_value = $filter_info["value"];
+            $suburl_param = array(
+                "{$input_name_prefix}_{$filter_name}_{$filter_relation}" => $filter_value,
+            );
+        }
+
+        return $suburl_param;
     }
 //
     function read_order_by($default_order_by_fields) {

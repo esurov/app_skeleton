@@ -187,12 +187,18 @@ class PagedQueryObjectsList extends QueryObjectsList {
         if ($this->pager_visible) {
             $pager_n_rows_per_page = get_param_value($params, "pager.n_rows_per_page", null);
             $pager_type = get_param_value($params, "pager.type", null);
+            $pager_show_one_page = get_param_value($params, "pager.show_one_page", null);
             $pager_pages_title_str = get_param_value($params, "pager.pages_title_str", null);
             $pager_prev_page_str = get_param_value($params, "pager.prev_page_str", null);
             $pager_next_page_str = get_param_value($params, "pager.next_page_str", null);
             $pager_page_begin_str = get_param_value($params, "pager.page_begin_str", null);
             $pager_page_end_str = get_param_value($params, "pager.page_end_str", null);
             $pager_delimiter_str = get_param_value($params, "pager.delimiter_str", null);
+            $pager_ignored_suburl_params = get_param_value(
+                $params,
+                "pager.ignored_suburl_params",
+                null
+            );
         }
 
         $this->filter_form_visible = get_param_value($params, "filter_form.visible", false);
@@ -247,13 +253,20 @@ class PagedQueryObjectsList extends QueryObjectsList {
             if ($n_objects_total == 0) {
                 $this->pager_visible = false;
             } else {
+                $pager_suburl_params = $this->_action_filters_order_by_suburl_params;
+                if (!is_null($pager_ignored_suburl_params)) {
+                    foreach ($pager_ignored_suburl_params as $pager_ignored_suburl_param) {
+                        unset($pager_suburl_params[$pager_ignored_suburl_param]);
+                    }
+                }
                 $this->pager =& $this->create_object(
                     "Pager",
                     array(
                         "n_total_rows" => $n_objects_total,
                         "n_rows_per_page" => $pager_n_rows_per_page,
-                        "suburl_params" => $this->_action_filters_order_by_suburl_params,
+                        "suburl_params" => $pager_suburl_params,
                         "type" => $pager_type,
+                        "show_one_page" => $pager_show_one_page,
                         "pages_title_str" => $pager_pages_title_str,
                         "prev_page_str" => $pager_prev_page_str,
                         "next_page_str" => $pager_next_page_str,

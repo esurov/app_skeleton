@@ -9,18 +9,18 @@
     <meta http-equiv="Page-Exit" content="progid:DXImageTransform.Microsoft.Fade(Duration=0.2)" />
     <meta http-equiv="imagetoolbar" content="no" />
 
-    <link rel="stylesheet" type="text/css" href="{%sys:self_url%}css/common.css" />
-    <link rel="stylesheet" type="text/css" href="{%sys:self_url%}css/user.css" />
+    <link rel="stylesheet" type="text/css" href="{%sys:self_path%}css/common.css" />
+    <link rel="stylesheet" type="text/css" href="{%sys:self_path%}css/user.css" />
 
     <link rel="alternate" type="application/rss+xml" title="{%global:news_article.rss_feed.title%}"
-        href="{%sys:self_url%}?action=news_articles_rss" />
+        href="{%sys:self_path%}?action=news_articles_rss" />
 
-    <script type="text/javascript" src="{%sys:self_url%}js/lib.js"></script>
+    <script type="text/javascript" src="{%sys:self_path%}js/lib.js"></script>
 
     {%include_yui_core_js%}
     
     <!--[if lte IE 6]>
-    <script type="text/javascript" src="{%sys:self_url%}js/minmax.js"></script>
+        <script type="text/javascript" src="{%sys:self_path%}js/minmax.js"></script>
     <![endif]-->
 </head>
 <body>
@@ -28,9 +28,9 @@
     <div class="header">
         {%login_state%}
         {%lang_menu%}
-        <a href="./"
+        <a href="{%sys:self_path%}"
             ><img
-                src="{%sys:self_url%}images/logo.gif"
+                src="{%sys:self_path%}images/logo.gif"
                 alt="{%global:head_page_title.app%}"
                 title="{%global:head_page_title.app%}"
             /></a>
@@ -49,7 +49,7 @@
         <p>
             <a href="http://validator.w3.org/check?uri=referer"
                 ><img
-                    src="{%sys:self_url%}images/valid-xhtml10.png"
+                    src="{%sys:self_path%}images/valid-xhtml10.png"
                     alt="Valid XHTML 1.0 Transitional"
                     width="88" height="31"
                     border="0"

@@ -77,24 +77,30 @@ function create_suburl($params = array(), $params_delimiter = "&") {
     return join($params_delimiter, $pairs);
 }
 
-function create_self_url($params = array(), $lang = null) {
-    $params_suburl = create_suburl($params);
-    
-    $script_path = dirname($_SERVER["SCRIPT_NAME"]);
-    if ($script_path == "/" || $script_path == "\\") {
-        $script_path = "";
+function create_self_path($lang = null) {
+    $self_script_path = dirname($_SERVER["SCRIPT_NAME"]);
+    if ($self_script_path == "/" || $self_script_path == "\\") {
+        $self_script_path = "";
     }
-    $script_name = basename($_SERVER["SCRIPT_NAME"]);
-
+    
     $lang_path = (is_null($lang)) ? "" : "{$lang}/";
+    
+    return "{$self_script_path}/{$lang_path}";
+}
 
-    $self_suburl = ($script_name == "index.php") ?
-        "{$script_path}/{$lang_path}" :
-        "{$script_path}/{$lang_path}{$script_name}";
+function create_self_url($params = array(), $lang = null) {
+    $self_path = create_self_path($lang);
+    $self_script_name = basename($_SERVER["SCRIPT_NAME"]);
+
+    $self_url = ($self_script_name == "index.php") ?
+        $self_path :
+        "{$self_path}{$self_script_name}";
+    
     if (count($params) == 0) {
-        return $self_suburl;            
+        return $self_url;
     } else {
-        return "{$self_suburl}?{$params_suburl}";
+        $params_suburl = create_suburl($params);
+        return "{$self_url}?{$params_suburl}";
     }
 }
 

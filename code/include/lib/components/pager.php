@@ -18,6 +18,9 @@ class Pager extends AppComponent {
     // "prev_next", "exponential" or "exponential_prev_next"
     var $type;
 
+    // Whether to show pager if there is just one page
+    var $show_one_page;
+
     // Pages title
     var $pages_title_str;
 
@@ -64,6 +67,14 @@ class Pager extends AppComponent {
         $this->type = get_param_value($params, "type", null);
         if (is_null($this->type)) {
             $this->type = "exponential_prev_next";
+        }
+
+        $this->show_one_page = get_param_value($params, "show_one_page", null);
+        if (is_null($this->show_one_page)) {
+            $this->show_one_page = $this->get_config_value(
+                "{$this->app->app_name}.pager.show_one_page",
+                1
+            );
         }
 
         $this->pages_title_str = get_param_value($params, "pages_title_str", null);
@@ -117,6 +128,9 @@ class Pager extends AppComponent {
         $this->suburl_params = $suburl_params;
 
         $this->_suburl_params_str = create_suburl($this->suburl_params, "&amp;");
+        if (count($this->suburl_params) != 0) {
+            $this->_suburl_params_str .= "&amp;";
+        }
     }
 //
     function get_query_ex() {
@@ -147,21 +161,25 @@ class Pager extends AppComponent {
     }
 //
     function print_values() {
-        switch ($this->type) {
-        case "prev_next":
-            $nav_str = $this->_create_prev_next_nav_str();
-            break;
-        
-        case "exponential":
-            $nav_str = $this->_create_exponential_nav_str();
-            break;
-        
-        case "exponential_prev_next":
-            $nav_str = $this->_create_exponential_prev_next_nav_str();
-            break;
-        
-        default:
+        if (!$this->show_one_page && $this->_n_total_pages <= 1) {
             $nav_str = "";
+        } else {
+            switch ($this->type) {
+            case "prev_next":
+                $nav_str = $this->_create_prev_next_nav_str();
+                break;
+            
+            case "exponential":
+                $nav_str = $this->_create_exponential_nav_str();
+                break;
+            
+            case "exponential_prev_next":
+                $nav_str = $this->_create_exponential_prev_next_nav_str();
+                break;
+            
+            default:
+                $nav_str = "";
+            }
         }
         $this->app->print_raw_value("nav_str", $nav_str);
         return $nav_str;
@@ -206,7 +224,7 @@ class Pager extends AppComponent {
         $page_offset = $this->_get_page_offset($page);
         return
             "{$this->page_begin_str}" .
-            "<a href=\"?{$this->_suburl_params_str}&amp;offset={$page_offset}\">{$page}</a>" .
+            "<a href=\"?{$this->_suburl_params_str}offset={$page_offset}\">{$page}</a>" .
             "{$this->page_end_str}\n";
     }
 
@@ -216,7 +234,7 @@ class Pager extends AppComponent {
         } else {
             $prev_page_offset = $this->_get_page_offset($this->_current_page - 1);
             return
-                "<a href=\"?{$this->_suburl_params_str}&amp;offset={$prev_page_offset}\">" .
+                "<a href=\"?{$this->_suburl_params_str}offset={$prev_page_offset}\">" .
                 "{$this->prev_page_str}</a>\n";
         }
     }
@@ -227,7 +245,7 @@ class Pager extends AppComponent {
         } else {
             $next_page_offset = $this->_get_page_offset($this->_current_page + 1);
             return
-                "<a href=\"?{$this->_suburl_params_str}&amp;offset={$next_page_offset}\">" .
+                "<a href=\"?{$this->_suburl_params_str}offset={$next_page_offset}\">" .
                 "{$this->next_page_str}</a>\n";
         }
     }
