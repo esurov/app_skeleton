@@ -3,7 +3,8 @@
 define("_APP_DIR", dirname(__FILE__));
 
 set_time_limit(0);  // turned off
-error_reporting(E_ALL);
+// Using value from global .htaccess
+// error_reporting(E_ALL); 
 
 require_once(_APP_DIR . "/lib/_init.php");
 
