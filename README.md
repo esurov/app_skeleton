@@ -19,8 +19,8 @@ while adhering to best practices and industry standards.
 To get started with *AppSkeleton*, simply clone the repository or download the latest release from GitHub.
 Then, run composer install to install any dependencies.
 
-```
-git clone https://github.com/your-username/app-skeleton.git
+```bash
+git clone https://github.com/esurov/app-skeleton.git
 cd app-skeleton
 composer install
 ```
