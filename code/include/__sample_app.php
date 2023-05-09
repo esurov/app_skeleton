@@ -2,8 +2,8 @@
 
 class SampleApp extends CustomApp {
 
-    function SampleApp() {
-        parent::CustomApp("SampleApp", "_sample_app");
+    function __construct() {
+        parent::__construct("SampleApp", "_sample_app");
 
         $e = array("roles" => array("guest"));
 
