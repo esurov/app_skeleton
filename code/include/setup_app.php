@@ -2,8 +2,8 @@
 
 class SetupApp extends CustomApp {
 
-    function SetupApp() {
-        parent::CustomApp("SetupApp", "setup_app");
+    function __construct() {
+        parent::__construct("SetupApp", "setup_app");
 
         $a = array("roles" => array("admin"));
 

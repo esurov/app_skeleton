@@ -2,8 +2,8 @@
 
 class CustomApp extends App {
 
-    function CustomApp($app_class_name, $app_name) {
-        parent::App($app_class_name, $app_name);
+    function __construct($app_class_name, $app_name) {
+        parent::__construct($app_class_name, $app_name);
     }
 //
     function action_get_security_image() {

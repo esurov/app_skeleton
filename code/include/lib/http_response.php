@@ -62,7 +62,7 @@ class HttpResponse {
     var $headers;
     var $cookies;
 
-    function HttpResponse() {
+    function __construct() {
         $this->headers = array();
         $this->cookies = array();
     }
@@ -82,7 +82,7 @@ class HttpResponse {
     }
 
     function push_headers($headers) {
-        $this->headers = array_merge($headers, $this->headers);
+        $this->headers = array_merge($headers, (array) $this->headers);
     }
 
     function add_no_cache_headers() {

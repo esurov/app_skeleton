@@ -5,8 +5,8 @@ class UserApp extends CustomApp {
     // Current logged in user
     var $user;
 
-    function UserApp() {
-        parent::CustomApp("UserApp", "user_app");
+    function __construct() {
+        parent::__construct("UserApp", "user_app");
 
         $this->use_cur_lang_from_cgi = true;
 

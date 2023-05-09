@@ -10,7 +10,7 @@ function v($var, $dump_all = false) {
                 $var_to_dump = array();
                 foreach ($var->_fields as $field_name => $field_info) {
                     if ($field_info["create"]) {
-                        $var_to_dump[$field_name] = $var->{$field_name};
+                        $var_to_dump[$field_name] = $var->$field_name;
                     }
                 }
             }
@@ -575,7 +575,7 @@ function parse_date_by_format($format, $value) {
         $p = 1;
         $format_len = strlen($format);
         for ($i = 0; $i < $format_len; $i++) {
-            $format_char = $format{$i};
+            $format_char = $format[$i];
             switch ($format_char) {
             case "Y":
                 $date_parts["year"] = (int) $date_parts_unordered[$p++];
@@ -655,7 +655,7 @@ function create_date_regexp_by_format($format) {
     $res = "/";
     $format_len = strlen($format);
     for ($i = 0; $i < $format_len; $i++) {
-        $format_char = $format{$i};
+        $format_char = $format[$i];
         switch ($format_char) {
         case "Y":
             $res .= '(\d{1,4})';
@@ -718,7 +718,7 @@ function create_date_by_format($format, $date_parts, $date_if_unknown) {
     $res = "";
     $format_len = strlen($format);
     for ($i = 0; $i < $format_len; $i++) {
-        $format_char = $format{$i};
+        $format_char = $format[$i];
         switch ($format_char) {
         case "Y":
             $res .= sprintf("%04d", $date_parts["year"]);

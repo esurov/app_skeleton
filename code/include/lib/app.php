@@ -37,7 +37,7 @@ class App extends AppObject {
     var $action_params;
 
     function App($app_class_name, $app_name) {
-        parent::AppObject();
+        parent::__construct();
 
         $this->set_class_name($app_class_name); 
         $this->app_name = $app_name;
@@ -67,7 +67,7 @@ class App extends AppObject {
     }
 
     function create_config() {
-        $this->config =& new Config();
+        $this->config = new Config();
         $this->config->read("config/app.cfg");
     }
 
@@ -80,7 +80,7 @@ class App extends AppObject {
     }
 
     function create_db() {
-        $sql_config =& new Config();
+        $sql_config = new Config();
         $sql_config->read("config/sql.cfg");
 
         $this->db =& $this->create_object(
@@ -123,7 +123,7 @@ class App extends AppObject {
         // Sentry redirect
         if ($this->use_cur_lang_from_cgi) {
             if (is_null($this->get_current_lang_from_cgi())) {
-                $redirect_response =& new RedirectResponse(
+                $redirect_response = new RedirectResponse(
                     create_self_full_url(
                         array(),
                         $this->lang
@@ -207,8 +207,8 @@ class App extends AppObject {
             }
         }
         
-        $obj =& new $class_name();
-        if (is_subclass_of($obj, "Object")) {
+        $obj = new $class_name();
+        if (is_subclass_of($obj, "BaseAppObject")) {
             $obj->set_class_name($class_name_without_suffix, $class_name_suffix);
             $init_obj_params = get_param_value($class_info, "params", null);
             if (!is_null($init_obj_params)) {
@@ -271,7 +271,7 @@ class App extends AppObject {
         $this->create_current_user();
 
         // Read action name
-        $this->action = trim(param("action"));
+        $this->action = trim((string) param("action"));
         if ($this->action == "") {
             $this->action = $this->get_default_action_name();
         }

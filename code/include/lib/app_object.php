@@ -1,11 +1,11 @@
 <?php
 
-class Object {
+class BaseAppObject {
     
     var $_class_name;
     var $_class_name_without_suffix;
 
-    function Object() {
+    function __construct() {
     }
 
     function _init($params) {
@@ -26,12 +26,12 @@ class Object {
 
 }
 
-class AppObject extends Object {
+class AppObject extends BaseAppObject {
     
     var $app;
 
-    function AppObject() {
-        parent::Object();
+    function __construct() {
+        parent::__construct();
     }
 
     function _init($params) {
