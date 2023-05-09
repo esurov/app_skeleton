@@ -54,6 +54,11 @@ We've defined a single method called `index` that renders a view called `home/in
 For more information on how to use `AppSkeleton`, please refer to the official documentation, located in the *docs/* directory of the framework.
 Additionally, you can browse the source code for examples of how to use the various features and libraries provided by the framework.
 
+## History
+
+The AppSkeleton was created by [@akozeka]( https://github.com/akozeka ) back in 2006 and based on Anahoret PHP Lib also known as [torba]( https://sourceforge.net/projects/torba ).
+
+
 ## Contributing
 If you find a bug or would like to contribute to the framework, please open an issue or submit a pull request on GitHub.
 We welcome all contributions and appreciate your help in making `AppSkeleton` even better!
